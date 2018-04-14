@@ -70,7 +70,7 @@ CROP = {
         MOVE: {
             LARGE: {
                 SIZE : (256,256),
-                'start': (2,70),
+                'start': (2,38),
                 'sub'  : (32,32),
                 },
             
@@ -92,7 +92,7 @@ CROP = {
             
         MOVE: {
             SIZE : (256,256),
-            'start': (2,70),
+            'start': (2,38),
             'sub'  : (32,32),
             },            
         },
@@ -108,14 +108,16 @@ def composite(img, alpha=True):
     h1,w1,c1 = img.shape
 
     #Head layer
-    c1 = crop(img, (0,0), (w1//2,h1))         #Color
-    m1 = crop(img, (w1//2,0), (w1//2,h1))     #Mask
-    m1 = cv2.cvtColor(m1, cv2.COLOR_RGB2BGR)  #Fix color
-    g1 = cv2.cvtColor(m1, cv2.COLOR_BGR2GRAY) #Grayscale
+    c1 = crop(img, (0,0), (w1//2,h1))         #Colored layer
+    m1 = crop(img, (w1//2,0), (w1//2,h1))     #Masking layer
+    m1 = cv2.cvtColor(m1, cv2.COLOR_RGB2BGR)  #Fix mask's color format
+    g1 = cv2.cvtColor(m1, cv2.COLOR_BGR2GRAY) #Change mask to grayscale
 
     outputs = {}
     colors = [c for c in get_colors(g1) if c not in IGNORE]
+    
     for col in colors:
+        #Use grayscale bitwise masking
         m = make_mask(m1,col)
         n = apply_mask(c1,m)
 
@@ -124,6 +126,7 @@ def composite(img, alpha=True):
             bChannel, gChannel, rChannel = cv2.split(n)
             aChannel = np.ones(bChannel.shape, dtype=bChannel.dtype) * 255
             n = cv2.merge((bChannel,gChannel,rChannel,aChannel))
+            
         outputs[col] = n
 
     return outputs
@@ -137,7 +140,7 @@ def crop(img, start, size):
 
 
 def fix_paths(outdir, name, color):
-    #Fixes output directories
+    #Fixes output directories (rigid, I don't really care)
     if not os.path.isdir(outdir):
         os.makedirs(outdir)
 
@@ -170,7 +173,6 @@ def make_mask(im, thresh, maxval=255):
     return t
 
 
-#def main(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
 def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR):
     #Main processing method
     images = {}
