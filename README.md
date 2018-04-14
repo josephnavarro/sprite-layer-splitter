@@ -22,7 +22,7 @@ input sprite sheets have to be <b>split</b> into components first. So yeah.
 `<head-size>` Either one of `small` or `large`<br>
 `<output-dir>` Subdirectory in `outputs`<br>
 
-Head size must be manually specified. Mounted units (cavalry, pegasus, wyvern, etc.) use small heads, while infantry and armored units use the larger heads.
+Head size must be manually specified as either `small` or `large`. Mounted units (cavalry, pegasus, wyvern, etc.) use small heads, while infantry and armored units use the larger heads.
 
 ## Dependencies
 * **[Python](https://www.python.org/)** 3.4+
