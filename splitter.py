@@ -30,6 +30,11 @@ IDLE     = 'idle'
 MOVE     = 'move'
 SIZE     = 'size'
 
+HEAD_IDLE_SIZE = 128,32
+HEAD_MOVE_SIZE = 128,256
+BODY_IDLE_SIZE = 128,32
+BODY_MOVE_SIZE = 128,256
+
 
 #Clipping bounds for different sprite formats
 CROP = {
@@ -125,6 +130,8 @@ def fix_paths(outdir, name):
         
     if not os.path.isdir(os.path.join(outdir,name)):
         os.makedirs(os.path.join(outdir,name))
+
+    return os.path.join(outdir, name)
         
 
 def get_colors(img):
@@ -152,11 +159,40 @@ def main(head, body, alpha=True, outdir=OUTDIR):
     #Main processing method
     headFile, headName, headType, headSize = head
     bodyFile, bodyName, bodyType, bodySize = body
+    images = {}
     
     head = process(headFile, headName, headType, headSize, alpha, outdir)
     body = process(bodyFile, bodyName, bodyType, bodySize, alpha, outdir)
-    
-    return
+
+    #Put all idle images together
+    w,h = HEAD_IDLE_SIZE
+    idleBlank = np.zeros((h,w,4), np.uint8)
+    idles = list(set(list(head[IDLE].keys()) + list(body[IDLE].keys())))
+    idles.sort()
+    for key in idles:
+        if key in head[IDLE].keys():
+            paste(head[IDLE][key], idleBlank, (0,0))
+
+        if key in body[IDLE].keys():
+            paste(body[IDLE][key], idleBlank, (0,0))
+
+
+    path = fix_paths(outdir,'{0}-{1}'.format(headName,bodyName))
+    cv2.imwrite(path + '/idle.png', idleBlank)
+
+    #Put all movement images together
+    w,h = HEAD_MOVE_SIZE
+    moveBlank = np.zeros((h,w,4), np.uint8)
+    moves = list(set(list(head[MOVE].keys()) + list(body[MOVE].keys())))
+    moves.sort()
+    for key in moves:
+        if key in head[MOVE].keys():
+            paste(head[MOVE][key], moveBlank, (0,0))
+        if key in body[MOVE].keys():
+            paste(body[MOVE][key], moveBlank, (0,0))
+
+    path = fix_paths(outdir,'{0}-{1}'.format(headName,bodyName))
+    cv2.imwrite(path + '/move.png', moveBlank)
 
 
 def remove_border(img, bw, bh):
@@ -180,18 +216,15 @@ def paste(src, dest, offset):
     
     x1,y1 = offset
     x2,y2 = x1+w, y1+h
+
+    for y in range(h):
+        for x in range(w):
+            m,n = x1+x, y1+y
+            if src[y,x,3] != 0:
+                dest[n,m] = src[y,x]
     
-    srcAlpha  = src[:,:,3]/255.0
-    destAlpha = 1.0 - srcAlpha
-
-    for c in range(0,3):
-        px = srcAlpha * src[:,:,c] + destAlpha * dest[y1:y2,x1:x2,c]
-        dest[y1:y2,x1:x2,c] = px
-
-
 def process(fn, name, type, size, alpha, outdir):
     #Processes a single color-layered image
-    fix_paths(outdir,name)
     img = cv2.imread(fn)
     replace_colors(img)
 
@@ -216,7 +249,7 @@ def process(fn, name, type, size, alpha, outdir):
         #Fix image formatting if small size
         if size==SMALL:
             #Idle image
-            w,h = CROP[HEAD_IMG][IDLE][LARGE][SIZE]
+            w,h = HEAD_IDLE_SIZE
             for k in idle.keys():
                 newIdle = np.zeros((h,w,4), np.uint8)
                 for x in range(4):
@@ -228,7 +261,7 @@ def process(fn, name, type, size, alpha, outdir):
                 idle[k] = newIdle
 
             #Moving image
-            w,h = CROP[HEAD_IMG][MOVE][LARGE][SIZE]
+            w,h = HEAD_MOVE_SIZE
             for k in move.keys():
                 newMove = np.zeros((h,w,4), np.uint8)
                 for y in range(8):
@@ -241,7 +274,8 @@ def process(fn, name, type, size, alpha, outdir):
                 move[k] = newMove
 
         #Format output dictionary (0: Draw head before body)
-        return {0:{IDLE:idle, MOVE:move, SIZE:size,}}
+            
+        return {IDLE:idle, MOVE:move, SIZE:size,}
     
 
     if type==BODY_IMG:
@@ -262,7 +296,7 @@ def process(fn, name, type, size, alpha, outdir):
                 replace_colors(move[k],[0,0,0,255],[0,0,0,0])
 
         #Format output dictionary (1: Draw body after head)
-        return {1:{IDLE:idle, MOVE:move, SIZE:None}}
+        return {IDLE:idle, MOVE:move, SIZE:None}
         
     return {}
 
