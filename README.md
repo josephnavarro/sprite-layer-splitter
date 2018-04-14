@@ -10,6 +10,9 @@ Of course, the games have their own method of putting all these images together 
 do not have access to **Nintendo's voodoo magic**, we have no choice but to composite them ourselves.
 This script is intended for such compositing. All sprites used for testing were stolen without credit
 from [The Spriters Resource](https://www.spriters-resource.com/3ds/fireemblemfates/).
+<br><br>
+The name might seem weird because it's actually putting images together, but if you think about it, the
+input sprite sheets have to be <b>split</b> into components first. So yeah.
 
 ## Usage
 `python3 splitter.py <head-image> <body-image> <head-size> <output-dir>`
