@@ -7,15 +7,15 @@ import splitter, glob, os
 
 PATH_TO  = 'inputs/'
 FILETYPE = '.png'
-INPUTS   = [
-    ('azura', 'head', 'small'),
-    ('azura', 'head', 'large'),
-    ('ballistician', 'body', None),
-    ('bowknight',    'body', None),
-    
-    ]
+HEAD = 'azura', 'azura', 'head', 'small'
+BODY = 'bowknight', 'bowknight', 'body', None
 
-for input in INPUTS:
-    name, type, size = input
-    fn = PATH_TO + name + FILETYPE
-    splitter.process(fn, name, type, size)
+file, name, type, size = HEAD
+file = PATH_TO + file + FILETYPE
+head = file, name, type, size
+
+file, name, type, size = BODY
+file = PATH_TO + file + FILETYPE
+body = file, name, type, size
+
+splitter.main(head, body)

@@ -147,6 +147,18 @@ def make_mask(im, thresh, maxval=255):
     return t
 
 
+#def main(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
+def main(head, body, alpha=True, outdir=OUTDIR):
+    #Main processing method
+    headFile, headName, headType, headSize = head
+    bodyFile, bodyName, bodyType, bodySize = body
+    
+    head = process(headFile, headName, headType, headSize, alpha, outdir)
+    body = process(bodyFile, bodyName, bodyType, bodySize, alpha, outdir)
+    
+    return
+
+
 def remove_border(img, bw, bh):
     #Removes surrounding border from image. (In-place).
     h,w,c = img.shape
@@ -162,7 +174,22 @@ def replace_colors(img, color=None, replace=[0,0,0]):
     img[np.where((img==color).all(axis=2))] = replace
 
 
-def process(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
+def paste(src, dest, offset):
+    #Pastes source image onto destination image
+    h,w = src.shape[0], src.shape[1]
+    
+    x1,y1 = offset
+    x2,y2 = x1+w, y1+h
+    
+    srcAlpha  = src[:,:,3]/255.0
+    destAlpha = 1.0 - srcAlpha
+
+    for c in range(0,3):
+        px = srcAlpha * src[:,:,c] + destAlpha * dest[y1:y2,x1:x2,c]
+        dest[y1:y2,x1:x2,c] = px
+
+
+def process(fn, name, type, size, alpha, outdir):
     #Processes a single color-layered image
     fix_paths(outdir,name)
     img = cv2.imread(fn)
@@ -186,17 +213,9 @@ def process(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
             for k in move.keys():
                 replace_colors(move[k],[0,0,0,255],[0,0,0,0])
 
-        #Format output dictionary
-        output = {
-            HEAD_IMG: {
-                IDLE: idle,
-                MOVE: move,
-                SIZE: size,
-                }
-            }
-
-        return output
-
+        #Format output dictionary (0: Draw head before body)
+        return {0:{IDLE:idle, MOVE:move, SIZE:size,}}
+    
 
     if type==BODY_IMG:
         #Processing for body-formatted image (idle)
@@ -215,15 +234,9 @@ def process(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
             for k in move.keys():
                 replace_colors(move[k],[0,0,0,255],[0,0,0,0])
 
-        #Format output dictionary
-        output = {
-            BODY_IMG: {
-                IDLE: idle,
-                MOVE: move,
-                }
-            }
-        return output
-
+        #Format output dictionary (1: Draw body after head)
+        return {1:{IDLE:idle, MOVE:move,}}
+        
     return {}
 
     #for k,v in imgs.items():
@@ -231,5 +244,5 @@ def process(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
 
 
 if __name__ == '__main__':
-    process(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])  
+    main(sys.argv[1], sys.argv[2])  
     
