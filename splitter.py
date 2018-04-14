@@ -21,6 +21,8 @@ import numpy as np
 
 
 IGNORE   = [0,255] #Colors to ignore (black and white)
+
+#Some dictionary keys
 OUTDIR   = 'outputs'
 HEAD_IMG = 'head'
 BODY_IMG = 'body'
@@ -30,10 +32,21 @@ IDLE     = 'idle'
 MOVE     = 'move'
 SIZE     = 'size'
 
+#Sizes for output images
 HEAD_IDLE_SIZE = 128,32
 HEAD_MOVE_SIZE = 128,256
 BODY_IDLE_SIZE = 128,32
 BODY_MOVE_SIZE = 128,256
+
+#Used to offset for different unit colors
+MOVE_BLOCK = 552
+HEAD_BLOCK = 584
+COLORS = {
+    'purple':0,
+    'green' :1,
+    'red'   :2,
+    'blue'  :3,
+    }
 
 
 #Clipping bounds for different sprite formats
@@ -123,15 +136,18 @@ def crop(img, start, size):
     return img[x:x+w, y:y+h]
 
 
-def fix_paths(outdir, name):
+def fix_paths(outdir, name, color):
     #Fixes output directories
     if not os.path.isdir(outdir):
         os.makedirs(outdir)
-        
+
     if not os.path.isdir(os.path.join(outdir,name)):
         os.makedirs(os.path.join(outdir,name))
+        
+    if not os.path.isdir(os.path.join(outdir,name,color)):
+        os.makedirs(os.path.join(outdir,name,color))
 
-    return os.path.join(outdir, name)
+    return os.path.join(outdir, name, color)
         
 
 def get_colors(img):
@@ -160,39 +176,43 @@ def main(head, body, size, offset=(0,0), alpha=True, outdir=OUTDIR):
     headFile, headName, headType = head
     bodyFile, bodyName, bodyType = body
     images = {}
+
+    for colorType in COLORS.keys():
+        headOffset = offset[0], offset[1]+HEAD_BLOCK*COLORS[colorType]
+        moveOffset = offset[0], offset[1]+MOVE_BLOCK*COLORS[colorType]
     
-    head = process(headFile, headName, headType, size, offset, alpha, outdir)
-    body = process(bodyFile, bodyName, bodyType, size, offset, alpha, outdir)
+        head = process(headFile, headName, headType, size, headOffset, alpha, outdir)
+        body = process(bodyFile, bodyName, bodyType, size, moveOffset, alpha, outdir)
 
-    #Put all idle images together
-    w,h = HEAD_IDLE_SIZE
-    idleBlank = np.zeros((h,w,4), np.uint8)
-    idles = list(set(list(head[IDLE].keys()) + list(body[IDLE].keys())))
-    idles.sort()
-    for key in idles:
-        if key in head[IDLE].keys():
-            paste(head[IDLE][key], idleBlank, (0,0))
+        #Put all idle images together
+        w,h = HEAD_IDLE_SIZE
+        idleBlank = np.zeros((h,w,4), np.uint8)
+        idles = list(set(list(head[IDLE].keys()) + list(body[IDLE].keys())))
+        idles.sort()
+        for key in idles:
+            if key in head[IDLE].keys():
+                paste(head[IDLE][key], idleBlank, (0,0))
 
-        if key in body[IDLE].keys():
-            paste(body[IDLE][key], idleBlank, (0,0))
+            if key in body[IDLE].keys():
+                paste(body[IDLE][key], idleBlank, (0,0))
 
 
-    path = fix_paths(outdir,'{0}-{1}'.format(headName,bodyName))
-    cv2.imwrite(path + '/idle.png', idleBlank)
+        path = fix_paths(outdir,'{0}-{1}'.format(headName,bodyName), colorType)
+        cv2.imwrite(path + '/idle.png', idleBlank)
 
-    #Put all movement images together
-    w,h = HEAD_MOVE_SIZE
-    moveBlank = np.zeros((h,w,4), np.uint8)
-    moves = list(set(list(head[MOVE].keys()) + list(body[MOVE].keys())))
-    moves.sort()
-    for key in moves:
-        if key in head[MOVE].keys():
-            paste(head[MOVE][key], moveBlank, (0,0))
-        if key in body[MOVE].keys():
-            paste(body[MOVE][key], moveBlank, (0,0))
+        #Put all movement images together
+        w,h = HEAD_MOVE_SIZE
+        moveBlank = np.zeros((h,w,4), np.uint8)
+        moves = list(set(list(head[MOVE].keys()) + list(body[MOVE].keys())))
+        moves.sort()
+        for key in moves:
+            if key in head[MOVE].keys():
+                paste(head[MOVE][key], moveBlank, (0,0))
+            if key in body[MOVE].keys():
+                paste(body[MOVE][key], moveBlank, (0,0))
 
-    path = fix_paths(outdir,'{0}-{1}'.format(headName,bodyName))
-    cv2.imwrite(path + '/move.png', moveBlank)
+        path = fix_paths(outdir,'{0}-{1}'.format(headName,bodyName), colorType)
+        cv2.imwrite(path + '/move.png', moveBlank)
 
 
 def remove_border(img, bw, bh):
