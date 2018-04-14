@@ -213,6 +213,33 @@ def process(fn, name, type, size, alpha, outdir):
             for k in move.keys():
                 replace_colors(move[k],[0,0,0,255],[0,0,0,0])
 
+        #Fix image formatting if small size
+        if size==SMALL:
+            #Idle image
+            w,h = CROP[HEAD_IMG][IDLE][LARGE][SIZE]
+            for k in idle.keys():
+                newIdle = np.zeros((h,w,4), np.uint8)
+                for x in range(4):
+                    start = x*16,0
+                    size  = 16,16
+                    sub   = crop(idle[k], start, size)
+                    dest  = x*32-24, 0
+                    paste(sub, newIdle, dest)
+                idle[k] = newIdle
+
+            #Moving image
+            w,h = CROP[HEAD_IMG][MOVE][LARGE][SIZE]
+            for k in move.keys():
+                newMove = np.zeros((h,w,4), np.uint8)
+                for y in range(8):
+                    for x in range(4):
+                        start = x*16,y*16
+                        size  = 16,16
+                        sub   = crop(move[k], start, size)
+                        dest  = x*32-24, y*32-24
+                        paste(sub, newMove, dest)
+                move[k] = newMove
+
         #Format output dictionary (0: Draw head before body)
         return {0:{IDLE:idle, MOVE:move, SIZE:size,}}
     
@@ -235,7 +262,7 @@ def process(fn, name, type, size, alpha, outdir):
                 replace_colors(move[k],[0,0,0,255],[0,0,0,0])
 
         #Format output dictionary (1: Draw body after head)
-        return {1:{IDLE:idle, MOVE:move,}}
+        return {1:{IDLE:idle, MOVE:move, SIZE:None}}
         
     return {}
 
