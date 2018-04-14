@@ -12,7 +12,9 @@ This script is intended for such compositing. All sprites used for testing were 
 from [The Spriters Resource](https://www.spriters-resource.com/3ds/fireemblemfates/).
 
 ## Usage
-`python3 splitter.py <image>`
+`python3 splitter.py <head-image> <body-image> <head-size>`
+
+You have to manually supply the head size, which is important because mounted units (cavalry, pegasus, wyvern, etc.) all use the small heads, while infantry and armored units use the larger heads. Head size is either one of `large` or `small`.
 
 ## Dependencies
 * **[Python](https://www.python.org/)** 3.4+
