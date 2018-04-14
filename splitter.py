@@ -103,7 +103,7 @@ def composite(img, alpha=True):
         #Add alpha channel
         if alpha:
             bChannel, gChannel, rChannel = cv2.split(n)
-            aChannel = np.ones(bChannel.shape, dtype=bChannel.dtype) * 50
+            aChannel = np.ones(bChannel.shape, dtype=bChannel.dtype) * 255
             n = cv2.merge((bChannel,gChannel,rChannel,aChannel))
         outputs[col] = n
 
@@ -172,11 +172,18 @@ def process(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
         cropIdle = CROP[HEAD_IMG][IDLE][size]
         idle = crop(img, cropIdle['start'], cropIdle['size'])
         idle = composite(idle, alpha)
+        if alpha:
+            for k in idle.keys():
+                replace_colors(idle[k],[0,0,0,255],[0,0,0,0])
+
 
         #Processing for head-formatted image (moving)
         cropMove = CROP[HEAD_IMG][MOVE][size]
         move = crop(img, cropMove['start'], cropMove['size'])
         move = composite(move, alpha)
+        if alpha:
+            for k in move.keys():
+                replace_colors(move[k],[0,0,0,255],[0,0,0,0])
 
         #Format output dictionary
         output = {
@@ -185,6 +192,7 @@ def process(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
                 MOVE: move,
                 }
             }
+
         return output
 
 
@@ -193,11 +201,17 @@ def process(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
         cropIdle = CROP[BODY_IMG][IDLE]
         idle = crop(img, cropIdle['start'], cropIdle['size'])
         idle = composite(idle, alpha)
+        if alpha:
+            for k in idle.keys():
+                replace_colors(idle[k],[0,0,0,255],[0,0,0,0])
 
         #Processing for body-formatted image (moving)
         cropMove = CROP[BODY_IMG][MOVE]
         move = crop(img, cropMove['start'], cropMove['size'])
         move = composite(move, alpha)
+        if alpha:
+            for k in move.keys():
+                replace_colors(move[k],[0,0,0,255],[0,0,0,0])
 
         #Format output dictionary
         output = {
