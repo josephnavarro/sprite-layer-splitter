@@ -7,15 +7,15 @@ import splitter, glob, os
 
 PATH_TO  = 'inputs/'
 FILETYPE = '.png'
-HEAD = 'odin', 'odin', 'head', 'small'
-BODY = 'bowknight', 'bowknight', 'body', None
+HEAD = 'odin', 'odin', 'head'
+BODY = 'bowknight', 'bowknight', 'body'
 
-file, name, type, size = HEAD
+file, name, type = HEAD
 file = PATH_TO + file + FILETYPE
-head = file, name, type, size
+head = file, name, type
 
-file, name, type, size = BODY
+file, name, type = BODY
 file = PATH_TO + file + FILETYPE
-body = file, name, type, size
+body = file, name, type
 
-splitter.main(head, body)
+splitter.main(head, body, 'small')

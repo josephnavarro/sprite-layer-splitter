@@ -155,14 +155,14 @@ def make_mask(im, thresh, maxval=255):
 
 
 #def main(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
-def main(head, body, alpha=True, outdir=OUTDIR):
+def main(head, body, size, offset=(0,0), alpha=True, outdir=OUTDIR):
     #Main processing method
-    headFile, headName, headType, headSize = head
-    bodyFile, bodyName, bodyType, bodySize = body
+    headFile, headName, headType = head
+    bodyFile, bodyName, bodyType = body
     images = {}
     
-    head = process(headFile, headName, headType, headSize, alpha, outdir)
-    body = process(bodyFile, bodyName, bodyType, bodySize, alpha, outdir)
+    head = process(headFile, headName, headType, size, offset, alpha, outdir)
+    body = process(bodyFile, bodyName, bodyType, size, offset, alpha, outdir)
 
     #Put all idle images together
     w,h = HEAD_IDLE_SIZE
@@ -223,15 +223,18 @@ def paste(src, dest, offset):
             if src[y,x,3] != 0:
                 dest[n,m] = src[y,x]
     
-def process(fn, name, type, size, alpha, outdir):
+def process(fn, name, type, size, offset, alpha, outdir):
     #Processes a single color-layered image
     img = cv2.imread(fn)
     replace_colors(img)
+    xOff, yOff = offset
 
     if type==HEAD_IMG:
         #Processing for head-formatted image (idle)
         cropIdle = CROP[HEAD_IMG][IDLE][size]
-        idle = crop(img, cropIdle['start'], cropIdle[SIZE])
+        xStart, yStart = cropIdle['start']
+        start = xStart+xOff, yStart+yOff
+        idle = crop(img, start, cropIdle[SIZE])
         idle = composite(idle, alpha)
         if alpha:
             for k in idle.keys():
@@ -240,7 +243,9 @@ def process(fn, name, type, size, alpha, outdir):
 
         #Processing for head-formatted image (moving)
         cropMove = CROP[HEAD_IMG][MOVE][size]
-        move = crop(img, cropMove['start'], cropMove[SIZE])
+        xStart, yStart = cropMove['start']
+        start = xStart+xOff, yStart+yOff
+        move = crop(img, start, cropMove[SIZE])
         move = composite(move, alpha)
         if alpha:
             for k in move.keys():
@@ -281,7 +286,9 @@ def process(fn, name, type, size, alpha, outdir):
     if type==BODY_IMG:
         #Processing for body-formatted image (idle)
         cropIdle = CROP[BODY_IMG][IDLE]
-        idle = crop(img, cropIdle['start'], cropIdle[SIZE])
+        xStart, yStart = cropIdle['start']
+        start = xStart+xOff, yStart+yOff
+        idle = crop(img, start, cropIdle[SIZE])
         idle = composite(idle, alpha)
         if alpha:
             for k in idle.keys():
@@ -289,7 +296,9 @@ def process(fn, name, type, size, alpha, outdir):
 
         #Processing for body-formatted image (moving)
         cropMove = CROP[BODY_IMG][MOVE]
-        move = crop(img, cropMove['start'], cropMove[SIZE])
+        xStart, yStart = cropMove['start']
+        start = xStart+xOff, yStart+yOff
+        move = crop(img, start, cropMove[SIZE])
         move = composite(move, alpha)
         if alpha:
             for k in move.keys():
@@ -305,5 +314,6 @@ def process(fn, name, type, size, alpha, outdir):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1], sys.argv[2])  
+    head, body, size = sys.argv[1], sys.argv[2], sys.argv[3]
+    main(head,body,size)
     
