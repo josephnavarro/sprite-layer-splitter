@@ -17,7 +17,7 @@ from [The Spriters Resource](https://www.spriters-resource.com/3ds/fireemblemfat
 `<head-image>` Relative path to head spritesheet<br>
 `<body-image>` Relative path to body spritesheet<br>
 `<head-size>` Either one of `small` or `large`<br>
-`<output-dir` Subdirectory in `outputs`<br><br>
+`<output-dir>` Subdirectory in `outputs`<br><br>
 
 Head size must be manually specified. Mounted units (cavalry, pegasus, wyvern, etc.) use small heads, while infantry and armored units use the larger heads.
 
@@ -36,9 +36,9 @@ Assembled images will be output to `outputs/odin-bowknight`.
 <img src="examples/base1.png" alt="base1"> <img src="examples/base2.png" alt="base2"><br>
 Character class and head inputs<br>
   <i>(cropped for demonstration)</i>
-<br><br><br>
+<br><br><br><br>
 <img src="examples/output1.png" alt="output-1"><br>
-  Idle output <i>(blue)</i><br><br>
+  Idle output <i>(blue)</i><br>
 <img src="examples/output2.png" alt="output-2"><br>
   Moving output <i>(blue)</i><br>
 </p>
