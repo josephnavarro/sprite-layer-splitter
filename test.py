@@ -7,7 +7,7 @@ import splitter, glob, os
 
 PATH_TO  = 'inputs/'
 FILETYPE = '.png'
-HEAD = 'azura', 'azura', 'head', 'small'
+HEAD = 'odin', 'odin', 'head', 'small'
 BODY = 'bowknight', 'bowknight', 'body', None
 
 file, name, type, size = HEAD
