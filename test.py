@@ -5,7 +5,17 @@ import splitter, glob, os
 # examples were taken from The Spriters Resource.
 # (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
-for fn in glob.glob('inputs/*.png'):
-    base = os.path.basename(fn)
-    name,ext = os.path.splitext(base)
-    splitter.process(fn, name)
+PATH_TO  = 'inputs/'
+FILETYPE = '.png'
+INPUTS   = [
+    ('azura', 'head', 'small'),
+    ('azura', 'head', 'large'),
+    ('ballistician', 'body', None),
+    ('bowknight',    'body', None),
+    
+    ]
+
+for input in INPUTS:
+    name, type, size = input
+    fn = PATH_TO + name + FILETYPE
+    splitter.process(fn, name, type, size)

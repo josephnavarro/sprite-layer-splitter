@@ -20,21 +20,76 @@ import numpy as np
 # mask given.
 
 
-IGNORE  = [0,255] #Colors to ignore (black and white)
-DIRNAME = 'outputs'
+IGNORE   = [0,255] #Colors to ignore (black and white)
+OUTDIR   = 'outputs'
+HEAD_IMG = 'head'
+BODY_IMG = 'body'
+LARGE    = 'large'
+SMALL    = 'small'
+IDLE     = 'idle'
+MOVE     = 'move'
+
+
+#Clipping bounds for different sprite formats
+CROP = {
+    HEAD_IMG: {
+        IDLE: {
+            LARGE: {
+                'start': (2,2),
+                'size' : (256,32),
+                'sub'  : (32,32),
+                },
+            
+            SMALL: {
+                'start': (2,34),
+                'size' : (256,16),
+                'sub'  : (16,16),
+                },
+            
+            },
+
+        MOVE: {
+            LARGE: {
+                'start': (2,70),
+                'size' : (256,320),
+                'sub'  : (32,32),
+                },
+            
+            SMALL: {
+                'start': (2,390),
+                'size' : (256,160),
+                'sub'  : (16,16),
+                },
+            
+            },
+        
+        },
+    BODY_IMG: {
+        IDLE: {
+            'start': (2,2),
+            'size' : (256,32),
+            'sub'  : (32,32),
+            },
+            
+        MOVE: {
+            'start': (2,70),
+            'size' : (256,256),
+            'sub'  : (32,32),
+            },            
+        },
+    }
 
 def apply_mask(img,mask):
     #Applies mask to (colored) image
     return cv2.bitwise_and(img,mask)
     
 
-def composite(img):
+def composite(img, alpha=True):
     #Combines head and body images by grayscale layers
     h1,w1,c1 = img.shape
 
     #Head layer
     c1 = crop(img, (0,0), (w1//2,h1))         #Color
-    #c1 = cv2.cvtColor(c1, cv2.COLOR_RGB2BGR)  #Fix color
     m1 = crop(img, (w1//2,0), (w1//2,h1))     #Mask
     m1 = cv2.cvtColor(m1, cv2.COLOR_RGB2BGR)  #Fix color
     g1 = cv2.cvtColor(m1, cv2.COLOR_BGR2GRAY) #Grayscale
@@ -44,6 +99,12 @@ def composite(img):
     for col in colors:
         m = make_mask(m1,col)
         n = apply_mask(c1,m)
+
+        #Add alpha channel
+        if alpha:
+            bChannel, gChannel, rChannel = cv2.split(n)
+            aChannel = np.ones(bChannel.shape, dtype=bChannel.dtype) * 50
+            n = cv2.merge((bChannel,gChannel,rChannel,aChannel))
         outputs[col] = n
 
     return outputs
@@ -54,7 +115,16 @@ def crop(img, start, size):
     y,x = start
     h,w = size
     return img[x:x+w, y:y+h]
-    
+
+
+def fix_paths(outdir, name):
+    #Fixes output directories
+    if not os.path.isdir(outdir):
+        os.makedirs(outdir)
+        
+    if not os.path.isdir(os.path.join(outdir,name)):
+        os.makedirs(os.path.join(outdir,name))
+        
 
 def get_colors(img):
     #Gets all unique colors from image
@@ -91,23 +161,59 @@ def replace_colors(img, color=None, replace=[0,0,0]):
     img[np.where((img==color).all(axis=2))] = replace
 
 
-def process(fn,name,outdir=DIRNAME):
+def process(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
     #Processes a single color-layered image
-    if not os.path.isdir(outdir):
-        os.makedirs(outdir)
-        
-    if not os.path.isdir(os.path.join(outdir,name)):
-        os.makedirs(os.path.join(outdir,name))
-        
+    fix_paths(outdir,name)
     img = cv2.imread(fn)
     replace_colors(img)
-    img = remove_border(img, 4,4)
-    imgs = composite(img)
 
-    for k,v in imgs.items():
-        cv2.imwrite('{0}/{1}/{2}.png'.format(DIRNAME,name,k),v)
+    if type==HEAD_IMG:
+        #Processing for head-formatted image (idle)
+        cropIdle = CROP[HEAD_IMG][IDLE][size]
+        idle = crop(img, cropIdle['start'], cropIdle['size'])
+        idle = composite(idle, alpha)
+
+        #Processing for head-formatted image (moving)
+        cropMove = CROP[HEAD_IMG][MOVE][size]
+        move = crop(img, cropMove['start'], cropMove['size'])
+        move = composite(move, alpha)
+
+        #Format output dictionary
+        output = {
+            HEAD_IMG: {
+                IDLE: idle,
+                MOVE: move,
+                }
+            }
+        return output
+
+
+    if type==BODY_IMG:
+        #Processing for body-formatted image (idle)
+        cropIdle = CROP[BODY_IMG][IDLE]
+        idle = crop(img, cropIdle['start'], cropIdle['size'])
+        idle = composite(idle, alpha)
+
+        #Processing for body-formatted image (moving)
+        cropMove = CROP[BODY_IMG][MOVE]
+        move = crop(img, cropMove['start'], cropMove['size'])
+        move = composite(move, alpha)
+
+        #Format output dictionary
+        output = {
+            BODY_IMG: {
+                IDLE: idle,
+                MOVE: move,
+                }
+            }
+        return output
+
+    return {}
+
+    #for k,v in imgs.items():
+    #    cv2.imwrite('{0}/{1}/{2}.png'.format(OUTDIR,name,k),v)
 
 
 if __name__ == '__main__':
-    process(sys.argv[1], sys.argv[2])  
+    process(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])  
     
