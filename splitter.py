@@ -63,7 +63,7 @@ CROP = {
             
             SMALL: {
                 SIZE : (256,128),
-                'start': (2,406),
+                'start': (2,422),
                 'sub'  : (16,16),
                 },
             
@@ -269,7 +269,7 @@ def process(fn, name, type, size, alpha, outdir):
                         start = x*16,y*16
                         size  = 16,16
                         sub   = crop(move[k], start, size)
-                        dest  = x*32-24, y*32-24
+                        dest  = x*32-24, y*32
                         paste(sub, newMove, dest)
                 move[k] = newMove
 
