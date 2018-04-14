@@ -22,12 +22,12 @@ from [The Spriters Resource](https://www.spriters-resource.com/3ds/fireemblemfat
 
 ## Example
 <p align="center">
-<img src="examples/base.png" alt="base"><br>
-Input (cropped)<br><br>
+<img src="examples/base1.png" alt="base1"> <img src="examples/base2.png" alt="base2"><br>
+Character class and head inputs (cropped)<br><br>
 <img src="examples/output1.png" alt="output-1"><br>
-Output layer 1<br><br>
+Idle output (blue)<br><br>
 <img src="examples/output2.png" alt="output-2"><br>
-Output layer 2<br>
+Moving output (blue)<br>
 </p>
 
 
