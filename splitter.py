@@ -28,6 +28,7 @@ LARGE    = 'large'
 SMALL    = 'small'
 IDLE     = 'idle'
 MOVE     = 'move'
+SIZE     = 'size'
 
 
 #Clipping bounds for different sprite formats
@@ -35,14 +36,14 @@ CROP = {
     HEAD_IMG: {
         IDLE: {
             LARGE: {
+                SIZE : (256,32),
                 'start': (2,2),
-                'size' : (256,32),
                 'sub'  : (32,32),
                 },
             
             SMALL: {
+                SIZE : (256,16),
                 'start': (2,34),
-                'size' : (256,16),
                 'sub'  : (16,16),
                 },
             
@@ -50,14 +51,14 @@ CROP = {
 
         MOVE: {
             LARGE: {
+                SIZE : (256,256),
                 'start': (2,70),
-                'size' : (256,320),
                 'sub'  : (32,32),
                 },
             
             SMALL: {
-                'start': (2,390),
-                'size' : (256,160),
+                SIZE : (256,128),
+                'start': (2,406),
                 'sub'  : (16,16),
                 },
             
@@ -66,14 +67,14 @@ CROP = {
         },
     BODY_IMG: {
         IDLE: {
+            SIZE : (256,32),
             'start': (2,2),
-            'size' : (256,32),
             'sub'  : (32,32),
             },
             
         MOVE: {
+            SIZE : (256,256),
             'start': (2,70),
-            'size' : (256,256),
             'sub'  : (32,32),
             },            
         },
@@ -170,7 +171,7 @@ def process(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
     if type==HEAD_IMG:
         #Processing for head-formatted image (idle)
         cropIdle = CROP[HEAD_IMG][IDLE][size]
-        idle = crop(img, cropIdle['start'], cropIdle['size'])
+        idle = crop(img, cropIdle['start'], cropIdle[SIZE])
         idle = composite(idle, alpha)
         if alpha:
             for k in idle.keys():
@@ -179,7 +180,7 @@ def process(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
 
         #Processing for head-formatted image (moving)
         cropMove = CROP[HEAD_IMG][MOVE][size]
-        move = crop(img, cropMove['start'], cropMove['size'])
+        move = crop(img, cropMove['start'], cropMove[SIZE])
         move = composite(move, alpha)
         if alpha:
             for k in move.keys():
@@ -190,6 +191,7 @@ def process(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
             HEAD_IMG: {
                 IDLE: idle,
                 MOVE: move,
+                SIZE: size,
                 }
             }
 
@@ -199,7 +201,7 @@ def process(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
     if type==BODY_IMG:
         #Processing for body-formatted image (idle)
         cropIdle = CROP[BODY_IMG][IDLE]
-        idle = crop(img, cropIdle['start'], cropIdle['size'])
+        idle = crop(img, cropIdle['start'], cropIdle[SIZE])
         idle = composite(idle, alpha)
         if alpha:
             for k in idle.keys():
@@ -207,7 +209,7 @@ def process(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
 
         #Processing for body-formatted image (moving)
         cropMove = CROP[BODY_IMG][MOVE]
-        move = crop(img, cropMove['start'], cropMove['size'])
+        move = crop(img, cropMove['start'], cropMove[SIZE])
         move = composite(move, alpha)
         if alpha:
             for k in move.keys():
