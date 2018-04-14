@@ -171,18 +171,16 @@ def make_mask(im, thresh, maxval=255):
 
 
 #def main(fn, name, type, size=SMALL, alpha=True, outdir=OUTDIR):
-def main(head, body, size, offset=(0,0), alpha=True, outdir=OUTDIR):
+def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR):
     #Main processing method
-    headFile, headName, headType = head
-    bodyFile, bodyName, bodyType = body
     images = {}
 
     for colorType in COLORS.keys():
         headOffset = offset[0], offset[1]+HEAD_BLOCK*COLORS[colorType]
         moveOffset = offset[0], offset[1]+MOVE_BLOCK*COLORS[colorType]
     
-        head = process(headFile, headName, headType, size, headOffset, alpha, outdir)
-        body = process(bodyFile, bodyName, bodyType, size, moveOffset, alpha, outdir)
+        head = process(headFile, 'head', size, headOffset, alpha, outdir)
+        body = process(bodyFile, 'body', size, moveOffset, alpha, outdir)
 
         #Put all idle images together
         w,h = HEAD_IDLE_SIZE
@@ -197,7 +195,7 @@ def main(head, body, size, offset=(0,0), alpha=True, outdir=OUTDIR):
                 paste(body[IDLE][key], idleBlank, (0,0))
 
 
-        path = fix_paths(outdir,'{0}-{1}'.format(headName,bodyName), colorType)
+        path = fix_paths(outdir, name, colorType)
         cv2.imwrite(path + '/idle.png', idleBlank)
 
         #Put all movement images together
@@ -211,7 +209,7 @@ def main(head, body, size, offset=(0,0), alpha=True, outdir=OUTDIR):
             if key in body[MOVE].keys():
                 paste(body[MOVE][key], moveBlank, (0,0))
 
-        path = fix_paths(outdir,'{0}-{1}'.format(headName,bodyName), colorType)
+        path = fix_paths(outdir, name, colorType)
         cv2.imwrite(path + '/move.png', moveBlank)
 
 
@@ -243,7 +241,7 @@ def paste(src, dest, offset):
             if src[y,x,3] != 0:
                 dest[n,m] = src[y,x]
     
-def process(fn, name, type, size, offset, alpha, outdir):
+def process(fn, type, size, offset, alpha, outdir):
     #Processes a single color-layered image
     img = cv2.imread(fn)
     replace_colors(img)
@@ -334,6 +332,6 @@ def process(fn, name, type, size, offset, alpha, outdir):
 
 
 if __name__ == '__main__':
-    head, body, size = sys.argv[1], sys.argv[2], sys.argv[3]
-    main(head,body,size)
+    head, body, size, name = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[3]
+    main(head,body,size,name)
     
