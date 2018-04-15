@@ -5,4 +5,9 @@ import splitter, glob, os
 # examples were taken from The Spriters Resource.
 # (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
-splitter.main('inputs/odin.png', 'inputs/bowknight.png', 'small', 'odin-bowknight')
+splitter.main(
+    'inputs/odin.png',
+    'inputs/bowknight.png',
+    'small',
+    'odin-bowknight',
+    )

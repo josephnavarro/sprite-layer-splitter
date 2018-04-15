@@ -20,7 +20,7 @@ import numpy as np
 # mask given.
 
 
-IGNORE   = [0,255] #Colors to ignore (black and white)
+IGNORE = [0,255] #Colors to ignore (black and white)
 
 #Some dictionary keys
 OUTDIR   = 'outputs'
@@ -31,6 +31,8 @@ SMALL    = 'small'
 IDLE     = 'idle'
 MOVE     = 'move'
 SIZE     = 'size'
+START    = 'start'
+SUB      = 'sub'
 
 #Sizes for output images
 HEAD_IDLE_SIZE = 128,32
@@ -55,14 +57,14 @@ CROP = {
         IDLE: {
             LARGE: {
                 SIZE : (256,32),
-                'start': (2,2),
-                'sub'  : (32,32),
+                START: (2,2),
+                SUB  : (32,32),
                 },
             
             SMALL: {
                 SIZE : (256,16),
-                'start': (2,34),
-                'sub'  : (16,16),
+                START: (2,34),
+                SUB  : (16,16),
                 },
             
             },
@@ -70,14 +72,14 @@ CROP = {
         MOVE: {
             LARGE: {
                 SIZE : (256,256),
-                'start': (2,68),
-                'sub'  : (32,32),
+                START: (2,68),
+                SUB  : (32,32),
                 },
             
             SMALL: {
                 SIZE : (256,128),
-                'start': (2,406),
-                'sub'  : (16,16),
+                START: (2,406),
+                SUB  : (16,16),
                 },
             
             },
@@ -86,14 +88,14 @@ CROP = {
     BODY_IMG: {
         IDLE: {
             SIZE : (256,32),
-            'start': (2,2),
-            'sub'  : (32,32),
+            START: (2,2),
+            SUB  : (32,32),
             },
             
         MOVE: {
             SIZE : (256,256),
-            'start': (2,38),
-            'sub'  : (32,32),
+            START: (2,38),
+            SUB  : (32,32),
             },            
         },
     }
@@ -101,17 +103,27 @@ CROP = {
 def apply_mask(img,mask):
     #Applies mask to (colored) image
     return cv2.bitwise_and(img,mask)
+
+
+def grayscale(img, colored=False):
+    #Converts RGB image to grayscale
+    out = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    out = cv2.cvtColor(out, cv2.COLOR_BGR2GRAY)
     
+    if colored:
+        #Optionally output BGR again
+        out = cv2.cvtColor(out, cv2.COLOR_GRAY2RGB)
+    return out
+
 
 def composite(img, alpha=True):
     #Combines head and body images by grayscale layers
     h1,w1,c1 = img.shape
 
     #Head layer
-    c1 = crop(img, (0,0), (w1//2,h1))         #Colored layer
-    m1 = crop(img, (w1//2,0), (w1//2,h1))     #Masking layer
-    m1 = cv2.cvtColor(m1, cv2.COLOR_RGB2BGR)  #Fix mask's color format
-    g1 = cv2.cvtColor(m1, cv2.COLOR_BGR2GRAY) #Change mask to grayscale
+    c1 = crop(img, (0,0), (w1//2,h1))     #Color layer
+    m1 = crop(img, (w1//2,0), (w1//2,h1)) #Mask layer
+    g1 = grayscale(m1)
 
     outputs = {}
     colors = [c for c in get_colors(g1) if c not in IGNORE]
@@ -130,6 +142,13 @@ def composite(img, alpha=True):
         outputs[col] = n
 
     return outputs
+
+
+def convert_alpha(img):
+    #Adds alpha channel to image
+    bChannel, gChannel, rChannel = cv2.split(img)
+    aChannel = np.ones(bChannel.shape, dtype=bChannel.dtype) * 255
+    return cv2.merge((bChannel,gChannel,rChannel,aChannel))
     
 
 def crop(img, start, size):
@@ -178,9 +197,11 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
     images = {}
 
     for colorType in COLORS.keys():
+        #Offset for specific unit color
         headOffset = offset[0], offset[1]+HEAD_BLOCK*COLORS[colorType]
         moveOffset = offset[0], offset[1]+MOVE_BLOCK*COLORS[colorType]
-    
+
+        #Process head and body separately
         head = process(headFile, 'head', size, headOffset, alpha, outdir)
         body = process(bodyFile, 'body', size, moveOffset, alpha, outdir)
 
@@ -189,6 +210,7 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
         idleBlank = np.zeros((h,w,4), np.uint8)
         idles = list(set(list(head[IDLE].keys()) + list(body[IDLE].keys())))
         idles.sort()
+        
         for key in idles:
             if key in head[IDLE].keys():
                 paste(head[IDLE][key], idleBlank, (0,0))
@@ -205,6 +227,7 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
         moveBlank = np.zeros((h,w,4), np.uint8)
         moves = list(set(list(head[MOVE].keys()) + list(body[MOVE].keys())))
         moves.sort()
+        
         for key in moves:
             if key in head[MOVE].keys():
                 paste(head[MOVE][key], moveBlank, (0,0))
@@ -213,6 +236,31 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
 
         path = fix_paths(outdir, name, colorType)
         cv2.imwrite(path + '/move.png', moveBlank)
+
+        #Generate grayscale image based on blue
+        if colorType == 'blue':
+            idleGray = idleBlank.copy()
+            moveGray = moveBlank.copy()
+
+            idleGray = cv2.cvtColor(idleGray, cv2.COLOR_BGR2GRAY)
+            moveGray = cv2.cvtColor(moveGray, cv2.COLOR_BGR2GRAY)
+
+            idleGray = cv2.cvtColor(idleGray, cv2.COLOR_GRAY2BGR)
+            moveGray = cv2.cvtColor(moveGray, cv2.COLOR_GRAY2BGR)
+
+            idleGray = convert_alpha(idleGray)
+            moveGray = convert_alpha(moveGray)
+
+            replace_colors(idleGray, [0,0,0,255], [0,0,0,0])
+            replace_colors(moveGray, [0,0,0,255], [0,0,0,0])
+            #grayscale(idleGray)
+            #grayscale(idleBlank)
+
+            path = fix_paths(outdir, name, 'gray')
+            cv2.imwrite(path + '/idle.png', idleGray)
+
+            path = fix_paths(outdir, name, 'gray')
+            cv2.imwrite(path + '/move.png', moveGray)
 
 
 def remove_border(img, bw, bh):
@@ -252,7 +300,7 @@ def process(fn, type, size, offset, alpha, outdir):
     if type==HEAD_IMG:
         #Processing for head-formatted image (idle)
         cropIdle = CROP[HEAD_IMG][IDLE][size]
-        xStart, yStart = cropIdle['start']
+        xStart, yStart = cropIdle[START]
         start = xStart+xOff, yStart+yOff
         idle = crop(img, start, cropIdle[SIZE])
         idle = composite(idle, alpha)
@@ -263,7 +311,7 @@ def process(fn, type, size, offset, alpha, outdir):
 
         #Processing for head-formatted image (moving)
         cropMove = CROP[HEAD_IMG][MOVE][size]
-        xStart, yStart = cropMove['start']
+        xStart, yStart = cropMove[START]
         start = xStart+xOff, yStart+yOff
         move = crop(img, start, cropMove[SIZE])
         move = composite(move, alpha)
@@ -306,7 +354,7 @@ def process(fn, type, size, offset, alpha, outdir):
     if type==BODY_IMG:
         #Processing for body-formatted image (idle)
         cropIdle = CROP[BODY_IMG][IDLE]
-        xStart, yStart = cropIdle['start']
+        xStart, yStart = cropIdle[START]
         start = xStart+xOff, yStart+yOff
         idle = crop(img, start, cropIdle[SIZE])
         idle = composite(idle, alpha)
@@ -316,7 +364,7 @@ def process(fn, type, size, offset, alpha, outdir):
 
         #Processing for body-formatted image (moving)
         cropMove = CROP[BODY_IMG][MOVE]
-        xStart, yStart = cropMove['start']
+        xStart, yStart = cropMove[START]
         start = xStart+xOff, yStart+yOff
         move = crop(img, start, cropMove[SIZE])
         move = composite(move, alpha)
