@@ -39,6 +39,7 @@ HEAD_IDLE_SIZE = 128,32
 HEAD_MOVE_SIZE = 128,256
 BODY_IDLE_SIZE = 128,32
 BODY_MOVE_SIZE = 128,256
+OUTPUT_SIZE    = 128*3,288
 
 #Used to offset for different unit colors
 MOVE_BLOCK = 552
@@ -158,18 +159,15 @@ def crop(img, start, size):
     return img[x:x+w, y:y+h]
 
 
-def fix_paths(outdir, name, color):
+def fix_paths(outdir, name):
     #Fixes output directories (rigid, I don't really care)
     if not os.path.isdir(outdir):
         os.makedirs(outdir)
 
     if not os.path.isdir(os.path.join(outdir,name)):
         os.makedirs(os.path.join(outdir,name))
-        
-    if not os.path.isdir(os.path.join(outdir,name,color)):
-        os.makedirs(os.path.join(outdir,name,color))
 
-    return os.path.join(outdir, name, color)
+    return os.path.join(outdir, name)
         
 
 def get_colors(img):
@@ -195,8 +193,11 @@ def make_mask(im, thresh, maxval=255):
 def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR):
     #Main processing method
     images = {}
+    colorKeys = 'red','blue'
+    outImage = make_blank(*OUTPUT_SIZE)
+    xPos = 0
 
-    for colorType in COLORS.keys():
+    for colorType in colorKeys:
         #Offset for specific unit color
         headOffset = offset[0], offset[1]+HEAD_BLOCK*COLORS[colorType]
         moveOffset = offset[0], offset[1]+MOVE_BLOCK*COLORS[colorType]
@@ -206,11 +207,12 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
         body = process(bodyFile, 'body', size, moveOffset, alpha, outdir)
 
         #Put all idle images together
-        w,h = HEAD_IDLE_SIZE
-        idleBlank = np.zeros((h,w,4), np.uint8)
-        idles = list(set(list(head[IDLE].keys()) + list(body[IDLE].keys())))
-        idles.sort()
-        
+        idleBlank = make_blank(*HEAD_IDLE_SIZE)
+        idles = sorted(list(set(
+            list(head[IDLE].keys()) + list(body[IDLE].keys())
+            )))
+
+        #Composite head and body
         for key in idles:
             if key in head[IDLE].keys():
                 paste(head[IDLE][key], idleBlank, (0,0))
@@ -218,26 +220,25 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
             if key in body[IDLE].keys():
                 paste(body[IDLE][key], idleBlank, (0,0))
 
-
-        path = fix_paths(outdir, name, colorType)
-        cv2.imwrite(path + '/idle.png', idleBlank)
+        paste(idleBlank, outImage, (xPos*128,0))
 
         #Put all movement images together
-        w,h = HEAD_MOVE_SIZE
-        moveBlank = np.zeros((h,w,4), np.uint8)
-        moves = list(set(list(head[MOVE].keys()) + list(body[MOVE].keys())))
-        moves.sort()
-        
+        moveBlank = make_blank(*HEAD_MOVE_SIZE)
+        moves = sorted(list(set(
+            list(head[MOVE].keys()) + list(body[MOVE].keys())
+            )))
+
+        #Composite head and body
         for key in moves:
             if key in head[MOVE].keys():
                 paste(head[MOVE][key], moveBlank, (0,0))
             if key in body[MOVE].keys():
                 paste(body[MOVE][key], moveBlank, (0,0))
 
-        path = fix_paths(outdir, name, colorType)
-        cv2.imwrite(path + '/move.png', moveBlank)
+        paste(moveBlank, outImage, (xPos*128,32))
 
         #Generate grayscale image based on blue
+        xPos += 1
         if colorType == 'blue':
             idleGray = idleBlank.copy()
             moveGray = moveBlank.copy()
@@ -253,15 +254,18 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
 
             replace_colors(idleGray, [0,0,0,255], [0,0,0,0])
             replace_colors(moveGray, [0,0,0,255], [0,0,0,0])
-            #grayscale(idleGray)
-            #grayscale(idleBlank)
 
-            path = fix_paths(outdir, name, 'gray')
-            cv2.imwrite(path + '/idle.png', idleGray)
+            paste(idleGray, outImage, (xPos*128,0))
+            paste(moveGray, outImage, (xPos*128,32))
 
-            path = fix_paths(outdir, name, 'gray')
-            cv2.imwrite(path + '/move.png', moveGray)
+    path = fix_paths(outdir, name)
+    cv2.imwrite(path + '/sheet.png', outImage)
+        
 
+
+def make_blank(w,h,channels=4):
+    #Makes a blank image with given size
+    return np.zeros((h,w,channels), np.uint8)
 
 def remove_border(img, bw, bh):
     #Removes surrounding border from image. (In-place).
@@ -346,8 +350,7 @@ def process(fn, type, size, offset, alpha, outdir):
                         paste(sub, newMove, dest)
                 move[k] = newMove
 
-        #Format output dictionary (0: Draw head before body)
-            
+        #Format output dictionary (0: Draw head before body)            
         return {IDLE:idle, MOVE:move, SIZE:size,}
     
 
