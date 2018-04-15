@@ -5,25 +5,13 @@ import numpy as np
 # Fire Emblem 3DS Sprite Splitter
 #
 # Intended for Fire Emblem Fates and Fire Emblem Echoes sprites.
-# Map sprites in the later Fire Emblem games for the 3DS (that is,
-# Fates and Echoes), unlike Awakening, have separate graphics for
-# the head and body components.
-#
-# More importantly, in addition to directional information (i.e.
-# upward-, downward-, left-, and right-facing sprites), these
-# graphics contain "layer" information in the form of a greyscale
-# channel. This layer data is meant to correct for differences in
-# hair and equipment between character classes and characters
-# themselves.
-#
-# This program splits the layer data according to the greyscale
-# mask given.
+# Map sprites in Fire Emblem Fates and Echoes store head and
+# body sprites separately, and give layer information via
+# grayscale masks. This program puts them together
 
-
-IGNORE = [0,255] #Colors to ignore (black and white)
+IGNORE = 0,255 #Ignored colors (black and white)
 
 #Some dictionary keys
-OUTDIR   = 'outputs'
 HEAD_IMG = 'head'
 BODY_IMG = 'body'
 LARGE    = 'large'
@@ -34,16 +22,21 @@ SIZE     = 'size'
 START    = 'start'
 SUB      = 'sub'
 
-#Sizes for output images
+#Directory strings
+OUTDIR = 'outputs'
+
+#Output image dimensions
 HEAD_IDLE_SIZE = 128,32
 HEAD_MOVE_SIZE = 128,256
 BODY_IDLE_SIZE = 128,32
 BODY_MOVE_SIZE = 128,256
-OUTPUT_SIZE    = 128*3,288
+OUTPUT_BASE    = 128,288
 
-#Used to offset for different unit colors
+#Pixel offsets for unit colors
 MOVE_BLOCK = 552
 HEAD_BLOCK = 584
+
+#Color offsets (multiplied by above blocks)
 COLORS = {
     'purple':0,
     'green' :1,
@@ -51,18 +44,20 @@ COLORS = {
     'blue'  :3,
     }
 
-
 #Clipping bounds for different sprite formats
 CROP = {
     HEAD_IMG: {
+        #Characters
         IDLE: {
             LARGE: {
+                #Large head idle poses
                 SIZE : (256,32),
                 START: (2,2),
                 SUB  : (32,32),
                 },
             
             SMALL: {
+                #Small head idle poses
                 SIZE : (256,16),
                 START: (2,34),
                 SUB  : (16,16),
@@ -72,28 +67,32 @@ CROP = {
 
         MOVE: {
             LARGE: {
+                #Large head moving poses
                 SIZE : (256,256),
                 START: (2,68),
                 SUB  : (32,32),
                 },
             
             SMALL: {
+                #Small head moving poses
                 SIZE : (256,128),
                 START: (2,406),
                 SUB  : (16,16),
                 },
-            
-            },
-        
+            },        
         },
+    
     BODY_IMG: {
+        #Character classes
         IDLE: {
+            #Idle poses
             SIZE : (256,32),
             START: (2,2),
             SUB  : (32,32),
             },
             
         MOVE: {
+            #Moving poses
             SIZE : (256,256),
             START: (2,38),
             SUB  : (32,32),
@@ -101,7 +100,7 @@ CROP = {
         },
     }
 
-def apply_mask(img,mask):
+def apply_mask(img, mask):
     #Applies mask to (colored) image
     return cv2.bitwise_and(img,mask)
 
@@ -118,7 +117,7 @@ def grayscale(img, colored=False):
 
 
 def composite(img, alpha=True):
-    #Combines head and body images by grayscale layers
+    #Overlays head and body sprites
     h1,w1,c1 = img.shape
 
     #Head layer
@@ -126,20 +125,18 @@ def composite(img, alpha=True):
     m1 = crop(img, (w1//2,0), (w1//2,h1)) #Mask layer
     g1 = grayscale(m1)
 
+    #Outputs sorted by grayscale for layering
     outputs = {}
     colors = [c for c in get_colors(g1) if c not in IGNORE]
     
     for col in colors:
-        #Use grayscale bitwise masking
+        #Bitwise masking
         m = make_mask(m1,col)
         n = apply_mask(c1,m)
 
         #Add alpha channel
         if alpha:
-            bChannel, gChannel, rChannel = cv2.split(n)
-            aChannel = np.ones(bChannel.shape, dtype=bChannel.dtype) * 255
-            n = cv2.merge((bChannel,gChannel,rChannel,aChannel))
-            
+            n = convert_alpha(n)
         outputs[col] = n
 
     return outputs
@@ -159,16 +156,12 @@ def crop(img, start, size):
     return img[x:x+w, y:y+h]
 
 
-def fix_paths(outdir, name):
-    #Fixes output directories (rigid, I don't really care)
-    if not os.path.isdir(outdir):
-        os.makedirs(outdir)
+def fix_paths(path):
+    #Fixes output directories
+    path = os.path.normpath(path)
+    os.makedirs(path, exist_ok=True)
+    return path
 
-    if not os.path.isdir(os.path.join(outdir,name)):
-        os.makedirs(os.path.join(outdir,name))
-
-    return os.path.join(outdir, name)
-        
 
 def get_colors(img):
     #Gets all unique colors from image
@@ -194,7 +187,10 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
     #Main processing method
     images = {}
     colorKeys = 'red','blue'
-    outImage = make_blank(*OUTPUT_SIZE)
+    n = len(colorKeys) + 1
+    w,h = OUTPUT_BASE[0] * n, OUTPUT_BASE[1]
+    print(w,h)
+    outImage = make_blank(w,h)
     xPos = 0
 
     for colorType in colorKeys:
@@ -243,25 +239,29 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
             idleGray = idleBlank.copy()
             moveGray = moveBlank.copy()
 
+            #Make gray
             idleGray = cv2.cvtColor(idleGray, cv2.COLOR_BGR2GRAY)
             moveGray = cv2.cvtColor(moveGray, cv2.COLOR_BGR2GRAY)
 
+            #Back to colorspace
             idleGray = cv2.cvtColor(idleGray, cv2.COLOR_GRAY2BGR)
             moveGray = cv2.cvtColor(moveGray, cv2.COLOR_GRAY2BGR)
 
+            #Add alpha channel
             idleGray = convert_alpha(idleGray)
             moveGray = convert_alpha(moveGray)
 
+            #Make black transparent
             replace_colors(idleGray, [0,0,0,255], [0,0,0,0])
             replace_colors(moveGray, [0,0,0,255], [0,0,0,0])
 
+            #Paste onto sheet
             paste(idleGray, outImage, (xPos*128,0))
             paste(moveGray, outImage, (xPos*128,32))
 
-    path = fix_paths(outdir, name)
+    path = fix_paths(os.path.join(outdir, name))
     cv2.imwrite(path + '/sheet.png', outImage)
-        
-
+    
 
 def make_blank(w,h,channels=4):
     #Makes a blank image with given size
@@ -379,9 +379,6 @@ def process(fn, type, size, offset, alpha, outdir):
         return {IDLE:idle, MOVE:move, SIZE:None}
         
     return {}
-
-    #for k,v in imgs.items():
-    #    cv2.imwrite('{0}/{1}/{2}.png'.format(OUTDIR,name,k),v)
 
 
 if __name__ == '__main__':
