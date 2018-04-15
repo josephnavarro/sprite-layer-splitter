@@ -34,16 +34,13 @@ Head size must be manually specified as either `small` or `large`. Mounted units
 ### Command line arguments
 `python3 inputs/odin.png inputs/bowknight.png small odin-bowknight`
 ### Image output
-Assembled images will be output to `outputs/odin-bowknight`.
+Assembled images will be output to `outputs/odin-bowknight/sheet.png`. Sprite sheet will contain red and blue versions of the full unit, as well as a generated grayscale image.<br><br><br>
 <p align="center">
 <img src="examples/base1.png" alt="base1"> <img src="examples/base2.png" alt="base2"><br><br>
 Character class and head inputs<br>
   <i>(cropped for demonstration)</i>
-<br><br><br><br>
+<br><br>
 <img src="examples/output1.png" alt="output-1"><br><br>
-  Idle output image <i>(blue)</i><br><br><br>
-<img src="examples/output2.png" alt="output-2"><br>
-  Moving output image <i>(blue)</i><br>
-</p>
+  Composited spritesheet <i>(red, blue, and gray)</i><br><br>
 
 
