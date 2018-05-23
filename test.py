@@ -6,8 +6,8 @@ import splitter, glob, os
 # (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
 FILE_STRING = 'inputs/{}.png'
-UNIT_NAME = 'orochi'
-CLASS_NAME = 'basara-f'
+UNIT_NAME = 'takumi'
+CLASS_NAME = 'basara-m'
 HEAD_SIZE = 'large'
 
 splitter.main(
