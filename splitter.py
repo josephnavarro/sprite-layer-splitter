@@ -94,11 +94,11 @@ HEAD_PARAMS = {
         'size': 'large',
         },
     'cavalier-f': {
-        'offset': [(0,0),(0,0),(0,0),(0,0),],
+        'offset': [(2,-2),(2,-2),(2,-2),(2,-2),],
         'size': 'small',
         },
     'cavalier-m': {
-        'offset': [(0,0),(0,0),(0,0),(0,0),],
+        'offset': [(2,-2),(2,-2),(2,-2),(2,-2),],
         'size': 'small',
         },
     }
@@ -257,7 +257,7 @@ def main(hd, bd, name, offset=(0,0), alpha=True, outdir=OUTDIR):
         idb = make_blank(*HEAD_IDLE_SIZE)
         ids = sorted(list(set(
             list(d['head'].keys()) + list(d['body'].keys())
-            )))
+            )))[::-1]
 
         #Composite head and body
         for k in ids:

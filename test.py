@@ -6,8 +6,8 @@ import splitter, glob, os
 # (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
 FILE_STRING = 'inputs/{}.png'
-UNIT_NAME = 'jakob'
-CLASS_NAME = 'butler'
+UNIT_NAME = 'xander'
+CLASS_NAME = 'cavalier-m'
 
 splitter.main(
     FILE_STRING.format(UNIT_NAME),
