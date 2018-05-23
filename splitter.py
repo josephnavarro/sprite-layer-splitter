@@ -71,6 +71,10 @@ HEAD_PARAMS = {
         'offset': (0,3),
         'size': 'large',
         },
+    'berserker-m': {
+        'offset': (0,2),
+        'size': 'large',
+        },
     }
 
 #Color offsets (multiplied by above blocks)
