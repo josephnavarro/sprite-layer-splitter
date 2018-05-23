@@ -27,7 +27,7 @@ BASE_OFFSET_ARRAY = [(0,0),(0,0),(0,0),(0,0),]
 BODY_PARAMS = {
     # Shift unit body by this much before pasting
     'ballistician': {
-        'offset': (0,-1),
+        'offset': [(0,-1),(0,-1),(0,-1),(0,-1),],
         },
     }
 
@@ -58,7 +58,7 @@ HEAD_PARAMS = {
         'size': 'large',
         },
     'ballistician': {
-        'offset': (0,-1),
+        'offset': [(0,-1),(0,-1),(0,-1),(0,-1),],
         'size': 'small',
         },
     'basara-f': {
