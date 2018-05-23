@@ -30,6 +30,10 @@ SPRITE_PARAMS = {
         'offset': (-1,2),
         'size': 'large',
         },
+    'apothecary-f': {
+        'offset': (-2,2),
+        'size': 'large',
+        },
     }
 
 #Color offsets (multiplied by above blocks)
