@@ -229,22 +229,21 @@ def main(hd, bd, size, name, offset=(0,0), alpha=True, outdir=OUTDIR):
         mpos = offset[0], offset[1] + MOVE_BLOCK * COLOR_OFFSETS[c]
 
         #Process head and body separately
-        head = process(hd, 'head', size, hpos, alpha, outdir)
-        body = process(bd, 'body', size, mpos, alpha, outdir)
+        d = process(hd, bd, size, hpos, mpos, alpha, outdir)
 
         #Put all idle images together
         idb = make_blank(*HEAD_IDLE_SIZE)
         ids = sorted(list(set(
-            list(head['idle'].keys()) + list(body['idle'].keys())
+            list(d['head'].keys()) + list(d['body'].keys())
             )))
 
         #Composite head and body
         for k in ids:
-            if k in head['idle'].keys():
-                paste(head['idle'][k], idb, (0,0))
+            if k in d['head'].keys():
+                paste(d['head'][k], idb, (0,0))
 
-            if k in body['idle'].keys():
-                paste(body['idle'][k], idb, (0,0))
+            if k in d['body'].keys():
+                paste(d['body'][k], idb, (0,0))
 
         paste(idb, output, (0, 32*y))
 
@@ -297,79 +296,94 @@ def paste(src, dest, offset):
                 dest[n,m] = src[y,x]
 
     
-def process(fn, type, size, offset, alpha, outdir):
+def process(hd, bd, hoff, boff, alpha, outdir):
     '''Processes a single color-layered image.'''
-    img = cv2.imread(fn)
-    replace_colors(img)
-    xOff, yOff = offset
+    hbase, ext = os.path.splitext(hd)
+    bbase, ext = os.path.splitext(bd)
+    himg = cv2.imread(hd)
+    bimg = cv2.imread(bd)
+    hsize = 'large'
+
+    replace_colors(himg)
+    replace_colors(bimg)
     
+    offset = [(0,0), (0,0), (0,0), (0,0)]
 
-    if type=='head':
-        # Processing for head (idle)
-        classOffset = [(0,0),(0,0),(0,0),(0,0),]
+    if bbase in HEAD_PARAMS:
+        offset = HEAD_PARAMS[bbase]['offset'][:]
+        hsize = HEAD_PARAMS[bbase]['size']
+         
+    head = CROP['head']['idle'][hsize]
+    
+    xStart, yStart = head['start']
+    start = xStart + hoff[0], yStart + hoff[1]
+    idleh = composite(crop(himg, start, head['size']), alpha)
+    
+    if alpha:
+        for k in idleh.keys():
+            replace_colors(idle[k], [0,0,0,255], [0,0,0,0])
+
+    if hsize == 'large':
+        # Large head size
+        w,h = HEAD_IDLE_SIZE
         
-        cropIdle = CROP['head']['idle'][size]
-        xStart, yStart = cropIdle['start']
-        start = xStart+xOff, yStart+yOff
-        idle = crop(img, start, cropIdle['size'])
-        idle = composite(idle, alpha)
-        
-        if alpha:
-            for k in idle.keys():
-                replace_colors(idle[k],[0,0,0,255],[0,0,0,0])
-
-
-        if size=='large':
-            w,h = HEAD_IDLE_SIZE
+        for k in idleh.keys():
+            newIdle = np.zeros((h,w,4), np.uint8)
             
-            for k in idle.keys():
-                newIdle = np.zeros((h,w,4), np.uint8)
-                for x in range(4):
-                    start = x*32,0
-                    size = 32,32
-                    sub = crop(idle[k], start, size)
-                    dest = (
-                        x*32 + classOffset[x][0],
-                        classOffset[x][1],
-                        )
-                    paste(sub, newIdle, dest)
-                idle[k] = newIdle
+            for x in range(4):
+                start = x*32,0
+                size = 32,32
+                sub = crop(idleh[k], start, size)
+                dest = x*32 + offset[x][0], offset[x][1]
+                paste(sub, newIdle, dest)
                 
-        if size=='small':
-            w,h = HEAD_IDLE_SIZE
+            idleh[k] = newIdle
             
-            for k in idle.keys():
-                newIdle = np.zeros((h,w,4), np.uint8)
-                for x in range(4):
-                    start = x*16,0
-                    size  = 16,16
-                    sub   = crop(idle[k], start, size)
-                    dest  = (
-                        x*32-24 + classOffset[x][0],
-                        classOffset[x][1],
-                        )
-                    paste(sub, newIdle, dest)
-                idle[k] = newIdle
-
-        #Format output dictionary (0: Draw head before body)            
-        return {'idle':idle, 'size':size,}
+    elif hsize == 'small':
+        # Small head size
+        w,h = HEAD_IDLE_SIZE
+        
+        for k in idleh.keys():
+            newIdle = np.zeros((h,w,4), np.uint8)
+            
+            for x in range(4):
+                start = x*16,0
+                size = 16,16
+                sub = crop(idleh[k], start, size)
+                dest = x*32-24 + offset[x][0], offset[x][1]
+                paste(sub, newIdle, dest)
+                
+            idleh[k] = newIdle
     
 
-    if type=='body':
-        #Processing for body-formatted image (idle)
-        cropIdle = CROP['body']['idle']
-        xStart, yStart = cropIdle['start']
-        start = xStart+xOff, yStart+yOff
-        idle = crop(img, start, cropIdle['size'])
-        idle = composite(idle, alpha)
-        if alpha:
-            for k in idle.keys():
-                replace_colors(idle[k],[0,0,0,255],[0,0,0,0])
-
-        #Format output dictionary (1: Draw body after head)
-        return {'idle':idle, 'size':None}
+    #Processing for body-formatted image (idle)
+    offset = [(0,0), (0,0), (0,0), (0,0)]
+    if bbase in BODY_PARAMS:
+        offset = BODY_PARAMS[bbase]['offset'][:]
         
-    return {}
+    body = CROP['body']['idle']
+    xStart, yStart = body['start']
+    start = xStart + boff, yStart + boff
+    idleb = composite(crop(bimg, start, body['size']), alpha)
+    
+    if alpha:
+        for k in idleb.keys():
+            replace_colors(idleb[k],[0,0,0,255],[0,0,0,0])
+
+    for k in idleb.keys():
+        newIdle = np.zeros((h,w,4), np.uint8)
+        
+        for x in range(4):
+            start = x*32,0
+            size = 32,32
+            sub = crop(idleb[k], start, size)
+            dest = x*32 + offset[x][0], offset[x][1]
+            paste(sub, newIdle, dest)
+            
+        idleb[k] = newIdle
+
+        
+    return {'head': idleh, 'body': idleb}
 
 
 if __name__ == '__main__':
