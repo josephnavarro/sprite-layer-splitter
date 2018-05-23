@@ -40,7 +40,7 @@ HEAD_PARAMS = {
         'size': 'large',
         },
     'apothecary-f': {
-        'offset': (-2,2),
+        'offset': [(0,0),(0,0),(0,0),(0,0)],
         'size': 'large',
         },
     'apothecary-m': {
@@ -298,8 +298,8 @@ def paste(src, dest, offset):
     
 def process(hd, bd, hoff, boff, alpha, outdir):
     '''Processes a single color-layered image.'''
-    hbase, ext = os.path.splitext(hd)
-    bbase, ext = os.path.splitext(bd)
+    hbase, ext = os.path.splitext(os.path.basename(hd))
+    bbase, ext = os.path.splitext(os.path.basename(bd))
     himg = cv2.imread(hd)
     bimg = cv2.imread(bd)
     hsize = 'large'
@@ -309,13 +309,13 @@ def process(hd, bd, hoff, boff, alpha, outdir):
     
     offset = [(0,0), (0,0), (0,0), (0,0)]
 
+
     if bbase in HEAD_PARAMS:
         offset = HEAD_PARAMS[bbase]['offset'][:]
         hsize = HEAD_PARAMS[bbase]['size']
 
 
     offset = offset[1:4] + [offset[0]]
-         
     head = CROP['head']['idle'][hsize]
     
     xStart, yStart = head['start']
