@@ -40,7 +40,7 @@ HEAD_PARAMS = {
         'size': 'large',
         },
     'apothecary-f': {
-        'offset': [(0,0),(0,0),(0,0),(0,0)],
+        'offset': [(-2,2),(-2,1),(-2,2),(-2,3)],
         'size': 'large',
         },
     'apothecary-m': {
@@ -315,7 +315,7 @@ def process(hd, bd, hoff, boff, alpha, outdir):
         hsize = HEAD_PARAMS[bbase]['size']
 
 
-    offset = offset[1:4] + [offset[0]]
+    #offset = offset[1:4] + [offset[0]]
     head = CROP['head']['idle'][hsize]
     
     xStart, yStart = head['start']
@@ -337,7 +337,7 @@ def process(hd, bd, hoff, boff, alpha, outdir):
                 start = x*32,0
                 size = 32,32
                 sub = crop(idleh[k], start, size)
-                dest = x*32 + offset[x][0], offset[x][1]
+                dest = x*32 + offset[x][0], -offset[x][1]
                 paste(sub, newIdle, dest)
                 
             idleh[k] = newIdle
@@ -353,7 +353,7 @@ def process(hd, bd, hoff, boff, alpha, outdir):
                 start = x*16,0
                 size = 16,16
                 sub = crop(idleh[k], start, size)
-                dest = x*32-24 + offset[x][0], offset[x][1]
+                dest = x*32-24 + offset[x][0], -offset[x][1]
                 paste(sub, newIdle, dest)
                 
             idleh[k] = newIdle
@@ -382,7 +382,7 @@ def process(hd, bd, hoff, boff, alpha, outdir):
             start = x*32,0
             size = 32,32
             sub = crop(idleb[k], start, size)
-            dest = x*32 + offset[x][0], offset[x][1]
+            dest = x*32 + offset[x][0], -offset[x][1]
             paste(sub, newIdle, dest)
             
         idleb[k] = newIdle
