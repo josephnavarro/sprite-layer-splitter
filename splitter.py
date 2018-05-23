@@ -26,6 +26,10 @@ SPRITE_PARAMS = {
         'offset': (0,2),
         'size': 'large',
         },
+    'adventurer-m': {
+        'offset': (-1,2),
+        'size': 'large',
+        },
     }
 
 #Color offsets (multiplied by above blocks)
