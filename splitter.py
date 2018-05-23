@@ -300,20 +300,21 @@ def process(fn, type, size, offset, alpha, outdir):
                     start = x*32,0
                     size = 32,32
                     sub = crop(idle[k], start, size)
-                    dest = x*32, -1 if x==3 else -2
+                    dest = x*32, -1 - (x+1)//2
                     paste(sub, newIdle, dest)
                 idle[k] = newIdle
                 
         if size==SMALL:
             #Idle image
             w,h = HEAD_IDLE_SIZE
+            offset = [1,3,2,2]
             for k in idle.keys():
                 newIdle = np.zeros((h,w,4), np.uint8)
                 for x in range(4):
                     start = x*16,0
                     size  = 16,16
                     sub   = crop(idle[k], start, size)
-                    dest  = x*32-24 - 2, 3 + (-1 if x==3 else -2)
+                    dest  = x*32-24 - 2, offset[x] - 1
                     paste(sub, newIdle, dest)
                 idle[k] = newIdle
 
