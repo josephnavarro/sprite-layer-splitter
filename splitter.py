@@ -75,7 +75,10 @@ HEAD_PARAMS = {
         'offset': (0,2),
         'size': 'large',
         },
-    
+    'blacksmith-m': {
+        'offset': (1,3),
+        'size': 'large',
+        },
     }
 
 #Color offsets (multiplied by above blocks)
