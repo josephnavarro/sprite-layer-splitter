@@ -70,11 +70,11 @@ HEAD_PARAMS = {
         'size': 'large',
         },
     'berserker-f': {
-        'offset': (0,3),
+        'offset': [(0,3),(0,3),(0,3),(0,3),],
         'size': 'large',
         },
     'berserker-m': {
-        'offset': (0,2),
+        'offset': [(0,2),(0,2),(0,2),(0,2),],
         'size': 'large',
         },
     'blacksmith-m': {
