@@ -42,6 +42,10 @@ SPRITE_PARAMS = {
         'offset': (0,1),
         'size': 'large',
         },
+    'archer-m': {
+        'offset': (-1,2),
+        'size': 'large',
+        },
     }
 
 #Color offsets (multiplied by above blocks)
