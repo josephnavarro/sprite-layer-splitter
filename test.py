@@ -19,3 +19,19 @@ splitter.main(
     'large',
     'camilla-hero',
     )
+
+
+splitter.main(
+    'inputs/odin.png',
+    'inputs/malig-knight-m.png',
+    'small',
+    'odin-malig-knight',
+    )
+
+
+splitter.main(
+    'inputs/odin.png',
+    'inputs/hero.png',
+    'large',
+    'odin-hero',
+    )

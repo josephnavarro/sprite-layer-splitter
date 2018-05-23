@@ -217,48 +217,15 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
 
         paste(idleBlank, outImage, (0,yPos*32))
 
-        '''
-        #Put all movement images together
-        moveBlank = make_blank(*HEAD_MOVE_SIZE)
-        moves = sorted(list(set(
-            list(head[MOVE].keys()) + list(body[MOVE].keys())
-            )))
-
-        #Composite head and body
-        for key in moves:
-            if key in head[MOVE].keys():
-                paste(head[MOVE][key], moveBlank, (0,0))
-            if key in body[MOVE].keys():
-                paste(body[MOVE][key], moveBlank, (0,0))
-
-        paste(moveBlank, outImage, (yPos*128,32))
-        '''
-
         #Generate grayscale image based on blue
         yPos += 1
         if colorType == 'purple':
             idleGray = idleBlank.copy()
-            #moveGray = moveBlank.copy()
-
-            #Make gray
             idleGray = cv2.cvtColor(idleGray, cv2.COLOR_BGR2GRAY)
-            #moveGray = cv2.cvtColor(moveGray, cv2.COLOR_BGR2GRAY)
-
-            #Back to colorspace
             idleGray = cv2.cvtColor(idleGray, cv2.COLOR_GRAY2BGR)
-            #moveGray = cv2.cvtColor(moveGray, cv2.COLOR_GRAY2BGR)
-
-            #Add alpha channel
             idleGray = convert_alpha(idleGray)
-            #moveGray = convert_alpha(moveGray)
-
-            #Make black transparent
             replace_colors(idleGray, [0,0,0,255], [0,0,0,0])
-            #replace_colors(moveGray, [0,0,0,255], [0,0,0,0])
-
-            #Paste onto sheet
             paste(idleGray, outImage, (0,yPos*32))
-            #paste(moveGray, outImage, (yPos*128,32))
 
     path = fix_paths(os.path.join(outdir, name))
     cv2.imwrite(path + '/sheet.png', outImage)
@@ -267,6 +234,7 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
 def make_blank(w,h,channels=4):
     #Makes a blank image with given size
     return np.zeros((h,w,channels), np.uint8)
+
 
 def remove_border(img, bw, bh):
     #Removes surrounding border from image. (In-place).
@@ -286,7 +254,6 @@ def replace_colors(img, color=None, replace=[0,0,0]):
 def paste(src, dest, offset):
     #Pastes source image onto destination image
     h,w = src.shape[0], src.shape[1]
-    
     x1,y1 = offset
     x2,y2 = x1+w, y1+h
 
@@ -295,6 +262,7 @@ def paste(src, dest, offset):
             m,n = x1+x, y1+y
             if src[y,x,3] != 0:
                 dest[n,m] = src[y,x]
+
     
 def process(fn, type, size, offset, alpha, outdir):
     #Processes a single color-layered image
@@ -307,17 +275,11 @@ def process(fn, type, size, offset, alpha, outdir):
         cropIdle = CROP[HEAD_IMG][IDLE][size]
         xStart, yStart = cropIdle[START]
         start = xStart+xOff, yStart+yOff
-        if size==SMALL:
-            start = start[0] + 2, start[1] - 1
-        else:
-            start = start[0] - 1, start[1] + 1
-            
         idle = crop(img, start, cropIdle[SIZE])
         idle = composite(idle, alpha)
         if alpha:
             for k in idle.keys():
                 replace_colors(idle[k],[0,0,0,255],[0,0,0,0])
-
 
         #Processing for head-formatted image (moving)
         cropMove = CROP[HEAD_IMG][MOVE][size]
@@ -330,6 +292,18 @@ def process(fn, type, size, offset, alpha, outdir):
                 replace_colors(move[k],[0,0,0,255],[0,0,0,0])
 
         #Fix image formatting if small size
+        if size==LARGE:
+            w,h = HEAD_IDLE_SIZE
+            for k in idle.keys():
+                newIdle = np.zeros((h,w,4), np.uint8)
+                for x in range(4):
+                    start = x*32,0
+                    size = 32,32
+                    sub = crop(idle[k], start, size)
+                    dest = x*32, -1 if x==3 else -2
+                    paste(sub, newIdle, dest)
+                idle[k] = newIdle
+                
         if size==SMALL:
             #Idle image
             w,h = HEAD_IDLE_SIZE
@@ -339,7 +313,7 @@ def process(fn, type, size, offset, alpha, outdir):
                     start = x*16,0
                     size  = 16,16
                     sub   = crop(idle[k], start, size)
-                    dest  = x*32-24, 0
+                    dest  = x*32-24 - 2, 3 + (-1 if x==3 else -2)
                     paste(sub, newIdle, dest)
                 idle[k] = newIdle
 
