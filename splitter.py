@@ -86,12 +86,20 @@ HEAD_PARAMS = {
         'size': 'large',
         },
     'bow-knight': {
-        'offset': [(0,0),(0,0),(0,0),(0,0),],
+        'offset': [(1,0),(1,0),(1,0),(1,0),],
         'size': 'small',
         },
     'butler': {
         'offset': [(0,0),(0,0),(0,0),(0,0),],
         'size': 'large',
+        },
+    'cavalier-f': {
+        'offset': [(0,0),(0,0),(0,0),(0,0),],
+        'size': 'small',
+        },
+    'cavalier-m': {
+        'offset': [(0,0),(0,0),(0,0),(0,0),],
+        'size': 'small',
         },
     }
 
