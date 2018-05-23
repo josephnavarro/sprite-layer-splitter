@@ -2,24 +2,31 @@
 import cv2, sys, os
 import numpy as np
 
-# Fire Emblem 3DS Sprite Splitter
+# Fire Emblem 3DS Sprite Compositing Tool
 #
 # Intended for Fire Emblem Fates and Fire Emblem Echoes sprites.
 # Map sprites in Fire Emblem Fates and Echoes store head and
-# body sprites separately, and give layer information via
-# grayscale masks. This program puts them together
+# body sprites separately, and store layer information using
+# grayscale masks. This program puts them together.
+#
+# (Currently only composites the idle frames).
 
-IGNORE = 0, 255 # Ignored colors (black and white)
-OUTDIR = 'outputs' # Directory strings
-
-#Output image dimensions
+IGNORE = 0, 255
+OUTDIR = 'outputs'
 HEAD_IDLE_SIZE = 128,32
 HEAD_MOVE_SIZE = 128,256
 OUTPUT_BASE = 128,32
-
-#Pixel offsets for unit colors
 MOVE_BLOCK = 552
 HEAD_BLOCK = 584
+
+# Sprite offsets exist on a class-by-class basis.
+# Found this out the hard way.
+SPRITE_PARAMS = {
+    'adventurer-f': {
+        'offset': (0,2),
+        'size': 'large',
+        },
+    }
 
 #Color offsets (multiplied by above blocks)
 COLOR_OFFSETS = {
@@ -242,44 +249,52 @@ def process(fn, type, size, offset, alpha, outdir):
     img = cv2.imread(fn)
     replace_colors(img)
     xOff, yOff = offset
+    
 
     if type=='head':
         # Processing for head (idle)
+        classOffset = [(0,0),(0,0),(0,0),(0,0),]
+        
         cropIdle = CROP['head']['idle'][size]
         xStart, yStart = cropIdle['start']
         start = xStart+xOff, yStart+yOff
         idle = crop(img, start, cropIdle['size'])
         idle = composite(idle, alpha)
+        
         if alpha:
             for k in idle.keys():
                 replace_colors(idle[k],[0,0,0,255],[0,0,0,0])
 
 
-
-        #Fix image formatting if small size
         if size=='large':
             w,h = HEAD_IDLE_SIZE
+            
             for k in idle.keys():
                 newIdle = np.zeros((h,w,4), np.uint8)
                 for x in range(4):
                     start = x*32,0
                     size = 32,32
                     sub = crop(idle[k], start, size)
-                    dest = x*32, -1 - (x+1)//2
+                    dest = (
+                        x*32 + classOffset[x][0],
+                        classOffset[x][1],
+                        )
                     paste(sub, newIdle, dest)
                 idle[k] = newIdle
                 
         if size=='small':
-            #Idle image
             w,h = HEAD_IDLE_SIZE
-            offset = [1,3,2,2]
+            
             for k in idle.keys():
                 newIdle = np.zeros((h,w,4), np.uint8)
                 for x in range(4):
                     start = x*16,0
                     size  = 16,16
                     sub   = crop(idle[k], start, size)
-                    dest  = x*32-24 - 2, offset[x] - 1
+                    dest  = (
+                        x*32-24 + classOffset[x][0],
+                        classOffset[x][1],
+                        )
                     paste(sub, newIdle, dest)
                 idle[k] = newIdle
 

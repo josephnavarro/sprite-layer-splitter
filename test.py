@@ -12,6 +12,22 @@ splitter.main(
     'anna-adventurer',
     )
 
+
+splitter.main(
+    'inputs/selena.png',
+    'inputs/hero-f.png',
+    'large',
+    'selena-hero',
+    )
+
+splitter.main(
+    'inputs/anna.png',
+    'inputs/hero-f.png',
+    'large',
+    'anna-hero',
+    )
+
+
 splitter.main(
     'inputs/anna.png',
     'inputs/bow-knight.png',
