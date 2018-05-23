@@ -62,11 +62,11 @@ HEAD_PARAMS = {
         'size': 'small',
         },
     'basara-f': {
-        'offset': (1,3),
+        'offset': [(1,2),(1,3),(2,3),(2,3),],
         'size': 'large',
         },
     'basara-m': {
-        'offset': (2,3),
+        'offset': [(2,2),(2,3),(3,3),(3,3),],
         'size': 'large',
         },
     'berserker-f': {
