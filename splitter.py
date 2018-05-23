@@ -21,7 +21,16 @@ HEAD_BLOCK = 584
 
 # Sprite offsets exist on a class-by-class basis.
 # Found this out the hard way.
-SPRITE_PARAMS = {
+
+BODY_PARAMS = {
+    # Shift unit body by this much before pasting
+    'ballistician': {
+        'offset': (0,-1),
+        },
+    }
+
+HEAD_PARAMS = {
+    # Shift head by this much before pasting
     'adventurer-f': {
         'offset': (0,2),
         'size': 'large',
@@ -45,6 +54,10 @@ SPRITE_PARAMS = {
     'archer-m': {
         'offset': (-1,2),
         'size': 'large',
+        },
+    'ballistician': {
+        'offset': (0,-1),
+        'size': 'small',
         },
     }
 
