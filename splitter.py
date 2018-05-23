@@ -229,7 +229,7 @@ def main(hd, bd, size, name, offset=(0,0), alpha=True, outdir=OUTDIR):
         mpos = offset[0], offset[1] + MOVE_BLOCK * COLOR_OFFSETS[c]
 
         #Process head and body separately
-        d = process(hd, bd, size, hpos, mpos, alpha, outdir)
+        d = process(hd, bd, hpos, mpos, alpha, outdir)
 
         #Put all idle images together
         idb = make_blank(*HEAD_IDLE_SIZE)
@@ -312,6 +312,9 @@ def process(hd, bd, hoff, boff, alpha, outdir):
     if bbase in HEAD_PARAMS:
         offset = HEAD_PARAMS[bbase]['offset'][:]
         hsize = HEAD_PARAMS[bbase]['size']
+
+
+    offset = offset[1:4] + [offset[0]]
          
     head = CROP['head']['idle'][hsize]
     
@@ -321,7 +324,7 @@ def process(hd, bd, hoff, boff, alpha, outdir):
     
     if alpha:
         for k in idleh.keys():
-            replace_colors(idle[k], [0,0,0,255], [0,0,0,0])
+            replace_colors(idleh[k], [0,0,0,255], [0,0,0,0])
 
     if hsize == 'large':
         # Large head size
@@ -360,10 +363,12 @@ def process(hd, bd, hoff, boff, alpha, outdir):
     offset = [(0,0), (0,0), (0,0), (0,0)]
     if bbase in BODY_PARAMS:
         offset = BODY_PARAMS[bbase]['offset'][:]
+
+    offset = offset[1:4] + [offset[0]]
         
     body = CROP['body']['idle']
     xStart, yStart = body['start']
-    start = xStart + boff, yStart + boff
+    start = xStart + boff[0], yStart + boff[1]
     idleb = composite(crop(bimg, start, body['size']), alpha)
     
     if alpha:
