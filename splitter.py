@@ -77,8 +77,20 @@ HEAD_PARAMS = {
         'offset': [(0,2),(0,2),(0,2),(0,2),],
         'size': 'large',
         },
+    'blacksmith-f': {
+        'offset': [(0,0),(0,0),(0,0),(0,1),],
+        'size': 'large',
+        },
     'blacksmith-m': {
-        'offset': (1,3),
+        'offset': [(1,1),(1,2),(1,3),(1,2),],
+        'size': 'large',
+        },
+    'bow-knight': {
+        'offset': [(0,0),(0,0),(0,0),(0,0),],
+        'size': 'small',
+        },
+    'butler': {
+        'offset': [(0,0),(0,0),(0,0),(0,0),],
         'size': 'large',
         },
     }
