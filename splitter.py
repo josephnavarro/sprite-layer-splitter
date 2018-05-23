@@ -19,6 +19,8 @@ OUTPUT_BASE = 128,32
 MOVE_BLOCK = 552
 HEAD_BLOCK = 584
 
+BASE_OFFSET_ARRAY = [(0,0),(0,0),(0,0),(0,0),]
+
 # Sprite offsets exist on a class-by-class basis.
 # Found this out the hard way.
 
@@ -40,11 +42,11 @@ HEAD_PARAMS = {
         'size': 'large',
         },
     'apothecary-f': {
-        'offset': [(-2,2),(-2,1),(-2,2),(-2,3)],
+        'offset': [(-2,2),(-2,1),(-2,2),(-2,3),],
         'size': 'large',
         },
     'apothecary-m': {
-        'offset': (-2,1),
+        'offset': [(-2,2),(-2,1),(-2,2),(-2,3),],
         'size': 'large',
         },
     'archer-f': {

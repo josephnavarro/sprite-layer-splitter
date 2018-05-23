@@ -6,8 +6,8 @@ import splitter, glob, os
 # (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
 FILE_STRING = 'inputs/{}.png'
-UNIT_NAME = 'oboro'
-CLASS_NAME = 'apothecary-f'
+UNIT_NAME = 'yukimura'
+CLASS_NAME = 'apothecary-m'
 HEAD_SIZE = 'large'
 
 splitter.main(
