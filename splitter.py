@@ -59,6 +59,10 @@ HEAD_PARAMS = {
         'offset': (0,-1),
         'size': 'small',
         },
+    'basara-f': {
+        'offset': (1,3),
+        'size': 'large',
+        },
     }
 
 #Color offsets (multiplied by above blocks)
