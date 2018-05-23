@@ -6,8 +6,8 @@ import splitter, glob, os
 # (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
 FILE_STRING = 'inputs/{}.png'
-UNIT_NAME = 'arthur'
-CLASS_NAME = 'berserker-m'
+UNIT_NAME = 'rinkah'
+CLASS_NAME = 'blacksmith-f'
 HEAD_SIZE = 'large'
 
 splitter.main(
