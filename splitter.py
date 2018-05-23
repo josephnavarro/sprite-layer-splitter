@@ -30,7 +30,7 @@ HEAD_IDLE_SIZE = 128,32
 HEAD_MOVE_SIZE = 128,256
 BODY_IDLE_SIZE = 128,32
 BODY_MOVE_SIZE = 128,256
-OUTPUT_BASE    = 128,288
+OUTPUT_BASE    = 128,32
 
 #Pixel offsets for unit colors
 MOVE_BLOCK = 552
@@ -189,7 +189,6 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
     colorKeys = 'red','blue'
     n = len(colorKeys) + 1
     w,h = OUTPUT_BASE[0] * n, OUTPUT_BASE[1]
-    print(w,h)
     outImage = make_blank(w,h)
     xPos = 0
 
@@ -218,6 +217,7 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
 
         paste(idleBlank, outImage, (xPos*128,0))
 
+        '''
         #Put all movement images together
         moveBlank = make_blank(*HEAD_MOVE_SIZE)
         moves = sorted(list(set(
@@ -232,32 +232,33 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
                 paste(body[MOVE][key], moveBlank, (0,0))
 
         paste(moveBlank, outImage, (xPos*128,32))
+        '''
 
         #Generate grayscale image based on blue
         xPos += 1
         if colorType == 'blue':
             idleGray = idleBlank.copy()
-            moveGray = moveBlank.copy()
+            #moveGray = moveBlank.copy()
 
             #Make gray
             idleGray = cv2.cvtColor(idleGray, cv2.COLOR_BGR2GRAY)
-            moveGray = cv2.cvtColor(moveGray, cv2.COLOR_BGR2GRAY)
+            #moveGray = cv2.cvtColor(moveGray, cv2.COLOR_BGR2GRAY)
 
             #Back to colorspace
             idleGray = cv2.cvtColor(idleGray, cv2.COLOR_GRAY2BGR)
-            moveGray = cv2.cvtColor(moveGray, cv2.COLOR_GRAY2BGR)
+            #moveGray = cv2.cvtColor(moveGray, cv2.COLOR_GRAY2BGR)
 
             #Add alpha channel
             idleGray = convert_alpha(idleGray)
-            moveGray = convert_alpha(moveGray)
+            #moveGray = convert_alpha(moveGray)
 
             #Make black transparent
             replace_colors(idleGray, [0,0,0,255], [0,0,0,0])
-            replace_colors(moveGray, [0,0,0,255], [0,0,0,0])
+            #replace_colors(moveGray, [0,0,0,255], [0,0,0,0])
 
             #Paste onto sheet
             paste(idleGray, outImage, (xPos*128,0))
-            paste(moveGray, outImage, (xPos*128,32))
+            #paste(moveGray, outImage, (xPos*128,32))
 
     path = fix_paths(os.path.join(outdir, name))
     cv2.imwrite(path + '/sheet.png', outImage)
@@ -306,6 +307,8 @@ def process(fn, type, size, offset, alpha, outdir):
         cropIdle = CROP[HEAD_IMG][IDLE][size]
         xStart, yStart = cropIdle[START]
         start = xStart+xOff, yStart+yOff
+        if size==SMALL:
+            start = start[0] + 2, start[1] - 1
         idle = crop(img, start, cropIdle[SIZE])
         idle = composite(idle, alpha)
         if alpha:

@@ -6,8 +6,8 @@ import splitter, glob, os
 # (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
 splitter.main(
-    'inputs/odin.png',
-    'inputs/bowknight.png',
+    'inputs/camilla.png',
+    'inputs/malig-knight-m.png',
     'small',
-    'odin-bowknight',
+    'camilla-malig-knight',
     )
