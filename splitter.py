@@ -50,11 +50,11 @@ HEAD_PARAMS = {
         'size': 'large',
         },
     'archer-f': {
-        'offset': (0,1),
+        'offset': [(0,1),(0,1),(0,1),(0,0),],
         'size': 'large',
         },
     'archer-m': {
-        'offset': (-1,2),
+        'offset': [(-1,2),(-1,2),(-1,2),(-1,1),],
         'size': 'large',
         },
     'ballistician': {
