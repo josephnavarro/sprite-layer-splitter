@@ -34,11 +34,11 @@ BODY_PARAMS = {
 HEAD_PARAMS = {
     # Shift head by this much before pasting
     'adventurer-f': {
-        'offset': (0,2),
+        'offset': [(0,2),(0,2),(0,2),(0,2),],
         'size': 'large',
         },
     'adventurer-m': {
-        'offset': (-1,2),
+        'offset': [(-1,2),(-1,2),(-1,2),(-1,2),],
         'size': 'large',
         },
     'apothecary-f': {
