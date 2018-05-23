@@ -90,7 +90,7 @@ HEAD_PARAMS = {
         'size': 'small',
         },
     'butler': {
-        'offset': [(0,0),(0,0),(0,0),(0,0),],
+        'offset': [(-1,3),(-1,3),(-1,3),(-1,3),],
         'size': 'large',
         },
     'cavalier-f': {
@@ -237,7 +237,7 @@ def make_mask(im, thresh, maxval=255):
     return t
 
 
-def main(hd, bd, size, name, offset=(0,0), alpha=True, outdir=OUTDIR):
+def main(hd, bd, name, offset=(0,0), alpha=True, outdir=OUTDIR):
     '''Image processor entrypoint.'''
     images = {}
     colorKeys = 'blue','red','green','purple'
@@ -414,6 +414,6 @@ def process(hd, bd, hoff, boff, alpha, outdir):
 
 
 if __name__ == '__main__':
-    head, body, size, name = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[3]
-    main(head,body,size,name)
+    head, body, name = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[3]
+    main(head,body,name)
     
