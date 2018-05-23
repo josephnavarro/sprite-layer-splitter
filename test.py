@@ -11,3 +11,11 @@ splitter.main(
     'small',
     'camilla-malig-knight',
     )
+
+
+splitter.main(
+    'inputs/camilla.png',
+    'inputs/hero.png',
+    'large',
+    'camilla-hero',
+    )

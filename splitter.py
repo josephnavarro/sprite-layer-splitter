@@ -186,11 +186,11 @@ def make_mask(im, thresh, maxval=255):
 def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR):
     #Main processing method
     images = {}
-    colorKeys = 'red','blue'
+    colorKeys = 'blue','red','green','purple'
     n = len(colorKeys) + 1
-    w,h = OUTPUT_BASE[0] * n, OUTPUT_BASE[1]
+    w,h = OUTPUT_BASE[0], OUTPUT_BASE[1] * n
     outImage = make_blank(w,h)
-    xPos = 0
+    yPos = 0
 
     for colorType in colorKeys:
         #Offset for specific unit color
@@ -215,7 +215,7 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
             if key in body[IDLE].keys():
                 paste(body[IDLE][key], idleBlank, (0,0))
 
-        paste(idleBlank, outImage, (xPos*128,0))
+        paste(idleBlank, outImage, (0,yPos*32))
 
         '''
         #Put all movement images together
@@ -231,12 +231,12 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
             if key in body[MOVE].keys():
                 paste(body[MOVE][key], moveBlank, (0,0))
 
-        paste(moveBlank, outImage, (xPos*128,32))
+        paste(moveBlank, outImage, (yPos*128,32))
         '''
 
         #Generate grayscale image based on blue
-        xPos += 1
-        if colorType == 'blue':
+        yPos += 1
+        if colorType == 'purple':
             idleGray = idleBlank.copy()
             #moveGray = moveBlank.copy()
 
@@ -257,8 +257,8 @@ def main(headFile, bodyFile, size, name, offset=(0,0), alpha=True, outdir=OUTDIR
             #replace_colors(moveGray, [0,0,0,255], [0,0,0,0])
 
             #Paste onto sheet
-            paste(idleGray, outImage, (xPos*128,0))
-            #paste(moveGray, outImage, (xPos*128,32))
+            paste(idleGray, outImage, (0,yPos*32))
+            #paste(moveGray, outImage, (yPos*128,32))
 
     path = fix_paths(os.path.join(outdir, name))
     cv2.imwrite(path + '/sheet.png', outImage)
@@ -309,6 +309,9 @@ def process(fn, type, size, offset, alpha, outdir):
         start = xStart+xOff, yStart+yOff
         if size==SMALL:
             start = start[0] + 2, start[1] - 1
+        else:
+            start = start[0] - 1, start[1] + 1
+            
         idle = crop(img, start, cropIdle[SIZE])
         idle = composite(idle, alpha)
         if alpha:
