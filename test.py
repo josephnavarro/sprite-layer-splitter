@@ -6,32 +6,46 @@ import splitter, glob, os
 # (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
 splitter.main(
-    'inputs/camilla.png',
+    'inputs/anna.png',
+    'inputs/adventurer-f.png',
+    'large',
+    'anna-adventurer',
+    )
+
+splitter.main(
+    'inputs/anna.png',
+    'inputs/bow-knight.png',
+    'small',
+    'anna-bow-knight',
+    )
+
+splitter.main(
+    'inputs/anna.png',
+    'inputs/dark-knight.png',
+    'small',
+    'anna-dark-knight',
+    )
+
+splitter.main(
+    'inputs/anna.png',
+    'inputs/falcon-knight.png',
+    'small',
+    'anna-falcon-knight',
+    )
+
+splitter.main(
+    'inputs/anna.png',
+    'inputs/general.png',
+    'large',
+    'anna-general',
+    )
+
+
+splitter.main(
+    'inputs/anna.png',
     'inputs/malig-knight-m.png',
     'small',
-    'camilla-malig-knight',
+    'anna-malig-knight',
     )
 
 
-splitter.main(
-    'inputs/camilla.png',
-    'inputs/hero.png',
-    'large',
-    'camilla-hero',
-    )
-
-
-splitter.main(
-    'inputs/odin.png',
-    'inputs/malig-knight-m.png',
-    'small',
-    'odin-malig-knight',
-    )
-
-
-splitter.main(
-    'inputs/odin.png',
-    'inputs/hero.png',
-    'large',
-    'odin-hero',
-    )
