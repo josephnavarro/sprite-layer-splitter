@@ -115,6 +115,14 @@ HEAD_PARAMS = {
         'offset': [(1,0),(1,0),(1,0),(1,0),],
         'size': 'small',
         },
+    'dark-mage-f': {
+        'offset': [(-1,3),(-1,3),(-1,3),(-1,3),],
+        'size': 'large',
+        },
+    'dark-mage-m': {
+        'offset': [(0,0),(0,0),(0,0),(0,0),],
+        'size': 'large',
+        },
     }
 
 #Color offsets (multiplied by above blocks)
