@@ -138,6 +138,10 @@ HEAD_PARAMS = {
         'offset': [(-2,2),(-2,2),(-2,1),(-2,1),],
         'size': 'large',
         },
+    'dread-fighter-m': {
+        'offset': [(-2,2),(-2,2),(-2,1),(-2,1),],
+        'size': 'large',
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
@@ -374,8 +378,13 @@ def process(hd, bd, hoff, boff, alpha, outdir):
     except:
         print("Error! Character image {} not found! Aborting...".format(hd))
         raise SystemExit
+
+    try:
+        bimg = cv2.imread(bd)
+    except:
+        print("Error! Class image {} not found! Aborting...".format(bd))
+        raise SystemExit
         
-    bimg = cv2.imread(bd)
     hsize = 'large'
 
     replace_colors(himg)
