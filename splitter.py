@@ -224,6 +224,10 @@ HEAD_PARAMS = {
         'offset': [(1,2),(1,2),(1,1),(1,1),],
         'size': 'large',
         },
+    'master-ninja-m': {
+        'offset': [(-3,0),(-3,0),(-3,-1),(-3,-1),],
+        'size': 'large',
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
