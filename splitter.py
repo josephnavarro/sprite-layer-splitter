@@ -147,6 +147,10 @@ HEAD_PARAMS = {
         'size': 'small',
         #'reverse': True,
         },
+    'fighter-f': {
+        'offset': [(1,1),(1,1),(1,2),(1,1),],
+        'size': 'large',
+        },
     'fighter-m': {
         'offset': [(1,0),(1,1),(1,2),(1,1),],
         'size': 'large',
