@@ -1,5 +1,5 @@
 #!usr/bin/env python3
-import splitter, glob, os
+import splitter
 
 # Image splitting tests. All spritesheets used in these
 # examples were taken from The Spriters Resource.
@@ -7,7 +7,7 @@ import splitter, glob, os
 
 FILE_STRING = 'inputs/{}.png'
 UNIT_NAME = 'marth'
-CLASS_NAME = 'lodestar'
+CLASS_NAME = 'maid'
 
 splitter.main(
     FILE_STRING.format(UNIT_NAME),
