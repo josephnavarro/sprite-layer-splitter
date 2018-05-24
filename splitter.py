@@ -175,6 +175,10 @@ HEAD_PARAMS = {
         'offset': [(0,2),(0,2),(0,2),(0,2),],
         'size': 'large',
         },
+    'hero-f': {
+        'offset': [(1,2),(1,1),(1,1),(1,0),],
+        'size': 'large',
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
