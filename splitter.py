@@ -190,7 +190,11 @@ HEAD_PARAMS = {
     'hoshido-noble-f': {
         'offset': [(-1,3),(-1,3),(-1,2),(-1,2),],
         'size': 'large',
-        #'reverse': True,
+        },
+    'kinshi-knight': {
+        'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
+        'size': 'small',
+        'reverse': True,
         },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],

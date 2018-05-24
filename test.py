@@ -6,8 +6,8 @@ import splitter, glob, os
 # (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
 FILE_STRING = 'inputs/{}.png'
-UNIT_NAME = 'corrin-f'
-CLASS_NAME = 'hoshido-noble-f'
+UNIT_NAME = 'hinoka'
+CLASS_NAME = 'kinshi-knight'
 
 splitter.main(
     FILE_STRING.format(UNIT_NAME),
