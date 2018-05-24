@@ -104,7 +104,12 @@ HEAD_PARAMS = {
         'reverse': True,
         },
     'dark-falcon-f': {
-        'offset': [],
+        'offset': [(1,0),(2,0),(2,-1),(1,-1),],
+        'size': 'small',
+        },
+    'dark-falcon-m': {
+        'offset': [(0,0),(0,0),(0,0),(0,0),],
+        'size': 'small',
         },
     }
 
