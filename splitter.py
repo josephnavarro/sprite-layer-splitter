@@ -183,6 +183,15 @@ HEAD_PARAMS = {
         'offset': [(0,2),(0,2),(0,1),(0,1),],
         'size': 'large',
         },
+    'hoshido-noble-m': {
+        'offset': [(-1,3),(-1,3),(-1,2),(-1,2),],
+        'size': 'large',
+        },
+    'hoshido-noble-f': {
+        'offset': [(-1,3),(-1,3),(-1,2),(-1,2),],
+        'size': 'large',
+        #'reverse': True,
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
