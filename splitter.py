@@ -120,7 +120,7 @@ HEAD_PARAMS = {
         'size': 'large',
         },
     'dark-mage-m': {
-        'offset': [(0,0),(0,0),(0,0),(0,0),],
+        'offset': [(-1,3),(-1,3),(-1,3),(-1,3),],
         'size': 'large',
         },
     }
