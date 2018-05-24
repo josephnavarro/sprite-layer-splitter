@@ -196,6 +196,14 @@ HEAD_PARAMS = {
         'size': 'small',
         'reverse': True,
         },
+    'kitsune-f': {
+        'offset': [(2,2),(2,2),(2,1),(2,1),],
+        'size': 'large',
+        },
+    'kitsune-m': {
+        'offset': [(-1,3),(-1,3),(-1,2),(-1,2),],
+        'size': 'large',
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
