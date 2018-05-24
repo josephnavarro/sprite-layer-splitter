@@ -6,8 +6,8 @@ import splitter
 # (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
 FILE_STRING = 'inputs/{}.png'
-UNIT_NAME = 'camilla'
-CLASS_NAME = 'malig-knight'
+UNIT_NAME = 'kagero'
+CLASS_NAME = 'master-ninja-f'
 
 splitter.main(
     FILE_STRING.format(UNIT_NAME),
