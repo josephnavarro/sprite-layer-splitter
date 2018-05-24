@@ -163,6 +163,10 @@ HEAD_PARAMS = {
         'offset': [(-1,3),(-1,3),(-1,3),(-1,3),],
         'size': 'large',
         },
+    'great-knight': {
+        'offset': [(1,0),(1,0),(1,0),(1,0),],
+        'size': 'small',
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
