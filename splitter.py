@@ -124,7 +124,7 @@ HEAD_PARAMS = {
         'size': 'large',
         },
     'diviner-f': {
-        'offset': [(0,0),(0,0),(0,0),(0,0),],
+        'offset': [(0,1),(0,1),(0,1),(0,1),],
         'size': 'large',
         },
     'diviner-m': {
