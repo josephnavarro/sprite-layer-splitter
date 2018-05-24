@@ -134,6 +134,10 @@ HEAD_PARAMS = {
         'offset':  [(0,2),(0,2),(0,2),(0,2),],
         'size': 'large',
         },
+    'dread-fighter-f': {
+        'offset': [(-2,2),(-2,2),(-2,1),(-2,1),],
+        'size': 'large',
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
@@ -365,7 +369,12 @@ def process(hd, bd, hoff, boff, alpha, outdir):
     '''Processes a single color-layered image.'''
     hbase, ext = os.path.splitext(os.path.basename(hd))
     bbase, ext = os.path.splitext(os.path.basename(bd))
-    himg = cv2.imread(hd)
+    try:
+        himg = cv2.imread(hd)
+    except:
+        print("Error! Character image {} not found! Aborting...".format(hd))
+        raise SystemExit
+        
     bimg = cv2.imread(bd)
     hsize = 'large'
 
@@ -378,6 +387,8 @@ def process(hd, bd, hoff, boff, alpha, outdir):
     if bbase in HEAD_PARAMS:
         offset = HEAD_PARAMS[bbase]['offset'][:]
         hsize = HEAD_PARAMS[bbase]['size']
+    else:
+        print("Error! Undefined character class! Continuing using defaults...")
 
 
     #offset = offset[1:4] + [offset[0]]
