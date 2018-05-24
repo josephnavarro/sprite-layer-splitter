@@ -6,8 +6,8 @@ import splitter, glob, os
 # (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
 FILE_STRING = 'inputs/{}.png'
-UNIT_NAME = 'odin'
-CLASS_NAME = 'dark-mage-m'
+UNIT_NAME = 'hayato'
+CLASS_NAME = 'diviner-m'
 
 splitter.main(
     FILE_STRING.format(UNIT_NAME),

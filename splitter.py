@@ -123,6 +123,14 @@ HEAD_PARAMS = {
         'offset': [(-1,3),(-1,3),(-1,3),(-1,3),],
         'size': 'large',
         },
+    'diviner-f': {
+        'offset': [(0,0),(0,0),(0,0),(0,0),],
+        'size': 'large',
+        },
+    'diviner-m': {
+        'offset':  [(0,2),(0,2),(0,2),(0,2),],
+        'size': 'large',
+        },
     }
 
 #Color offsets (multiplied by above blocks)
