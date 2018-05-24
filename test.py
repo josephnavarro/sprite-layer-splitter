@@ -7,7 +7,7 @@ import splitter, glob, os
 
 FILE_STRING = 'inputs/{}.png'
 UNIT_NAME = 'leo'
-CLASS_NAME = 'dark-falcon-m'
+CLASS_NAME = 'dark-knight'
 
 splitter.main(
     FILE_STRING.format(UNIT_NAME),

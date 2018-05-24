@@ -111,6 +111,10 @@ HEAD_PARAMS = {
         'offset': [(1,0),(2,0),(2,-1),(1,-1),],
         'size': 'small',
         },
+    'dark-knight': {
+        'offset': [(1,0),(1,0),(1,0),(1,0),],
+        'size': 'small',
+        },
     }
 
 #Color offsets (multiplied by above blocks)
