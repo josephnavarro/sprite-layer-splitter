@@ -248,6 +248,10 @@ HEAD_PARAMS = {
         'offset': [(-1,2),(-1,2),(-1,1),(-1,1),],
         'size': 'large',
         },
+    'merchant-f': {
+        'offset': [(0,2),(0,1),(0,0),(1,-1),],
+        'size': 'large',
+        },
     'merchant-m': {
         'offset': [(-2,2),(-2,1),(-2,0),(-1,-1),],
         'size': 'large',
