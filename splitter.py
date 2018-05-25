@@ -264,6 +264,10 @@ HEAD_PARAMS = {
         'offset': [(-2,0),(-2,0),(-2,-1),(-2,-1),],
         'size': 'large',
         },
+    'nine-tails-f': {
+        'offset': [(0,3),(0,3),(0,2),(0,2),],
+        'size': 'large',
+        },
     'nine-tails-m': {
         'offset': [(0,3),(0,3),(0,2),(0,2),],
         'size': 'large',
