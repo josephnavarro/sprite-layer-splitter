@@ -244,6 +244,10 @@ HEAD_PARAMS = {
         'offset': [(0,1),(0,0),(0,-1),(0,0)],
         'size': 'large',
         },
+    'mercenary-m': {
+        'offset': [(-1,2),(-1,2),(-1,1),(-1,1),],
+        'size': 'large',
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
