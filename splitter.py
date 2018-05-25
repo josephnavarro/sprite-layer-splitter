@@ -277,7 +277,7 @@ HEAD_PARAMS = {
         'size': 'large',
         },
     'nohr-noble-f': {
-        'offset': [(0,0),(0,0),(0,0),(0,0),],
+        'offset': [(-1,3),(-1,3),(-1,2),(-1,2),],
         'size': 'large',
         'reverse': True,
         },
