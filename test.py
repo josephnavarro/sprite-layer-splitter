@@ -1,5 +1,5 @@
 #!usr/bin/env python3
-import splitter, importlib
+import splitter, importlib, os
 
 # Image splitting tests. All spritesheets used in these
 # examples were taken from The Spriters Resource.
@@ -25,12 +25,18 @@ while doContinue:
     if cmd[0] in ('c', 'composite'):
         if len(cmd) != 3:
             continue
+
+        a = FILE_STRING.format(cmd[1])
+        b = FILE_STRING.format(cmd[2])
+
+        if not os.path.exists(a):
+            print("Error: file {} does not exist!".format(a))
+            continue
+        if not os.path.exists(b):
+            print("Error: file {} does not exist!".format(b))
+            continue
         
-        splitter.main(
-            FILE_STRING.format(cmd[1]),
-            FILE_STRING.format(cmd[2]),
-            '{}_{}'.format(cmd[1], cmd[2]),
-            )
+        splitter.main(a,b,'{}_{}'.format(cmd[1], cmd[2]))
 
         print("Composited sprite for {}_{}!".format(cmd[1], cmd[2]))
 
