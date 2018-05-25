@@ -281,6 +281,11 @@ HEAD_PARAMS = {
         'size': 'large',
         'reverse': True,
         },
+    'nohr-noble-m': {
+        'offset': [(-1,3),(-1,3),(-1,2),(-1,2),],
+        'size': 'large',
+        'reverse': True,
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
