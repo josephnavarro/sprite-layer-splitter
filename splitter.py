@@ -236,6 +236,10 @@ HEAD_PARAMS = {
         'offset': [(0,2),(0,2),(0,1),(0,1),],
         'size': 'large',
         },
+    'mechanist': {
+        'offset': [(2,0),(2,0),(2,0),(2,0),],
+        'size': 'small',
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',

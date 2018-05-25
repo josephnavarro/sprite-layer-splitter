@@ -1,13 +1,15 @@
 #!usr/bin/env python3
 import splitter
+import splitter
 
 # Image splitting tests. All spritesheets used in these
 # examples were taken from The Spriters Resource.
 # (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
 FILE_STRING = 'inputs/{}.png'
-UNIT_NAME = 'ryoma'
-CLASS_NAME = 'master-of-arms-m'
+
+UNIT_NAME = 'kagero'
+CLASS_NAME = 'mechanist'
 
 splitter.main(
     FILE_STRING.format(UNIT_NAME),
