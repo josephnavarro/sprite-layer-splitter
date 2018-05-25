@@ -401,6 +401,10 @@ def main(hd, bd, name, offset=(0,0), alpha=True, outdir=OUTDIR):
     output = make_blank(w, h)
     y = 0
 
+    bbase, ext = os.path.splitext(os.path.basename(bd))
+    if bbase not in HEAD_PARAMS:
+        print("Error! Undefined character class! Continuing using defaults...")
+
     for c in colorKeys:
         #Offset for specific unit color
         hpos = offset[0], offset[1] + HEAD_BLOCK * COLOR_OFFSETS[c]
@@ -506,9 +510,6 @@ def process(hd, bd, hoff, boff, alpha, outdir):
     if bbase in HEAD_PARAMS:
         offset = HEAD_PARAMS[bbase]['offset'][:]
         hsize = HEAD_PARAMS[bbase]['size']
-    else:
-        print("Error! Undefined character class! Continuing using defaults...")
-
 
     #offset = offset[1:4] + [offset[0]]
     head = CROP['head']['idle'][hsize]

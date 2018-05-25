@@ -37,7 +37,6 @@ while doContinue:
             continue
         
         splitter.main(a,b,'{}_{}'.format(cmd[1], cmd[2]))
-
         print("Composited sprite for {}_{}!".format(cmd[1], cmd[2]))
 
     elif cmd[0] in ('r', 'refresh'):
