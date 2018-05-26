@@ -322,6 +322,10 @@ HEAD_PARAMS = {
         'offset': [(1,2),(1,2),(1,2),(1,1),],
         'size': 'large',
         },
+    'outlaw-m': {
+        'offset': [(-3,1),(-3,0),(-3,0),(-3,0),],
+        'size': 'large',
+        },
     'paladin': {
         'offset': [(2,0),(2,0),(2,0),(2,0),],
         'size': 'small',
