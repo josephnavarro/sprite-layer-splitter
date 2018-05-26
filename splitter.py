@@ -334,6 +334,10 @@ HEAD_PARAMS = {
         'offset': [(0,3),(0,3),(0,3),(0,3),],
         'size': 'large',
         },
+    'samurai-f': {
+        'offset': [(1,2),(1,2),(1,1),(1,2),],
+        'size': 'large',
+        },
     'samurai-m': {
         'offset': [(0,0),(0,0),(0,-1),(0,-2),],
         'size': 'large',
