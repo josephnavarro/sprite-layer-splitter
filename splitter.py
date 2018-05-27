@@ -354,7 +354,7 @@ HEAD_PARAMS = {
         'size': 'large',
         },
     'sniper-m': {
-        'offset': [],
+        'offset': [(1,2),(1,3),(1,3),(1,3),],
         'size': 'large',
         },
     'wyvern-lord': {
