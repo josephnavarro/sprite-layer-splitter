@@ -145,7 +145,6 @@ HEAD_PARAMS = {
     'falcon-knight': {
         'offset': [(1,0),(2,1),(2,0),(1,-1),],
         'size': 'small',
-        #'reverse': True,
         },
     'fighter-f': {
         'offset': [(1,1),(1,1),(1,2),(1,1),],
@@ -340,6 +339,10 @@ HEAD_PARAMS = {
         },
     'samurai-m': {
         'offset': [(0,0),(0,0),(0,-1),(0,-2),],
+        'size': 'large',
+        },
+    'shrine-maiden': {
+        'offset': [(0,3),(0,3),(0,3),(0,3),],
         'size': 'large',
         },
     'wyvern-lord': {
