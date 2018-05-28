@@ -361,6 +361,10 @@ HEAD_PARAMS = {
         'offset': [(0,3),]*4,
         'size': 'large',
         },
+    'sorcerer-m': {
+        'offset': [(0,3),]*4,
+        'size': 'large',
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
