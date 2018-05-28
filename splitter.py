@@ -389,6 +389,10 @@ HEAD_PARAMS = {
         'offset': [(1,0),]*4,
         'size': 'small',
         },
+    'troubadour-m': {
+        'offset': [(2,0),]*4,
+        'size': 'small',
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
