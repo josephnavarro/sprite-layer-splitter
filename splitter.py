@@ -409,6 +409,9 @@ HEAD_PARAMS = {
         'offset': [(-1,2),(-1,2),(-1,1),(-1,1),],
         'size': 'large',
         },
+    'wolfskin-f': {
+        'offset': [(0,3),]*4,
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
@@ -660,15 +663,19 @@ def process(hd, bd, hoff, boff, alpha, outdir):
 
     replace_colors(himg)
     replace_colors(bimg)
-    
-    offset = [(0,0), (0,0), (0,0), (0,0)]
+
+    headParams = {
+        'offset': [(0,0)]*4,
+        'size': 'large',
+        }
 
 
     if bbase in HEAD_PARAMS:
-        offset = HEAD_PARAMS[bbase]['offset'][:]
-        hsize = HEAD_PARAMS[bbase]['size']
+        headParams.update(HEAD_PARAMS[bbase])
 
     #offset = offset[1:4] + [offset[0]]
+    offset = headParams['offset'][:]
+    hsize = headParams['size']
     head = CROP['head']['idle'][hsize]
     
     xStart, yStart = head['start']
