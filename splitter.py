@@ -393,6 +393,10 @@ HEAD_PARAMS = {
         'offset': [(2,0),]*4,
         'size': 'small',
         },
+    'vanguard': {
+        'offset': [(1,2),(1,2),(1,1),(1,1),],
+        'size': 'large',
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
