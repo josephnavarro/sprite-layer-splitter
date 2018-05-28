@@ -675,7 +675,6 @@ def process(hd, bd, hoff, boff, alpha, outdir):
         'size': 'large',
         }
 
-
     if bbase in HEAD_PARAMS:
         headParams.update(HEAD_PARAMS[bbase])
 
@@ -695,6 +694,7 @@ def process(hd, bd, hoff, boff, alpha, outdir):
     if hsize == 'large':
         # Large head size
         w,h = HEAD_IDLE_SIZE
+        xPos = [3,2,1,0]
         
         for k in idleh.keys():
             newIdle = np.zeros((h,w,4), np.uint8)
@@ -703,7 +703,7 @@ def process(hd, bd, hoff, boff, alpha, outdir):
                 start = x*32,0
                 size = 32,32
                 sub = crop(idleh[k], start, size)
-                dest = x*32 + offset[x][0], -offset[x][1]
+                dest = xPos[x]*32 + offset[x][0], -offset[x][1]
                 paste(sub, newIdle, dest)
                 
             idleh[k] = newIdle
@@ -711,6 +711,7 @@ def process(hd, bd, hoff, boff, alpha, outdir):
     elif hsize == 'small':
         # Small head size
         w,h = HEAD_IDLE_SIZE
+        xPos = [0,1,2,3]
         
         for k in idleh.keys():
             newIdle = np.zeros((h,w,4), np.uint8)
@@ -719,7 +720,7 @@ def process(hd, bd, hoff, boff, alpha, outdir):
                 start = x*16,0
                 size = 16,16
                 sub = crop(idleh[k], start, size)
-                dest = x*32-24 + offset[x][0], -offset[x][1]
+                dest = xPos[x]*32-24 + offset[x][0], -offset[x][1]
                 paste(sub, newIdle, dest)
                 
             idleh[k] = newIdle
