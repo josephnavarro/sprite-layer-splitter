@@ -397,6 +397,14 @@ HEAD_PARAMS = {
         'offset': [(1,2),(1,2),(1,1),(1,1),],
         'size': 'large',
         },
+    'villager-f': {
+        'offset': [(1,1),(1,0),(1,0),(1,1)],
+        'size': 'large',
+        },
+    'villager-m': {
+        'offset': [(1,1),(1,0),(1,0),(1,1)],
+        'size': 'large',
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
