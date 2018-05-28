@@ -415,6 +415,9 @@ HEAD_PARAMS = {
     'wolfskin-m': {
         'offset': [(-2,-1),(-2,0),(-2,1),(-2,2),],
         },
+    'wolfssegner-f': {
+        'offset': [(0,3),]*4,
+        },
     'wyvern-lord': {
         'offset': [(-2,0),(-2,-2),(-2,-1),(-2,-1),],
         'size': 'small',
