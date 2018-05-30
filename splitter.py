@@ -694,7 +694,7 @@ def process(hd, bd, hoff, boff, alpha, outdir):
     if hsize == 'large':
         # Large head size
         w,h = HEAD_IDLE_SIZE
-        xPos = [3,2,1,0]
+        xPos = [0,1,2,3]
         
         for k in idleh.keys():
             newIdle = np.zeros((h,w,4), np.uint8)
@@ -711,7 +711,7 @@ def process(hd, bd, hoff, boff, alpha, outdir):
     elif hsize == 'small':
         # Small head size
         w,h = HEAD_IDLE_SIZE
-        xPos = [3,2,1,0]
+        xPos = [0,1,2,3]
         
         for k in idleh.keys():
             newIdle = np.zeros((h,w,4), np.uint8)
