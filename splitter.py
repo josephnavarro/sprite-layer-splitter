@@ -70,7 +70,7 @@ HEAD_PARAMS = {
         'size': 'large',
         },
     'berserker-f': {
-        'offset': [(0,3),(0,3),(0,3),(0,3),],
+        'offset': [(0,2),(0,2),(0,3),(0,2),],
         'size': 'large',
         },
     'berserker-m': {
@@ -262,6 +262,7 @@ HEAD_PARAMS = {
     'ninja-f': {
         'offset': [(0,2),(0,2),(0,1),(0,1),],
         'size': 'large',
+        'reverse': True,
         },
     'ninja-m': {
         'offset': [(-2,0),(-2,0),(-2,-1),(-2,-1),],
