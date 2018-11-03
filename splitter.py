@@ -1,15 +1,16 @@
 #! usr/bin/env python3
+"""
+Fire Emblem 3DS Sprite Compositing Tool
+
+Intended for Fire Emblem Fates and Fire Emblem Echoes sprites. Map sprites in
+Fire Emblem Fates and Echoes store head and body sprites separately, and store
+layer information using grayscale masks. This program puts them together.
+
+(Currently only composites the idle frames).
+
+"""
 import cv2, sys, os
 import numpy as np
-
-# Fire Emblem 3DS Sprite Compositing Tool
-#
-# Intended for Fire Emblem Fates and Fire Emblem Echoes sprites.
-# Map sprites in Fire Emblem Fates and Echoes store head and
-# body sprites separately, and store layer information using
-# grayscale masks. This program puts them together.
-#
-# (Currently only composites the idle frames).
 
 IGNORE = 0, 255
 OUTDIR = 'outputs'
@@ -436,15 +437,19 @@ COLOR_OFFSETS = {
 
 # Clipping bounds for different sprite formats
 CROP = {
-    'head': {  # Characters
+    'head': {
+        # Characters
+
         'idle': {
-            'large': {  # Large head idle poses
+            'large': {
+                # Large head idle poses
                 'size' : (256, 32),
                 'start': (2, 2),
                 'sub'  : (32, 32),
                 },
 
-            'small': {  # Small head idle poses
+            'small': {
+                # Small head idle poses
                 'size' : (256, 16),
                 'start': (2, 34),
                 'sub'  : (16, 16),
@@ -452,13 +457,15 @@ CROP = {
             },
 
         'move': {
-            'large': {  # Large head moving poses
+            'large': {
+                # Large head moving poses
                 'size' : (256, 256),
                 'start': (2, 68),
                 'sub'  : (32, 32),
                 },
 
-            'small': {  # Small head moving poses
+            'small': {
+                # Small head moving poses
                 'size' : (256, 128),
                 'start': (2, 406),
                 'sub'  : (16, 16),
@@ -466,15 +473,18 @@ CROP = {
             },
         },
 
-    'body': {  # Character classes
+    'body': {
+        # Character classes
 
-        'idle': {  # Idle poses
+        'idle': {
+            # Idle poses
             'size' : (256, 32),
             'start': (2, 2),
             'sub'  : (32, 32),
             },
 
-        'move': {  # Moving poses
+        'move': {
+            # Moving poses
             'size' : (256, 256),
             'start': (2, 38),
             'sub'  : (32, 32),
@@ -483,77 +493,86 @@ CROP = {
     }
 
 
-def apply_mask(img, mask):
-    '''Applies mask to (colored) image.'''
-    return cv2.bitwise_and(img, mask)
+def apply_mask(im, mask):
+    """Applies bitwise masking to a colored image.
+    """
+    return cv2.bitwise_and(im, mask)
 
 
-def grayscale(img, colored=False):
-    '''Converts RGB image to grayscale.'''
-    out = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    out = cv2.cvtColor(out, cv2.COLOR_BGR2GRAY)
+def grayscale(im, colored=False):
+    """Converts an RGB-format image to grayscale.
+    """
+    output = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
+    output = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
 
     if colored:  # Optionally output as BGR again
-        out = cv2.cvtColor(out, cv2.COLOR_GRAY2RGB)
-    return out
+        output = cv2.cvtColor(output, cv2.COLOR_GRAY2RGB)
+    return output
 
 
-def composite(img, alpha=True):
-    '''Overlays head and body sprites.'''
-    h1, w1, c1 = img.shape
+def composite(im, alpha=True):
+    """Overlays head sprites over body sprites.
+    """
+    height, width, colormask = im.shape
 
     # Head layer
-    c1 = crop(img, (0, 0), (w1 // 2, h1))  # Color
-    m1 = crop(img, (w1 // 2, 0), (w1 // 2, h1))  # Bitmask
-    g1 = grayscale(m1)
+    colormask  = crop(im, (0, 0), (width // 2, height))
+    bitmask    = crop(im, (width // 2, 0), (width // 2, height))
+    gray_image = grayscale(bitmask)
 
     # Outputs categorized by grayscale value
     outputs = {}
-    colors = [c for c in get_colors(g1) if c not in IGNORE]
-    for col in colors:
-        m = make_mask(m1, col)
-        n = apply_mask(c1, m)
+    colors = [c for c in get_colors(gray_image) if c not in IGNORE]
+
+    for color in colors:
+        new_image = apply_mask(colormask, make_mask(bitmask, color))
         if alpha:
-            n = convert_alpha(n)
-        outputs[col] = n
+            new_image = convert_alpha(new_image)
+        outputs[color] = new_image
 
     return outputs
 
 
-def convert_alpha(img):
-    '''Adds alpha channel to image.'''
-    bChannel, gChannel, rChannel = cv2.split(img)
-    aChannel = np.ones(bChannel.shape, dtype=bChannel.dtype) * 255
-    return cv2.merge((bChannel, gChannel, rChannel, aChannel))
+def convert_alpha(im):
+    """Adds an alpha channel to an RGB-formatted image.
+    """
+    b, g, r = cv2.split(im)
+    a = np.ones(b.shape, dtype=b.dtype) * 255
+    return cv2.merge((b, g, r, a))
 
 
-def crop(img, start, size):
-    '''Crops an image.'''
+def crop(im, start, size):
+    """Crops an image to the given size.
+    """
     y, x = start
     h, w = size
-    return img[x:x + w, y:y + h]
+    return im[x:x + w, y:y + h]
 
 
 def fix_paths(path):
-    '''Fixes output directories.'''
+    """Ensures output directories exist.
+    """
     path = os.path.normpath(path)
     os.makedirs(path, exist_ok=True)
     return path
 
 
-def get_colors(img):
-    '''Gets all unique colors from image.'''
-    return np.unique(img)
+def get_colors(im):
+    """Finds all unique colors in the input image.
+    """
+    return np.unique(im)
 
 
 def is_grayscale(color):
-    '''Detects if a color is monochrome.'''
+    """Returns true if the input color is monochrome; false otherwise.
+    """
     r, g, b = color
     return r == g == b
 
 
 def make_mask(im, thresh, maxval=255):
-    '''Create bitmask from grayscale image.'''
+    """Creates a bitmask from a grayscale image.
+    """
     r, t = cv2.threshold(im, thresh - 1, maxval, cv2.THRESH_TOZERO)
     r, t = cv2.threshold(t, thresh + 1, maxval, cv2.THRESH_TOZERO_INV)
     r, t = cv2.threshold(t, thresh - 1, maxval, cv2.THRESH_BINARY)
@@ -562,55 +581,57 @@ def make_mask(im, thresh, maxval=255):
 
 
 def main(hd, bd, name, offset=(0, 0), alpha=True, outdir=OUTDIR):
-    '''Image processor entrypoint.'''
-    images = {}
-    colorKeys = 'blue', 'red', 'green', 'purple'
-    w, h = OUTPUT_BASE[0], OUTPUT_BASE[1] * (len(colorKeys) + 1)
+    """Image processing entrypoint.
+    """
+    color_keys = 'blue', 'red', 'green', 'purple'
+    w, h = OUTPUT_BASE[0], OUTPUT_BASE[1] * (len(color_keys) + 1)
     output = make_blank(w, h)
     y = 0
 
-    bbase, ext = os.path.splitext(os.path.basename(bd))
-    if bbase not in HEAD_PARAMS:
-        print("Error! Undefined character class! Continuing using defaults...")
+    base_name, ext = os.path.splitext(os.path.basename(bd))
+    if base_name not in HEAD_PARAMS:
+        print(
+            "Error! Undefined character class! Continuing using defaults..."
+            )
 
-    for c in colorKeys:
+    for color_name in color_keys:
         # Offset for specific unit color
-        hpos = offset[0], offset[1] + HEAD_BLOCK * COLOR_OFFSETS[c]
-        mpos = offset[0], offset[1] + MOVE_BLOCK * COLOR_OFFSETS[c]
+        head_pos = offset[0], offset[1] + HEAD_BLOCK * COLOR_OFFSETS[color_name]
+        body_pos = offset[0], offset[1] + MOVE_BLOCK * COLOR_OFFSETS[color_name]
 
         # Process head and body separately
-        d = process(hd, bd, hpos, mpos, alpha, outdir)
+        sprite_data = process(hd, bd, head_pos, body_pos, alpha, outdir)
 
         # Put all idle images together
-        idb = make_blank(*HEAD_IDLE_SIZE)
-        ids = sorted(list(set(
-            list(d['head'].keys()) + list(d['body'].keys())
+        idle_output = make_blank(*HEAD_IDLE_SIZE)
+        idle_images = sorted(list(set(
+            list(sprite_data['head'].keys()) + list(sprite_data['body'].keys())
             )))
 
         if bd in HEAD_PARAMS:
             if 'reverse' in HEAD_PARAMS[bd]:
                 if HEAD_PARAMS[bd]['reverse']:
-                    ids = ids[::-1]
+                    idle_images = idle_images[::-1]
 
         # Composite head and body
-        for k in ids:
-            if k in d['head'].keys():
-                paste(d['head'][k], idb, (0, 0))
+        for key in idle_images:
+            if key in sprite_data['head']:
+                paste(sprite_data['head'][key], idle_output, (0, 0))
 
-            if k in d['body'].keys():
-                paste(d['body'][k], idb, (0, 0))
+            if key in sprite_data['body']:
+                paste(sprite_data['body'][key], idle_output, (0, 0))
 
-        paste(idb, output, (0, 32 * y))
+        paste(idle_output, output, (0, 32 * y))
 
         # Generate grayscale image based on blue
         y += 1
-        if c == 'purple':
-            gr = idb.copy()
-            gr = cv2.cvtColor(gr, cv2.COLOR_BGR2GRAY)
-            gr = cv2.cvtColor(gr, cv2.COLOR_GRAY2BGR)
-            gr = convert_alpha(gr)
-            replace_colors(gr, [0, 0, 0, 255], [0, 0, 0, 0])
-            paste(gr, output, (0, y * 32))
+        if color_name == 'blue':
+            gray_image = idle_output.copy()
+            gray_image = cv2.cvtColor(gray_image, cv2.COLOR_BGR2GRAY)
+            gray_image = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2BGR)
+            gray_image = convert_alpha(gray_image)
+            replace_colors(gray_image, [0, 0, 0, 255], [0, 0, 0, 0])
+            paste(gray_image, output, (0, len(color_keys) * 32))
 
     path = fix_paths(os.path.join(outdir, name))
     cv2.imwrite(path + '/sheet.png', output)
