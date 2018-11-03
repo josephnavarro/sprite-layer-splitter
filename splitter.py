@@ -372,7 +372,7 @@ HEAD_PARAMS = {
         'size'  : 'large',
         },
     'spear-fighter-m' : {
-        'offset': [(1, 2), (1, 1), (1, 0), (1, 1), ],
+        'offset': [(1, 1), (1, 1), (1, 0), (1, 2), ],
         'size'  : 'large',
         },
     'spear-master-f'  : {
