@@ -12,6 +12,8 @@ import numpy as np
 # (Currently only composites the idle frames).
 
 IGNORE = 0, 255
+HEAD_DIR = 'inputs/head'
+BODY_DIR = 'inputs/body'
 OUTDIR = 'outputs'
 COLORS = 'blue', 'red', 'green', 'purple'
 HEAD_IDLE_SIZE = 128, 32
@@ -634,15 +636,15 @@ def process(head_path, body_path, head_offset, body_offset, alpha):
     Processes a single color-layered image.
     '''
     try:
-        head_im = cv2.imread(head_path)
+        head_im = cv2.imread(os.path.join(HEAD_DIR, head_path))
     except:
-        print("Error! Character {} not found! Aborting...".format(head_path))
+        print("Error! Head source {} not found! Aborting...".format(head_path))
         raise SystemExit
 
     try:
-        body_im = cv2.imread(body_path)
+        body_im = cv2.imread(os.path.join(BODY_DIR, body_path))
     except:
-        print("Error! Class {} not found! Aborting...".format(body_path))
+        print("Error! Body source {} not found! Aborting...".format(body_path))
         raise SystemExit
 
     replace_colors(head_im)

@@ -5,7 +5,7 @@ import splitter, importlib, os
 # examples were taken from The Spriters Resource.
 # (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
-FILE_STRING = 'inputs/{}.png'
+FILE_STRING = '{}.png'
 PROMPT = '''
 Commands:
 [c]omposite <unit> <class> -> Composite new sprite
@@ -29,10 +29,10 @@ while running:
         head = FILE_STRING.format(command[1])
         body = FILE_STRING.format(command[2])
 
-        if not os.path.exists(head):
+        if not os.path.exists(os.path.join(splitter.HEAD_DIR, head)):
             print("Error: file {} does not exist!".format(head))
             continue
-        if not os.path.exists(body):
+        if not os.path.exists(os.path.join(splitter.BODY_DIR, body)):
             print("Error: file {} does not exist!".format(body))
             continue
 
