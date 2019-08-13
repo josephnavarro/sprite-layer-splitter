@@ -1,48 +1,50 @@
-#!usr/bin/env python3
+#! usr/bin/env python3
+"""
+Image splitting tests. All spritesheets used in these
+examples were taken from The Spriters Resource.
+(https://www.spriters-resource.com/3ds/fireemblemfates/)
+
+"""
 import splitter, importlib, os
 
-# Image splitting tests. All spritesheets used in these
-# examples were taken from The Spriters Resource.
-# (https://www.spriters-resource.com/3ds/fireemblemfates/)
-
-FILE_STRING = '{}.png'
-PROMPT = '''
+FILE_STRING = "{}.png"
+PROMPT = """
 Commands:
 [c]omposite <unit> <class> -> Composite new sprite
 [r]efresh -> Refresh sprite loader
 [q]uit -> Quit application
 
 What do?
->>> '''
-
+>>> """
 
 running = True
 
 while running:
-    command = input(PROMPT).lower().split()
-    if not command:
+    cmd = input(PROMPT).lower().split()
+
+    if not cmd:
         continue
 
-    if command[0] in ('c', 'composite'):
-        if len(command) != 3:
+    elif cmd[0] in ('c', 'composite'):
+        if len(cmd) != 3:
             continue
+        else:
+            head = FILE_STRING.format(cmd[1])
+            body = FILE_STRING.format(cmd[2])
 
-        head = FILE_STRING.format(command[1])
-        body = FILE_STRING.format(command[2])
+            if not os.path.exists(os.path.join(splitter.HEAD_DIR, head)):
+                print("Error: file {} does not exist!".format(head))
+                continue
+            elif not os.path.exists(os.path.join(splitter.BODY_DIR, body)):
+                print("Error: file {} does not exist!".format(body))
+                continue
+            else:
+                splitter.main(head, body, '{}_{}'.format(cmd[1], cmd[2]))
+                print("Composited sprite for {}_{}!".format(cmd[1], cmd[2]))
 
-        if not os.path.exists(os.path.join(splitter.HEAD_DIR, head)):
-            print("Error: file {} does not exist!".format(head))
-            continue
-        if not os.path.exists(os.path.join(splitter.BODY_DIR, body)):
-            print("Error: file {} does not exist!".format(body))
-            continue
-
-        splitter.main(head, body, '{}_{}'.format(command[1], command[2]))
-        print("Composited sprite for {}_{}!".format(command[1], command[2]))
-
-    elif command[0] in ('r', 'refresh'):
+    elif cmd[0] in ('r', 'refresh'):
         importlib.reload(splitter)
         print("Refreshed sprite loader!")
 
-    elif command[0] in ('q', 'quit'):
+    elif cmd[0] in ('q', 'quit'):
         running = False
