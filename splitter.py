@@ -171,10 +171,10 @@ def process_head(base: str, src, region, alpha: bool) -> dict:
 
         if key == "left":
             offset = left_offset
-            dy = dims[1]
+            dy = 32  #dims[1]
         elif key == "right":
             offset = right_offset
-            dy = dims[1] * 2
+            dy = 64  #dims[1] * 2
         else:
             offset = idle_offset
             dy = 0
