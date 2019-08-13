@@ -23,19 +23,19 @@ BODY_RECT_4C = (2, 1726, 2 + 256, 1726 + 32)  # Move right
 
 HEAD_RECT_1A = (2, 2, 2 + 256, 2 + 64)  # Idle (large + small)
 HEAD_RECT_1B = (2, 70, 2 + 256, 70 + 64)  # Move left + right (large)
-HEAD_RECT_1C = (2, 407, 2 + 256, 407 + 48)  # Move left + right (small)
+HEAD_RECT_1C = (2, 406, 2 + 256, 406 + 48)  # Move left + right (small)
 
 HEAD_RECT_2A = (2, 586, 2 + 256, 586 + 64)  # Idle (large + small)
 HEAD_RECT_2B = (2, 654, 2 + 256, 654 + 64)  # Move left + right (large)
-HEAD_RECT_2C = (2, 991, 2 + 256, 991 + 48)  # Move left + right (small)
+HEAD_RECT_2C = (2, 990, 2 + 256, 990 + 48)  # Move left + right (small)
 
 HEAD_RECT_3A = (2, 1170, 2 + 256, 1170 + 64)  # Idle (large + small)
-HEAD_RECT_3B = (2, 1240, 2 + 256, 1240 + 64)  # Move left + right (large)
-HEAD_RECT_3C = (2, 1575, 2 + 256, 1575 + 48)  # Move left + right (small)
+HEAD_RECT_3B = (2, 1238, 2 + 256, 1238 + 64)  # Move left + right (large)
+HEAD_RECT_3C = (2, 1574, 2 + 256, 1574 + 48)  # Move left + right (small)
 
 HEAD_RECT_4A = (2, 1754, 2 + 256, 1754 + 64)  # Idle (large + small)
-HEAD_RECT_4B = (2, 1824, 2 + 256, 1824 + 64)  # Move left + right (large)
-HEAD_RECT_4C = (2, 2159, 2 + 256, 2159 + 48)  # Move left + right (small)
+HEAD_RECT_4B = (2, 1822, 2 + 256, 1822 + 64)  # Move left + right (large)
+HEAD_RECT_4C = (2, 2158, 2 + 256, 2158 + 48)  # Move left + right (small)
 
 MODE = "RGBA"
 
