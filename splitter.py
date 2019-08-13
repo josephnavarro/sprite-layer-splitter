@@ -171,10 +171,10 @@ def process_head(base: str, src, region, alpha: bool) -> dict:
 
         if key == "left":
             offset = left_offset
-            dy = 32  #dims[1]
+            dy = 32
         elif key == "right":
             offset = right_offset
-            dy = 64  #dims[1] * 2
+            dy = 64
         else:
             offset = idle_offset
             dy = 0
@@ -230,9 +230,85 @@ def process(head_path: str, body_path: str, head_offset: tuple, body_offset: tup
         }
 
 
+def main_idle(head: str, body: str, name, offset=(0, 0), alpha=True, outdir=OUTDIR):
+    """
+    Image processor entrypoint. Only assembles idle frames.
+
+    :param head:
+    :param body:
+    :param name:
+    :param offset:
+    :param alpha:
+    :param outdir:
+    """
+    w = COLOR_REGION_SIZE[0]
+    h = STATE_REGION_SIZE[1] * (len(COLORS) + 1)
+    y = 0
+    out = make_blank(w, h)
+
+    # Check whether specified character class (body sprite) exists
+    base = os.path.splitext(os.path.basename(body))[0]
+    if base not in HEAD_PARAMS:
+        print("Error! Undefined character class! Continuing with defaults...")
+
+    # Generate 1 sprite block per color region
+    for color in COLORS:
+        # Offset to specific color
+        head_offset: tuple = (offset[0], offset[1] + HEAD_BLOCK * COLOR_OFFSETS[color])
+        body_offset: tuple = (offset[0], offset[1] + BODY_BLOCK * COLOR_OFFSETS[color])
+
+        # Process head and body
+        data: dict = process(head, body, head_offset, body_offset, alpha)
+        head_data: dict = data["head"]
+        body_data: dict = data["body"]
+
+        new = make_blank(*COLOR_REGION_SIZE)
+        idle_layers: list = sorted(list(set(list(head_data["idle"].keys()) + list(body_data["idle"].keys()))))
+
+        try:
+            if HEAD_PARAMS[body]["reverse"]:
+                idle_layers = idle_layers[::-1]
+        except KeyError:
+            pass
+
+        # Composite head and body (idle)
+        for layer in idle_layers:
+            try:
+                paste(head_data["idle"][layer], new, (0, 0))
+            except KeyError:
+                pass
+
+            try:
+                paste(body_data["idle"][layer], new, (0, 0))
+            except KeyError:
+                pass
+
+        paste(new, out, (0, y * STATE_REGION_SIZE[1]))
+
+        # Generate grayscale image based on purple sprite
+        y += 1
+        if color == "purple":
+            grey = new.copy()
+            grey = cv2.cvtColor(grey, cv2.COLOR_BGR2GRAY)
+            grey = cv2.cvtColor(grey, cv2.COLOR_GRAY2BGR)
+            grey = convert_alpha(grey)
+            replace_color(grey, [0, 0, 0, 255], [0, 0, 0, 0])
+            paste(grey, out, (0, y * STATE_REGION_SIZE[1]))
+
+    path = fix_paths(os.path.join(outdir, name))
+    cv2.imwrite(path + '/sheet.png', out)
+
+
 def main(head: str, body: str, name, offset=(0, 0), alpha=True, outdir=OUTDIR):
     """
     Image processor entrypoint.
+
+    :param head:
+    :param body:
+    :param name:
+    :param offset:
+    :param alpha:
+    :param outdir:
     """
     w = COLOR_REGION_SIZE[0]
     h = COLOR_REGION_SIZE[1] * (len(COLORS) + 1)
@@ -315,7 +391,6 @@ def main(head: str, body: str, name, offset=(0, 0), alpha=True, outdir=OUTDIR):
             paste(grey, out, (0, y * COLOR_REGION_SIZE[1]))
 
     path = fix_paths(os.path.join(outdir, name))
-    print(path, "written!")
     cv2.imwrite(path + '/sheet.png', out)
 
 

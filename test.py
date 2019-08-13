@@ -10,7 +10,8 @@ import splitter, importlib, os
 FILE_STRING = "{}.png"
 PROMPT = """
 Commands:
-[c]omposite <unit> <class> -> Composite new sprite
+[c]omposite <unit> <class> -> Composite full sprite
+[i]dle <unit> <class> -> Composite idle frames
 [r]efresh -> Refresh sprite loader
 [q]uit -> Quit application
 
@@ -40,7 +41,24 @@ while running:
                 continue
             else:
                 splitter.main(head, body, '{}_{}'.format(cmd[1], cmd[2]))
-                print("Composited sprite for {}_{}!".format(cmd[1], cmd[2]))
+                print("Composited sprites for {}_{}!".format(cmd[1], cmd[2]))
+
+    elif cmd[0] in ('i', 'idle'):
+        if len(cmd) != 3:
+            continue
+        else:
+            head = FILE_STRING.format(cmd[1])
+            body = FILE_STRING.format(cmd[2])
+
+            if not os.path.exists(os.path.join(splitter.HEAD_DIR, head)):
+                print("Error: file {} does not exist!".format(head))
+                continue
+            elif not os.path.exists(os.path.join(splitter.BODY_DIR, body)):
+                print("Error: file {} does not exist!".format(body))
+                continue
+            else:
+                splitter.main_idle(head, body, '{}_{}'.format(cmd[1], cmd[2]))
+                print("Composited idle sprites for {}_{}!".format(cmd[1], cmd[2]))
 
     elif cmd[0] in ('r', 'refresh'):
         importlib.reload(splitter)
