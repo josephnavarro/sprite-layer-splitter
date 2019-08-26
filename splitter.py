@@ -23,9 +23,12 @@ def split(image, alpha=True) -> dict:
     color = crop(image, (0x0, 0x0), (w >> 1, h))  # Fully-colored sprite
     mask = crop(image, (w >> 1, 0), (w >> 1, h))  # Grayscale masking data
 
+    replace_color(mask, [255,255,255], [252,252,252])
+
     # Sort irregular subregions by grayscale value
     out = {}
     for layer in [_ for _ in get_colors(grayscale(mask)) if _ not in IGNORE]:
+
         new = apply_mask(color, make_mask(mask, layer))
         if alpha:
             new = convert_alpha(new)
@@ -72,18 +75,21 @@ def process_body(base: str, src, region, alpha: bool) -> dict:
     left_offset = left_offset[1:4] + [left_offset[0]]
     right_offset = right_offset[1:4] + [right_offset[0]]
 
+
     # Crop out two-sided color region on source image, then extract layers
-    x, y = 0, 0  # CROP["body"]["start"]
+    x, y = 0, 0
     dims = CROP["body"]["sub"]
     w, h = COLOR_REGION_SIZE
     img = crop(src, (x + region[0], y + region[1]), CROP["body"]["size"])
     layers: dict = split(img, alpha)
     out: dict = {}
 
+
     # (Optional) Replace black pixels with transparent ones
     if alpha:
         for layer in layers:
             replace_color(layers[layer], [0, 0, 0, 255], [0, 0, 0, 0])
+
 
     # Assemble idle, left, and right layers for body sprite
     for key in ["idle", "left", "right"]:
@@ -97,7 +103,7 @@ def process_body(base: str, src, region, alpha: bool) -> dict:
             y = dims[1] * 2
         else:
             offset = idle_offset
-            y = 0
+            y = dims[1] * 0
 
         for layer in layers:
             new = np.zeros((h, w, 4), np.uint8)
@@ -151,6 +157,7 @@ def process_head(base: str, src, region, alpha: bool) -> dict:
     except KeyError:
         pass
 
+
     # Crop out two-sided color region on source image, then extract layers
     x, y = 0, 0  # CROP["head"][size]["start"]
     dims = CROP["head"][size]["sub"]
@@ -159,10 +166,12 @@ def process_head(base: str, src, region, alpha: bool) -> dict:
     layers: dict = split(img, alpha)
     out: dict = {}
 
+
     # (Optional) Replace black pixels with transparent ones
     if alpha:
         for layer in layers:
             replace_color(layers[layer], [0, 0, 0, 255], [0, 0, 0, 0])
+
 
     # Assemble idle, left, and right layers for body sprite
     for key in ["idle", "left", "right"]:
