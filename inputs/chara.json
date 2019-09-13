@@ -1,0 +1,449 @@
+{
+    "adventurer-f":   {
+        "path": ["head", "adventurer-f.png"]
+    },
+    "adventurer-m":   {
+        "path": ["head", "adventurer-m.png"]
+    },
+    "anna":           {
+        "path": ["head", "anna.png"]
+    },
+    "anthony":        {
+        "path": ["head", "anthony.png"]
+    },
+    "apothecary":     {
+        "path": ["head", "apothecary.png"]
+    },
+    "archer":         {
+        "path": ["head", "archer.png"]
+    },
+    "arete":          {
+        "path": ["head", "arete.png"]
+    },
+    "arthur":         {
+        "path": ["head", "arthur.png"]
+    },
+    "asugi":          {
+        "path": ["head", "asugi.png"]
+    },
+    "azama":          {
+        "path": ["head", "azama.png"]
+    },
+    "azura":          {
+        "path": ["head", "azura.png"]
+    },
+    "basara":         {
+        "path": ["head", "basara.png"]
+    },
+    "benny":          {
+        "path": ["head", "benny.png"]
+    },
+    "berserker-f":    {
+        "path": ["head", "berserker-f.png"]
+    },
+    "berserker-m":    {
+        "path": ["head", "berserker-m.png"]
+    },
+    "beruka":         {
+        "path": ["head", "beruka.png"]
+    },
+    "blacksmith":     {
+        "path": ["head", "blacksmith.png"]
+    },
+    "bow-knight":     {
+        "path": ["head", "bow-knight.png"]
+    },
+    "butler":         {
+        "path": ["head", "butler.png"]
+    },
+    "caeldori":       {
+        "path": ["head", "caeldori.png"]
+    },
+    "camilla":        {
+        "path": ["head", "camilla.png"]
+    },
+    "cavalier":       {
+        "path": ["head", "cavalier.png"]
+    },
+    "charlotte":      {
+        "path": ["head", "charlotte.png"]
+    },
+    "cleric":         {
+        "path": ["head", "cleric.png"]
+    },
+    "corrin-f":       {
+        "path": ["head", "corrin-f.png"]
+    },
+    "corrin-m":       {
+        "path": ["head", "corrin-m.png"]
+    },
+    "daichi":         {
+        "path": ["head", "daichi.png"]
+    },
+    "daniela":        {
+        "path": ["head", "daniela.png"]
+    },
+    "dark-knight":    {
+        "path": ["head", "dark-knight.png"]
+    },
+    "dark-mage-f":    {
+        "path": ["head", "dark-mage-f.png"]
+    },
+    "dark-mage-m":    {
+        "path": ["head", "dark-mage-m.png"]
+    },
+    "diviner":        {
+        "path": ["head", "diviner.png"]
+    },
+    "dwyer":          {
+        "path": ["head", "dwyer.png"]
+    },
+    "edelgard":       {
+        "path": ["head", "edelgard.png"]
+    },
+    "effie":          {
+        "path": ["head", "effie.png"]
+    },
+    "elise":          {
+        "path": ["head", "elise.png"]
+    },
+    "falcon-knight":  {
+        "path": ["head", "falcon-knight.png"]
+    },
+    "felicia":        {
+        "path": ["head", "felicia.png"]
+    },
+    "fighter-m":      {
+        "path": ["head", "fighter-m.png"]
+    },
+    "flora":          {
+        "path": ["head", "flora.png"]
+    },
+    "forrest":        {
+        "path": ["head", "forrest.png"]
+    },
+    "fuga":           {
+        "path": ["head", "fuga.png"]
+    },
+    "funke":          {
+        "path": ["head", "funke.png"]
+    },
+    "gazak":          {
+        "path": ["head", "gazak.png"]
+    },
+    "general":        {
+        "path": ["head", "general.png"]
+    },
+    "great-knight":   {
+        "path": ["head", "great-knight.png"]
+    },
+    "great-master":   {
+        "path": ["head", "great-master.png"]
+    },
+    "gunter":         {
+        "path": ["head", "gunter.png"]
+    },
+    "haitaka":        {
+        "path": ["head", "haitaka.png"]
+    },
+    "hana":           {
+        "path": ["head", "hana.png"]
+    },
+    "hans":           {
+        "path": ["head", "hans.png"]
+    },
+    "hayato":         {
+        "path": ["head", "hayato.png"]
+    },
+    "hinata":         {
+        "path": ["head", "hinata.png"]
+    },
+    "hinoka":         {
+        "path": ["head", "hinoka.png"]
+    },
+    "hisame":         {
+        "path": ["head", "hisame.png"]
+    },
+    "ignatius":       {
+        "path": ["head", "ignatius.png"]
+    },
+    "ike":            {
+        "path": ["head", "ike.png"]
+    },
+    "izana":          {
+        "path": ["head", "izana.png"]
+    },
+    "jakob":          {
+        "path": ["head", "jakob.png"]
+    },
+    "kaden":          {
+        "path": ["head", "kaden.png"]
+    },
+    "kagero":         {
+        "path": ["head", "kagero.png"]
+    },
+    "kana-f":         {
+        "path": ["head", "kana-f.png"]
+    },
+    "kana-m":         {
+        "path": ["head", "kana-m.png"]
+    },
+    "kaze":           {
+        "path": ["head", "kaze.png"]
+    },
+    "keaton":         {
+        "path": ["head", "keaton.png"]
+    },
+    "kilma":          {
+        "path": ["head", "kilma.png"]
+    },
+    "kinshi-knight":  {
+        "path": ["head", "kinshi-knight.png"]
+    },
+    "kiragi":         {
+        "path": ["head", "kiragi.png"]
+    },
+    "kumagera":       {
+        "path": ["head", "kumagera.png"]
+    },
+    "lancer":         {
+        "path": ["head", "lancer.png"]
+    },
+    "laslow":         {
+        "path": ["head", "laslow.png"]
+    },
+    "leo":            {
+        "path": ["head", "leo.png"]
+    },
+    "llewelyn":       {
+        "path": ["head", "llewelyn.png"]
+    },
+    "lloyd":          {
+        "path": ["head", "lloyd.png"]
+    },
+    "lucina":         {
+        "path": ["head", "lucina.png"]
+    },
+    "maid":           {
+        "path": ["head", "maid.png"]
+    },
+    "malig-knight":   {
+        "path": ["head", "malig-knight.png"]
+    },
+    "marth":          {
+        "path": ["head", "marth.png"]
+    },
+    "master-ninja":   {
+        "path": ["head", "master-ninja.png"]
+    },
+    "master-of-arms": {
+        "path": ["head", "master-of-arms.png"]
+    },
+    "mechanist":      {
+        "path": ["head", "mechanist.png"]
+    },
+    "midori":         {
+        "path": ["head", "midori.png"]
+    },
+    "mikoto":         {
+        "path": ["head", "mikoto.png"]
+    },
+    "mitama":         {
+        "path": ["head", "mitama.png"]
+    },
+    "mozu":           {
+        "path": ["head", "mozu.png"]
+    },
+    "nichol":         {
+        "path": ["head", "nichol.png"]
+    },
+    "niles":          {
+        "path": ["head", "niles.png"]
+    },
+    "nina":           {
+        "path": ["head", "nina.png"]
+    },
+    "nine-tails":     {
+        "path": ["head", "nine-tails.png"]
+    },
+    "ninja":          {
+        "path": ["head", "ninja.png"]
+    },
+    "nyx":            {
+        "path": ["head", "nyx.png"]
+    },
+    "oboro":          {
+        "path": ["head", "oboro.png"]
+    },
+    "odin":           {
+        "path": ["head", "odin.png"]
+    },
+    "omozu":          {
+        "path": ["head", "omozu.png"]
+    },
+    "oni-chieftain":  {
+        "path": ["head", "oni-chieftain.png"]
+    },
+    "oni-savage":     {
+        "path": ["head", "oni-savage.png"]
+    },
+    "onmyoji":        {
+        "path": ["head", "onmyoji.png"]
+    },
+    "ophelia":        {
+        "path": ["head", "ophelia.png"]
+    },
+    "orochi":         {
+        "path": ["head", "orochi.png"]
+    },
+    "outlaw":         {
+        "path": ["head", "outlaw.png"]
+    },
+    "paladin":        {
+        "path": ["head", "paladin.png"]
+    },
+    "percy":          {
+        "path": ["head", "percy.png"]
+    },
+    "peri":           {
+        "path": ["head", "peri.png"]
+    },
+    "priestess":      {
+        "path": ["head", "priestess.png"]
+    },
+    "reina":          {
+        "path": ["head", "reina.png"]
+    },
+    "rhajat":         {
+        "path": ["head", "rhajat.png"]
+    },
+    "rinkah":         {
+        "path": ["head", "rinkah.png"]
+    },
+    "robin":          {
+        "path": ["head", "robin.png"]
+    },
+    "ryoma":          {
+        "path": ["head", "ryoma.png"]
+    },
+    "saizo":          {
+        "path": ["head", "saizo.png"]
+    },
+    "sakura":         {
+        "path": ["head", "sakura.png"]
+    },
+    "samurai":        {
+        "path": ["head", "samurai.png"]
+    },
+    "scarlet":        {
+        "path": ["head", "scarlet.png"]
+    },
+    "selena":         {
+        "path": ["head", "selena.png"]
+    },
+    "selkie":         {
+        "path": ["head", "selkie.png"]
+    },
+    "senno":          {
+        "path": ["head", "senno.png"]
+    },
+    "setsuna":        {
+        "path": ["head", "setsuna.png"]
+    },
+    "shigure":        {
+        "path": ["head", "shigure.png"]
+    },
+    "shiro":          {
+        "path": ["head", "shiro.png"]
+    },
+    "shrine-maiden":  {
+        "path": ["head", "shrine-maiden.png"]
+    },
+    "shura":          {
+        "path": ["head", "shura.png"]
+    },
+    "siegbert":       {
+        "path": ["head", "siegbert.png"]
+    },
+    "silas":          {
+        "path": ["head", "silas.png"]
+    },
+    "sky-knight":     {
+        "path": ["head", "sky-knight.png"]
+    },
+    "sniper":         {
+        "path": ["head", "sniper.png"]
+    },
+    "soleil":         {
+        "path": ["head", "soleil.png"]
+    },
+    "sophie":         {
+        "path": ["head", "sophie.png"]
+    },
+    "sorcerer-f":     {
+        "path": ["head", "sorcerer-f.png"]
+    },
+    "sorcerer-m":     {
+        "path": ["head", "sorcerer-m.png"]
+    },
+    "spear-fighter":  {
+        "path": ["head", "spear-fighter.png"]
+    },
+    "spear-master":   {
+        "path": ["head", "spear-master.png"]
+    },
+    "strategist-f":   {
+        "path": ["head", "strategist-f.png"]
+    },
+    "subaki":         {
+        "path": ["head", "subaki.png"]
+    },
+    "swordmaster":    {
+        "path": ["head", "swordmaster.png"]
+    },
+    "takumi":         {
+        "path": ["head", "takumi.png"]
+    },
+    "tarba":          {
+        "path": ["head", "tarba.png"]
+    },
+    "troubadour-f":   {
+        "path": ["head", "troubadour-f.png"]
+    },
+    "velouria":       {
+        "path": ["head", "velouria.png"]
+    },
+    "villager-f":     {
+        "path": ["head", "villager-f.png"]
+    },
+    "villager-m":     {
+        "path": ["head", "villager-m.png"]
+    },
+    "wolfskin-f":     {
+        "path": ["head", "wolfskin-f.png"]
+    },
+    "wolfskin-m":     {
+        "path": ["head", "wolfskin-m.png"]
+    },
+    "wolfssegner":    {
+        "path": ["head", "wolfssegner.png"]
+    },
+    "wyvern-lord":    {
+        "path": ["head", "wyvern-lord.png"]
+    },
+    "wyvern-rider":   {
+        "path": ["head", "wyvern-rider.png"]
+    },
+    "xander":         {
+        "path": ["head", "xander.png"]
+    },
+    "yukimura":       {
+        "path": ["head", "yukimura.png"]
+    },
+    "zhara":          {
+        "path": ["head", "zhara.png"]
+    },
+    "zola":           {
+        "path": ["head", "zola.png"]
+    }
+}

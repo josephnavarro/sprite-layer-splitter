@@ -1,0 +1,873 @@
+{
+    "adventurer-f":     {
+        "path":   ["head", "adventurer-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 2], [0, 2], [0, 2], [0, 2]],
+            "left":  [[-2, 2], [-2, 1], [-2, 2], [-2, 1]],
+            "right": [[2, 2], [2, 1], [2, 2], [2, 1]]
+        }
+    },
+    "adventurer-m":     {
+        "path":   ["head", "adventurer-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-1, 2], [-1, 2], [-1, 2], [-1, 2]],
+            "left":  [[-1, 2], [-1, 1], [-1, 1], [-1, 1]],
+            "right": [[1, 2], [1, 1], [1, 2], [1, 1]]
+        }
+    },
+    "apothecary-f":     {
+        "path":   ["head", "apothecary-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-2, 2], [-2, 1], [-2, 2], [-2, 3]],
+            "left":  [[-1, 2], [-1, 1], [-1, 2], [-1, 1]],
+            "right": [[1, 2], [1, 1], [1, 2], [1, 1]]
+        }
+    },
+    "apothecary-m":     {
+        "path":   ["head", "apothecary-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-2, 2], [-2, 1], [-2, 2], [-2, 3]],
+            "left":  [[-2, 2], [-2, 1], [-2, 2], [-2, 1]],
+            "right": [[2, 2], [2, 1], [2, 2], [2, 1]]
+        }
+    },
+    "archer-f":         {
+        "path":   ["head", "archer-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 1], [0, 1], [0, 1], [0, 0]],
+            "left":  [[-2, 1], [-2, 0], [-2, 1], [-2, 0]],
+            "right": [[4, 1], [4, 0], [4, 1], [4, 0]]
+        }
+    },
+    "archer-m":         {
+        "path":   ["head", "archer-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-1, 2], [-1, 2], [-1, 2], [-1, 1]],
+            "left":  [[-4, 1], [-4, 0], [-4, 1], [-4, 0]],
+            "right": [[4, 1], [4, 0], [4, 1], [4, 0]]
+        }
+    },
+    "ballistician":     {
+        "path":   ["head", "ballistician.png"],
+        "size":   "small",
+        "offset": {
+            "idle":  [[0, -1], [0, 0], [0, 0], [0, 0]],
+            "left":  [[0, 0], [0, 0], [0, -1], [0, -1]],
+            "right": [[0, 0], [0, 0], [0, -1], [0, -1]]
+        }
+    },
+    "basara-f":         {
+        "path":   ["head", "basara-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 2], [1, 3], [2, 3], [2, 3]],
+            "left":  [[0, 1], [0, 2], [0, 1], [0, 2]],
+            "right": [[0, 1], [0, 2], [0, 1], [0, 2]]
+        }
+    },
+    "basara-m":         {
+        "path":   ["head", "basara-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[2, 2], [2, 3], [3, 3], [3, 3]],
+            "left":  [[0, 1], [0, 2], [0, 1], [0, 2]],
+            "right": [[0, 1], [0, 2], [0, 1], [0, 2]]
+        }
+    },
+    "berserker-f":      {
+        "path":   ["head", "berserker-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 2], [0, 2], [0, 3], [0, 2]],
+            "left":  [[0, 1], [0, 2], [0, 1], [0, 2]],
+            "right": [[0, 1], [0, 2], [0, 1], [0, 2]]
+        }
+    },
+    "berserker-m":      {
+        "path":   ["head", "berserker-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 2], [0, 2], [0, 3], [0, 2]],
+            "left":  [[-1, 2], [-1, 2], [-1, 1], [-1, 2]],
+            "right": [[], [], [], []]
+        }
+    },
+    "blacksmith-f":     {
+        "path":   ["head", "blacksmith-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 0], [0, 0], [0, 0], [0, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "blacksmith-m":     {
+        "path":   ["head", "blacksmith-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 1], [1, 2], [1, 3], [1, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "bow-knight":       {
+        "path":   ["head", "bow-knight.png"],
+        "size":   "small",
+        "offset": {
+            "idle":  [[1, 0], [1, 0], [1, 0], [1, 0]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "butler":           {
+        "path":   ["head", "butler.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "cavalier-f":       {
+        "path":    ["head", "cavalier-f.png"],
+        "size":    "small",
+        "reverse": true,
+        "offset":  {
+            "idle":  [[2, -2], [2, -2], [2, -2], [2, -2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "cavalier-m":       {
+        "path":    ["head", "cavalier-m.png"],
+        "size":    "small",
+        "reverse": true,
+        "offset":  {
+            "idle":  [[2, -2], [2, -2], [2, -2], [2, -2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "dark-falcon-f":    {
+        "path":    ["head", "dark-falcon-f.png"],
+        "size":    "small",
+        "reverse": true,
+        "offset":  {
+            "idle":  [[1, 0], [2, 0], [2, -1], [1, -1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "dark-falcon-m":    {
+        "path":    ["head", "dark-falcon-m.png"],
+        "size":    "small",
+        "reverse": true,
+        "offset":  {
+            "idle":  [[1, 0], [2, 0], [2, -1], [1, -1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "dark-knight":      {
+        "path":    ["head", "dark-knight.png"],
+        "size":    "small",
+        "reverse": true,
+        "offset":  {
+            "idle":  [[1, 0], [1, 0], [1, 0], [1, 0]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "dark-mage-f":      {
+        "path":   ["head", "dark-mage-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-1, 3], [-1, 3], [-1, 3], [-1, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "dark-mage-m":      {
+        "path":   ["head", "dark-mage-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-1, 3], [-1, 3], [-1, 3], [-1, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "diviner-f":        {
+        "path":   ["head", "diviner-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 1], [0, 1], [0, 1], [0, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "diviner-m":        {
+        "path":   ["head", "diviner-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 2], [0, 2], [0, 2], [0, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "dread-fighter-f":  {
+        "path":   ["head", "dread-fighter-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-2, 2], [-2, 2], [-2, 1], [-2, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "dread-fighter-m":  {
+        "path":   ["head", "dread-fighter-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-2, 2], [-2, 2], [-2, 1], [-2, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "falcon-knight":    {
+        "path":   ["head", "falcon-knight.png"],
+        "size":   "small",
+        "offset": {
+            "idle":  [[1, 0], [2, 1], [2, 0], [1, -1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "fighter-f":        {
+        "path":   ["head", "fighter-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 1], [1, 1], [1, 2], [1, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "fighter-m":        {
+        "path":   ["head", "fighter-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 0], [1, 1], [1, 2], [1, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "general":          {
+        "path":   ["head", "general.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-4, 3], [-4, 3], [-4, 3], [-4, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "grandmaster":      {
+        "path":   ["head", "grandmaster.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-1, 3], [-1, 3], [-1, 3], [-1, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "great-knight":     {
+        "path":   ["head", "great-knight.png"],
+        "size":   "small",
+        "offset": {
+            "idle":  [[1, 0], [1, 0], [1, 0], [1, 0]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "great-lord":       {
+        "path":   ["head", "great-lord.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[2, 2], [2, 2], [2, 1], [2, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "great-master":     {
+        "path":   ["head", "great-master.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 2], [0, 2], [0, 2], [0, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "hero-f":           {
+        "path":   ["head", "hero-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 2], [1, 1], [1, 1], [1, 0]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "hero-m":           {
+        "path":   ["head", "hero-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 2], [0, 2], [0, 1], [0, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "hoshido-noble-m":  {
+        "path":   ["head", "hoshido-noble-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-1, 3], [-1, 3], [-1, 2], [-1, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "hoshido-noble-f":  {
+        "path":   ["head", "hoshido-noble-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-1, 3], [-1, 3], [-1, 2], [-1, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "kinshi-knight":    {
+        "path":    ["head", "kinshi-knight.png"],
+        "size":    "small",
+        "reverse": true,
+        "offset":  {
+            "idle":  [[-2, 0], [-2, -2], [-2, -1], [-2, -1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "kitsune-f":        {
+        "path":   ["head", "kitsune-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[2, 2], [2, 2], [2, 1], [2, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "kitsune-m":        {
+        "path":   ["head", "kitsune-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-1, 3], [-1, 3], [-1, 2], [-1, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "knight":           {
+        "path":   ["head", "knight.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-4, 2], [-4, 2], [-4, 2], [-4, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "lodestar":         {
+        "path":   ["head", "lodestar.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[2, 2], [2, 2], [2, 1], [2, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "maid":             {
+        "path":   ["head", "maid.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 3], [0, 3], [0, 3], [0, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "malig-knight":     {
+        "path":   ["head", "malig-knight.png"],
+        "size":   "small",
+        "offset": {
+            "idle":  [[-2, 0], [-2, -2], [-2, -1], [-2, -1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "master-ninja-f":   {
+        "path":   ["head", "master-ninja-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 2], [1, 2], [1, 1], [1, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "master-ninja-m":   {
+        "path":   ["head", "master-ninja-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-3, 0], [-3, 0], [-3, -1], [-3, -1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "master-of-arms-f": {
+        "path":   ["head", "master-of-arms-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 2], [0, 2], [0, 1], [0, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "master-of-arms-m": {
+        "path":   ["head", "master-of-arms-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 2], [0, 2], [0, 1], [0, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "mechanist":        {
+        "path":   ["head", "mechanist.png"],
+        "size":   "small",
+        "offset": {
+            "idle":  [[2, 0], [2, 0], [2, 0], [2, 0]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "mercenary-f":      {
+        "path":   ["head", "mercenary-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 1], [0, 0], [0, -1], [0, 0]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "mercenary-m":      {
+        "path":   ["head", "mercenary-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-1, 2], [-1, 2], [-1, 1], [-1, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "merchant-f":       {
+        "path":   ["head", "merchant-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 2], [0, 1], [0, 0], [1, -1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "merchant-m":       {
+        "path":   ["head", "merchant-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-2, 2], [-2, 1], [-2, 0], [-1, -1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "monk":             {
+        "path":   ["head", "monk.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 2], [0, 2], [0, 2], [0, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "ninja-f":          {
+        "reverse": true,
+        "size":    "large",
+        "offset":  {
+            "idle":  [[0, 2], [0, 2], [0, 1], [0, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "ninja-m":          {
+        "path":   ["head", "ninja-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-2, 0], [-2, 0], [-2, -1], [-2, -1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "nine-tails-f":     {
+        "path":   ["head", "nine-tails-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 3], [0, 3], [0, 2], [0, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "nine-tails-m":     {
+        "path":   ["head", "nine-tails-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 3], [0, 3], [0, 2], [0, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "nohr-noble-f":     {
+        "reverse": true,
+        "size":    "large",
+        "offset":  {
+            "idle":  [[-1, 3], [-1, 3], [-1, 2], [-1, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "nohr-noble-m":     {
+        "reverse": true,
+        "size":    "large",
+        "offset":  {
+            "idle":  [[-1, 3], [-1, 3], [-1, 2], [-1, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "nohr-princess":    {
+        "path":   ["head", "nohr-princess.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-1, 3], [-1, 3], [-1, 2], [-1, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "nohr-prince":      {
+        "path":   ["head", "nohr-prince.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-1, 3], [-1, 3], [-1, 2], [-1, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "oni-chieftain-f":  {
+        "path":   ["head", "oni-chieftain-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 0], [0, 0], [0, 1], [0, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "oni-chieftain-m":  {
+        "path":   ["head", "oni-chieftain-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 1], [1, 2], [1, 3], [1, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "oni-savage-f":     {
+        "path":   ["head", "oni-savage-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 0], [0, 0], [0, 1], [0, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "oni-savage-m":     {
+        "path":   ["head", "oni-savage-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 1], [1, 2], [1, 3], [1, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "onmyoji-f":        {
+        "path":   ["head", "onmyoji-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 1], [0, 1], [0, 1], [0, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "onmyoji-m":        {
+        "path":   ["head", "onmyoji-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 1], [0, 1], [0, 1], [0, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "outlaw-f":         {
+        "path":   ["head", "outlaw-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 2], [1, 2], [1, 2], [1, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "outlaw-m":         {
+        "path":   ["head", "outlaw-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-3, 1], [-3, 0], [-3, 0], [-3, 0]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "paladin":          {
+        "path":   ["head", "paladin.png"],
+        "size":   "small",
+        "offset": {
+            "idle":  [[2, 0], [2, 0], [2, 0], [2, 0]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "priestess":        {
+        "path":   ["head", "priestess.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 3], [0, 3], [0, 3], [0, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "samurai-f":        {
+        "path":   ["head", "samurai-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 2], [1, 2], [1, 1], [1, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "samurai-m":        {
+        "path":   ["head", "samurai-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 0], [0, 0], [0, -1], [0, -2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "shrine-maiden":    {
+        "path":   ["head", "shrine-maiden.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 3], [0, 3], [0, 3], [0, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "sky-knight":       {
+        "path":   ["head", "sky-knight.png"],
+        "size":   "small",
+        "offset": {
+            "idle":  [[1, 0], [2, 0], [2, -1], [1, -1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "sniper-f":         {
+        "path":   ["head", "sniper-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 1], [0, 2], [0, 2], [0, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "sniper-m":         {
+        "path":   ["head", "sniper-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 2], [1, 3], [1, 3], [1, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "sorcerer-f":       {
+        "path":   ["head", "sorcerer-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 3], [0, 3], [0, 3], [0, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "sorcerer-m":       {
+        "path":   ["head", "sorcerer-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 3], [0, 3], [0, 3], [0, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "spear-fighter-f":  {
+        "path":   ["head", "spear-fighter-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 2], [1, 1], [1, 0], [1, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "spear-fighter-m":  {
+        "path":   ["head", "spear-fighter-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 1], [1, 1], [1, 0], [1, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "spear-master-f":   {
+        "path":   ["head", "spear-master-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-1, 3], [-1, 3], [0, 3], [0, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "spear-master-m":   {
+        "path":   ["head", "spear-master-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 3], [0, 3], [0, 3], [0, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "strategist":       {
+        "path":   ["head", "strategist.png"],
+        "size":   "small",
+        "offset": {
+            "idle":  [[1, -1], [1, 0], [1, 0], [1, 0]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "troubadour-f":     {
+        "path":   ["head", "troubadour-f.png"],
+        "size":   "small",
+        "offset": {
+            "idle":  [[1, 0], [1, 0], [1, 0], [1, 0]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "troubadour-m":     {
+        "path":   ["head", "troubadour-m.png"],
+        "size":   "small",
+        "offset": {
+            "idle":  [[2, 0], [2, 0], [2, 0], [2, 0]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "vanguard":         {
+        "path":   ["head", "vanguard.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 2], [1, 2], [1, 1], [1, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "villager-f":       {
+        "path":   ["head", "villager-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 1], [1, 0], [1, 0], [1, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "villager-m":       {
+        "path":   ["head", "villager-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[1, 1], [1, 0], [1, 0], [1, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "witch":            {
+        "path":   ["head", "witch.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-1, 2], [-1, 2], [-1, 1], [-1, 1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "wolfskin-f":       {
+        "path":   ["head", "wolfskin-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 3], [0, 3], [0, 3], [0, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "wolfskin-m":       {
+        "path":   ["head", "wolfskin-m.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[-2, -1], [-2, 0], [-2, 1], [-2, 2]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "wolfssegner-f":    {
+        "path":   ["head", "wolfssegner-f.png"],
+        "size":   "large",
+        "offset": {
+            "idle":  [[0, 3], [0, 3], [0, 3], [0, 3]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    },
+    "wyvern-lord":      {
+        "path":    ["head", "wyvern-lord.png"],
+        "size":    "small",
+        "reverse": true,
+        "offset":  {
+            "idle":  [[-2, 0], [-2, -2], [-2, -1], [-2, -1]],
+            "left":  [[0, 0], [0, 0], [0, 0], [0, 0]],
+            "right": [[0, 0], [0, 0], [0, 0], [0, 0]]
+        }
+    }
+}
