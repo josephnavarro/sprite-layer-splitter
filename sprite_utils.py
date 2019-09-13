@@ -6,7 +6,12 @@ Fire Emblem 3DS Sprite Compositing Tool
 Path utility functions.
 
 """
-import os
+import shutil
+from sprite_constant import *
+
+
+def FlushOutputs():
+    shutil.rmtree(ROOT_OUTPUT_DIRECTORY)
 
 
 def FixPath(path: str):
@@ -20,3 +25,7 @@ def FixPath(path: str):
     path = os.path.normpath(path)
     os.makedirs(path, exist_ok=True)
     return path
+
+
+if __name__ == "__main__":
+    FlushOutputs()

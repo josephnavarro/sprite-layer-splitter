@@ -246,8 +246,8 @@ def Process(head_path: str,
     """
     Assembles sprite data for both head and body images.
 
-    :param head_path:    Filename of head spritesheet.
-    :param body_path:    Filename of body spritesheet.
+    :param head_path:    Head spritesheet's filename.
+    :param body_path:    Body spritesheet's filename.
     :param head_offset:  X-Y offset onto head spritesheet.
     :param body_offset:  X-Y offset onto body spritesheet.
     :param head_data:    Head compositing data.
@@ -289,12 +289,12 @@ def MainIdle(head: str,
     """
     Image processing entrypoint. Only assembles idle frames.
 
-    :param head:     Head spritesheet name.
-    :param body:     Body spritesheet name.
+    :param head:     Head name.
+    :param body:     Body name.
     :param output:   Output filename.
     :param offset:   Manual X-Y offset onto master sheet. (Default (0, 0)).
     :param is_alpha: Whether to make black pixels transparent. (Default True).
-    :param outdir:   Root output directory. (Default `OUTDIR`).
+    :param outdir:   Root output directory. (Default `ROOT_OUTPUT_DIRECTORY`).
 
     :return: None.
     """
@@ -357,9 +357,9 @@ def MainIdle(head: str,
 def Main(head: str,
          body: str,
          output: str,
-         offset=(0, 0),
-         is_alpha=True,
-         outdir=ROOT_OUTPUT_DIRECTORY) -> None:
+         offset: tuple = (0, 0),
+         is_alpha: bool = True,
+         outdir: str = ROOT_OUTPUT_DIRECTORY) -> None:
     """
     Image processing entrypoint.
 
@@ -367,8 +367,8 @@ def Main(head: str,
     :param body:     Body spritesheet name.
     :param output:   Output filename.
     :param offset:   Manual X-Y offset onto master sheet. (Default (0,0)).
-    :param is_alpha: Whether to make black pixels transparent.
-    :param outdir:   Root output directory.
+    :param is_alpha: Whether to make black pixels transparent. (Default False).
+    :param outdir:   Root output directory. (Default `ROOT_OUTPUT_DIRECTORY`).
 
     :return: None.
     """

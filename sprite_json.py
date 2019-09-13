@@ -34,6 +34,7 @@ def CreateCharaJSON() -> None:
         n = os.path.splitext(os.path.basename(_))[0]
         newstr += TEMPLATE_JSON_CHARA.format(name=n)
 
+    newstr = newstr.rstrip(",")
     newstr = TEMPLATE_JSON_BASE.format(newstr)
     with open(PATH_JSON_CHARA, "w") as f:
         f.write(newstr)
@@ -51,6 +52,7 @@ def CreateClassJSON() -> None:
         n = os.path.splitext(os.path.basename(_))[0]
         newstr += TEMPLATE_JSON_CLASS.format(name=n)
 
+    newstr = newstr.rstrip(",")
     newstr = TEMPLATE_JSON_BASE.format(newstr)
     with open(PATH_JSON_CLASS, "w") as f:
         f.write(newstr)
@@ -120,3 +122,8 @@ def GetSourceCropData() -> dict:
     with open(PATH_JSON_SOURCE_CROP, "r") as f:
         data = json.load(f)
     return data
+
+
+if __name__ == "__main__":
+    CreateCharaJSON()
+    CreateClassJSON()
