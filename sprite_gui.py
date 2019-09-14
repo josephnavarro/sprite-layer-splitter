@@ -93,10 +93,12 @@ class App(tk.Frame):
     DEFAULT_CLASS = "Select body"
 
     HEAD_BUTTON_FG_COLOR = [0, 0, 0]
-    HEAD_BUTTON_BG_COLOR = [255, 200, 200]
+    HEAD_BUTTON_BG_COLOR = [200, 224, 255]
     BODY_BUTTON_FG_COLOR = [0, 0, 0]
-    BODY_BUTTON_BG_COLOR = [200, 255, 200]
-    PREVIEW_CANVAS_COLOR = [100, 100, 100]
+    BODY_BUTTON_BG_COLOR = [255, 200, 200]
+    PREVIEW_CANVAS_COLOR = [0, 0, 0]
+    PREVIEW_BUTTON_FG_COLOR = [0, 0, 0]
+    PREVIEW_BUTTON_BG_COLOR = [200, 255, 212]
 
     GRID_SELECT_HEAD_OPTIONS = [1, 0]
 
@@ -120,10 +122,10 @@ class App(tk.Frame):
     PREVIEW_CROP_SIZE = [128, 32]
     PREVIEW_RESIZE_SIZE = (384, 96)
 
-    CMPIDLE_BTN_TEXT = "Composite idle frames"
-    CMPFULL_BTN_TEXT = "Composite all frames"
-    RB_HEADFILE_TEXT = "Rebuild head filepaths"
-    RB_BODYFILE_TEXT = "Rebuild body filepaths"
+    CMPIDLE_BTN_TEXT = "Save idle frames"
+    CMPFULL_BTN_TEXT = "Save all frames"
+    RB_HEADFILE_TEXT = "Rebuild head database"
+    RB_BODYFILE_TEXT = "Rebuild body database"
     RB_HEADOFFS_TEXT = "Rebuild head offsets"
     RB_BODYOFFS_TEXT = "Rebuild body offsets"
     PREVIEW_BTN_TEXT = "Generate preview"
@@ -312,7 +314,9 @@ class App(tk.Frame):
             self._master,
             width=self.PREVIEW_CANVAS_WIDTH,
             height=self.PREVIEW_CANVAS_HEIGHT,
-            bg=self.FromRGB(*self.PREVIEW_CANVAS_COLOR)
+            bg=self.FromRGB(*self.PREVIEW_CANVAS_COLOR),
+            relief=tk.SUNKEN,
+            borderwidth=16,
             )
         self._preview_image.grid(
             row=self.GRID_IMAGEPREVIEW_CANVAS[0],
@@ -326,7 +330,10 @@ class App(tk.Frame):
             text=self.PREVIEW_BTN_TEXT,
             command=self.generate_preview
             )
-        self._preview_button.config(width=self.DEFAULT_BUTTON_WIDTH)
+        self._preview_button.config(
+            width=self.DEFAULT_BUTTON_WIDTH,
+            bg=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR)
+            )
         self._preview_button.grid(
             row=self.GRID_MAKE_PREVIEW_BUTTON[0],
             column=self.GRID_MAKE_PREVIEW_BUTTON[1],
@@ -549,7 +556,7 @@ class App(tk.Frame):
                     interpolation=cv2.INTER_NEAREST
                     )
                 self._imageobj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
-                self._preview_image.create_image((0, 0), anchor=tk.NW, image=self._imageobj)
+                self._preview_image.create_image((16, 16), anchor=tk.NW, image=self._imageobj)
 
             except sprite_splitter.NonexistentHeadException as e:
                 raise InvalidHeadException(e.filename)
