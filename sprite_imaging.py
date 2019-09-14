@@ -11,7 +11,8 @@ import cv2
 import numpy as np
 
 
-def ApplyMask(image: np.ndarray, mask: np.ndarray) -> np.ndarray:
+def ApplyMask(image: np.ndarray,
+              mask: np.ndarray) -> np.ndarray:
     """
     Applies an alpha mask to a colored image.
 
@@ -35,10 +36,12 @@ def ConvertAlpha(image: np.ndarray) -> np.ndarray:
     return cv2.merge((b, g, r, np.ones(b.shape, dtype=b.dtype) * 255))
 
 
-def Crop(image: np.ndarray, start: (int, int), size: (int, int)) -> np.ndarray:
+def Crop(image: np.ndarray,
+         start: list,
+         size: list) -> np.ndarray:
     """
     Returns a subregion from a CV2 image.
-    (Does not modify the original image!)
+    (Does not modify the original image).
 
     :param image: Image to crop from.
     :param start: X-Y coordinate to start cropping from.
@@ -62,12 +65,13 @@ def GetUniqueColors(image: np.ndarray) -> np.ndarray:
     return np.unique(image)
 
 
-def ToGrayscale(image: np.ndarray, is_color=False) -> np.ndarray:
+def ToGrayscale(image: np.ndarray,
+                is_color: bool = False) -> np.ndarray:
     """
     Converts an RGB image to grayscale.
 
     :param image:    CV2 image to convert.
-    :param is_color: Whether to preserve color channels.
+    :param is_color: Whether to preserve color channels. (Default False).
 
     :return: Image as converted to grayscale.
     """
@@ -92,26 +96,30 @@ def IsGrayscale(color: iter) -> bool:
     return r == g == b
 
 
-def MakeBlank(w: int, h: int, channels=4) -> np.ndarray:
+def MakeBlank(w: int,
+              h: int,
+              channels: int = 4) -> np.ndarray:
     """
     Makes a blank image of the given size.
 
     :param w:        Width of output image.
     :param h:        Height of output image.
-    :param channels: Number of color channels.
+    :param channels: Number of color channels. (Default 4).
 
     :return: Blank CV2-ready image.
     """
     return np.zeros((h, w, channels), np.uint8)
 
 
-def MakeMask(image: np.ndarray, thresh: float, maxval=255) -> np.ndarray:
+def MakeMask(image: np.ndarray,
+             thresh: float,
+             maxval: int = 255) -> np.ndarray:
     """
     Creates a bitmask from a grayscale CV2 image.
 
     :param image:  Image to create mask from.
     :param thresh: Transparency threshold.
-    :param maxval: Maximum threshold value.
+    :param maxval: Maximum threshold value. (Default 255).
 
     :return: Newly-generated bitmask.
     """
@@ -123,13 +131,12 @@ def MakeMask(image: np.ndarray, thresh: float, maxval=255) -> np.ndarray:
     return image
 
 
-def Paste(
-        dest: np.ndarray,
-        src: np.ndarray,
-        pos: (int, int)) -> None:
+def Paste(dest: np.ndarray,
+          src: np.ndarray,
+          pos: tuple) -> None:
     """
-    Pastes one image onto another. In-place.
-    Preserves alpha transparency (i.e. transparent pixels won't overwrite each other).
+    Pastes one image onto another. (In-place).
+    Preserves alpha transparency; transparent pixels won't overwrite anything.
 
     :param dest: Destination image to modify.
     :param src:  Source image to paste.
@@ -146,10 +153,9 @@ def Paste(
 
 
 # noinspection PyUnresolvedReferences
-def ReplaceColor(
-        image: np.ndarray,
-        color: iter = [],
-        replace: iter = [0, 0, 0]) -> np.ndarray:
+def ReplaceColor(image: np.ndarray,
+                 color: list = [],
+                 replace: list = [0, 0, 0]) -> np.ndarray:
     """
     Replaces a color in an image with another one.
     Defaults to top-left pixel's color.

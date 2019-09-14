@@ -9,7 +9,9 @@ examples were taken from The Spriters Resource.
 
 """
 import sprite_splitter
+import sprite_utils
 import importlib
+from sprite_constant import *
 
 PROMPT = """
 Commands:
@@ -24,12 +26,17 @@ What do?
 
 def DoComposite(cmd: iter, idle: bool = False):
     if len(cmd) == 3:
+        sprite_utils.FixPath(ROOT_OUTPUT_DIRECTORY)
+        head = cmd[1]
+        body = cmd[2]
+        output = os.path.join(ROOT_OUTPUT_DIRECTORY, '{}_{}'.format(head, body))
+
         if idle:
-            sprite_splitter.MainIdle(cmd[1], cmd[2], '{}_{}'.format(cmd[1], cmd[2]))
-            print("Composited idle sprites for {}_{}!".format(cmd[1], cmd[2]))
+            sprite_splitter.MainIdle(head, body, output)
+            print("Composited {} (idle only)!".format(output))
         else:
-            sprite_splitter.Main(cmd[1], cmd[2], '{}_{}'.format(cmd[1], cmd[2]))
-            print("Composited sprites for {}_{}!".format(cmd[1], cmd[2]))
+            sprite_splitter.Main(head, body, output)
+            print("Composited {}!".format(output))
 
 
 def DoRefresh():

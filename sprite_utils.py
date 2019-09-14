@@ -1,20 +1,26 @@
 #! usr/bin/env python3
 """
+------------------------------------------------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
-Path utility functions.
-
+Filepath utility functions.
+------------------------------------------------------------------------------------------------------------------------
 """
 import shutil
 from sprite_constant import *
 
 
-def FlushOutputs():
+def FlushOutputs() -> None:
+    """
+    Flushes entire image output directory.
+
+    :return: None.
+    """
     shutil.rmtree(ROOT_OUTPUT_DIRECTORY)
 
 
-def FixPath(path: str):
+def FixPath(path: str) -> str:
     """
     Ensures existence of an output directory.
 

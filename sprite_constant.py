@@ -24,6 +24,17 @@ ROOT_INPUT_DIRECTORY: str = os.path.join("inputs", "")
 """ Root spritesheet output directory. """
 ROOT_OUTPUT_DIRECTORY: str = os.path.join("outputs", "")
 
+""" Recognized file types. """
+FILETYPES = (
+    ("PNG", "*.png"),
+    ("JPEG", "*.jpg; *.jpeg; *.jpe; *.jfif; *.exif"),
+    ("BMP", "*.bmp; *.dib; *.rle"),
+    ("TIFF", "*.tiff; *.tif"),
+    ("GIF", "*.gif"),
+    ("TGA", "*.tga"),
+    ("DirectDraw Surface (DDS)", "*.dds"),
+    )
+
 """ Recognized color names. """
 COLORS = NamedEnumIter(
     "blue",

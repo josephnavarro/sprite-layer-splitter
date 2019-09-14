@@ -12,7 +12,6 @@ layer information using grayscale masks. This program puts them together.
 """
 import itertools
 from sprite_json import *
-from sprite_constant import *
 from sprite_imaging import *
 from sprite_utils import *
 
@@ -71,8 +70,8 @@ def Split(image: np.ndarray,
     h, w, channels = image.shape
 
     # Generate `base` and `mask` images
-    base = Crop(image, (0, 0), (w >> 1, h))
-    mask = ReplaceColor(Crop(image, (w >> 1, 0), (w >> 1, h)), [255, 255, 255], [252, 252, 252])
+    base = Crop(image, [0, 0], [w >> 1, h])
+    mask = ReplaceColor(Crop(image, [w >> 1, 0], [w >> 1, h]), [255, 255, 255], [252, 252, 252])
 
     # Isolate regions and sort into layers
     out_data = {}
@@ -132,7 +131,7 @@ def GetHeadOffsets(name: str,
 
 def ProcessBody(name: str,
                 image: np.ndarray,
-                where: tuple,
+                where: list,
                 body_data: dict,
                 source_data: dict,
                 is_alpha: bool) -> dict:
@@ -172,7 +171,7 @@ def ProcessBody(name: str,
                 where_x: int = body_where[state][0] + (body_size[0] * n)
                 where_y: int = body_where[state][1]
 
-                new_img: np.ndarray = Crop(img, (where_x, where_y), body_size)
+                new_img: np.ndarray = Crop(img, [where_x, where_y], body_size)
                 new_pos: tuple = (dx + off_x + (32 * n), dy - off_y)
 
                 Paste(new_frame, new_img, new_pos)
@@ -184,7 +183,7 @@ def ProcessBody(name: str,
 
 def ProcessHead(name: str,
                 image: np.ndarray,
-                where: tuple,
+                where: list,
                 head_data: dict,
                 source_data: dict,
                 is_alpha: bool) -> dict:
@@ -225,7 +224,7 @@ def ProcessHead(name: str,
                 where_x: int = head_where[state][0] + (head_size[0] * n)
                 where_y: int = head_where[state][1]
 
-                new_img: np.ndarray = Crop(img, (where_x, where_y), head_size)
+                new_img: np.ndarray = Crop(img, [where_x, where_y], head_size)
                 new_pos: tuple = (dx + off_x + (32 * n), dy - off_y)
 
                 Paste(new_frame, new_img, new_pos)
@@ -237,8 +236,8 @@ def ProcessHead(name: str,
 
 def Process(head_path: str,
             body_path: str,
-            head_offset: tuple,
-            body_offset: tuple,
+            head_offset: list,
+            body_offset: list,
             head_data: dict,
             body_data: dict,
             source_data: dict,
@@ -284,8 +283,7 @@ def MainIdle(head: str,
              body: str,
              output: str,
              offset: tuple = (0, 0),
-             is_alpha: bool = True,
-             outdir: str = ROOT_OUTPUT_DIRECTORY) -> None:
+             is_alpha: bool = True) -> None:
     """
     Image processing entrypoint. Only assembles idle frames.
 
@@ -294,17 +292,18 @@ def MainIdle(head: str,
     :param output:   Output filename.
     :param offset:   Manual X-Y offset onto master sheet. (Default (0, 0)).
     :param is_alpha: Whether to make black pixels transparent. (Default True).
-    :param outdir:   Root output directory. (Default `ROOT_OUTPUT_DIRECTORY`).
 
     :return: None.
     """
-    # Load compositing data from JSON files
+    # Load compositing data from JSON
     offset_head_data = GetOffsetHeadData()
     offset_body_data = GetOffsetBodyData()
 
+    # Load filepaths from JSON
     path_chara_data = GetCharaPathData()
     path_class_data = GetClassPathData()
 
+    # Load compositing rules from JSON
     source_color_data = GetSourceColorData()
     source_crop_data = GetSourceCropData()
 
@@ -320,8 +319,8 @@ def MainIdle(head: str,
         new_data = Process(
             head_path,
             body_path,
-            (offset[0], offset[1] + HEAD_BLOCK * source_color_data[color]),
-            (offset[0], offset[1] + BODY_BLOCK * source_color_data[color]),
+            [offset[0], offset[1] + HEAD_BLOCK * source_color_data[color]],
+            [offset[0], offset[1] + BODY_BLOCK * source_color_data[color]],
             offset_head_data,
             offset_body_data,
             source_crop_data,
@@ -351,15 +350,14 @@ def MainIdle(head: str,
             Paste(out_image, new_gray, (0, (y + 1) * STATE_REGION[1]))
 
     # Save image to file
-    cv2.imwrite(os.path.join(FixPath(os.path.join(outdir, output)), "sheet.png"), out_image)
+    cv2.imwrite(output, out_image)
 
 
 def Main(head: str,
          body: str,
          output: str,
          offset: tuple = (0, 0),
-         is_alpha: bool = True,
-         outdir: str = ROOT_OUTPUT_DIRECTORY) -> None:
+         is_alpha: bool = True) -> None:
     """
     Image processing entrypoint.
 
@@ -368,34 +366,35 @@ def Main(head: str,
     :param output:   Output filename.
     :param offset:   Manual X-Y offset onto master sheet. (Default (0,0)).
     :param is_alpha: Whether to make black pixels transparent. (Default False).
-    :param outdir:   Root output directory. (Default `ROOT_OUTPUT_DIRECTORY`).
 
     :return: None.
     """
     # Load compositing data from JSON files
-    offset_head_data = GetOffsetHeadData()
-    offset_body_data = GetOffsetBodyData()
+    offset_head_data: dict = GetOffsetHeadData()
+    offset_body_data: dict = GetOffsetBodyData()
 
-    path_chara_data = GetCharaPathData()
-    path_class_data = GetClassPathData()
+    # Load filepath data from JSON
+    path_chara_data: dict = GetCharaPathData()
+    path_class_data: dict = GetClassPathData()
 
-    source_color_data = GetSourceColorData()
-    source_crop_data = GetSourceCropData()
+    # Load compositing rules from JSON
+    source_color_data: dict = GetSourceColorData()
+    source_crop_data: dict = GetSourceCropData()
 
     # Make master spritesheet
-    out_image = MakeBlank(COLOR_REGION[0], COLOR_REGION[1] * (len(COLORS) + 1))
+    out_image: np.ndarray = MakeBlank(COLOR_REGION[0], COLOR_REGION[1] * (len(COLORS) + 1))
 
     # Assemble sprites for each color
     head_path: str = os.path.join(*path_chara_data[head]["path"])
     body_path: str = os.path.join(*path_class_data[body]["path"])
 
     for y, color in enumerate(COLORS):
-        new_image = MakeBlank(*COLOR_REGION)
-        new_data = Process(
+        new_image: np.ndarray = MakeBlank(*COLOR_REGION)
+        new_data: dict = Process(
             head_path,
             body_path,
-            (offset[0], offset[1] + HEAD_BLOCK * source_color_data[color]),
-            (offset[0], offset[1] + BODY_BLOCK * source_color_data[color]),
+            [offset[0], offset[1] + HEAD_BLOCK * source_color_data[color]],
+            [offset[0], offset[1] + BODY_BLOCK * source_color_data[color]],
             offset_head_data,
             offset_body_data,
             source_crop_data,
@@ -441,4 +440,4 @@ def Main(head: str,
             Paste(out_image, new_gray, (0, (y + 1) * COLOR_REGION[1]))
 
     # Save image to file
-    cv2.imwrite(os.path.join(FixPath(os.path.join(outdir, output)), "sheet.png"), out_image)
+    cv2.imwrite(output, out_image)
