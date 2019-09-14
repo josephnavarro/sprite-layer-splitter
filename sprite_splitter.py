@@ -21,7 +21,6 @@ class NonexistentHeadException(Exception):
         "filename",
         ]
 
-
     def __init__(self, name):
         super().__init__()
         self.filename = name
@@ -31,7 +30,6 @@ class NonexistentBodyException(Exception):
     __slots__ = [
         "filename",
         ]
-
 
     def __init__(self, name):
         super().__init__()
@@ -296,19 +294,17 @@ def Process(head_path: str,
 
 def MainIdle(head: str,
              body: str,
-             output: str,
              offset: tuple = (0, 0),
-             is_alpha: bool = True) -> None:
+             is_alpha: bool = True) -> np.ndarray:
     """
-    Image processing entrypoint. Only assembles idle frames.
+    Only assembles idle frames.
 
     :param head:     Head name.
     :param body:     Body name.
-    :param output:   Output filename.
     :param offset:   Manual X-Y offset onto master sheet. (Default (0, 0)).
     :param is_alpha: Whether to make black pixels transparent. (Default True).
 
-    :return: None.
+    :return: Composited image.
     """
     # Load compositing data from JSON
     offset_head_data = GetOffsetHeadData()
@@ -370,24 +366,22 @@ def MainIdle(head: str,
             Paste(out_image, new_gray, (0, (y + 1) * STATE_REGION[1]))
 
     # Save image to file
-    cv2.imwrite(output, out_image)
+    return out_image
 
 
 def Main(head: str,
          body: str,
-         output: str,
          offset: tuple = (0, 0),
-         is_alpha: bool = True) -> None:
+         is_alpha: bool = True) -> np.ndarray:
     """
-    Image processing entrypoint.
+    Creates a spritesheet.
 
     :param head:     Head spritesheet name.
     :param body:     Body spritesheet name.
-    :param output:   Output filename.
     :param offset:   Manual X-Y offset onto master sheet. (Default (0,0)).
     :param is_alpha: Whether to make black pixels transparent. (Default False).
 
-    :return: None.
+    :return: Composited image.
     """
     # Load compositing data from JSON files
     offset_head_data: dict = GetOffsetHeadData()
@@ -465,4 +459,16 @@ def Main(head: str,
             Paste(out_image, new_gray, (0, (y + 1) * COLOR_REGION[1]))
 
     # Save image to file
-    cv2.imwrite(output, out_image)
+    return out_image
+
+
+def SaveImage(image: np.ndarray, path: str) -> None:
+    """
+    Saves a CV2-format image to file.
+
+    :param image: CV2 image to save.
+    :param path:  Relative path to save to.
+
+    :return: None.
+    """
+    cv2.imwrite(path, image)

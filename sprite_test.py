@@ -30,14 +30,16 @@ def DoComposite(cmd: iter,
         sprite_utils.FixPath(ROOT_OUTPUT_DIRECTORY)
         head = cmd[1]
         body = cmd[2]
-        output = os.path.join(ROOT_OUTPUT_DIRECTORY, '{}_{}.png'.format(head, body))
+        path = os.path.join(ROOT_OUTPUT_DIRECTORY, '{}_{}.png'.format(head, body))
 
         if idle:
-            sprite_splitter.MainIdle(head, body, output)
-            print("Composited {} (idle only)!".format(output))
+            image = sprite_splitter.MainIdle(head, body)
+            sprite_splitter.SaveImage(image, path)
+            print("Composited {} (idle only)!".format(path))
         else:
-            sprite_splitter.Main(head, body, output)
-            print("Composited {}!".format(output))
+            image = sprite_splitter.Main(head, body)
+            sprite_splitter.SaveImage(image, path)
+            print("Composited {}!".format(path))
 
 
 def DoRefresh():

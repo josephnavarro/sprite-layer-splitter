@@ -1,12 +1,15 @@
 """
+------------------------------------------------------------------------------------------------------------------------
+Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
-Implements an iterable enumerated value container.
-
+Implements an iterable container for enumerated values.
+------------------------------------------------------------------------------------------------------------------------
 """
 
 
 class NamedEnumIter:
+
 
     def __init__(self, *args, **kwargs):
         """
@@ -26,8 +29,7 @@ class NamedEnumIter:
 
     def _register_attr(self, attrname: str, enumeration: int = -1) -> bool:
         """
-        Registers a new enumerated attribute into a NamedEnumIter object.
-        In-place.
+        Registers a new enumerated attribute into a NamedEnumIter object. (In-place).
 
         :param attrname: Name of enumeration to set.
         :param enumeration:
@@ -51,24 +53,20 @@ class NamedEnumIter:
             return True
 
     def __call__(self, accessor):
-        """ Implements __call__.
-        """
+        """ Implements __call__. """
         return self[accessor]
 
     def __len__(self):
-        """ Implements __len__.
-        """
+        """ Implements __len__. """
         return self._num_items
 
     def __iter__(self):
-        """ Implements __iter__.
-        """
+        """ Implements __iter__. """
         self._iterator = 0
         return self
 
     def __next__(self):
-        """ Implements __next__.
-        """
+        """ Implements __next__. """
         if self._iterator < self._num_items:
             n = self._iterator
             self._iterator += 1
@@ -77,8 +75,7 @@ class NamedEnumIter:
             raise StopIteration
 
     def __getitem__(self, accessor):
-        """ Implements __getitem__.
-        """
+        """ Implements __getitem__. """
         container = None
 
         if type(accessor) == int:

@@ -1,14 +1,17 @@
 #! usr/bin/env python3
 """
+------------------------------------------------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 General image processing functions.
 
+------------------------------------------------------------------------------------------------------------------------
 """
 
 import cv2
 import numpy as np
+from PIL import Image, ImageTk
 
 
 def ApplyMask(image: np.ndarray,
@@ -82,6 +85,28 @@ def ToGrayscale(image: np.ndarray,
         out_image = cv2.cvtColor(out_image, cv2.COLOR_GRAY2RGB)
 
     return out_image
+
+
+def ToPIL(image: np.ndarray) -> Image:
+    """
+    Converts a numpy array to a PIL image.
+
+    :param image: Numpy image array.
+
+    :return: PIL Image object.
+    """
+    return Image.fromarray(image)
+
+
+def ToTkinter(image: Image) -> ImageTk.PhotoImage:
+    """
+    Converts a PIL image to a Tkinter-compatible object.
+
+    :param image: PIL image.
+
+    :return: PhotoImage compatible with Tkinter.
+    """
+    return ImageTk.PhotoImage(image)
 
 
 def IsGrayscale(color: iter) -> bool:

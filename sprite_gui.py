@@ -5,6 +5,7 @@ Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 Graphical user interface layer.
+
 ------------------------------------------------------------------------------------------------------------------------
 """
 import cv2
@@ -28,14 +29,12 @@ class UnspecifiedBodyException(Exception):
 class InvalidHeadException(sprite_splitter.NonexistentHeadException):
     __slots__ = []
 
-
     def __init__(self, name):
         super().__init__(name)
 
 
 class InvalidBodyException(sprite_splitter.NonexistentBodyException):
     __slots__ = []
-
 
     def __init__(self, name):
         super().__init__(name)
@@ -96,7 +95,6 @@ class App(tk.Frame):
     REBUILD_HEAD_TEXT = "Rebuild head sources"
     REBUILD_BODY_TEXT = "Rebuild body sources"
 
-
     @staticmethod
     def FromRGB(r: int, g: int, b: int) -> str:
         """
@@ -109,7 +107,6 @@ class App(tk.Frame):
         :return:
         """
         return "#{0:02x}{1:02x}{2:02x}".format(r, g, b)
-
 
     def __init__(self, root, *args, **kwargs):
         """
@@ -147,7 +144,6 @@ class App(tk.Frame):
         self._init_chara_menu()
         self._init_class_menu()
 
-
     def _init_chara_data(self) -> None:
         """
         Completes initialization of local character head data (as loaded from file).
@@ -157,7 +153,6 @@ class App(tk.Frame):
         self._chara_data = {v.get("name", "---"): k for k, v in sprite_json.GetHeadPathData().items()}
         self._characters = list(self._chara_data)
 
-
     def _init_class_data(self):
         """
         Completes initialization of local character body data (as loaded from file).
@@ -166,7 +161,6 @@ class App(tk.Frame):
         """
         self._class_data = {v.get("name", "---"): k for k, v in sprite_json.GetBodyPathData().items()}
         self._classes = list(self._class_data)
-
 
     def _init_chara_menu(self) -> None:
         """
@@ -187,7 +181,6 @@ class App(tk.Frame):
             )
         self._chara_menu.grid(row=0, column=0, padx=4, pady=5)
 
-
     def _init_class_menu(self) -> None:
         """
         Completes initialization of character body dropdown menu.
@@ -207,7 +200,6 @@ class App(tk.Frame):
             )
         self._class_menu.grid(row=0, column=1, padx=4, pady=5)
 
-
     def _init_idle_button(self) -> None:
         """
         Completes initialization of "idle composition" button.
@@ -217,7 +209,6 @@ class App(tk.Frame):
         self._idle_button = tk.Button(self._master, text=self.IDLE_BUTTON_TEXT, command=self.composite_idle)
         self._idle_button.config(width=self.DEFAULT_BUTTON_WIDTH)
         self._idle_button.grid(row=2, column=0, padx=4, pady=5)
-
 
     def _init_full_button(self) -> None:
         """
@@ -229,7 +220,6 @@ class App(tk.Frame):
         self._full_button.config(width=self.DEFAULT_BUTTON_WIDTH)
         self._full_button.grid(row=2, column=1, padx=4, pady=5)
 
-
     def _init_rebuild_body_button(self) -> None:
         """
         Completes initialization of "rebuild body" button.
@@ -240,7 +230,6 @@ class App(tk.Frame):
         self._rebuild_body_button.config(width=self.DEFAULT_BUTTON_WIDTH)
         self._rebuild_body_button.grid(row=3, column=1, padx=4, pady=5)
 
-
     def _init_rebuild_head_button(self) -> None:
         """
         Completes initialization of "rebuild head" button.
@@ -250,7 +239,6 @@ class App(tk.Frame):
         self._rebuild_head_button = tk.Button(self._master, text=self.REBUILD_HEAD_TEXT, command=self.rebuild_head)
         self._rebuild_head_button.config(width=self.DEFAULT_BUTTON_WIDTH)
         self._rebuild_head_button.grid(row=3, column=0, padx=4, pady=10)
-
 
     def composite_idle(self) -> None:
         """
@@ -273,29 +261,33 @@ class App(tk.Frame):
 
             # Prompt user for destination filename
             sprite_utils.FixPath(ROOT_OUTPUT_DIRECTORY)
-            output = filedialog.asksaveasfilename(
+            path: str = filedialog.asksaveasfilename(
                 initialfile="{}_{}.png".format(head, body),
                 initialdir=ROOT_OUTPUT_DIRECTORY,
                 title="Save As",
                 filetypes=FILETYPES
                 )
-            if not output:
+            if not path:
                 raise EmptyFilenameException
 
             # Perform sprite composition
             try:
-                sprite_splitter.MainIdle(head, body, output)
+                image = sprite_splitter.MainIdle(head, body)
+                sprite_splitter.SaveImage(image, path)
+
             except sprite_splitter.NonexistentHeadException as e:
                 raise InvalidHeadException(e.filename)
+
             except sprite_splitter.NonexistentBodyException as e:
                 raise InvalidBodyException(e.filename)
+
             except cv2.error:
                 raise InvalidFilenameException
 
             # Alert user upon success
             tk.messagebox.showinfo(
                 self.WINDOW_TITLE,
-                self.SUCCESS_IDLE_MESSAGE.format(filename=os.path.basename(output))
+                self.SUCCESS_IDLE_MESSAGE.format(filename=os.path.basename(path))
                 )
 
         except UnspecifiedHeadException:
@@ -320,7 +312,6 @@ class App(tk.Frame):
 
         except EmptyFilenameException:
             pass
-
 
     def composite_full(self):
         """
@@ -343,29 +334,33 @@ class App(tk.Frame):
 
             # Prompt user for destination filename
             sprite_utils.FixPath(ROOT_OUTPUT_DIRECTORY)
-            output = filedialog.asksaveasfilename(
+            path: str = filedialog.asksaveasfilename(
                 initialfile="{}_{}.png".format(head, body),
                 initialdir=ROOT_OUTPUT_DIRECTORY,
                 title="Save As",
                 filetypes=FILETYPES
                 )
-            if not output:
+            if not path:
                 raise EmptyFilenameException
 
             # Perform sprite composition
             try:
-                sprite_splitter.Main(head, body, output)
+                image = sprite_splitter.Main(head, body)
+                sprite_splitter.SaveImage(image, path)
+
             except sprite_splitter.NonexistentHeadException as e:
                 raise InvalidHeadException(e.filename)
+
             except sprite_splitter.NonexistentBodyException as e:
                 raise InvalidBodyException(e.filename)
+
             except cv2.error:
                 raise InvalidFilenameException
 
             # Alert user upon success
             tk.messagebox.showinfo(
                 self.WINDOW_TITLE,
-                self.SUCCESS_FULL_MESSAGE.format(filename=os.path.basename(output))
+                self.SUCCESS_FULL_MESSAGE.format(filename=os.path.basename(path))
                 )
 
         except UnspecifiedHeadException:
@@ -391,7 +386,6 @@ class App(tk.Frame):
         except EmptyFilenameException:
             pass
 
-
     def rebuild_body(self) -> None:
         """
         Rebuilds body JSON database.
@@ -404,7 +398,6 @@ class App(tk.Frame):
             self._init_class_data()
             self._init_class_menu()
             tk.messagebox.showinfo(self.WINDOW_TITLE, self.REBUILD_BODY_MESSAGE)
-
 
     def rebuild_head(self) -> None:
         """
