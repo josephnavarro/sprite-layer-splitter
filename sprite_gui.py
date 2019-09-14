@@ -12,8 +12,8 @@ import tkinter as tk
 import sprite_splitter
 import sprite_utils
 import sprite_json
+from tkinter import messagebox
 from tkinter import filedialog
-from tkinter.messagebox import showinfo
 from sprite_constant import *
 
 
@@ -57,8 +57,10 @@ class App(tk.Frame):
     FAILURE_TYPE_MESSAGE = "Error: Invalid image format specified!"
     SUCCESS_IDLE_MESSAGE = "Idle frames saved to {filename}!"
     SUCCESS_FULL_MESSAGE = "Sprite frames saved to {filename}!"
-    REBUILD_HEAD_MESSAGE = "Rebuild head database?"
-    REBUILD_BODY_MESSAGE = "Rebuild body database?"
+    REBUILD_HEAD_CONFIRM = "Rebuild head database?"
+    REBUILD_HEAD_MESSAGE = "Head database was rebuilt."
+    REBUILD_BODY_CONFIRM = "Rebuild body database?"
+    REBUILD_BODY_MESSAGE = "Body database was rebuilt."
 
     DEFAULT_DROPDOWN_WIDTH = 26
     DEFAULT_BUTTON_WIDTH = 27
@@ -218,7 +220,7 @@ class App(tk.Frame):
         """
         self._rebuild_body_button = tk.Button(self._master, text=self.REBUILD_BODY_TEXT, command=self.rebuild_body)
         self._rebuild_body_button.config(width=self.DEFAULT_BUTTON_WIDTH)
-        self._rebuild_body_button.grid(row=3, column=0, padx=4, pady=5)
+        self._rebuild_body_button.grid(row=3, column=1, padx=4, pady=5)
 
 
     def _init_rebuild_head_button(self) -> None:
@@ -229,7 +231,7 @@ class App(tk.Frame):
         """
         self._rebuild_head_button = tk.Button(self._master, text=self.REBUILD_HEAD_TEXT, command=self.rebuild_head)
         self._rebuild_head_button.config(width=self.DEFAULT_BUTTON_WIDTH)
-        self._rebuild_head_button.grid(row=3, column=1, padx=4, pady=10)
+        self._rebuild_head_button.grid(row=3, column=0, padx=4, pady=10)
 
 
     def composite_idle(self) -> None:
@@ -269,19 +271,22 @@ class App(tk.Frame):
                 raise InvalidFilenameException
 
             # Alert user upon success
-            showinfo(self.WINDOW_TITLE, self.SUCCESS_IDLE_MESSAGE.format(filename=os.path.basename(output)))
+            tk.messagebox.showinfo(
+                self.WINDOW_TITLE,
+                self.SUCCESS_IDLE_MESSAGE.format(filename=os.path.basename(output))
+                )
 
         except InvalidHeadException:
             # Head not specified
-            showinfo(self.WINDOW_TITLE, self.FAILURE_HEAD_MESSAGE)
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_HEAD_MESSAGE)
 
         except InvalidBodyException:
             # Body not specified
-            showinfo(self.WINDOW_TITLE, self.FAILURE_BODY_MESSAGE)
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_BODY_MESSAGE)
 
         except InvalidFilenameException:
             # Image format not recognized
-            showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
 
         except EmptyFilenameException:
             pass
@@ -324,19 +329,22 @@ class App(tk.Frame):
                 raise InvalidFilenameException
 
             # Alert user upon success
-            showinfo(self.WINDOW_TITLE, self.SUCCESS_FULL_MESSAGE.format(filename=os.path.basename(output)))
+            tk.messagebox.showinfo(
+                self.WINDOW_TITLE,
+                self.SUCCESS_FULL_MESSAGE.format(filename=os.path.basename(output))
+                )
 
         except InvalidHeadException:
             # Head not specified
-            showinfo(self.WINDOW_TITLE, self.FAILURE_HEAD_MESSAGE)
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_HEAD_MESSAGE)
 
         except InvalidBodyException:
             # Body not specified
-            showinfo(self.WINDOW_TITLE, self.FAILURE_BODY_MESSAGE)
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_BODY_MESSAGE)
 
         except InvalidFilenameException:
             # Image format not recognized
-            showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
 
         except EmptyFilenameException:
             pass
@@ -348,11 +356,12 @@ class App(tk.Frame):
 
         :return: None
         """
-        do_rebuild = tk.messagebox.askquestion(self.WINDOW_TITLE, self.REBUILD_BODY_MESSAGE)
+        do_rebuild = tk.messagebox.askquestion(self.WINDOW_TITLE, self.REBUILD_BODY_CONFIRM)
         if do_rebuild == "yes":
             sprite_json.CreateBodyJSON()
             self._init_class_data()
             self._init_class_menu()
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.REBUILD_BODY_MESSAGE)
 
     def rebuild_head(self) -> None:
         """
@@ -360,11 +369,12 @@ class App(tk.Frame):
 
         :return: None.
         """
-        do_rebuild = tk.messagebox.askquestion(self.WINDOW_TITLE, self.REBUILD_HEAD_MESSAGE)
+        do_rebuild = tk.messagebox.askquestion(self.WINDOW_TITLE, self.REBUILD_HEAD_CONFIRM)
         if do_rebuild == "yes":
             sprite_json.CreateHeadJSON()
             self._init_chara_data()
             self._init_chara_menu()
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.REBUILD_HEAD_MESSAGE)
 
 
 def GUIMain() -> None:
