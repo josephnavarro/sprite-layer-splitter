@@ -51,11 +51,14 @@ class App(tk.Frame):
         ]
 
     WINDOW_TITLE = "Fire Emblem 3DS Sprite Tool"
+
     FAILURE_HEAD_MESSAGE = "Error: Head not specified!"
     FAILURE_BODY_MESSAGE = "Error: Body not specified!"
     FAILURE_TYPE_MESSAGE = "Error: Invalid image format specified!"
     SUCCESS_IDLE_MESSAGE = "Idle frames saved to {filename}!"
     SUCCESS_FULL_MESSAGE = "Sprite frames saved to {filename}!"
+    REBUILD_HEAD_MESSAGE = "Rebuild head database?"
+    REBUILD_BODY_MESSAGE = "Rebuild body database?"
 
     DEFAULT_DROPDOWN_WIDTH = 26
     DEFAULT_BUTTON_WIDTH = 27
@@ -131,7 +134,7 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._chara_data = {v.get("name", "---"): k for k, v in sprite_json.GetCharaPathData().items()}
+        self._chara_data = {v.get("name", "---"): k for k, v in sprite_json.GetHeadPathData().items()}
         self._characters = list(self._chara_data)
 
 
@@ -141,7 +144,7 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._class_data = {v.get("name", "---"): k for k, v in sprite_json.GetClassPathData().items()}
+        self._class_data = {v.get("name", "---"): k for k, v in sprite_json.GetBodyPathData().items()}
         self._classes = list(self._class_data)
 
 
@@ -236,42 +239,48 @@ class App(tk.Frame):
         :return: None.
         """
         try:
+            # Get head key
             try:
                 head = self._chara_data[self._chara_string.get()]
             except KeyError:
                 raise InvalidHeadException
 
+            # Get body key
             try:
                 body = self._class_data[self._class_string.get()]
             except KeyError:
                 raise InvalidBodyException
 
+            # Prompt user for destination filename
             sprite_utils.FixPath(ROOT_OUTPUT_DIRECTORY)
-
             output = filedialog.asksaveasfilename(
                 initialfile="{}_{}.png".format(head, body),
                 initialdir=ROOT_OUTPUT_DIRECTORY,
                 title="Save As",
                 filetypes=FILETYPES
                 )
-
             if not output:
                 raise EmptyFilenameException
 
+            # Perform sprite composition
             try:
                 sprite_splitter.MainIdle(head, body, output)
             except cv2.error:
                 raise InvalidFilenameException
 
+            # Alert user upon success
             showinfo(self.WINDOW_TITLE, self.SUCCESS_IDLE_MESSAGE.format(filename=os.path.basename(output)))
 
         except InvalidHeadException:
+            # Head not specified
             showinfo(self.WINDOW_TITLE, self.FAILURE_HEAD_MESSAGE)
 
         except InvalidBodyException:
+            # Body not specified
             showinfo(self.WINDOW_TITLE, self.FAILURE_BODY_MESSAGE)
 
         except InvalidFilenameException:
+            # Image format not recognized
             showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
 
         except EmptyFilenameException:
@@ -285,54 +294,77 @@ class App(tk.Frame):
         :return: None.
         """
         try:
+            # Get head key
             try:
                 head = self._chara_data[self._chara_string.get()]
             except KeyError:
                 raise InvalidHeadException
 
+            # Get body key
             try:
                 body = self._class_data[self._class_string.get()]
             except KeyError:
                 raise InvalidBodyException
 
+            # Prompt user for destination filename
             sprite_utils.FixPath(ROOT_OUTPUT_DIRECTORY)
-
             output = filedialog.asksaveasfilename(
                 initialfile="{}_{}.png".format(head, body),
                 initialdir=ROOT_OUTPUT_DIRECTORY,
                 title="Save As",
                 filetypes=FILETYPES
                 )
-
             if not output:
                 raise EmptyFilenameException
 
+            # Perform sprite composition
             try:
                 sprite_splitter.Main(head, body, output)
             except cv2.error:
                 raise InvalidFilenameException
 
+            # Alert user upon success
             showinfo(self.WINDOW_TITLE, self.SUCCESS_FULL_MESSAGE.format(filename=os.path.basename(output)))
 
         except InvalidHeadException:
+            # Head not specified
             showinfo(self.WINDOW_TITLE, self.FAILURE_HEAD_MESSAGE)
 
         except InvalidBodyException:
+            # Body not specified
             showinfo(self.WINDOW_TITLE, self.FAILURE_BODY_MESSAGE)
 
         except InvalidFilenameException:
+            # Image format not recognized
             showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
 
         except EmptyFilenameException:
             pass
 
 
-    def rebuild_body(self):
-        pass
+    def rebuild_body(self) -> None:
+        """
+        Rebuilds body JSON database.
 
+        :return: None
+        """
+        do_rebuild = tk.messagebox.askquestion(self.WINDOW_TITLE, self.REBUILD_BODY_MESSAGE)
+        if do_rebuild == "yes":
+            sprite_json.CreateBodyJSON()
+            self._init_class_data()
+            self._init_class_menu()
 
-    def rebuild_head(self):
-        pass
+    def rebuild_head(self) -> None:
+        """
+        Rebuilds head JSON database.
+
+        :return: None.
+        """
+        do_rebuild = tk.messagebox.askquestion(self.WINDOW_TITLE, self.REBUILD_HEAD_MESSAGE)
+        if do_rebuild == "yes":
+            sprite_json.CreateHeadJSON()
+            self._init_chara_data()
+            self._init_chara_menu()
 
 
 def GUIMain() -> None:

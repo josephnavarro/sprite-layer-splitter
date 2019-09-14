@@ -57,13 +57,11 @@ def PasteLayers(dest: np.ndarray,
             pass
 
 
-def Split(image: np.ndarray,
-          is_alpha: bool = True) -> dict:
+def Split(image: np.ndarray) -> dict:
     """
     Isolates irregular regions on an image, then sorts regions by their luminosities.
 
-    :param image:    Image to extract regions from.
-    :param is_alpha: Whether to preserve alpha channel. (Default True).
+    :param image: Image to extract regions from.
 
     :return: Layers sorted by luminosity.
     """
@@ -78,10 +76,7 @@ def Split(image: np.ndarray,
     values = [value for value in GetUniqueColors(ToGrayscale(mask)) if value not in IGNORED_COLORS]
 
     for v in values:
-        if is_alpha:
-            out_data[v] = ConvertAlpha(ApplyMask(base, MakeMask(mask, v)))
-        else:
-            out_data[v] = ApplyMask(base, MakeMask(mask, v))
+        out_data[v] = ConvertAlpha(ApplyMask(base, MakeMask(mask, v)))
 
     # Return ordered layers
     return out_data
@@ -151,11 +146,12 @@ def ProcessBody(name: str,
     body_size: list = source_data["body"]["size"]
     body_where: list = source_data["body"]["where"]
 
-    layers: dict = Split(Crop(ReplaceColor(image), where, REGION_FULL_BODY), is_alpha)
+    layers: dict = Split(Crop(image, where, REGION_FULL_BODY))
     if is_alpha:
         layers = {k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0]) for k, v in layers.items()}
 
     out_data: dict = {}
+
     for state in STATES:
         dx: int = 0
         dy: int = 32 * (2 if state == "right" else (1 if state == "left" else 0))
@@ -204,11 +200,12 @@ def ProcessHead(name: str,
     head_size: list = source_data["head"][head_type]["size"]
     head_where: list = source_data["head"][head_type]["where"]
 
-    layers: dict = Split(Crop(ReplaceColor(image), where, REGION_FULL_HEAD), is_alpha)
+    layers: dict = Split(Crop(image, where, REGION_FULL_HEAD))
     if is_alpha:
         layers = {k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0]) for k, v in layers.items()}
 
     out_data: dict = {}
+
     for state in STATES:
         dx: int = -24 if head_type == "small" else 0
         dy: int = +32 * (2 if state == "right" else (1 if state == "left" else 0))
@@ -300,8 +297,8 @@ def MainIdle(head: str,
     offset_body_data = GetOffsetBodyData()
 
     # Load filepaths from JSON
-    path_chara_data = GetCharaPathData()
-    path_class_data = GetClassPathData()
+    path_chara_data = GetHeadPathData()
+    path_class_data = GetBodyPathData()
 
     # Load compositing rules from JSON
     source_color_data = GetSourceColorData()
@@ -374,8 +371,8 @@ def Main(head: str,
     offset_body_data: dict = GetOffsetBodyData()
 
     # Load filepath data from JSON
-    path_chara_data: dict = GetCharaPathData()
-    path_class_data: dict = GetClassPathData()
+    path_chara_data: dict = GetHeadPathData()
+    path_class_data: dict = GetBodyPathData()
 
     # Load compositing rules from JSON
     source_color_data: dict = GetSourceColorData()

@@ -22,10 +22,10 @@ PATH_JSON_SOURCE_COLOR = os.path.join("inputs", "source_color.json")
 PATH_JSON_SOURCE_CROP = os.path.join("inputs", "source_crop.json")
 
 
-def CreateCharaJSON() -> None:
+def CreateHeadJSON() -> None:
     """
     Automatically generates a character head JSON file.
-    JSON contents reflect the contents of "inputs/head/".
+    JSON contents will reflect the contents of "inputs/head/".
 
     :return: None.
     """
@@ -43,7 +43,7 @@ def CreateCharaJSON() -> None:
         f.write(newstr)
 
 
-def CreateClassJSON() -> None:
+def CreateBodyJSON() -> None:
     """
     Automatically generates a character body JSON file.
     JSON contents will reflect the contents of "inputs/body/".
@@ -64,7 +64,7 @@ def CreateClassJSON() -> None:
         f.write(newstr)
 
 
-def GetCharaPathData() -> dict:
+def GetHeadPathData() -> dict:
     """
     Loads and returns relative filepaths to character head spritesheets.
 
@@ -75,7 +75,7 @@ def GetCharaPathData() -> dict:
     return data
 
 
-def GetClassPathData() -> dict:
+def GetBodyPathData() -> dict:
     """
     Loads and returns relative filepaths to character body spritesheets.
 
@@ -131,5 +131,5 @@ def GetSourceCropData() -> dict:
 
 
 if __name__ == "__main__":
-    CreateCharaJSON()
-    CreateClassJSON()
+    CreateHeadJSON()
+    CreateBodyJSON()

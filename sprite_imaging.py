@@ -147,8 +147,11 @@ def Paste(dest: np.ndarray,
     x, y = pos
     for yy in range(src.shape[0]):
         for xx in range(src.shape[1]):
-            if src[yy, xx, 3]:
-                # Copy if not transparent
+            try:
+                if src[yy, xx, 3]:
+                    # Copy if not transparent
+                    dest[y + yy, x + xx] = src[yy, xx]
+            except IndexError:
                 dest[y + yy, x + xx] = src[yy, xx]
 
 
