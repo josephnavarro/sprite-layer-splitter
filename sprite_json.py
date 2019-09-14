@@ -1,10 +1,12 @@
 #! usr/bin/env python3
 """
+------------------------------------------------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 Utilities for reading and writing local JSON files.
 
+------------------------------------------------------------------------------------------------------------------------
 """
 import json
 import glob
@@ -14,6 +16,7 @@ from sprite_constant import *
 TEMPLATE_JSON_BASE = "{{{}}}"
 TEMPLATE_JSON_CHARA = "\"{name}\":{{\"path\":[\"head\", \"{name}.png\"],\"name\":\"{full}\"}},"
 TEMPLATE_JSON_CLASS = "\"{name}\":{{\"path\":[\"body\", \"{name}.png\"],\"name\":\"{full}\"}},"
+
 PATH_JSON_CHARA = os.path.join("inputs", "head.json")
 PATH_JSON_CLASS = os.path.join("inputs", "body.json")
 PATH_JSON_OFFSET_HEAD = os.path.join("inputs", "head_offsets.json")
@@ -32,9 +35,10 @@ def CreateHeadJSON() -> None:
     newstr = ""
     for _ in glob.glob(os.path.join(ROOT_INPUT_DIRECTORY, "head", "*.png")):
         n = os.path.splitext(os.path.basename(_))[0]
-        p = " ".join(
-            [("({})".format(x.capitalize()) if len(x) == 1 else (x if len(x) == 2 else x.capitalize())) for x in
-             n.split("-")])
+        p = " ".join([
+            ("({})".format(x.capitalize()) if len(x) == 1 else (x if len(x) == 2 else x.capitalize()))
+            for x in n.split("-")
+            ])
         newstr += TEMPLATE_JSON_CHARA.format(name=n, full=p)
 
     newstr = newstr.rstrip(",")

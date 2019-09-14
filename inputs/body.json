@@ -1,1 +1,402 @@
-{"adventurer-f":{"path":["body", "adventurer-f.png"],"name":"Adventurer (F)"},"adventurer-m":{"path":["body", "adventurer-m.png"],"name":"Adventurer (M)"},"apothecary-f":{"path":["body", "apothecary-f.png"],"name":"Apothecary (F)"},"apothecary-m":{"path":["body", "apothecary-m.png"],"name":"Apothecary (M)"},"archer-f":{"path":["body", "archer-f.png"],"name":"Archer (F)"},"archer-m":{"path":["body", "archer-m.png"],"name":"Archer (M)"},"ballistician":{"path":["body", "ballistician.png"],"name":"Ballistician"},"basara-f":{"path":["body", "basara-f.png"],"name":"Basara (F)"},"basara-m":{"path":["body", "basara-m.png"],"name":"Basara (M)"},"berserker-f":{"path":["body", "berserker-f.png"],"name":"Berserker (F)"},"berserker-m":{"path":["body", "berserker-m.png"],"name":"Berserker (M)"},"blacksmith-f":{"path":["body", "blacksmith-f.png"],"name":"Blacksmith (F)"},"blacksmith-m":{"path":["body", "blacksmith-m.png"],"name":"Blacksmith (M)"},"bow-knight":{"path":["body", "bow-knight.png"],"name":"Bow Knight"},"butler":{"path":["body", "butler.png"],"name":"Butler"},"cavalier-f":{"path":["body", "cavalier-f.png"],"name":"Cavalier (F)"},"cavalier-m":{"path":["body", "cavalier-m.png"],"name":"Cavalier (M)"},"dark-falcon-f":{"path":["body", "dark-falcon-f.png"],"name":"Dark Falcon (F)"},"dark-falcon-m":{"path":["body", "dark-falcon-m.png"],"name":"Dark Falcon (M)"},"dark-knight":{"path":["body", "dark-knight.png"],"name":"Dark Knight"},"dark-mage-f":{"path":["body", "dark-mage-f.png"],"name":"Dark Mage (F)"},"dark-mage-m":{"path":["body", "dark-mage-m.png"],"name":"Dark Mage (M)"},"diviner-f":{"path":["body", "diviner-f.png"],"name":"Diviner (F)"},"diviner-m":{"path":["body", "diviner-m.png"],"name":"Diviner (M)"},"dread-fighter-f":{"path":["body", "dread-fighter-f.png"],"name":"Dread Fighter (F)"},"dread-fighter-m":{"path":["body", "dread-fighter-m.png"],"name":"Dread Fighter (M)"},"falcon-knight":{"path":["body", "falcon-knight.png"],"name":"Falcon Knight"},"fighter-f":{"path":["body", "fighter-f.png"],"name":"Fighter (F)"},"fighter-m":{"path":["body", "fighter-m.png"],"name":"Fighter (M)"},"general":{"path":["body", "general.png"],"name":"General"},"grandmaster":{"path":["body", "grandmaster.png"],"name":"Grandmaster"},"great-knight":{"path":["body", "great-knight.png"],"name":"Great Knight"},"great-lord":{"path":["body", "great-lord.png"],"name":"Great Lord"},"great-master":{"path":["body", "great-master.png"],"name":"Great Master"},"hero-f":{"path":["body", "hero-f.png"],"name":"Hero (F)"},"hero-m":{"path":["body", "hero-m.png"],"name":"Hero (M)"},"hoshido-noble-f":{"path":["body", "hoshido-noble-f.png"],"name":"Hoshido Noble (F)"},"hoshido-noble-m":{"path":["body", "hoshido-noble-m.png"],"name":"Hoshido Noble (M)"},"kinshi-knight":{"path":["body", "kinshi-knight.png"],"name":"Kinshi Knight"},"kitsune-f":{"path":["body", "kitsune-f.png"],"name":"Kitsune (F)"},"kitsune-m":{"path":["body", "kitsune-m.png"],"name":"Kitsune (M)"},"knight":{"path":["body", "knight.png"],"name":"Knight"},"lodestar":{"path":["body", "lodestar.png"],"name":"Lodestar"},"maid":{"path":["body", "maid.png"],"name":"Maid"},"malig-knight":{"path":["body", "malig-knight.png"],"name":"Malig Knight"},"master-ninja-f":{"path":["body", "master-ninja-f.png"],"name":"Master Ninja (F)"},"master-ninja-m":{"path":["body", "master-ninja-m.png"],"name":"Master Ninja (M)"},"master-of-arms-f":{"path":["body", "master-of-arms-f.png"],"name":"Master of Arms (F)"},"master-of-arms-m":{"path":["body", "master-of-arms-m.png"],"name":"Master of Arms (M)"},"mechanist":{"path":["body", "mechanist.png"],"name":"Mechanist"},"mercenary-f":{"path":["body", "mercenary-f.png"],"name":"Mercenary (F)"},"mercenary-m":{"path":["body", "mercenary-m.png"],"name":"Mercenary (M)"},"merchant-f":{"path":["body", "merchant-f.png"],"name":"Merchant (F)"},"merchant-m":{"path":["body", "merchant-m.png"],"name":"Merchant (M)"},"monk":{"path":["body", "monk.png"],"name":"Monk"},"nine-tails-f":{"path":["body", "nine-tails-f.png"],"name":"Nine Tails (F)"},"nine-tails-m":{"path":["body", "nine-tails-m.png"],"name":"Nine Tails (M)"},"ninja-f":{"path":["body", "ninja-f.png"],"name":"Ninja (F)"},"ninja-m":{"path":["body", "ninja-m.png"],"name":"Ninja (M)"},"nohr-noble-f":{"path":["body", "nohr-noble-f.png"],"name":"Nohr Noble (F)"},"nohr-noble-m":{"path":["body", "nohr-noble-m.png"],"name":"Nohr Noble (M)"},"nohr-prince":{"path":["body", "nohr-prince.png"],"name":"Nohr Prince"},"nohr-princess":{"path":["body", "nohr-princess.png"],"name":"Nohr Princess"},"oni-chieftain-f":{"path":["body", "oni-chieftain-f.png"],"name":"Oni Chieftain (F)"},"oni-chieftain-m":{"path":["body", "oni-chieftain-m.png"],"name":"Oni Chieftain (M)"},"oni-savage-f":{"path":["body", "oni-savage-f.png"],"name":"Oni Savage (F)"},"oni-savage-m":{"path":["body", "oni-savage-m.png"],"name":"Oni Savage (M)"},"onmyoji-f":{"path":["body", "onmyoji-f.png"],"name":"Onmyoji (F)"},"onmyoji-m":{"path":["body", "onmyoji-m.png"],"name":"Onmyoji (M)"},"outlaw-f":{"path":["body", "outlaw-f.png"],"name":"Outlaw (F)"},"outlaw-m":{"path":["body", "outlaw-m.png"],"name":"Outlaw (M)"},"paladin":{"path":["body", "paladin.png"],"name":"Paladin"},"priestess":{"path":["body", "priestess.png"],"name":"Priestess"},"samurai-f":{"path":["body", "samurai-f.png"],"name":"Samurai (F)"},"samurai-m":{"path":["body", "samurai-m.png"],"name":"Samurai (M)"},"shrine-maiden":{"path":["body", "shrine-maiden.png"],"name":"Shrine Maiden"},"sky-knight":{"path":["body", "sky-knight.png"],"name":"Sky Knight"},"sniper-f":{"path":["body", "sniper-f.png"],"name":"Sniper (F)"},"sniper-m":{"path":["body", "sniper-m.png"],"name":"Sniper (M)"},"sorcerer-f":{"path":["body", "sorcerer-f.png"],"name":"Sorcerer (F)"},"sorcerer-m":{"path":["body", "sorcerer-m.png"],"name":"Sorcerer (M)"},"spear-fighter-f":{"path":["body", "spear-fighter-f.png"],"name":"Spear Fighter (F)"},"spear-fighter-m":{"path":["body", "spear-fighter-m.png"],"name":"Spear Fighter (M)"},"spear-master-f":{"path":["body", "spear-master-f.png"],"name":"Spear Master (F)"},"spear-master-m":{"path":["body", "spear-master-m.png"],"name":"Spear Master (M)"},"strategist":{"path":["body", "strategist.png"],"name":"Strategist"},"swordmaster-f":{"path":["body", "swordmaster-f.png"],"name":"Swordmaster (F)"},"swordmaster-m":{"path":["body", "swordmaster-m.png"],"name":"Swordmaster (M)"},"troubadour-f":{"path":["body", "troubadour-f.png"],"name":"Troubadour (F)"},"troubadour-m":{"path":["body", "troubadour-m.png"],"name":"Troubadour (M)"},"vanguard":{"path":["body", "vanguard.png"],"name":"Vanguard"},"villager-f":{"path":["body", "villager-f.png"],"name":"Villager (F)"},"villager-m":{"path":["body", "villager-m.png"],"name":"Villager (M)"},"witch":{"path":["body", "witch.png"],"name":"Witch"},"wolfskin-f":{"path":["body", "wolfskin-f.png"],"name":"Wolfskin (F)"},"wolfskin-m":{"path":["body", "wolfskin-m.png"],"name":"Wolfskin (M)"},"wolfssegner-f":{"path":["body", "wolfssegner-f.png"],"name":"Wolfssegner (F)"},"wolfssegner-m":{"path":["body", "wolfssegner-m.png"],"name":"Wolfssegner (M)"},"wyvern-lord":{"path":["body", "wyvern-lord.png"],"name":"Wyvern Lord"},"wyvern-rider":{"path":["body", "wyvern-rider.png"],"name":"Wyvern Rider"}}
+{
+    "adventurer-f":     {
+        "path": ["body", "adventurer-f.png"],
+        "name": "Adventurer (F)"
+    },
+    "adventurer-m":     {
+        "path": ["body", "adventurer-m.png"],
+        "name": "Adventurer (M)"
+    },
+    "apothecary-f":     {
+        "path": ["body", "apothecary-f.png"],
+        "name": "Apothecary (F)"
+    },
+    "apothecary-m":     {
+        "path": ["body", "apothecary-m.png"],
+        "name": "Apothecary (M)"
+    },
+    "archer-f":         {
+        "path": ["body", "archer-f.png"],
+        "name": "Archer (F)"
+    },
+    "archer-m":         {
+        "path": ["body", "archer-m.png"],
+        "name": "Archer (M)"
+    },
+    "ballistician":     {
+        "path": ["body", "ballistician.png"],
+        "name": "Ballistician"
+    },
+    "basara-f":         {
+        "path": ["body", "basara-f.png"],
+        "name": "Basara (F)"
+    },
+    "basara-m":         {
+        "path": ["body", "basara-m.png"],
+        "name": "Basara (M)"
+    },
+    "berserker-f":      {
+        "path": ["body", "berserker-f.png"],
+        "name": "Berserker (F)"
+    },
+    "berserker-m":      {
+        "path": ["body", "berserker-m.png"],
+        "name": "Berserker (M)"
+    },
+    "blacksmith-f":     {
+        "path": ["body", "blacksmith-f.png"],
+        "name": "Blacksmith (F)"
+    },
+    "blacksmith-m":     {
+        "path": ["body", "blacksmith-m.png"],
+        "name": "Blacksmith (M)"
+    },
+    "bow-knight":       {
+        "path": ["body", "bow-knight.png"],
+        "name": "Bow Knight"
+    },
+    "butler":           {
+        "path": ["body", "butler.png"],
+        "name": "Butler"
+    },
+    "cavalier-f":       {
+        "path": ["body", "cavalier-f.png"],
+        "name": "Cavalier (F)"
+    },
+    "cavalier-m":       {
+        "path": ["body", "cavalier-m.png"],
+        "name": "Cavalier (M)"
+    },
+    "dark-falcon-f":    {
+        "path": ["body", "dark-falcon-f.png"],
+        "name": "Dark Falcon (F)"
+    },
+    "dark-falcon-m":    {
+        "path": ["body", "dark-falcon-m.png"],
+        "name": "Dark Falcon (M)"
+    },
+    "dark-knight":      {
+        "path": ["body", "dark-knight.png"],
+        "name": "Dark Knight"
+    },
+    "dark-mage-f":      {
+        "path": ["body", "dark-mage-f.png"],
+        "name": "Dark Mage (F)"
+    },
+    "dark-mage-m":      {
+        "path": ["body", "dark-mage-m.png"],
+        "name": "Dark Mage (M)"
+    },
+    "diviner-f":        {
+        "path": ["body", "diviner-f.png"],
+        "name": "Diviner (F)"
+    },
+    "diviner-m":        {
+        "path": ["body", "diviner-m.png"],
+        "name": "Diviner (M)"
+    },
+    "dread-fighter-f":  {
+        "path": ["body", "dread-fighter-f.png"],
+        "name": "Dread Fighter (F)"
+    },
+    "dread-fighter-m":  {
+        "path": ["body", "dread-fighter-m.png"],
+        "name": "Dread Fighter (M)"
+    },
+    "falcon-knight":    {
+        "path": ["body", "falcon-knight.png"],
+        "name": "Falcon Knight"
+    },
+    "fighter-f":        {
+        "path": ["body", "fighter-f.png"],
+        "name": "Fighter (F)"
+    },
+    "fighter-m":        {
+        "path": ["body", "fighter-m.png"],
+        "name": "Fighter (M)"
+    },
+    "general":          {
+        "path": ["body", "general.png"],
+        "name": "General"
+    },
+    "grandmaster":      {
+        "path": ["body", "grandmaster.png"],
+        "name": "Grandmaster"
+    },
+    "great-knight":     {
+        "path": ["body", "great-knight.png"],
+        "name": "Great Knight"
+    },
+    "great-lord":       {
+        "path": ["body", "great-lord.png"],
+        "name": "Great Lord"
+    },
+    "great-master":     {
+        "path": ["body", "great-master.png"],
+        "name": "Great Master"
+    },
+    "hero-f":           {
+        "path": ["body", "hero-f.png"],
+        "name": "Hero (F)"
+    },
+    "hero-m":           {
+        "path": ["body", "hero-m.png"],
+        "name": "Hero (M)"
+    },
+    "hoshido-noble-f":  {
+        "path": ["body", "hoshido-noble-f.png"],
+        "name": "Hoshido Noble (F)"
+    },
+    "hoshido-noble-m":  {
+        "path": ["body", "hoshido-noble-m.png"],
+        "name": "Hoshido Noble (M)"
+    },
+    "kinshi-knight":    {
+        "path": ["body", "kinshi-knight.png"],
+        "name": "Kinshi Knight"
+    },
+    "kitsune-f":        {
+        "path": ["body", "kitsune-f.png"],
+        "name": "Kitsune (F)"
+    },
+    "kitsune-m":        {
+        "path": ["body", "kitsune-m.png"],
+        "name": "Kitsune (M)"
+    },
+    "knight":           {
+        "path": ["body", "knight.png"],
+        "name": "Knight"
+    },
+    "lodestar":         {
+        "path": ["body", "lodestar.png"],
+        "name": "Lodestar"
+    },
+    "maid":             {
+        "path": ["body", "maid.png"],
+        "name": "Maid"
+    },
+    "malig-knight":     {
+        "path": ["body", "malig-knight.png"],
+        "name": "Malig Knight"
+    },
+    "master-ninja-f":   {
+        "path": ["body", "master-ninja-f.png"],
+        "name": "Master Ninja (F)"
+    },
+    "master-ninja-m":   {
+        "path": ["body", "master-ninja-m.png"],
+        "name": "Master Ninja (M)"
+    },
+    "master-of-arms-f": {
+        "path": ["body", "master-of-arms-f.png"],
+        "name": "Master of Arms (F)"
+    },
+    "master-of-arms-m": {
+        "path": ["body", "master-of-arms-m.png"],
+        "name": "Master of Arms (M)"
+    },
+    "mechanist":        {
+        "path": ["body", "mechanist.png"],
+        "name": "Mechanist"
+    },
+    "mercenary-f":      {
+        "path": ["body", "mercenary-f.png"],
+        "name": "Mercenary (F)"
+    },
+    "mercenary-m":      {
+        "path": ["body", "mercenary-m.png"],
+        "name": "Mercenary (M)"
+    },
+    "merchant-f":       {
+        "path": ["body", "merchant-f.png"],
+        "name": "Merchant (F)"
+    },
+    "merchant-m":       {
+        "path": ["body", "merchant-m.png"],
+        "name": "Merchant (M)"
+    },
+    "monk":             {
+        "path": ["body", "monk.png"],
+        "name": "Monk"
+    },
+    "nine-tails-f":     {
+        "path": ["body", "nine-tails-f.png"],
+        "name": "Nine Tails (F)"
+    },
+    "nine-tails-m":     {
+        "path": ["body", "nine-tails-m.png"],
+        "name": "Nine Tails (M)"
+    },
+    "ninja-f":          {
+        "path": ["body", "ninja-f.png"],
+        "name": "Ninja (F)"
+    },
+    "ninja-m":          {
+        "path": ["body", "ninja-m.png"],
+        "name": "Ninja (M)"
+    },
+    "nohr-noble-f":     {
+        "path": ["body", "nohr-noble-f.png"],
+        "name": "Nohr Noble (F)"
+    },
+    "nohr-noble-m":     {
+        "path": ["body", "nohr-noble-m.png"],
+        "name": "Nohr Noble (M)"
+    },
+    "nohr-prince":      {
+        "path": ["body", "nohr-prince.png"],
+        "name": "Nohr Prince"
+    },
+    "nohr-princess":    {
+        "path": ["body", "nohr-princess.png"],
+        "name": "Nohr Princess"
+    },
+    "oni-chieftain-f":  {
+        "path": ["body", "oni-chieftain-f.png"],
+        "name": "Oni Chieftain (F)"
+    },
+    "oni-chieftain-m":  {
+        "path": ["body", "oni-chieftain-m.png"],
+        "name": "Oni Chieftain (M)"
+    },
+    "oni-savage-f":     {
+        "path": ["body", "oni-savage-f.png"],
+        "name": "Oni Savage (F)"
+    },
+    "oni-savage-m":     {
+        "path": ["body", "oni-savage-m.png"],
+        "name": "Oni Savage (M)"
+    },
+    "onmyoji-f":        {
+        "path": ["body", "onmyoji-f.png"],
+        "name": "Onmyoji (F)"
+    },
+    "onmyoji-m":        {
+        "path": ["body", "onmyoji-m.png"],
+        "name": "Onmyoji (M)"
+    },
+    "outlaw-f":         {
+        "path": ["body", "outlaw-f.png"],
+        "name": "Outlaw (F)"
+    },
+    "outlaw-m":         {
+        "path": ["body", "outlaw-m.png"],
+        "name": "Outlaw (M)"
+    },
+    "paladin":          {
+        "path": ["body", "paladin.png"],
+        "name": "Paladin"
+    },
+    "priestess":        {
+        "path": ["body", "priestess.png"],
+        "name": "Priestess"
+    },
+    "samurai-f":        {
+        "path": ["body", "samurai-f.png"],
+        "name": "Samurai (F)"
+    },
+    "samurai-m":        {
+        "path": ["body", "samurai-m.png"],
+        "name": "Samurai (M)"
+    },
+    "shrine-maiden":    {
+        "path": ["body", "shrine-maiden.png"],
+        "name": "Shrine Maiden"
+    },
+    "sky-knight":       {
+        "path": ["body", "sky-knight.png"],
+        "name": "Sky Knight"
+    },
+    "sniper-f":         {
+        "path": ["body", "sniper-f.png"],
+        "name": "Sniper (F)"
+    },
+    "sniper-m":         {
+        "path": ["body", "sniper-m.png"],
+        "name": "Sniper (M)"
+    },
+    "sorcerer-f":       {
+        "path": ["body", "sorcerer-f.png"],
+        "name": "Sorcerer (F)"
+    },
+    "sorcerer-m":       {
+        "path": ["body", "sorcerer-m.png"],
+        "name": "Sorcerer (M)"
+    },
+    "spear-fighter-f":  {
+        "path": ["body", "spear-fighter-f.png"],
+        "name": "Spear Fighter (F)"
+    },
+    "spear-fighter-m":  {
+        "path": ["body", "spear-fighter-m.png"],
+        "name": "Spear Fighter (M)"
+    },
+    "spear-master-f":   {
+        "path": ["body", "spear-master-f.png"],
+        "name": "Spear Master (F)"
+    },
+    "spear-master-m":   {
+        "path": ["body", "spear-master-m.png"],
+        "name": "Spear Master (M)"
+    },
+    "strategist":       {
+        "path": ["body", "strategist.png"],
+        "name": "Strategist"
+    },
+    "swordmaster-f":    {
+        "path": ["body", "swordmaster-f.png"],
+        "name": "Swordmaster (F)"
+    },
+    "swordmaster-m":    {
+        "path": ["body", "swordmaster-m.png"],
+        "name": "Swordmaster (M)"
+    },
+    "troubadour-f":     {
+        "path": ["body", "troubadour-f.png"],
+        "name": "Troubadour (F)"
+    },
+    "troubadour-m":     {
+        "path": ["body", "troubadour-m.png"],
+        "name": "Troubadour (M)"
+    },
+    "vanguard":         {
+        "path": ["body", "vanguard.png"],
+        "name": "Vanguard"
+    },
+    "villager-f":       {
+        "path": ["body", "villager-f.png"],
+        "name": "Villager (F)"
+    },
+    "villager-m":       {
+        "path": ["body", "villager-m.png"],
+        "name": "Villager (M)"
+    },
+    "witch":            {
+        "path": ["body", "witch.png"],
+        "name": "Witch"
+    },
+    "wolfskin-f":       {
+        "path": ["body", "wolfskin-f.png"],
+        "name": "Wolfskin (F)"
+    },
+    "wolfskin-m":       {
+        "path": ["body", "wolfskin-m.png"],
+        "name": "Wolfskin (M)"
+    },
+    "wolfssegner-f":    {
+        "path": ["body", "wolfssegner-f.png"],
+        "name": "Wolfssegner (F)"
+    },
+    "wolfssegner-m":    {
+        "path": ["body", "wolfssegner-m.png"],
+        "name": "Wolfssegner (M)"
+    },
+    "wyvern-lord":      {
+        "path": ["body", "wyvern-lord.png"],
+        "name": "Wyvern Lord"
+    },
+    "wyvern-rider":     {
+        "path": ["body", "wyvern-rider.png"],
+        "name": "Wyvern Rider"
+    }
+}
