@@ -16,8 +16,8 @@ TEMPLATE_JSON_CHARA = "\"{name}\":{{\"path\":[\"head\", \"{name}.png\"],\"name\"
 TEMPLATE_JSON_CLASS = "\"{name}\":{{\"path\":[\"body\", \"{name}.png\"],\"name\":\"{full}\"}},"
 PATH_JSON_CHARA = os.path.join("inputs", "head.json")
 PATH_JSON_CLASS = os.path.join("inputs", "body.json")
-PATH_JSON_OFFSET_HEAD = os.path.join("inputs", "offset_head.json")
-PATH_JSON_OFFSET_BODY = os.path.join("inputs", "offset_body.json")
+PATH_JSON_OFFSET_HEAD = os.path.join("inputs", "head_offsets.json")
+PATH_JSON_OFFSET_BODY = os.path.join("inputs", "body_offsets.json")
 PATH_JSON_SOURCE_COLOR = os.path.join("inputs", "source_color.json")
 PATH_JSON_SOURCE_CROP = os.path.join("inputs", "source_crop.json")
 
