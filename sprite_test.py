@@ -24,12 +24,13 @@ What do?
 >>> """
 
 
-def DoComposite(cmd: iter, idle: bool = False):
+def DoComposite(cmd: iter,
+                idle: bool = False) -> None:
     if len(cmd) == 3:
         sprite_utils.FixPath(ROOT_OUTPUT_DIRECTORY)
         head = cmd[1]
         body = cmd[2]
-        output = os.path.join(ROOT_OUTPUT_DIRECTORY, '{}_{}'.format(head, body))
+        output = os.path.join(ROOT_OUTPUT_DIRECTORY, '{}_{}.png'.format(head, body))
 
         if idle:
             sprite_splitter.MainIdle(head, body, output)

@@ -7,7 +7,6 @@ Fire Emblem 3DS Sprite Compositing Tool
 Graphical user interface layer.
 ------------------------------------------------------------------------------------------------------------------------
 """
-import os
 import tkinter as tk
 import sprite_splitter
 import sprite_utils
