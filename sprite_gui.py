@@ -7,12 +7,30 @@ Fire Emblem 3DS Sprite Compositing Tool
 Graphical user interface layer.
 ------------------------------------------------------------------------------------------------------------------------
 """
+import cv2
 import tkinter as tk
 import sprite_splitter
 import sprite_utils
 import sprite_json
-from sprite_constant import *
 from tkinter import filedialog
+from tkinter.messagebox import showinfo
+from sprite_constant import *
+
+
+class InvalidHeadException(Exception):
+    pass
+
+
+class InvalidBodyException(Exception):
+    pass
+
+
+class InvalidFilenameException(Exception):
+    pass
+
+
+class EmptyFilenameException(Exception):
+    pass
 
 
 class App(tk.Frame):
@@ -32,16 +50,42 @@ class App(tk.Frame):
         "_class_data",
         ]
 
-    DEFAULT_DROPDOWN_WIDTH = 48
-    DEFAULT_BUTTON_WIDTH = 46
+    WINDOW_TITLE = "Fire Emblem 3DS Sprite Tool"
+    FAILURE_HEAD_MESSAGE = "Error: Head not specified!"
+    FAILURE_BODY_MESSAGE = "Error: Body not specified!"
+    FAILURE_TYPE_MESSAGE = "Error: Invalid image format specified!"
+    SUCCESS_IDLE_MESSAGE = "Idle frames saved to {filename}!"
+    SUCCESS_FULL_MESSAGE = "Sprite frames saved to {filename}!"
+
+    DEFAULT_DROPDOWN_WIDTH = 26
+    DEFAULT_BUTTON_WIDTH = 27
 
     DEFAULT_CHARA = "Select head"
     DEFAULT_CLASS = "Select body"
+
+    CHARA_BUTTON_FG_COLOR = [0, 0, 0]
+    CHARA_BUTTON_BG_COLOR = [255, 200, 200]
+    CLASS_BUTTON_FG_COLOR = [0, 0, 0]
+    CLASS_BUTTON_BG_COLOR = [200, 255, 200]
 
     IDLE_BUTTON_TEXT = "Composite idle frames"
     FULL_BUTTON_TEXT = "Composite all frames"
     REBUILD_HEAD_TEXT = "Rebuild head sources"
     REBUILD_BODY_TEXT = "Rebuild body sources"
+
+
+    @staticmethod
+    def FromRGB(r: int, g: int, b: int) -> str:
+        """
+        Returns a Tkinter-friendly color code from an RGB color tuple.
+
+        :param r: Red channel (0-255)
+        :param g: Green channel (0-255)
+        :param b: Blue channel (0-255)
+
+        :return:
+        """
+        return "#{0:02x}{1:02x}{2:02x}".format(r, g, b)
 
 
     def __init__(self, root, *args, **kwargs):
@@ -55,6 +99,7 @@ class App(tk.Frame):
         super().__init__(root, *args, **kwargs)
 
         self._master = root
+        self.winfo_toplevel().title(self.WINDOW_TITLE)
 
         self._chara_data = {}
         self._class_data = {}
@@ -110,8 +155,14 @@ class App(tk.Frame):
         self._chara_string.set(self.DEFAULT_CHARA)
 
         self._chara_menu = tk.OptionMenu(self._master, self._chara_string, *self._characters)
-        self._chara_menu.config(width=self.DEFAULT_DROPDOWN_WIDTH)
-        self._chara_menu.grid(row=0, column=0, padx=10, pady=5)
+        self._chara_menu.config(
+            width=self.DEFAULT_DROPDOWN_WIDTH,
+            fg=self.FromRGB(*self.CHARA_BUTTON_FG_COLOR),
+            bg=self.FromRGB(*self.CHARA_BUTTON_BG_COLOR),
+            activebackground=self.FromRGB(*self.CHARA_BUTTON_BG_COLOR),
+            activeforeground=self.FromRGB(*self.CHARA_BUTTON_FG_COLOR)
+            )
+        self._chara_menu.grid(row=0, column=0, padx=4, pady=5)
 
 
     def _init_class_menu(self) -> None:
@@ -124,8 +175,14 @@ class App(tk.Frame):
         self._class_string.set(self.DEFAULT_CLASS)
 
         self._class_menu = tk.OptionMenu(self._master, self._class_string, *self._classes)
-        self._class_menu.config(width=self.DEFAULT_DROPDOWN_WIDTH)
-        self._class_menu.grid(row=1, column=0, padx=10, pady=5)
+        self._class_menu.config(
+            width=self.DEFAULT_DROPDOWN_WIDTH,
+            fg=self.FromRGB(*self.CLASS_BUTTON_FG_COLOR),
+            bg=self.FromRGB(*self.CLASS_BUTTON_BG_COLOR),
+            activebackground=self.FromRGB(*self.CLASS_BUTTON_BG_COLOR),
+            activeforeground=self.FromRGB(*self.CLASS_BUTTON_FG_COLOR)
+            )
+        self._class_menu.grid(row=0, column=1, padx=4, pady=5)
 
 
     def _init_idle_button(self) -> None:
@@ -136,7 +193,7 @@ class App(tk.Frame):
         """
         self._idle_button = tk.Button(self._master, text=self.IDLE_BUTTON_TEXT, command=self.composite_idle)
         self._idle_button.config(width=self.DEFAULT_BUTTON_WIDTH)
-        self._idle_button.grid(row=2, column=0, padx=10, pady=10)
+        self._idle_button.grid(row=2, column=0, padx=4, pady=5)
 
 
     def _init_full_button(self) -> None:
@@ -147,7 +204,7 @@ class App(tk.Frame):
         """
         self._full_button = tk.Button(self._master, text=self.FULL_BUTTON_TEXT, command=self.composite_full)
         self._full_button.config(width=self.DEFAULT_BUTTON_WIDTH)
-        self._full_button.grid(row=3, column=0, padx=10, pady=10)
+        self._full_button.grid(row=2, column=1, padx=4, pady=5)
 
 
     def _init_rebuild_body_button(self) -> None:
@@ -158,7 +215,7 @@ class App(tk.Frame):
         """
         self._rebuild_body_button = tk.Button(self._master, text=self.REBUILD_BODY_TEXT, command=self.rebuild_body)
         self._rebuild_body_button.config(width=self.DEFAULT_BUTTON_WIDTH)
-        self._rebuild_body_button.grid(row=4, column=0, padx=10, pady=10)
+        self._rebuild_body_button.grid(row=3, column=0, padx=4, pady=5)
 
 
     def _init_rebuild_head_button(self) -> None:
@@ -169,7 +226,7 @@ class App(tk.Frame):
         """
         self._rebuild_head_button = tk.Button(self._master, text=self.REBUILD_HEAD_TEXT, command=self.rebuild_head)
         self._rebuild_head_button.config(width=self.DEFAULT_BUTTON_WIDTH)
-        self._rebuild_head_button.grid(row=5, column=0, padx=10, pady=10)
+        self._rebuild_head_button.grid(row=3, column=1, padx=4, pady=10)
 
 
     def composite_idle(self) -> None:
@@ -179,8 +236,16 @@ class App(tk.Frame):
         :return: None.
         """
         try:
-            head = self._chara_data[self._chara_string.get()]
-            body = self._class_data[self._class_string.get()]
+            try:
+                head = self._chara_data[self._chara_string.get()]
+            except KeyError:
+                raise InvalidHeadException
+
+            try:
+                body = self._class_data[self._class_string.get()]
+            except KeyError:
+                raise InvalidBodyException
+
             sprite_utils.FixPath(ROOT_OUTPUT_DIRECTORY)
 
             output = filedialog.asksaveasfilename(
@@ -190,9 +255,26 @@ class App(tk.Frame):
                 filetypes=FILETYPES
                 )
 
-            sprite_splitter.MainIdle(head, body, output, )
+            if not output:
+                raise EmptyFilenameException
 
-        except KeyError:
+            try:
+                sprite_splitter.MainIdle(head, body, output)
+            except cv2.error:
+                raise InvalidFilenameException
+
+            showinfo(self.WINDOW_TITLE, self.SUCCESS_IDLE_MESSAGE.format(filename=os.path.basename(output)))
+
+        except InvalidHeadException:
+            showinfo(self.WINDOW_TITLE, self.FAILURE_HEAD_MESSAGE)
+
+        except InvalidBodyException:
+            showinfo(self.WINDOW_TITLE, self.FAILURE_BODY_MESSAGE)
+
+        except InvalidFilenameException:
+            showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
+
+        except EmptyFilenameException:
             pass
 
 
@@ -203,8 +285,16 @@ class App(tk.Frame):
         :return: None.
         """
         try:
-            head = self._chara_data[self._chara_string.get()]
-            body = self._class_data[self._class_string.get()]
+            try:
+                head = self._chara_data[self._chara_string.get()]
+            except KeyError:
+                raise InvalidHeadException
+
+            try:
+                body = self._class_data[self._class_string.get()]
+            except KeyError:
+                raise InvalidBodyException
+
             sprite_utils.FixPath(ROOT_OUTPUT_DIRECTORY)
 
             output = filedialog.asksaveasfilename(
@@ -214,9 +304,26 @@ class App(tk.Frame):
                 filetypes=FILETYPES
                 )
 
-            sprite_splitter.Main(head, body, output, )
+            if not output:
+                raise EmptyFilenameException
 
-        except KeyError:
+            try:
+                sprite_splitter.Main(head, body, output)
+            except cv2.error:
+                raise InvalidFilenameException
+
+            showinfo(self.WINDOW_TITLE, self.SUCCESS_FULL_MESSAGE.format(filename=os.path.basename(output)))
+
+        except InvalidHeadException:
+            showinfo(self.WINDOW_TITLE, self.FAILURE_HEAD_MESSAGE)
+
+        except InvalidBodyException:
+            showinfo(self.WINDOW_TITLE, self.FAILURE_BODY_MESSAGE)
+
+        except InvalidFilenameException:
+            showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
+
+        except EmptyFilenameException:
             pass
 
 

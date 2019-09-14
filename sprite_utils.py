@@ -17,7 +17,12 @@ def FlushOutputs() -> None:
 
     :return: None.
     """
-    shutil.rmtree(ROOT_OUTPUT_DIRECTORY)
+    try:
+        shutil.rmtree(ROOT_OUTPUT_DIRECTORY)
+        print("Removed directory '{}'!".format(ROOT_OUTPUT_DIRECTORY))
+    except FileNotFoundError:
+        print("Directory '{}' already removed!".format(ROOT_OUTPUT_DIRECTORY))
+        return
 
 
 def FixPath(path: str) -> str:
