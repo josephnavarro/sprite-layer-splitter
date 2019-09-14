@@ -33,11 +33,11 @@ def DoComposite(cmd: iter,
         path = os.path.join(ROOT_OUTPUT_DIRECTORY, '{}_{}.png'.format(head, body))
 
         if idle:
-            image = sprite_splitter.MainIdle(head, body)
+            image = sprite_splitter.CompositeIdle(head, body)
             sprite_splitter.SaveImage(image, path)
             print("Composited {} (idle only)!".format(path))
         else:
-            image = sprite_splitter.Main(head, body)
+            image = sprite_splitter.CompositeFull(head, body)
             sprite_splitter.SaveImage(image, path)
             print("Composited {}!".format(path))
 

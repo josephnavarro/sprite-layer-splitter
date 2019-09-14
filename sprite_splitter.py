@@ -292,12 +292,12 @@ def Process(head_path: str,
         }
 
 
-def MainIdle(head: str,
-             body: str,
-             offset: tuple = (0, 0),
-             is_alpha: bool = True) -> np.ndarray:
+def CompositeIdle(head: str,
+                  body: str,
+                  offset: tuple = (0, 0),
+                  is_alpha: bool = True) -> np.ndarray:
     """
-    Only assembles idle frames.
+    Composites spritesheet (idle frames only).
 
     :param head:     Head name.
     :param body:     Body name.
@@ -369,12 +369,12 @@ def MainIdle(head: str,
     return out_image
 
 
-def Main(head: str,
-         body: str,
-         offset: tuple = (0, 0),
-         is_alpha: bool = True) -> np.ndarray:
+def CompositeFull(head: str,
+                  body: str,
+                  offset: tuple = (0, 0),
+                  is_alpha: bool = True) -> np.ndarray:
     """
-    Creates a spritesheet.
+    Composites spritesheet.
 
     :param head:     Head spritesheet name.
     :param body:     Body spritesheet name.

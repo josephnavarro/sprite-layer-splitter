@@ -13,6 +13,7 @@ import tkinter as tk
 import sprite_splitter
 import sprite_utils
 import sprite_json
+import sprite_imaging
 from tkinter import messagebox
 from tkinter import filedialog
 from sprite_constant import *
@@ -63,23 +64,26 @@ class App(tk.Frame):
         "_rebuild_body_button",
         "_chara_data",
         "_class_data",
+        "_preview_button",
+        "_preview_image",
+        "_imageobj"
         ]
 
     WINDOW_TITLE = "Fire Emblem 3DS Sprite Tool"
 
-    FAILURE_HEAD_MESSAGE = "Error: Head not specified!"
     FAILURE_BODY_MESSAGE = "Error: Body not specified!"
-    INVALID_HEAD_MESSAGE = "Error: Head spritesheet '{filename}' does not exist!"
-    INVALID_BODY_MESSAGE = "Error: Body spritesheet '{filename}' does not exist!"
+    FAILURE_HEAD_MESSAGE = "Error: Head not specified!"
     FAILURE_TYPE_MESSAGE = "Error: Invalid image format specified!"
-    SUCCESS_IDLE_MESSAGE = "Idle frames saved to {filename}!"
-    SUCCESS_FULL_MESSAGE = "Sprite frames saved to {filename}!"
-    REBUILD_HEAD_CONFIRM = "Rebuild head database?"
-    REBUILD_HEAD_MESSAGE = "Head database was rebuilt."
+    INVALID_BODY_MESSAGE = "Error: Body spritesheet '{filename}' does not exist!"
+    INVALID_HEAD_MESSAGE = "Error: Head spritesheet '{filename}' does not exist!"
     REBUILD_BODY_CONFIRM = "Rebuild body database?"
     REBUILD_BODY_MESSAGE = "Body database was rebuilt."
+    REBUILD_HEAD_CONFIRM = "Rebuild head database?"
+    REBUILD_HEAD_MESSAGE = "Head database was rebuilt."
+    SUCCESS_FULL_MESSAGE = "Sprite frames saved to {filename}!"
+    SUCCESS_IDLE_MESSAGE = "Idle frames saved to {filename}!"
 
-    DEFAULT_DROPDOWN_WIDTH = 26
+    DEFAULT_OPTION_WIDTH = 26
     DEFAULT_BUTTON_WIDTH = 27
 
     DEFAULT_CHARA = "Select head"
@@ -92,8 +96,9 @@ class App(tk.Frame):
 
     IDLE_BUTTON_TEXT = "Composite idle frames"
     FULL_BUTTON_TEXT = "Composite all frames"
-    REBUILD_HEAD_TEXT = "Rebuild head sources"
-    REBUILD_BODY_TEXT = "Rebuild body sources"
+    REBUILDHEAD_TEXT = "Rebuild head sources"
+    REBUILDBODY_TEXT = "Rebuild body sources"
+    PREVIEW_BTN_TEXT = "Generate preview"
 
     @staticmethod
     def FromRGB(r: int, g: int, b: int) -> str:
@@ -121,6 +126,7 @@ class App(tk.Frame):
         self._master = root
         self.winfo_toplevel().title(self.WINDOW_TITLE)
 
+        self._imageobj = None
         self._chara_data = {}
         self._class_data = {}
         self._characters = [""]
@@ -128,6 +134,8 @@ class App(tk.Frame):
 
         self._idle_button = tk.Button()
         self._full_button = tk.Button()
+        self._preview_button = tk.Button()
+        self._preview_image = tk.Canvas(self._master)
         self._rebuild_body_button = tk.Button()
         self._rebuild_head_button = tk.Button()
         self._chara_string = tk.StringVar(self._master)
@@ -139,6 +147,7 @@ class App(tk.Frame):
         self._init_class_data()
         self._init_idle_button()
         self._init_full_button()
+        self._init_preview_button()
         self._init_rebuild_body_button()
         self._init_rebuild_head_button()
         self._init_chara_menu()
@@ -171,15 +180,16 @@ class App(tk.Frame):
         self._chara_string = tk.StringVar(self._master)
         self._chara_string.set(self.DEFAULT_CHARA)
 
+        self._chara_menu.destroy()
         self._chara_menu = tk.OptionMenu(self._master, self._chara_string, *self._characters)
         self._chara_menu.config(
-            width=self.DEFAULT_DROPDOWN_WIDTH,
+            width=self.DEFAULT_OPTION_WIDTH,
             fg=self.FromRGB(*self.CHARA_BUTTON_FG_COLOR),
             bg=self.FromRGB(*self.CHARA_BUTTON_BG_COLOR),
             activebackground=self.FromRGB(*self.CHARA_BUTTON_BG_COLOR),
             activeforeground=self.FromRGB(*self.CHARA_BUTTON_FG_COLOR)
             )
-        self._chara_menu.grid(row=0, column=0, padx=4, pady=5)
+        self._chara_menu.grid(row=1, column=0, padx=4, pady=5)
 
     def _init_class_menu(self) -> None:
         """
@@ -190,15 +200,16 @@ class App(tk.Frame):
         self._class_string = tk.StringVar(self._master)
         self._class_string.set(self.DEFAULT_CLASS)
 
+        self._class_menu.destroy()
         self._class_menu = tk.OptionMenu(self._master, self._class_string, *self._classes)
         self._class_menu.config(
-            width=self.DEFAULT_DROPDOWN_WIDTH,
+            width=self.DEFAULT_OPTION_WIDTH,
             fg=self.FromRGB(*self.CLASS_BUTTON_FG_COLOR),
             bg=self.FromRGB(*self.CLASS_BUTTON_BG_COLOR),
             activebackground=self.FromRGB(*self.CLASS_BUTTON_BG_COLOR),
             activeforeground=self.FromRGB(*self.CLASS_BUTTON_FG_COLOR)
             )
-        self._class_menu.grid(row=0, column=1, padx=4, pady=5)
+        self._class_menu.grid(row=1, column=1, padx=4, pady=5)
 
     def _init_idle_button(self) -> None:
         """
@@ -206,9 +217,10 @@ class App(tk.Frame):
 
         :return: None.
         """
+        self._idle_button.destroy()
         self._idle_button = tk.Button(self._master, text=self.IDLE_BUTTON_TEXT, command=self.composite_idle)
         self._idle_button.config(width=self.DEFAULT_BUTTON_WIDTH)
-        self._idle_button.grid(row=2, column=0, padx=4, pady=5)
+        self._idle_button.grid(row=3, column=0, padx=4, pady=5)
 
     def _init_full_button(self) -> None:
         """
@@ -216,9 +228,27 @@ class App(tk.Frame):
 
         :return: None.
         """
+        self._full_button.destroy()
         self._full_button = tk.Button(self._master, text=self.FULL_BUTTON_TEXT, command=self.composite_full)
         self._full_button.config(width=self.DEFAULT_BUTTON_WIDTH)
-        self._full_button.grid(row=2, column=1, padx=4, pady=5)
+        self._full_button.grid(row=3, column=1, padx=4, pady=5)
+
+    def _init_preview_button(self) -> None:
+        """
+        Completes initialization of "preview" button.
+
+        :return: None
+        """
+        self._imageobj = None
+
+        self._preview_image.destroy()
+        self._preview_image = tk.Canvas(self._master, width=100, height=100, bg=self.FromRGB(100,100,100))
+        self._preview_image.grid(row=0, column=1)
+
+        self._preview_button.destroy()
+        self._preview_button = tk.Button(self._master, text=self.PREVIEW_BTN_TEXT, command=self.generate_preview)
+        self._preview_button.config(width=self.DEFAULT_BUTTON_WIDTH)
+        self._preview_button.grid(row=3, column=2, padx=4, pady=5)
 
     def _init_rebuild_body_button(self) -> None:
         """
@@ -226,9 +256,10 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._rebuild_body_button = tk.Button(self._master, text=self.REBUILD_BODY_TEXT, command=self.rebuild_body)
+        self._rebuild_body_button.destroy()
+        self._rebuild_body_button = tk.Button(self._master, text=self.REBUILDBODY_TEXT, command=self.rebuild_body)
         self._rebuild_body_button.config(width=self.DEFAULT_BUTTON_WIDTH)
-        self._rebuild_body_button.grid(row=3, column=1, padx=4, pady=5)
+        self._rebuild_body_button.grid(row=4, column=1, padx=4, pady=5)
 
     def _init_rebuild_head_button(self) -> None:
         """
@@ -236,9 +267,10 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._rebuild_head_button = tk.Button(self._master, text=self.REBUILD_HEAD_TEXT, command=self.rebuild_head)
+        self._rebuild_head_button.destroy()
+        self._rebuild_head_button = tk.Button(self._master, text=self.REBUILDHEAD_TEXT, command=self.rebuild_head)
         self._rebuild_head_button.config(width=self.DEFAULT_BUTTON_WIDTH)
-        self._rebuild_head_button.grid(row=3, column=0, padx=4, pady=10)
+        self._rebuild_head_button.grid(row=4, column=0, padx=4, pady=10)
 
     def composite_idle(self) -> None:
         """
@@ -272,7 +304,7 @@ class App(tk.Frame):
 
             # Perform sprite composition
             try:
-                image = sprite_splitter.MainIdle(head, body)
+                image = sprite_splitter.CompositeIdle(head, body)
                 sprite_splitter.SaveImage(image, path)
 
             except sprite_splitter.NonexistentHeadException as e:
@@ -345,7 +377,7 @@ class App(tk.Frame):
 
             # Perform sprite composition
             try:
-                image = sprite_splitter.Main(head, body)
+                image = sprite_splitter.CompositeFull(head, body)
                 sprite_splitter.SaveImage(image, path)
 
             except sprite_splitter.NonexistentHeadException as e:
@@ -362,6 +394,63 @@ class App(tk.Frame):
                 self.WINDOW_TITLE,
                 self.SUCCESS_FULL_MESSAGE.format(filename=os.path.basename(path))
                 )
+
+        except UnspecifiedHeadException:
+            # Head not specified
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_HEAD_MESSAGE)
+
+        except UnspecifiedBodyException:
+            # Body not specified
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_BODY_MESSAGE)
+
+        except InvalidHeadException as e:
+            # Head spritesheet does not exist
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.INVALID_HEAD_MESSAGE.format(filename=e.filename))
+
+        except InvalidBodyException as e:
+            # Body spritesheet does not exist
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.INVALID_BODY_MESSAGE.format(filename=e.filename))
+
+        except InvalidFilenameException:
+            # Image format not recognized
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
+
+        except EmptyFilenameException:
+            pass
+
+    def generate_preview(self) -> None:
+        """
+        Generates a preview image.
+
+        :return: None
+        """
+        try:
+            # Get head key
+            try:
+                head = self._chara_data[self._chara_string.get()]
+            except KeyError:
+                raise UnspecifiedHeadException
+
+            # Get body key
+            try:
+                body = self._class_data[self._class_string.get()]
+            except KeyError:
+                raise UnspecifiedBodyException
+
+            # Perform sprite composition
+            try:
+                image = sprite_splitter.CompositeIdle(head, body)
+                self._imageobj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(cv2.cvtColor(image, cv2.COLOR_BGR2RGB)))
+                self._preview_image.create_image((0, 0), anchor=tk.NW, image=self._imageobj)
+
+            except sprite_splitter.NonexistentHeadException as e:
+                raise InvalidHeadException(e.filename)
+
+            except sprite_splitter.NonexistentBodyException as e:
+                raise InvalidBodyException(e.filename)
+
+            except cv2.error:
+                raise InvalidFilenameException
 
         except UnspecifiedHeadException:
             # Head not specified
