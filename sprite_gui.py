@@ -86,6 +86,9 @@ class App(tk.Frame):
     DEFAULT_OPTION_WIDTH = 26
     DEFAULT_BUTTON_WIDTH = 27
 
+    PREVIEW_FRAME_WIDTH = 96
+    PREVIEW_FRAME_HEIGHT = 96
+
     DEFAULT_CHARA = "Select head"
     DEFAULT_CLASS = "Select body"
 
@@ -242,7 +245,12 @@ class App(tk.Frame):
         self._imageobj = None
 
         self._preview_image.destroy()
-        self._preview_image = tk.Canvas(self._master, width=100, height=100, bg=self.FromRGB(100,100,100))
+        self._preview_image = tk.Canvas(
+            self._master,
+            width=self.PREVIEW_FRAME_WIDTH,
+            height=self.PREVIEW_FRAME_HEIGHT,
+            bg=self.FromRGB(100, 100, 100),
+            )
         self._preview_image.grid(row=0, column=1)
 
         self._preview_button.destroy()
@@ -440,7 +448,13 @@ class App(tk.Frame):
             # Perform sprite composition
             try:
                 image = sprite_splitter.CompositeIdle(head, body)
-                self._imageobj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(cv2.cvtColor(image, cv2.COLOR_BGR2RGB)))
+                image = sprite_imaging.Crop(image, [0, 0], [64, 64])
+                image = cv2.resize(
+                    cv2.cvtColor(image, cv2.COLOR_BGR2RGB),
+                    dsize=(192, 192),
+                    interpolation=cv2.INTER_NEAREST
+                    )
+                self._imageobj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
                 self._preview_image.create_image((0, 0), anchor=tk.NW, image=self._imageobj)
 
             except sprite_splitter.NonexistentHeadException as e:
