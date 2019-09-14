@@ -16,6 +16,28 @@ from sprite_imaging import *
 from sprite_utils import *
 
 
+class NonexistentHeadException(Exception):
+    __slots__ = [
+        "filename",
+        ]
+
+
+    def __init__(self, name):
+        super().__init__()
+        self.filename = name
+
+
+class NonexistentBodyException(Exception):
+    __slots__ = [
+        "filename",
+        ]
+
+
+    def __init__(self, name):
+        super().__init__()
+        self.filename = name
+
+
 def SortedSet(*lists,
               reverse: bool = False) -> list:
     """
@@ -253,10 +275,6 @@ def Process(head_path: str,
 
     :return: Dictionary containing head and body compositing rules.
     """
-    # Adjust paths
-    head_path: str = os.path.join(ROOT_INPUT_DIRECTORY, head_path)
-    body_path: str = os.path.join(ROOT_INPUT_DIRECTORY, body_path)
-
     # Load head spritesheet from file
     head_image: np.ndarray = cv2.imread(head_path)
     if head_image.size == 0:
@@ -308,8 +326,13 @@ def MainIdle(head: str,
     out_image = MakeBlank(COLOR_REGION[0], STATE_REGION[1] * (len(COLORS) + 1))
 
     # Assemble sprites for each color
-    head_path = os.path.join(*path_chara_data[head]["path"])
-    body_path = os.path.join(*path_class_data[body]["path"])
+    head_path = os.path.join(ROOT_INPUT_DIRECTORY, *path_chara_data[head]["path"])
+    if not os.path.isfile(head_path):
+        raise NonexistentHeadException(head_path)
+
+    body_path = os.path.join(ROOT_INPUT_DIRECTORY, *path_class_data[body]["path"])
+    if not os.path.isfile(body_path):
+        raise NonexistentBodyException(body_path)
 
     for y, color in enumerate(COLORS):
         new_image = MakeBlank(*COLOR_REGION)
@@ -382,8 +405,13 @@ def Main(head: str,
     out_image: np.ndarray = MakeBlank(COLOR_REGION[0], COLOR_REGION[1] * (len(COLORS) + 1))
 
     # Assemble sprites for each color
-    head_path: str = os.path.join(*path_chara_data[head]["path"])
-    body_path: str = os.path.join(*path_class_data[body]["path"])
+    head_path: str = os.path.join(ROOT_INPUT_DIRECTORY, *path_chara_data[head]["path"])
+    if not os.path.isfile(head_path):
+        raise NonexistentHeadException(head_path)
+
+    body_path: str = os.path.join(ROOT_INPUT_DIRECTORY, *path_class_data[body]["path"])
+    if not os.path.isfile(body_path):
+        raise NonexistentBodyException(body_path)
 
     for y, color in enumerate(COLORS):
         new_image: np.ndarray = MakeBlank(*COLOR_REGION)

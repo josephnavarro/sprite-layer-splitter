@@ -17,12 +17,28 @@ from tkinter import filedialog
 from sprite_constant import *
 
 
-class InvalidHeadException(Exception):
+class UnspecifiedHeadException(Exception):
     pass
 
 
-class InvalidBodyException(Exception):
+class UnspecifiedBodyException(Exception):
     pass
+
+
+class InvalidHeadException(sprite_splitter.NonexistentHeadException):
+    __slots__ = []
+
+
+    def __init__(self, name):
+        super().__init__(name)
+
+
+class InvalidBodyException(sprite_splitter.NonexistentBodyException):
+    __slots__ = []
+
+
+    def __init__(self, name):
+        super().__init__(name)
 
 
 class InvalidFilenameException(Exception):
@@ -54,6 +70,8 @@ class App(tk.Frame):
 
     FAILURE_HEAD_MESSAGE = "Error: Head not specified!"
     FAILURE_BODY_MESSAGE = "Error: Body not specified!"
+    INVALID_HEAD_MESSAGE = "Error: Head spritesheet '{filename}' does not exist!"
+    INVALID_BODY_MESSAGE = "Error: Body spritesheet '{filename}' does not exist!"
     FAILURE_TYPE_MESSAGE = "Error: Invalid image format specified!"
     SUCCESS_IDLE_MESSAGE = "Idle frames saved to {filename}!"
     SUCCESS_FULL_MESSAGE = "Sprite frames saved to {filename}!"
@@ -245,13 +263,13 @@ class App(tk.Frame):
             try:
                 head = self._chara_data[self._chara_string.get()]
             except KeyError:
-                raise InvalidHeadException
+                raise UnspecifiedHeadException
 
             # Get body key
             try:
                 body = self._class_data[self._class_string.get()]
             except KeyError:
-                raise InvalidBodyException
+                raise UnspecifiedBodyException
 
             # Prompt user for destination filename
             sprite_utils.FixPath(ROOT_OUTPUT_DIRECTORY)
@@ -267,6 +285,10 @@ class App(tk.Frame):
             # Perform sprite composition
             try:
                 sprite_splitter.MainIdle(head, body, output)
+            except sprite_splitter.NonexistentHeadException as e:
+                raise InvalidHeadException(e.filename)
+            except sprite_splitter.NonexistentBodyException as e:
+                raise InvalidBodyException(e.filename)
             except cv2.error:
                 raise InvalidFilenameException
 
@@ -276,13 +298,21 @@ class App(tk.Frame):
                 self.SUCCESS_IDLE_MESSAGE.format(filename=os.path.basename(output))
                 )
 
-        except InvalidHeadException:
+        except UnspecifiedHeadException:
             # Head not specified
             tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_HEAD_MESSAGE)
 
-        except InvalidBodyException:
+        except UnspecifiedBodyException:
             # Body not specified
             tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_BODY_MESSAGE)
+
+        except InvalidHeadException as e:
+            # Head spritesheet does not exist
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.INVALID_HEAD_MESSAGE.format(filename=e.filename))
+
+        except InvalidBodyException as e:
+            # Body spritesheet does not exist
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.INVALID_BODY_MESSAGE.format(filename=e.filename))
 
         except InvalidFilenameException:
             # Image format not recognized
@@ -303,13 +333,13 @@ class App(tk.Frame):
             try:
                 head = self._chara_data[self._chara_string.get()]
             except KeyError:
-                raise InvalidHeadException
+                raise UnspecifiedHeadException
 
             # Get body key
             try:
                 body = self._class_data[self._class_string.get()]
             except KeyError:
-                raise InvalidBodyException
+                raise UnspecifiedBodyException
 
             # Prompt user for destination filename
             sprite_utils.FixPath(ROOT_OUTPUT_DIRECTORY)
@@ -325,6 +355,10 @@ class App(tk.Frame):
             # Perform sprite composition
             try:
                 sprite_splitter.Main(head, body, output)
+            except sprite_splitter.NonexistentHeadException as e:
+                raise InvalidHeadException(e.filename)
+            except sprite_splitter.NonexistentBodyException as e:
+                raise InvalidBodyException(e.filename)
             except cv2.error:
                 raise InvalidFilenameException
 
@@ -334,13 +368,21 @@ class App(tk.Frame):
                 self.SUCCESS_FULL_MESSAGE.format(filename=os.path.basename(output))
                 )
 
-        except InvalidHeadException:
+        except UnspecifiedHeadException:
             # Head not specified
             tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_HEAD_MESSAGE)
 
-        except InvalidBodyException:
+        except UnspecifiedBodyException:
             # Body not specified
             tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_BODY_MESSAGE)
+
+        except InvalidHeadException as e:
+            # Head spritesheet does not exist
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.INVALID_HEAD_MESSAGE.format(filename=e.filename))
+
+        except InvalidBodyException as e:
+            # Body spritesheet does not exist
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.INVALID_BODY_MESSAGE.format(filename=e.filename))
 
         except InvalidFilenameException:
             # Image format not recognized
@@ -362,6 +404,7 @@ class App(tk.Frame):
             self._init_class_data()
             self._init_class_menu()
             tk.messagebox.showinfo(self.WINDOW_TITLE, self.REBUILD_BODY_MESSAGE)
+
 
     def rebuild_head(self) -> None:
         """
