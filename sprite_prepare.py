@@ -1,10 +1,12 @@
 #! usr/bin/env python3
 """
+------------------------------------------------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 Creates intermediate spritesheets used during the final compositing process.
 
+------------------------------------------------------------------------------------------------------------------------
 """
 from PIL import Image
 from sprite_json import *

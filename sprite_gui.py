@@ -11,87 +11,73 @@ Graphical user interface layer.
 import cv2
 import tkinter as tk
 import sprite_splitter
-import sprite_utils
-import sprite_json
 import sprite_imaging
 from tkinter import messagebox
 from tkinter import filedialog
-from sprite_constant import *
-
-
-class UnspecifiedHeadException(Exception):
-    pass
-
-
-class UnspecifiedBodyException(Exception):
-    pass
-
-
-class InvalidHeadException(sprite_splitter.NonexistentHeadException):
-    __slots__ = []
-
-    def __init__(self, name):
-        super().__init__(name)
-
-
-class InvalidBodyException(sprite_splitter.NonexistentBodyException):
-    __slots__ = []
-
-    def __init__(self, name):
-        super().__init__(name)
-
-
-class InvalidFilenameException(Exception):
-    pass
+from sprite_prepare import *
 
 
 class EmptyFilenameException(Exception):
+    """ Exception thrown when spritesheet saving is attempted while no filename is specified. """
+    pass
+
+
+class InvalidFilenameException(Exception):
+    """ Exception thrown when a provided file extension is invalid. """
+    pass
+
+
+class InvalidBodyException(sprite_splitter.NonexistentBodyException):
+    """ Exception thrown when an invalid body spritesheet is referenced. """
+
+    def __init__(self, name):
+        super().__init__(name)
+
+
+class InvalidHeadException(sprite_splitter.NonexistentHeadException):
+    """ Exception thrown when an invalid head spritesheet is referenced. """
+
+    def __init__(self, name):
+        super().__init__(name)
+
+
+class UnspecifiedBodyException(Exception):
+    """ Exception thrown when sprite composition is attempted while no body is selected. """
+    pass
+
+
+class UnspecifiedHeadException(Exception):
+    """ Exception thrown when sprite composition is attempted while no head is selected. """
     pass
 
 
 class App(tk.Frame):
-    __slots__ = [
-        "_master",
-        "_characters",
-        "_classes",
-        "_chara_string",
-        "_class_string",
-        "_chara_menu",
-        "_class_menu",
-        "_idle_button",
-        "_full_button",
-        "_rebuild_head_button",
-        "_rebuild_body_button",
-        "_chara_data",
-        "_class_data",
-        "_preview_button",
-        "_preview_image",
-        "_imageobj"
-        ]
-
     WINDOW_TITLE = "Fire Emblem 3DS Sprite Tool"
 
+    # Popup message text content
     FAILURE_BODY_MESSAGE = "Error: Body not specified!"
     FAILURE_HEAD_MESSAGE = "Error: Head not specified!"
     FAILURE_TYPE_MESSAGE = "Error: Invalid image format specified!"
     INVALID_BODY_MESSAGE = "Error: Body spritesheet '{filename}' does not exist!"
     INVALID_HEAD_MESSAGE = "Error: Head spritesheet '{filename}' does not exist!"
+    REBUILD_BIMG_CONFIRM = "Rebuild body source images?"
+    REBUILD_BIMG_MESSAGE = "Body source images successfully rebuilt."
     REBUILD_BODY_CONFIRM = "Rebuild body database?"
     REBUILD_BODY_MESSAGE = "Body database was rebuilt."
+    REBUILD_HIMG_CONFIRM = "Rebuild head source images?"
+    REBUILD_HIMG_MESSAGE = "Head source images successfully rebuilt."
     REBUILD_HEAD_CONFIRM = "Rebuild head database?"
     REBUILD_HEAD_MESSAGE = "Head database was rebuilt."
     SUCCESS_FULL_MESSAGE = "Sprite frames saved to {filename}!"
     SUCCESS_IDLE_MESSAGE = "Idle frames saved to {filename}!"
 
+    # Default widget dimensions
     DEFAULT_OPTION_WIDTH = 26
     DEFAULT_BUTTON_WIDTH = 27
-
     PREVIEW_CANVAS_WIDTH = 384
     PREVIEW_CANVAS_HEIGHT = 96
 
-    DEFAULT_CHARA = "Select head"
-    DEFAULT_CLASS = "Select body"
-
+    # Default widget colors
     HEAD_BUTTON_FG_COLOR = [0, 0, 0]
     HEAD_BUTTON_BG_COLOR = [200, 224, 255]
     BODY_BUTTON_FG_COLOR = [0, 0, 0]
@@ -100,35 +86,43 @@ class App(tk.Frame):
     PREVIEW_BUTTON_FG_COLOR = [0, 0, 0]
     PREVIEW_BUTTON_BG_COLOR = [200, 255, 212]
 
-    GRID_SELECT_HEAD_OPTIONS = [1, 0]
-
+    # Grid positions for widgets
     GRID_IMAGEPREVIEW_CANVAS = [0, 1]
-    GRID_CHARA_DROPDOWN_MENU = [1, 0]
-    GRID_CLASS_DROPDOWN_MENU = [1, 1]
+    GRID_SELECT_HEAD_OPTIONS = [1, 0]
+    GRID_SELECT_BODY_OPTIONS = [1, 1]
     GRID_MAKE_PREVIEW_BUTTON = [1, 2]
     GRID_COMPOSE_IDLE_BUTTON = [2, 0]
-    GRID_REBUILD_HEAD_BUTTON = [2, 1]
+    GRID_RB_JSON_HEAD_BUTTON = [2, 1]
+    GRID_RB_SRCS_HEAD_BUTTON = [2, 2]  #
     GRID_COMPOSE_FULL_BUTTON = [3, 0]
-    GRID_REBUILD_BODY_BUTTON = [3, 1]
+    GRID_RB_JSON_BODY_BUTTON = [3, 1]
+    GRID_RB_SRCS_BODY_BUTTON = [3, 2]
 
+    # Padding for widgets
     PAD_COMPOSE_FULL_BUTTON = [4, 4]
     PAD_COMPOSE_IDLE_BUTTON = [4, 4]
     PAD_MAKE_PREVIEW_BUTTON = [4, 4]
-    PAD_REBUILD_BODY_BUTTON = [4, 4]
-    PAD_REBUILD_HEAD_BUTTON = [4, 4]
-    PAD_CLASS_DROPDOWN_MENU = [4, 4]
-    PAD_CHARA_DROPDOWN_MENU = [4, 4]
+    PAD_RB_JSON_BODY_BUTTON = [4, 4]
+    PAD_RB_JSON_HEAD_BUTTON = [4, 4]
+    PAD_RB_IMGS_BODY_BUTTON = [4, 4]
+    PAD_RB_IMGS_HEAD_BUTTON = [4, 4]
+    PAD_SELECT_BODY_OPTIONS = [4, 4]
+    PAD_SELECT_HEAD_OPTIONS = [4, 4]
 
+    # Preview composition dimensions
     PREVIEW_CROP_SIZE = [128, 32]
     PREVIEW_RESIZE_SIZE = (384, 96)
 
-    CMPIDLE_BTN_TEXT = "Save idle frames"
-    CMPFULL_BTN_TEXT = "Save all frames"
-    RB_HEADFILE_TEXT = "Rebuild head database"
-    RB_BODYFILE_TEXT = "Rebuild body database"
-    RB_HEADOFFS_TEXT = "Rebuild head offsets"
-    RB_BODYOFFS_TEXT = "Rebuild body offsets"
-    PREVIEW_BTN_TEXT = "Generate preview"
+    # Button and menu text labels
+    DEFAULT_HEAD_LABEL = "Select head"
+    DEFAULT_BODY_LABEL = "Select body"
+    MAKE_PREVIEW_LABEL = "Generate preview"
+    RB_JSON_BODY_LABEL = "Rebuild body database"
+    RB_JSON_HEAD_LABEL = "Rebuild head database"
+    RB_IMGS_BODY_LABEL = "Rebuild body source images"
+    RB_IMGS_HEAD_LABEL = "Rebuild head source images"
+    SAV_IDLE_BTN_LABEL = "Save idle frames"
+    SAV_FULL_BTN_LABEL = "Save all frames"
 
     @staticmethod
     def FromRGB(r: int, g: int, b: int) -> str:
@@ -153,153 +147,223 @@ class App(tk.Frame):
         """
         super().__init__(root, *args, **kwargs)
 
+        # Maintain reference to root Frame
         self._master = root
         self.winfo_toplevel().title(self.WINDOW_TITLE)
 
+        # Initialize local non-widget data
         self._imageobj = None
-        self._chara_data = {}
-        self._class_data = {}
-        self._characters = [""]
-        self._classes = [""]
+        self._head_data = {}
+        self._body_data = {}
+        self._head_list = [""]
+        self._body_list = [""]
 
-        self._idle_button = tk.Button()
-        self._full_button = tk.Button()
-        self._preview_button = tk.Button()
+        # Initialize local widgets
         self._preview_image = tk.Canvas(self._master)
+
+        self._select_head_string = tk.StringVar(self._master)
+        self._select_body_string = tk.StringVar(self._master)
+
+        self._compose_idle_button = tk.Button()
+        self._compose_full_button = tk.Button()
+        self._make_preview_button = tk.Button()
         self._rebuild_body_button = tk.Button()
         self._rebuild_head_button = tk.Button()
-        self._chara_string = tk.StringVar(self._master)
-        self._chara_menu = tk.OptionMenu(self._master, self._chara_string, *self._characters)
-        self._class_string = tk.StringVar(self._master)
-        self._class_menu = tk.OptionMenu(self._master, self._class_string, *self._classes)
+        self._rebuild_body_images = tk.Button()
+        self._rebuild_head_images = tk.Button()
+        self._select_head_options = tk.OptionMenu(self._master, self._select_head_string, *self._head_list)
+        self._select_body_options = tk.OptionMenu(self._master, self._select_body_string, *self._body_list)
 
-        self._init_chara_data()
-        self._init_class_data()
-        self._init_idle_button()
-        self._init_full_button()
-        self._init_preview_button()
+        # Complete widget initialization
+        self._init_head_data()
+        self._init_body_data()
+        self._init_compose_idle_button()
+        self._init_compose_full_button()
+        self._init_make_preview_button()
         self._init_rebuild_body_button()
         self._init_rebuild_head_button()
-        self._init_chara_menu()
-        self._init_class_menu()
+        self._init_rebuild_body_images()
+        self._init_rebuild_head_images()
+        self._init_select_head_options()
+        self._init_select_body_options()
 
-    def _init_chara_data(self) -> None:
+    def _init_head_data(self) -> None:
         """
         Completes initialization of local character head data (as loaded from file).
 
         :return: None.
         """
-        self._chara_data = {v.get("name", "---"): k for k, v in sprite_json.GetHeadPathData().items()}
-        self._characters = list(self._chara_data)
+        self._head_data = {v.get("name", "---"): k for k, v in GetHeadPathData().items()}
+        self._head_list = list(self._head_data)
 
-    def _init_class_data(self):
+    def _init_body_data(self):
         """
         Completes initialization of local character body data (as loaded from file).
 
         :return: None.
         """
-        self._class_data = {v.get("name", "---"): k for k, v in sprite_json.GetBodyPathData().items()}
-        self._classes = list(self._class_data)
+        self._body_data = {v.get("name", "---"): k for k, v in GetBodyPathData().items()}
+        self._body_list = list(self._body_data)
 
-    def _init_chara_menu(self) -> None:
+    def _init_rebuild_body_images(self) -> None:
+        """
+        Completes initialization of "rebuild body intermediates" button.
+
+        :return: None.
+        """
+        # Create new button
+        self._rebuild_body_images.destroy()
+        self._rebuild_body_images = tk.Button(
+            self._master,
+            text=self.RB_IMGS_BODY_LABEL,
+            command=self.rebuild_body_intermediates
+            )
+        self._rebuild_body_images.config(width=self.DEFAULT_BUTTON_WIDTH)
+
+        # Place button
+        self._rebuild_body_images.grid(
+            row=self.GRID_RB_SRCS_BODY_BUTTON[0],
+            column=self.GRID_RB_SRCS_BODY_BUTTON[1],
+            padx=self.PAD_RB_IMGS_BODY_BUTTON[0],
+            pady=self.PAD_RB_IMGS_BODY_BUTTON[1]
+            )
+
+    def _init_rebuild_head_images(self) -> None:
+        """
+        Completes initialization of "rebuild head intermediates" button.
+
+        :return: None.
+        """
+        # Create new button
+        self._rebuild_head_images.destroy()
+        self._rebuild_head_images = tk.Button(
+            self._master,
+            text=self.RB_IMGS_HEAD_LABEL,
+            command=self.rebuild_head_intermediates
+            )
+        self._rebuild_head_images.config(width=self.DEFAULT_BUTTON_WIDTH)
+
+        # Place button
+        self._rebuild_head_images.grid(
+            row=self.GRID_RB_SRCS_HEAD_BUTTON[0],
+            column=self.GRID_RB_SRCS_HEAD_BUTTON[1],
+            padx=self.PAD_RB_IMGS_HEAD_BUTTON[0],
+            pady=self.PAD_RB_IMGS_HEAD_BUTTON[1]
+            )
+
+    def _init_select_head_options(self) -> None:
         """
         Completes initialization of character head dropdown menu.
 
         :return: None.
         """
-        self._chara_string = tk.StringVar(self._master)
-        self._chara_string.set(self.DEFAULT_CHARA)
+        # Set string variable
+        #self._select_head_string = tk.StringVar(self._master)
+        self._select_head_string.set(self.DEFAULT_HEAD_LABEL)
 
-        self._chara_menu.destroy()
-        self._chara_menu = tk.OptionMenu(
+        # Create option menu
+        self._select_head_options.destroy()
+        self._select_head_options = tk.OptionMenu(
             self._master,
-            self._chara_string,
-            *self._characters
+            self._select_head_string,
+            *self._head_list
             )
-        self._chara_menu.config(
+        self._select_head_options.config(
             width=self.DEFAULT_OPTION_WIDTH,
             fg=self.FromRGB(*self.HEAD_BUTTON_FG_COLOR),
             bg=self.FromRGB(*self.HEAD_BUTTON_BG_COLOR),
             activebackground=self.FromRGB(*self.HEAD_BUTTON_BG_COLOR),
             activeforeground=self.FromRGB(*self.HEAD_BUTTON_FG_COLOR)
             )
-        self._chara_menu.grid(
-            row=self.GRID_CHARA_DROPDOWN_MENU[0],
-            column=self.GRID_CHARA_DROPDOWN_MENU[1],
-            padx=self.PAD_CHARA_DROPDOWN_MENU[0],
-            pady=self.PAD_CHARA_DROPDOWN_MENU[1]
+
+        # Place option menu
+        self._select_head_options.grid(
+            row=self.GRID_SELECT_HEAD_OPTIONS[0],
+            column=self.GRID_SELECT_HEAD_OPTIONS[1],
+            padx=self.PAD_SELECT_HEAD_OPTIONS[0],
+            pady=self.PAD_SELECT_HEAD_OPTIONS[1]
             )
 
-    def _init_class_menu(self) -> None:
+    def _init_select_body_options(self) -> None:
         """
         Completes initialization of character body dropdown menu.
 
         :return: None.
         """
-        self._class_string = tk.StringVar(self._master)
-        self._class_string.set(self.DEFAULT_CLASS)
+        # Set string variable
+        #self._select_body_string = tk.StringVar(self._master)
+        self._select_body_string.set(self.DEFAULT_BODY_LABEL)
 
-        self._class_menu.destroy()
-        self._class_menu = tk.OptionMenu(
+        # Create option menu
+        self._select_body_options.destroy()
+        self._select_body_options = tk.OptionMenu(
             self._master,
-            self._class_string,
-            *self._classes
+            self._select_body_string,
+            *self._body_list
             )
-        self._class_menu.config(
+
+        # Place option menu
+        self._select_body_options.config(
             width=self.DEFAULT_OPTION_WIDTH,
             fg=self.FromRGB(*self.BODY_BUTTON_FG_COLOR),
             bg=self.FromRGB(*self.BODY_BUTTON_BG_COLOR),
             activebackground=self.FromRGB(*self.BODY_BUTTON_BG_COLOR),
             activeforeground=self.FromRGB(*self.BODY_BUTTON_FG_COLOR)
             )
-        self._class_menu.grid(
-            row=self.GRID_CLASS_DROPDOWN_MENU[0],
-            column=self.GRID_CLASS_DROPDOWN_MENU[1],
-            padx=self.PAD_CLASS_DROPDOWN_MENU[0],
-            pady=self.PAD_CLASS_DROPDOWN_MENU[1]
+        self._select_body_options.grid(
+            row=self.GRID_SELECT_BODY_OPTIONS[0],
+            column=self.GRID_SELECT_BODY_OPTIONS[1],
+            padx=self.PAD_SELECT_BODY_OPTIONS[0],
+            pady=self.PAD_SELECT_BODY_OPTIONS[1]
             )
 
-    def _init_idle_button(self) -> None:
+    def _init_compose_idle_button(self) -> None:
         """
         Completes initialization of "idle composition" button.
 
         :return: None.
         """
-        self._idle_button.destroy()
-        self._idle_button = tk.Button(
+        # Create new button
+        self._compose_idle_button.destroy()
+        self._compose_idle_button = tk.Button(
             self._master,
-            text=self.CMPIDLE_BTN_TEXT,
+            text=self.SAV_IDLE_BTN_LABEL,
             command=self.composite_idle
             )
-        self._idle_button.config(width=self.DEFAULT_BUTTON_WIDTH)
-        self._idle_button.grid(
+        self._compose_idle_button.config(width=self.DEFAULT_BUTTON_WIDTH)
+
+        # Place button
+        self._compose_idle_button.grid(
             row=self.GRID_COMPOSE_IDLE_BUTTON[0],
             column=self.GRID_COMPOSE_IDLE_BUTTON[1],
             padx=self.PAD_COMPOSE_IDLE_BUTTON[0],
             pady=self.PAD_COMPOSE_IDLE_BUTTON[1]
             )
 
-    def _init_full_button(self) -> None:
+    def _init_compose_full_button(self) -> None:
         """
         Completes initialization of "full composition" button.
 
         :return: None.
         """
-        self._full_button.destroy()
-        self._full_button = tk.Button(
+        # Create new button
+        self._compose_full_button.destroy()
+        self._compose_full_button = tk.Button(
             self._master,
-            text=self.CMPFULL_BTN_TEXT,
+            text=self.SAV_FULL_BTN_LABEL,
             command=self.composite_full
             )
-        self._full_button.config(width=self.DEFAULT_BUTTON_WIDTH)
-        self._full_button.grid(
+        self._compose_full_button.config(width=self.DEFAULT_BUTTON_WIDTH)
+
+        # Place button
+        self._compose_full_button.grid(
             row=self.GRID_COMPOSE_FULL_BUTTON[0],
             column=self.GRID_COMPOSE_FULL_BUTTON[1],
             padx=self.PAD_COMPOSE_FULL_BUTTON[0],
             pady=self.PAD_COMPOSE_FULL_BUTTON[1]
             )
 
-    def _init_preview_button(self) -> None:
+    def _init_make_preview_button(self) -> None:
         """
         Completes initialization of "preview" button.
 
@@ -324,17 +388,17 @@ class App(tk.Frame):
             )
 
         # Initialize preview command button
-        self._preview_button.destroy()
-        self._preview_button = tk.Button(
+        self._make_preview_button.destroy()
+        self._make_preview_button = tk.Button(
             self._master,
-            text=self.PREVIEW_BTN_TEXT,
+            text=self.MAKE_PREVIEW_LABEL,
             command=self.generate_preview
             )
-        self._preview_button.config(
+        self._make_preview_button.config(
             width=self.DEFAULT_BUTTON_WIDTH,
             bg=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR)
             )
-        self._preview_button.grid(
+        self._make_preview_button.grid(
             row=self.GRID_MAKE_PREVIEW_BUTTON[0],
             column=self.GRID_MAKE_PREVIEW_BUTTON[1],
             padx=self.PAD_MAKE_PREVIEW_BUTTON[0],
@@ -347,18 +411,21 @@ class App(tk.Frame):
 
         :return: None.
         """
+        # Create new button
         self._rebuild_body_button.destroy()
         self._rebuild_body_button = tk.Button(
             self._master,
-            text=self.RB_BODYFILE_TEXT,
-            command=self.rebuild_body
+            text=self.RB_JSON_BODY_LABEL,
+            command=self.rebuild_body_database
             )
         self._rebuild_body_button.config(width=self.DEFAULT_BUTTON_WIDTH)
+
+        # Place button
         self._rebuild_body_button.grid(
-            row=self.GRID_REBUILD_BODY_BUTTON[0],
-            column=self.GRID_REBUILD_BODY_BUTTON[1],
-            padx=self.PAD_REBUILD_BODY_BUTTON[0],
-            pady=self.PAD_REBUILD_BODY_BUTTON[1]
+            row=self.GRID_RB_JSON_BODY_BUTTON[0],
+            column=self.GRID_RB_JSON_BODY_BUTTON[1],
+            padx=self.PAD_RB_JSON_BODY_BUTTON[0],
+            pady=self.PAD_RB_JSON_BODY_BUTTON[1]
             )
 
     def _init_rebuild_head_button(self) -> None:
@@ -367,18 +434,21 @@ class App(tk.Frame):
 
         :return: None.
         """
+        # Create new button
         self._rebuild_head_button.destroy()
         self._rebuild_head_button = tk.Button(
             self._master,
-            text=self.RB_HEADFILE_TEXT,
-            command=self.rebuild_head
+            text=self.RB_JSON_HEAD_LABEL,
+            command=self.rebuild_head_database
             )
         self._rebuild_head_button.config(width=self.DEFAULT_BUTTON_WIDTH)
+
+        # Place button
         self._rebuild_head_button.grid(
-            row=self.GRID_REBUILD_HEAD_BUTTON[0],
-            column=self.GRID_REBUILD_HEAD_BUTTON[1],
-            padx=self.PAD_REBUILD_HEAD_BUTTON[0],
-            pady=self.PAD_REBUILD_HEAD_BUTTON[1]
+            row=self.GRID_RB_JSON_HEAD_BUTTON[0],
+            column=self.GRID_RB_JSON_HEAD_BUTTON[1],
+            padx=self.PAD_RB_JSON_HEAD_BUTTON[0],
+            pady=self.PAD_RB_JSON_HEAD_BUTTON[1]
             )
 
     def composite_idle(self) -> None:
@@ -390,18 +460,18 @@ class App(tk.Frame):
         try:
             # Get head key
             try:
-                head = self._chara_data[self._chara_string.get()]
+                head = self._head_data[self._select_head_string.get()]
             except KeyError:
                 raise UnspecifiedHeadException
 
             # Get body key
             try:
-                body = self._class_data[self._class_string.get()]
+                body = self._body_data[self._select_body_string.get()]
             except KeyError:
                 raise UnspecifiedBodyException
 
             # Prompt user for destination filename
-            sprite_utils.FixPath(ROOT_OUTPUT_DIRECTORY)
+            FixPath(ROOT_OUTPUT_DIRECTORY)
             path: str = filedialog.asksaveasfilename(
                 initialfile="{}_{}.png".format(head, body),
                 initialdir=ROOT_OUTPUT_DIRECTORY,
@@ -463,18 +533,18 @@ class App(tk.Frame):
         try:
             # Get head key
             try:
-                head = self._chara_data[self._chara_string.get()]
+                head = self._head_data[self._select_head_string.get()]
             except KeyError:
                 raise UnspecifiedHeadException
 
             # Get body key
             try:
-                body = self._class_data[self._class_string.get()]
+                body = self._body_data[self._select_body_string.get()]
             except KeyError:
                 raise UnspecifiedBodyException
 
             # Prompt user for destination filename
-            sprite_utils.FixPath(ROOT_OUTPUT_DIRECTORY)
+            FixPath(ROOT_OUTPUT_DIRECTORY)
             path: str = filedialog.asksaveasfilename(
                 initialfile="{}_{}.png".format(head, body),
                 initialdir=ROOT_OUTPUT_DIRECTORY,
@@ -536,13 +606,13 @@ class App(tk.Frame):
         try:
             # Get head key
             try:
-                head = self._chara_data[self._chara_string.get()]
+                head = self._head_data[self._select_head_string.get()]
             except KeyError:
                 raise UnspecifiedHeadException
 
             # Get body key
             try:
-                body = self._class_data[self._class_string.get()]
+                body = self._body_data[self._select_body_string.get()]
             except KeyError:
                 raise UnspecifiedBodyException
 
@@ -590,7 +660,7 @@ class App(tk.Frame):
         except EmptyFilenameException:
             pass
 
-    def rebuild_body(self) -> None:
+    def rebuild_body_database(self) -> None:
         """
         Rebuilds body JSON database.
 
@@ -598,12 +668,12 @@ class App(tk.Frame):
         """
         do_rebuild = tk.messagebox.askquestion(self.WINDOW_TITLE, self.REBUILD_BODY_CONFIRM)
         if do_rebuild == "yes":
-            sprite_json.CreateBodyJSON()
-            self._init_class_data()
-            self._init_class_menu()
+            CreateBodyJSON()
+            self._init_body_data()
+            self._init_select_body_options()
             tk.messagebox.showinfo(self.WINDOW_TITLE, self.REBUILD_BODY_MESSAGE)
 
-    def rebuild_head(self) -> None:
+    def rebuild_head_database(self) -> None:
         """
         Rebuilds head JSON database.
 
@@ -611,10 +681,32 @@ class App(tk.Frame):
         """
         do_rebuild = tk.messagebox.askquestion(self.WINDOW_TITLE, self.REBUILD_HEAD_CONFIRM)
         if do_rebuild == "yes":
-            sprite_json.CreateHeadJSON()
-            self._init_chara_data()
-            self._init_chara_menu()
+            CreateHeadJSON()
+            self._init_head_data()
+            self._init_select_head_options()
             tk.messagebox.showinfo(self.WINDOW_TITLE, self.REBUILD_HEAD_MESSAGE)
+
+    def rebuild_body_intermediates(self) -> None:
+        """
+        Rebuilds intermediate body spritesheets.
+
+        :return: None.
+        """
+        do_rebuild = tk.messagebox.askquestion(self.WINDOW_TITLE, self.REBUILD_BIMG_CONFIRM)
+        if do_rebuild == "yes":
+            PrepareBody()
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.REBUILD_BIMG_MESSAGE)
+
+    def rebuild_head_intermediates(self) -> None:
+        """
+        Rebuilds intermediate head spritesheets.
+
+        :return: None.
+        """
+        do_rebuild = tk.messagebox.askquestion(self.WINDOW_TITLE, self.REBUILD_HIMG_CONFIRM)
+        if do_rebuild == "yes":
+            PrepareHead()
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.REBUILD_HIMG_MESSAGE)
 
 
 def GUIMain() -> None:

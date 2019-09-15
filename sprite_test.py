@@ -1,12 +1,13 @@
 #! usr/bin/env python3
 """
+------------------------------------------------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
-Image splitting tests. All spritesheets used in these
-examples were taken from The Spriters Resource.
+Image splitting tests. All spritesheets used in these examples were taken from The Spriters Resource.
 (https://www.spriters-resource.com/3ds/fireemblemfates/)
 
+------------------------------------------------------------------------------------------------------------------------
 """
 import sprite_splitter
 import sprite_utils

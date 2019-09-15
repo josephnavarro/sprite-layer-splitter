@@ -3,7 +3,9 @@
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
-Implements an iterable container for enumerated values.
+Implements an iterable container for enumerated values. Not really necessary, mainly did this just
+so I could tell myself I implemented something like it.
+
 ------------------------------------------------------------------------------------------------------------------------
 """
 

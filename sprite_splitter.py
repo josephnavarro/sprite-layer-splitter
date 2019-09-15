@@ -17,9 +17,7 @@ from sprite_utils import *
 
 
 class NonexistentHeadException(Exception):
-    __slots__ = [
-        "filename",
-        ]
+    """ Exception thrown when a nonexistent head spritesheet is referenced. """
 
     def __init__(self, name):
         super().__init__()
@@ -27,9 +25,7 @@ class NonexistentHeadException(Exception):
 
 
 class NonexistentBodyException(Exception):
-    __slots__ = [
-        "filename",
-        ]
+    """ Exception thrown when a nonexistent body spritesheet is referenced. """
 
     def __init__(self, name):
         super().__init__()
@@ -166,7 +162,7 @@ def ProcessBody(name: str,
     body_size: list = source_data["body"]["size"]
     body_where: list = source_data["body"]["where"]
 
-    layers: dict = Split(Crop(image, where, REGION_FULL_BODY))
+    layers: dict = Split(Crop(ReplaceColor(image), where, REGION_FULL_BODY))
     if is_alpha:
         layers = {k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0]) for k, v in layers.items()}
 
@@ -220,7 +216,7 @@ def ProcessHead(name: str,
     head_size: list = source_data["head"][head_type]["size"]
     head_where: list = source_data["head"][head_type]["where"]
 
-    layers: dict = Split(Crop(image, where, REGION_FULL_HEAD))
+    layers: dict = Split(Crop(ReplaceColor(image), where, REGION_FULL_HEAD))
     if is_alpha:
         layers = {k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0]) for k, v in layers.items()}
 
@@ -307,32 +303,34 @@ def CompositeIdle(head: str,
     :return: Composited image.
     """
     # Load compositing data from JSON
-    offset_head_data = GetOffsetHeadData()
-    offset_body_data = GetOffsetBodyData()
+    offset_head_data: dict = GetOffsetHeadData()
+    offset_body_data: dict = GetOffsetBodyData()
 
     # Load filepaths from JSON
-    path_chara_data = GetHeadPathData()
-    path_class_data = GetBodyPathData()
+    path_chara_data: dict = GetHeadPathData()
+    path_class_data: dict = GetBodyPathData()
 
     # Load compositing rules from JSON
-    source_color_data = GetSourceColorData()
-    source_crop_data = GetSourceCropData()
+    source_color_data: dict = GetSourceColorData()
+    source_crop_data: dict = GetSourceCropData()
 
-    # Make master spritesheet
-    out_image = MakeBlank(COLOR_REGION[0], STATE_REGION[1] * (len(COLORS) + 1))
-
-    # Assemble sprites for each color
-    head_path = os.path.join(ROOT_INPUT_DIRECTORY, *path_chara_data[head]["path"])
+    # Check path to head spritesheet
+    head_path: str = os.path.join(ROOT_INPUT_DIRECTORY, *path_chara_data[head]["path"])
     if not os.path.isfile(head_path):
         raise NonexistentHeadException(head_path)
 
-    body_path = os.path.join(ROOT_INPUT_DIRECTORY, *path_class_data[body]["path"])
+    # Check path to body spritesheet
+    body_path: str = os.path.join(ROOT_INPUT_DIRECTORY, *path_class_data[body]["path"])
     if not os.path.isfile(body_path):
         raise NonexistentBodyException(body_path)
 
+    # Make master spritesheet
+    out_image: np.ndarray = MakeBlank(COLOR_REGION[0], STATE_REGION[1] * (len(COLORS) + 1))
+
+    # Process each color
     for y, color in enumerate(COLORS):
-        new_image = MakeBlank(*COLOR_REGION)
-        new_data = Process(
+        new_image: np.ndarray = MakeBlank(*COLOR_REGION)
+        new_data: dict = Process(
             head_path,
             body_path,
             [offset[0], offset[1] + HEAD_BLOCK * source_color_data[color]],
@@ -360,7 +358,10 @@ def CompositeIdle(head: str,
 
         # (Optional) Make grayscale based on purple
         if color == "purple":
-            new_gray = cv2.cvtColor(cv2.cvtColor(new_image.copy(), cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
+            new_gray: np.ndarray = cv2.cvtColor(
+                cv2.cvtColor(new_image.copy(), cv2.COLOR_BGR2GRAY),
+                cv2.COLOR_GRAY2BGR
+                )
             if is_alpha:
                 new_gray = ReplaceColor(ConvertAlpha(new_gray), [0, 0, 0, 255], [0, 0, 0, 0])
             Paste(out_image, new_gray, (0, (y + 1) * STATE_REGION[1]))
@@ -395,18 +396,20 @@ def CompositeFull(head: str,
     source_color_data: dict = GetSourceColorData()
     source_crop_data: dict = GetSourceCropData()
 
-    # Make master spritesheet
-    out_image: np.ndarray = MakeBlank(COLOR_REGION[0], COLOR_REGION[1] * (len(COLORS) + 1))
-
-    # Assemble sprites for each color
+    # Check path to head spritesheet
     head_path: str = os.path.join(ROOT_INPUT_DIRECTORY, *path_chara_data[head]["path"])
     if not os.path.isfile(head_path):
         raise NonexistentHeadException(head_path)
 
+    # Check path to body spritesheet
     body_path: str = os.path.join(ROOT_INPUT_DIRECTORY, *path_class_data[body]["path"])
     if not os.path.isfile(body_path):
         raise NonexistentBodyException(body_path)
 
+    # Make master spritesheet
+    out_image: np.ndarray = MakeBlank(COLOR_REGION[0], COLOR_REGION[1] * (len(COLORS) + 1))
+
+    # Process frames for each color
     for y, color in enumerate(COLORS):
         new_image: np.ndarray = MakeBlank(*COLOR_REGION)
         new_data: dict = Process(
@@ -453,7 +456,10 @@ def CompositeFull(head: str,
 
         # (Optional) Make grayscale based on purple
         if color == "purple":
-            new_gray = cv2.cvtColor(cv2.cvtColor(new_image.copy(), cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
+            new_gray: np.ndarray = cv2.cvtColor(
+                cv2.cvtColor(new_image.copy(), cv2.COLOR_BGR2GRAY),
+                cv2.COLOR_GRAY2BGR
+                )
             if is_alpha:
                 new_gray = ReplaceColor(ConvertAlpha(new_gray), [0, 0, 0, 255], [0, 0, 0, 0])
             Paste(out_image, new_gray, (0, (y + 1) * COLOR_REGION[1]))
@@ -462,7 +468,8 @@ def CompositeFull(head: str,
     return out_image
 
 
-def SaveImage(image: np.ndarray, path: str) -> None:
+def SaveImage(image: np.ndarray,
+              path: str) -> None:
     """
     Saves a CV2-format image to file.
 

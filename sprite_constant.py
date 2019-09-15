@@ -5,9 +5,9 @@ Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 Definitions for constant values.
+
 ------------------------------------------------------------------------------------------------------------------------
 """
-
 import os
 from namedenumiter import NamedEnumIter
 
