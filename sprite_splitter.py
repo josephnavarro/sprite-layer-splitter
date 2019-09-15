@@ -303,16 +303,16 @@ def CompositeIdle(head: str,
     :return: Composited image.
     """
     # Load compositing data from JSON
-    offset_head_data: dict = GetOffsetHeadData()
-    offset_body_data: dict = GetOffsetBodyData()
+    offset_head_data: dict = LoadHeadOffsets()
+    offset_body_data: dict = LoadBodyOffsets()
 
     # Load filepaths from JSON
-    path_chara_data: dict = GetHeadPathData()
-    path_class_data: dict = GetBodyPathData()
+    path_chara_data: dict = LoadHeadPaths()
+    path_class_data: dict = LoadBodyPaths()
 
     # Load compositing rules from JSON
-    source_color_data: dict = GetSourceColorData()
-    source_crop_data: dict = GetSourceCropData()
+    source_color_data: dict = LoadSourceImgColors()
+    source_crop_data: dict = LoadSourceImgCropping()
 
     # Check path to head spritesheet
     head_path: str = os.path.join(ROOT_INPUT_DIRECTORY, *path_chara_data[head]["path"])
@@ -385,16 +385,16 @@ def CompositeFull(head: str,
     :return: Composited image.
     """
     # Load compositing data from JSON files
-    offset_head_data: dict = GetOffsetHeadData()
-    offset_body_data: dict = GetOffsetBodyData()
+    offset_head_data: dict = LoadHeadOffsets()
+    offset_body_data: dict = LoadBodyOffsets()
 
     # Load filepath data from JSON
-    path_chara_data: dict = GetHeadPathData()
-    path_class_data: dict = GetBodyPathData()
+    path_chara_data: dict = LoadHeadPaths()
+    path_class_data: dict = LoadBodyPaths()
 
     # Load compositing rules from JSON
-    source_color_data: dict = GetSourceColorData()
-    source_crop_data: dict = GetSourceCropData()
+    source_color_data: dict = LoadSourceImgColors()
+    source_crop_data: dict = LoadSourceImgCropping()
 
     # Check path to head spritesheet
     head_path: str = os.path.join(ROOT_INPUT_DIRECTORY, *path_chara_data[head]["path"])

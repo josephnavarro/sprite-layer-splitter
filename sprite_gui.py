@@ -193,7 +193,7 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._head_data = {v.get("name", "---"): k for k, v in GetHeadPathData().items()}
+        self._head_data = {v.get("name", "---"): k for k, v in LoadHeadPaths().items()}
         self._head_list = list(self._head_data)
 
     def _init_body_data(self):
@@ -202,7 +202,7 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._body_data = {v.get("name", "---"): k for k, v in GetBodyPathData().items()}
+        self._body_data = {v.get("name", "---"): k for k, v in LoadBodyPaths().items()}
         self._body_list = list(self._body_data)
 
     def _init_rebuild_body_images(self) -> None:

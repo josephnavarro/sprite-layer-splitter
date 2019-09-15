@@ -21,8 +21,10 @@ PATH_JSON_CHARA = os.path.join("inputs", "head.json")
 PATH_JSON_CLASS = os.path.join("inputs", "body.json")
 PATH_JSON_OFFSET_HEAD = os.path.join("inputs", "head_offsets.json")
 PATH_JSON_OFFSET_BODY = os.path.join("inputs", "body_offsets.json")
-PATH_JSON_SOURCE_COLOR = os.path.join("inputs", "source_color.json")
-PATH_JSON_SOURCE_CROP = os.path.join("inputs", "source_crop.json")
+PATH_JSON_SOURCE_COLOR = os.path.join("inputs", ".src_color.json")
+PATH_JSON_SOURCE_CROP = os.path.join("inputs", ".src_crop.json")
+PATH_JSON_GENSRC_BODY = os.path.join("inputs", ".raw_body.json")
+PATH_JSON_GENSRC_HEAD = os.path.join("inputs", ".raw_head.json")
 
 
 def CreateHeadJSON() -> None:
@@ -68,7 +70,7 @@ def CreateBodyJSON() -> None:
         f.write(newstr)
 
 
-def GetHeadPathData() -> dict:
+def LoadHeadPaths() -> dict:
     """
     Loads and returns relative filepaths to character head spritesheets.
 
@@ -79,7 +81,7 @@ def GetHeadPathData() -> dict:
     return data
 
 
-def GetBodyPathData() -> dict:
+def LoadBodyPaths() -> dict:
     """
     Loads and returns relative filepaths to character body spritesheets.
 
@@ -90,7 +92,7 @@ def GetBodyPathData() -> dict:
     return data
 
 
-def GetOffsetBodyData() -> dict:
+def LoadBodyOffsets() -> dict:
     """
     Loads and returns per-frame character body offsets.
 
@@ -101,7 +103,7 @@ def GetOffsetBodyData() -> dict:
     return data
 
 
-def GetOffsetHeadData() -> dict:
+def LoadHeadOffsets() -> dict:
     """
     Loads and returns per-frame character head offsets.
 
@@ -112,7 +114,28 @@ def GetOffsetHeadData() -> dict:
     return data
 
 
-def GetSourceColorData() -> dict:
+def LoadGenSrcBody() -> dict:
+    """
+    Loads and returns cropping regions on raw body spritesheets.
+
+    :return:
+    """
+    with open(PATH_JSON_GENSRC_BODY, "r") as f:
+        data = json.load(f)
+    return data
+
+
+def LoadGenSrcHead() -> dict:
+    """
+    Loads and returns cropping regions on raw head spritesheets.
+    :return:
+    """
+    with open(PATH_JSON_GENSRC_HEAD, "r") as f:
+        data = json.load(f)
+    return data
+
+
+def LoadSourceImgColors() -> dict:
     """
     Loads and returns standardized color order on master spritesheets.
 
@@ -123,7 +146,7 @@ def GetSourceColorData() -> dict:
     return data
 
 
-def GetSourceCropData() -> dict:
+def LoadSourceImgCropping() -> dict:
     """
     Loads and returns standardized cropping regions on master spritesheets.
 
