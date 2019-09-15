@@ -9,6 +9,7 @@ Graphical user interface layer.
 ------------------------------------------------------------------------------------------------------------------------
 """
 import cv2
+import numpy as np
 import tkinter as tk
 import sprite_splitter
 import sprite_imaging
@@ -89,19 +90,23 @@ class App(tk.Frame):
     # Grid positions for widgets
     GRID_IMAGEPREVIEW_CANVAS = [0, 1]
     GRID_SELECT_HEAD_OPTIONS = [1, 0]
-    GRID_RB_SRCS_HEAD_BUTTON = [2, 0]  #
+    GRID_RB_SRCS_HEAD_BUTTON = [2, 0]
     GRID_RB_JSON_HEAD_BUTTON = [3, 0]
     GRID_SELECT_BODY_OPTIONS = [1, 1]
     GRID_RB_SRCS_BODY_BUTTON = [2, 1]
     GRID_RB_JSON_BODY_BUTTON = [3, 1]
-    GRID_MAKE_PREVIEW_BUTTON = [1, 2]
-    GRID_COMPOSE_IDLE_BUTTON = [2, 2]
-    GRID_COMPOSE_FULL_BUTTON = [3, 2]
+    GRID_PREVIEW_IDLE_BUTTON = [1, 2]
+    GRID_PREVIEW_LEFT_BUTTON = [2, 2]
+    GRID_PREVIEW_RIGHTBUTTON = [3, 2]
+    GRID_COMPOSE_IDLE_BUTTON = [2, 3]
+    GRID_COMPOSE_FULL_BUTTON = [3, 3]
 
     # Padding for widgets
     PAD_COMPOSE_FULL_BUTTON = [4, 4]
     PAD_COMPOSE_IDLE_BUTTON = [4, 4]
-    PAD_MAKE_PREVIEW_BUTTON = [4, 4]
+    PAD_PREVIEW_IDLE_BUTTON = [4, 4]
+    PAD_PREVIEW_LEFT_BUTTON = [4, 4] # !!
+    PAD_PREVIEW_RIGHTBUTTON = [4, 4] # !!
     PAD_RB_JSON_BODY_BUTTON = [4, 4]
     PAD_RB_JSON_HEAD_BUTTON = [4, 4]
     PAD_RB_IMGS_BODY_BUTTON = [4, 4]
@@ -110,13 +115,20 @@ class App(tk.Frame):
     PAD_SELECT_HEAD_OPTIONS = [4, 4]
 
     # Preview composition dimensions
-    PREVIEW_CROP_SIZE = [128, 32]
-    PREVIEW_RESIZE_SIZE = (384, 96)
+    PREVIEW_IDLE_CROP_ORIG = [0, 0]
+    PREVIEW_IDLE_CROP_SIZE = [128, 32]
+    PREVIEW_LEFT_CROP_ORIG = [0, 32]
+    PREVIEW_LEFT_CROP_SIZE = [128, 32]
+    PREVIEW_RIGHTCROP_ORIG = [0, 64]
+    PREVIEW_RIGHTCROP_SIZE = [128, 32]
+    PREVIEW_RESIZED_DIMENS = (384, 96)
 
     # Button and menu text labels
     DEFAULT_HEAD_LABEL = "Select head"
     DEFAULT_BODY_LABEL = "Select body"
-    MAKE_PREVIEW_LABEL = "Generate preview"
+    PREVIEW_IDLE_LABEL = "Preview idle frames"
+    PREVIEW_LEFT_LABEL = "Preview left frames"
+    PREVIEW_RIGHTLABEL = "Preview right frames"
     RB_JSON_BODY_LABEL = "Rebuild body database"
     RB_JSON_HEAD_LABEL = "Rebuild head database"
     RB_IMGS_BODY_LABEL = "Rebuild body source images"
@@ -173,7 +185,9 @@ class App(tk.Frame):
 
         self._compose_idle_button = tk.Button()
         self._compose_full_button = tk.Button()
-        self._make_preview_button = tk.Button()
+        self._preview_idle_button = tk.Button()
+        self._preview_left_button = tk.Button()
+        self._preview_rightbutton = tk.Button()
         self._rebuild_body_button = tk.Button()
         self._rebuild_head_button = tk.Button()
         self._rebuild_body_images = tk.Button()
@@ -186,7 +200,10 @@ class App(tk.Frame):
         self._init_body_data()
         self._init_compose_idle_button()
         self._init_compose_full_button()
-        self._init_make_preview_button()
+        self._init_preview_canvas()
+        self._init_preview_idle_button()
+        self._init_preview_left_button()
+        self._init_preview_rightbutton()
         self._init_rebuild_body_button()
         self._init_rebuild_head_button()
         self._init_rebuild_body_images()
@@ -370,11 +387,11 @@ class App(tk.Frame):
             pady=self.PAD_COMPOSE_FULL_BUTTON[1]
             )
 
-    def _init_make_preview_button(self) -> None:
+    def _init_preview_canvas(self) -> None:
         """
-        Completes initialization of "preview" button.
+        Completes initialization of preview image canvas.
 
-        :return: None
+        :return: None.
         """
         # Initialize preview image reference
         self._imageobj = None
@@ -394,22 +411,76 @@ class App(tk.Frame):
             column=self.GRID_IMAGEPREVIEW_CANVAS[1]
             )
 
+    def _init_preview_idle_button(self) -> None:
+        """
+        Completes initialization of "preview idle" button.
+
+        :return: None
+        """
         # Initialize preview command button
-        self._make_preview_button.destroy()
-        self._make_preview_button = tk.Button(
+        self._preview_idle_button.destroy()
+        self._preview_idle_button = tk.Button(
             self._bottom_frame,
-            text=self.MAKE_PREVIEW_LABEL,
-            command=self.generate_preview
+            text=self.PREVIEW_IDLE_LABEL,
+            command=self.generate_idle_preview
             )
-        self._make_preview_button.config(
+        self._preview_idle_button.config(
             width=self.DEFAULT_BUTTON_WIDTH,
             bg=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR)
             )
-        self._make_preview_button.grid(
-            row=self.GRID_MAKE_PREVIEW_BUTTON[0],
-            column=self.GRID_MAKE_PREVIEW_BUTTON[1],
-            padx=self.PAD_MAKE_PREVIEW_BUTTON[0],
-            pady=self.PAD_MAKE_PREVIEW_BUTTON[1]
+        self._preview_idle_button.grid(
+            row=self.GRID_PREVIEW_IDLE_BUTTON[0],
+            column=self.GRID_PREVIEW_IDLE_BUTTON[1],
+            padx=self.PAD_PREVIEW_IDLE_BUTTON[0],
+            pady=self.PAD_PREVIEW_IDLE_BUTTON[1]
+            )
+
+    def _init_preview_left_button(self) -> None:
+        """
+        Completes initialization of "preview idle" button.
+
+        :return: None
+        """
+        # Initialize preview command button
+        self._preview_left_button.destroy()
+        self._preview_left_button = tk.Button(
+            self._bottom_frame,
+            text=self.PREVIEW_LEFT_LABEL,
+            command=self.generate_left_preview
+            )
+        self._preview_left_button.config(
+            width=self.DEFAULT_BUTTON_WIDTH,
+            bg=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR)
+            )
+        self._preview_left_button.grid(
+            row=self.GRID_PREVIEW_LEFT_BUTTON[0],
+            column=self.GRID_PREVIEW_LEFT_BUTTON[1],
+            padx=self.PAD_PREVIEW_LEFT_BUTTON[0],
+            pady=self.PAD_PREVIEW_LEFT_BUTTON[1]
+            )
+
+    def _init_preview_rightbutton(self) -> None:
+        """
+        Completes initialization of "preview idle" button.
+
+        :return: None
+        """
+        # Initialize preview command button
+        self._preview_rightbutton.destroy()
+        self._preview_rightbutton = tk.Button(
+            self._bottom_frame,
+            text=self.PREVIEW_RIGHTLABEL,
+            command=self.generate_right_preview
+            )
+        self._preview_rightbutton.config(
+            width=self.DEFAULT_BUTTON_WIDTH,
+            bg=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR)
+            )
+        self._preview_rightbutton.grid(
+            row=self.GRID_PREVIEW_RIGHTBUTTON[0],
+            column=self.GRID_PREVIEW_RIGHTBUTTON[1],
+            padx=self.PAD_PREVIEW_RIGHTBUTTON[0],
+            pady=self.PAD_PREVIEW_RIGHTBUTTON[1]
             )
 
     def _init_rebuild_body_button(self) -> None:
@@ -458,11 +529,13 @@ class App(tk.Frame):
             pady=self.PAD_RB_JSON_HEAD_BUTTON[1]
             )
 
-    def _composite(self, func):
+    def _composite(self, func) -> (str, str, (np.ndarray or None)):
         """
+        Performs a general-purpose image composition routine.
 
-        :param func:
-        :return:
+        :param func: Function to use for compositing (e.g. CompositeIdle, CompositeFull...)
+
+        :return: Tuple containing (in order) head key, body key, and generated numpy image.
         """
         head: str = ""
         body: str = ""
@@ -518,6 +591,7 @@ class App(tk.Frame):
         :return: None.
         """
         try:
+            # Perform image composition
             head, body, image = self._composite(sprite_splitter.CompositeIdle)
             if image is not None:
                 # Prompt user for destination filename
@@ -543,6 +617,7 @@ class App(tk.Frame):
             tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
 
         except EmptyFilenameException:
+            # Filename not specified
             pass
 
     def composite_full(self):
@@ -552,6 +627,7 @@ class App(tk.Frame):
         :return: None.
         """
         try:
+            # Perform sprite composition
             head, body, image = self._composite(sprite_splitter.CompositeFull)
             if image is not None:
                 # Prompt user for destination filename
@@ -577,23 +653,24 @@ class App(tk.Frame):
             tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
 
         except EmptyFilenameException:
+            # Filename not specified
             pass
 
-    def generate_preview(self) -> None:
+    def generate_idle_preview(self) -> None:
         """
-        Generates a preview image.
+        Generates a preview image for current sprite's "idle" frames.
 
         :return: None
         """
         try:
+            # Perform sprite composition
             head, body, image = self._composite(sprite_splitter.CompositeIdle)
             if image is not None:
-                # Perform sprite composition
                 try:
-                    image = sprite_imaging.Crop(image, [0, 0], self.PREVIEW_CROP_SIZE)
+                    image = sprite_imaging.Crop(image, self.PREVIEW_IDLE_CROP_ORIG, self.PREVIEW_IDLE_CROP_SIZE)
                     image = cv2.resize(
                         cv2.cvtColor(image, cv2.COLOR_BGR2RGB),
-                        dsize=self.PREVIEW_RESIZE_SIZE,
+                        dsize=self.PREVIEW_RESIZED_DIMENS,
                         interpolation=cv2.INTER_NEAREST
                         )
                     self._imageobj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
@@ -607,6 +684,68 @@ class App(tk.Frame):
             tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
 
         except EmptyFilenameException:
+            pass
+
+    def generate_left_preview(self) -> None:
+        """
+        Generates a preview image for current sprite's "left" frames.
+
+        :return: None
+        """
+        try:
+            # Perform sprite composition
+            head, body, image = self._composite(sprite_splitter.CompositeFull)
+            if image is not None:
+                try:
+                    image = sprite_imaging.Crop(image, self.PREVIEW_LEFT_CROP_ORIG, self.PREVIEW_LEFT_CROP_SIZE)
+                    image = cv2.resize(
+                        cv2.cvtColor(image, cv2.COLOR_BGR2RGB),
+                        dsize=self.PREVIEW_RESIZED_DIMENS,
+                        interpolation=cv2.INTER_NEAREST
+                        )
+                    self._imageobj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
+                    self._preview_image.create_image((16, 16), anchor=tk.NW, image=self._imageobj)
+
+                except cv2.error:
+                    raise InvalidFilenameException
+
+        except InvalidFilenameException:
+            # Image format not recognized
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
+
+        except EmptyFilenameException:
+            # Filename not specified
+            pass
+
+    def generate_right_preview(self) -> None:
+        """
+        Generates a preview image for current sprite's "right" frames.
+
+        :return: None
+        """
+        try:
+            # Perform sprite composition
+            head, body, image = self._composite(sprite_splitter.CompositeFull)
+            if image is not None:
+                try:
+                    image = sprite_imaging.Crop(image, self.PREVIEW_RIGHTCROP_ORIG, self.PREVIEW_RIGHTCROP_SIZE)
+                    image = cv2.resize(
+                        cv2.cvtColor(image, cv2.COLOR_BGR2RGB),
+                        dsize=self.PREVIEW_RESIZED_DIMENS,
+                        interpolation=cv2.INTER_NEAREST
+                        )
+                    self._imageobj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
+                    self._preview_image.create_image((16, 16), anchor=tk.NW, image=self._imageobj)
+
+                except cv2.error:
+                    raise InvalidFilenameException
+
+        except InvalidFilenameException:
+            # Image format not recognized
+            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_TYPE_MESSAGE)
+
+        except EmptyFilenameException:
+            # Filename not specified
             pass
 
     def rebuild_body_database(self) -> None:

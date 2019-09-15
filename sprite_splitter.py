@@ -52,7 +52,7 @@ def PasteLayers(dest: np.ndarray,
                 head: dict,
                 body: dict,
                 layers: list,
-                headfirst: bool = False) -> None:
+                headfirst: bool = True) -> None:
     """
     Pastes head and body subregions in proper layering order. (In-place).
 
