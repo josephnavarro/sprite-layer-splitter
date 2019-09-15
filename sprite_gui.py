@@ -242,7 +242,13 @@ class App(tk.Frame):
             text=self.RB_IMGS_BODY_LABEL,
             command=self.rebuild_body_intermediates
             )
-        self._rebuild_body_images.config(width=self.DEFAULT_BUTTON_WIDTH)
+        self._rebuild_body_images.config(
+            width=self.DEFAULT_BUTTON_WIDTH,
+            fg=self.FromRGB(*self.BODY_BUTTON_FG_COLOR),
+            bg=self.FromRGB(*self.BODY_BUTTON_BG_COLOR),
+            activebackground=self.FromRGB(*self.BODY_BUTTON_BG_COLOR),
+            activeforeground=self.FromRGB(*self.BODY_BUTTON_FG_COLOR)
+            )
 
         # Place button
         self._rebuild_body_images.grid(
@@ -265,7 +271,13 @@ class App(tk.Frame):
             text=self.RB_IMGS_HEAD_LABEL,
             command=self.rebuild_head_intermediates
             )
-        self._rebuild_head_images.config(width=self.DEFAULT_BUTTON_WIDTH)
+        self._rebuild_head_images.config(
+            width=self.DEFAULT_BUTTON_WIDTH,
+            fg=self.FromRGB(*self.HEAD_BUTTON_FG_COLOR),
+            bg=self.FromRGB(*self.HEAD_BUTTON_BG_COLOR),
+            activebackground=self.FromRGB(*self.HEAD_BUTTON_BG_COLOR),
+            activeforeground=self.FromRGB(*self.HEAD_BUTTON_FG_COLOR)
+            )
 
         # Place button
         self._rebuild_head_images.grid(
@@ -426,7 +438,10 @@ class App(tk.Frame):
             )
         self._preview_idle_button.config(
             width=self.DEFAULT_BUTTON_WIDTH,
-            bg=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR)
+            bg=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR),
+            fg=self.FromRGB(*self.PREVIEW_BUTTON_FG_COLOR),
+            activebackground=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR),
+            activeforeground=self.FromRGB(*self.PREVIEW_BUTTON_FG_COLOR)
             )
         self._preview_idle_button.grid(
             row=self.GRID_PREVIEW_IDLE_BUTTON[0],
@@ -450,7 +465,10 @@ class App(tk.Frame):
             )
         self._preview_left_button.config(
             width=self.DEFAULT_BUTTON_WIDTH,
-            bg=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR)
+            bg=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR),
+            fg=self.FromRGB(*self.PREVIEW_BUTTON_FG_COLOR),
+            activebackground=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR),
+            activeforeground=self.FromRGB(*self.PREVIEW_BUTTON_FG_COLOR)
             )
         self._preview_left_button.grid(
             row=self.GRID_PREVIEW_LEFT_BUTTON[0],
@@ -474,7 +492,10 @@ class App(tk.Frame):
             )
         self._preview_rightbutton.config(
             width=self.DEFAULT_BUTTON_WIDTH,
-            bg=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR)
+            bg=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR),
+            fg=self.FromRGB(*self.PREVIEW_BUTTON_FG_COLOR),
+            activebackground=self.FromRGB(*self.PREVIEW_BUTTON_BG_COLOR),
+            activeforeground=self.FromRGB(*self.PREVIEW_BUTTON_FG_COLOR)
             )
         self._preview_rightbutton.grid(
             row=self.GRID_PREVIEW_RIGHTBUTTON[0],
@@ -496,7 +517,13 @@ class App(tk.Frame):
             text=self.RB_JSON_BODY_LABEL,
             command=self.rebuild_body_database
             )
-        self._rebuild_body_button.config(width=self.DEFAULT_BUTTON_WIDTH)
+        self._rebuild_body_button.config(
+            width=self.DEFAULT_BUTTON_WIDTH,
+            fg=self.FromRGB(*self.BODY_BUTTON_FG_COLOR),
+            bg=self.FromRGB(*self.BODY_BUTTON_BG_COLOR),
+            activebackground=self.FromRGB(*self.BODY_BUTTON_BG_COLOR),
+            activeforeground=self.FromRGB(*self.BODY_BUTTON_FG_COLOR)
+            )
 
         # Place button
         self._rebuild_body_button.grid(
@@ -519,7 +546,13 @@ class App(tk.Frame):
             text=self.RB_JSON_HEAD_LABEL,
             command=self.rebuild_head_database
             )
-        self._rebuild_head_button.config(width=self.DEFAULT_BUTTON_WIDTH)
+        self._rebuild_head_button.config(
+            width=self.DEFAULT_BUTTON_WIDTH,
+            fg=self.FromRGB(*self.HEAD_BUTTON_FG_COLOR),
+            bg=self.FromRGB(*self.HEAD_BUTTON_BG_COLOR),
+            activebackground=self.FromRGB(*self.HEAD_BUTTON_BG_COLOR),
+            activeforeground=self.FromRGB(*self.HEAD_BUTTON_FG_COLOR)
+            )
 
         # Place button
         self._rebuild_head_button.grid(
