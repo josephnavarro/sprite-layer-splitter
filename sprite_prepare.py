@@ -131,7 +131,8 @@ def ProcessBody(filename: str, data: dict) -> Image:
     img: Image = Image.open(filename)
 
     try:
-        rect_data: dict = data[os.path.basename(filename)]
+        key: str = os.path.splitext(os.path.basename(filename))[0]
+        rect_data: dict = data[key]
     except KeyError:
         rect_data: dict = data[JSON_KEY_DEFAULT]
 
@@ -172,7 +173,8 @@ def ProcessHead(filename: str, data: dict) -> Image:
     img = Image.open(filename)
 
     try:
-        rect_data: dict = data[os.path.basename(filename)]
+        key: str = os.path.splitext(os.path.basename(filename))[0]
+        rect_data: dict = data[key]
     except KeyError:
         rect_data: dict = data[JSON_KEY_DEFAULT]
 
