@@ -149,6 +149,7 @@ class App(tk.Frame):
 
         # Maintain reference to root Frame
         self._master = root
+        self._master.resizable(False, False)
         self.winfo_toplevel().title(self.WINDOW_TITLE)
 
         # Initialize local non-widget data
@@ -161,8 +162,14 @@ class App(tk.Frame):
         # Initialize local widgets
         self._preview_image = tk.Canvas(self._master)
 
-        self._select_head_string = tk.StringVar(self._master)
-        self._select_body_string = tk.StringVar(self._master)
+        self._head_options_string = tk.StringVar(self._master)
+        self._body_options_string = tk.StringVar(self._master)
+
+        self._top_frame = tk.Frame(self._master)
+        self._top_frame.config(width=640, height=480)
+        self._top_frame.grid(row=1)
+        self._bottom_frame = tk.Frame(self._master)
+        self._bottom_frame.grid(row=2)
 
         self._compose_idle_button = tk.Button()
         self._compose_full_button = tk.Button()
@@ -171,8 +178,8 @@ class App(tk.Frame):
         self._rebuild_head_button = tk.Button()
         self._rebuild_body_images = tk.Button()
         self._rebuild_head_images = tk.Button()
-        self._select_head_options = tk.OptionMenu(self._master, self._select_head_string, *self._head_list)
-        self._select_body_options = tk.OptionMenu(self._master, self._select_body_string, *self._body_list)
+        self._select_head_options = tk.OptionMenu(self._bottom_frame, self._head_options_string, *self._head_list)
+        self._select_body_options = tk.OptionMenu(self._bottom_frame, self._body_options_string, *self._body_list)
 
         # Complete widget initialization
         self._init_head_data()
@@ -214,7 +221,7 @@ class App(tk.Frame):
         # Create new button
         self._rebuild_body_images.destroy()
         self._rebuild_body_images = tk.Button(
-            self._master,
+            self._bottom_frame,
             text=self.RB_IMGS_BODY_LABEL,
             command=self.rebuild_body_intermediates
             )
@@ -237,7 +244,7 @@ class App(tk.Frame):
         # Create new button
         self._rebuild_head_images.destroy()
         self._rebuild_head_images = tk.Button(
-            self._master,
+            self._bottom_frame,
             text=self.RB_IMGS_HEAD_LABEL,
             command=self.rebuild_head_intermediates
             )
@@ -258,14 +265,14 @@ class App(tk.Frame):
         :return: None.
         """
         # Set string variable
-        #self._select_head_string = tk.StringVar(self._master)
-        self._select_head_string.set(self.DEFAULT_HEAD_LABEL)
+        # self._select_head_string = tk.StringVar(self._master)
+        self._head_options_string.set(self.DEFAULT_HEAD_LABEL)
 
         # Create option menu
         self._select_head_options.destroy()
         self._select_head_options = tk.OptionMenu(
-            self._master,
-            self._select_head_string,
+            self._bottom_frame,
+            self._head_options_string,
             *self._head_list
             )
         self._select_head_options.config(
@@ -291,14 +298,14 @@ class App(tk.Frame):
         :return: None.
         """
         # Set string variable
-        #self._select_body_string = tk.StringVar(self._master)
-        self._select_body_string.set(self.DEFAULT_BODY_LABEL)
+        # self._select_body_string = tk.StringVar(self._master)
+        self._body_options_string.set(self.DEFAULT_BODY_LABEL)
 
         # Create option menu
         self._select_body_options.destroy()
         self._select_body_options = tk.OptionMenu(
-            self._master,
-            self._select_body_string,
+            self._bottom_frame,
+            self._body_options_string,
             *self._body_list
             )
 
@@ -326,7 +333,7 @@ class App(tk.Frame):
         # Create new button
         self._compose_idle_button.destroy()
         self._compose_idle_button = tk.Button(
-            self._master,
+            self._bottom_frame,
             text=self.SAV_IDLE_BTN_LABEL,
             command=self.composite_idle
             )
@@ -349,7 +356,7 @@ class App(tk.Frame):
         # Create new button
         self._compose_full_button.destroy()
         self._compose_full_button = tk.Button(
-            self._master,
+            self._bottom_frame,
             text=self.SAV_FULL_BTN_LABEL,
             command=self.composite_full
             )
@@ -375,7 +382,7 @@ class App(tk.Frame):
         # Initialize preview image canvas
         self._preview_image.destroy()
         self._preview_image = tk.Canvas(
-            self._master,
+            self._top_frame,
             width=self.PREVIEW_CANVAS_WIDTH,
             height=self.PREVIEW_CANVAS_HEIGHT,
             bg=self.FromRGB(*self.PREVIEW_CANVAS_COLOR),
@@ -390,7 +397,7 @@ class App(tk.Frame):
         # Initialize preview command button
         self._make_preview_button.destroy()
         self._make_preview_button = tk.Button(
-            self._master,
+            self._bottom_frame,
             text=self.MAKE_PREVIEW_LABEL,
             command=self.generate_preview
             )
@@ -414,7 +421,7 @@ class App(tk.Frame):
         # Create new button
         self._rebuild_body_button.destroy()
         self._rebuild_body_button = tk.Button(
-            self._master,
+            self._bottom_frame,
             text=self.RB_JSON_BODY_LABEL,
             command=self.rebuild_body_database
             )
@@ -437,7 +444,7 @@ class App(tk.Frame):
         # Create new button
         self._rebuild_head_button.destroy()
         self._rebuild_head_button = tk.Button(
-            self._master,
+            self._bottom_frame,
             text=self.RB_JSON_HEAD_LABEL,
             command=self.rebuild_head_database
             )
@@ -451,40 +458,31 @@ class App(tk.Frame):
             pady=self.PAD_RB_JSON_HEAD_BUTTON[1]
             )
 
-    def composite_idle(self) -> None:
+    def _composite(self, func):
         """
-        Composites idle frames.
 
-        :return: None.
+        :param func:
+        :return:
         """
+        head: str = ""
+        body: str = ""
+
         try:
             # Get head key
             try:
-                head = self._head_data[self._select_head_string.get()]
+                head: str = self._head_data[self._head_options_string.get()]
             except KeyError:
                 raise UnspecifiedHeadException
 
             # Get body key
             try:
-                body = self._body_data[self._select_body_string.get()]
+                body: str = self._body_data[self._body_options_string.get()]
             except KeyError:
                 raise UnspecifiedBodyException
 
-            # Prompt user for destination filename
-            FixPath(ROOT_OUTPUT_DIRECTORY)
-            path: str = filedialog.asksaveasfilename(
-                initialfile="{}_{}.png".format(head, body),
-                initialdir=ROOT_OUTPUT_DIRECTORY,
-                title="Save As",
-                filetypes=FILETYPES
-                )
-            if not path:
-                raise EmptyFilenameException
-
             # Perform sprite composition
             try:
-                image = sprite_splitter.CompositeIdle(head, body)
-                sprite_splitter.SaveImage(image, path)
+                return head, body, func(head, body)
 
             except sprite_splitter.NonexistentHeadException as e:
                 raise InvalidHeadException(e.filename)
@@ -494,12 +492,6 @@ class App(tk.Frame):
 
             except cv2.error:
                 raise InvalidFilenameException
-
-            # Alert user upon success
-            tk.messagebox.showinfo(
-                self.WINDOW_TITLE,
-                self.SUCCESS_IDLE_MESSAGE.format(filename=os.path.basename(path))
-                )
 
         except UnspecifiedHeadException:
             # Head not specified
@@ -516,6 +508,35 @@ class App(tk.Frame):
         except InvalidBodyException as e:
             # Body spritesheet does not exist
             tk.messagebox.showinfo(self.WINDOW_TITLE, self.INVALID_BODY_MESSAGE.format(filename=e.filename))
+
+        return head, body, None
+
+    def composite_idle(self) -> None:
+        """
+        Composites and saves idle frames.
+
+        :return: None.
+        """
+        try:
+            head, body, image = self._composite(sprite_splitter.CompositeIdle)
+            if image is not None:
+                # Prompt user for destination filename
+                FixPath(ROOT_OUTPUT_DIRECTORY)
+                path: str = filedialog.asksaveasfilename(
+                    initialfile="{}_{}.png".format(head, body),
+                    initialdir=ROOT_OUTPUT_DIRECTORY,
+                    title="Save As",
+                    filetypes=FILETYPES
+                    )
+                if not path:
+                    raise EmptyFilenameException
+                sprite_splitter.SaveImage(image, path)
+
+                # Alert user upon success
+                tk.messagebox.showinfo(
+                    self.WINDOW_TITLE,
+                    self.SUCCESS_IDLE_MESSAGE.format(filename=os.path.basename(path))
+                    )
 
         except InvalidFilenameException:
             # Image format not recognized
@@ -531,64 +552,25 @@ class App(tk.Frame):
         :return: None.
         """
         try:
-            # Get head key
-            try:
-                head = self._head_data[self._select_head_string.get()]
-            except KeyError:
-                raise UnspecifiedHeadException
-
-            # Get body key
-            try:
-                body = self._body_data[self._select_body_string.get()]
-            except KeyError:
-                raise UnspecifiedBodyException
-
-            # Prompt user for destination filename
-            FixPath(ROOT_OUTPUT_DIRECTORY)
-            path: str = filedialog.asksaveasfilename(
-                initialfile="{}_{}.png".format(head, body),
-                initialdir=ROOT_OUTPUT_DIRECTORY,
-                title="Save As",
-                filetypes=FILETYPES
-                )
-            if not path:
-                raise EmptyFilenameException
-
-            # Perform sprite composition
-            try:
-                image = sprite_splitter.CompositeFull(head, body)
+            head, body, image = self._composite(sprite_splitter.CompositeFull)
+            if image is not None:
+                # Prompt user for destination filename
+                FixPath(ROOT_OUTPUT_DIRECTORY)
+                path: str = filedialog.asksaveasfilename(
+                    initialfile="{}_{}.png".format(head, body),
+                    initialdir=ROOT_OUTPUT_DIRECTORY,
+                    title="Save As",
+                    filetypes=FILETYPES
+                    )
+                if not path:
+                    raise EmptyFilenameException
                 sprite_splitter.SaveImage(image, path)
 
-            except sprite_splitter.NonexistentHeadException as e:
-                raise InvalidHeadException(e.filename)
-
-            except sprite_splitter.NonexistentBodyException as e:
-                raise InvalidBodyException(e.filename)
-
-            except cv2.error:
-                raise InvalidFilenameException
-
-            # Alert user upon success
-            tk.messagebox.showinfo(
-                self.WINDOW_TITLE,
-                self.SUCCESS_FULL_MESSAGE.format(filename=os.path.basename(path))
-                )
-
-        except UnspecifiedHeadException:
-            # Head not specified
-            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_HEAD_MESSAGE)
-
-        except UnspecifiedBodyException:
-            # Body not specified
-            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_BODY_MESSAGE)
-
-        except InvalidHeadException as e:
-            # Head spritesheet does not exist
-            tk.messagebox.showinfo(self.WINDOW_TITLE, self.INVALID_HEAD_MESSAGE.format(filename=e.filename))
-
-        except InvalidBodyException as e:
-            # Body spritesheet does not exist
-            tk.messagebox.showinfo(self.WINDOW_TITLE, self.INVALID_BODY_MESSAGE.format(filename=e.filename))
+                # Alert user upon success
+                tk.messagebox.showinfo(
+                    self.WINDOW_TITLE,
+                    self.SUCCESS_IDLE_MESSAGE.format(filename=os.path.basename(path))
+                    )
 
         except InvalidFilenameException:
             # Image format not recognized
@@ -604,54 +586,21 @@ class App(tk.Frame):
         :return: None
         """
         try:
-            # Get head key
-            try:
-                head = self._head_data[self._select_head_string.get()]
-            except KeyError:
-                raise UnspecifiedHeadException
+            head, body, image = self._composite(sprite_splitter.CompositeIdle)
+            if image is not None:
+                # Perform sprite composition
+                try:
+                    image = sprite_imaging.Crop(image, [0, 0], self.PREVIEW_CROP_SIZE)
+                    image = cv2.resize(
+                        cv2.cvtColor(image, cv2.COLOR_BGR2RGB),
+                        dsize=self.PREVIEW_RESIZE_SIZE,
+                        interpolation=cv2.INTER_NEAREST
+                        )
+                    self._imageobj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
+                    self._preview_image.create_image((16, 16), anchor=tk.NW, image=self._imageobj)
 
-            # Get body key
-            try:
-                body = self._body_data[self._select_body_string.get()]
-            except KeyError:
-                raise UnspecifiedBodyException
-
-            # Perform sprite composition
-            try:
-                image = sprite_splitter.CompositeIdle(head, body)
-                image = sprite_imaging.Crop(image, [0, 0], self.PREVIEW_CROP_SIZE)
-                image = cv2.resize(
-                    cv2.cvtColor(image, cv2.COLOR_BGR2RGB),
-                    dsize=self.PREVIEW_RESIZE_SIZE,
-                    interpolation=cv2.INTER_NEAREST
-                    )
-                self._imageobj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
-                self._preview_image.create_image((16, 16), anchor=tk.NW, image=self._imageobj)
-
-            except sprite_splitter.NonexistentHeadException as e:
-                raise InvalidHeadException(e.filename)
-
-            except sprite_splitter.NonexistentBodyException as e:
-                raise InvalidBodyException(e.filename)
-
-            except cv2.error:
-                raise InvalidFilenameException
-
-        except UnspecifiedHeadException:
-            # Head not specified
-            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_HEAD_MESSAGE)
-
-        except UnspecifiedBodyException:
-            # Body not specified
-            tk.messagebox.showinfo(self.WINDOW_TITLE, self.FAILURE_BODY_MESSAGE)
-
-        except InvalidHeadException as e:
-            # Head spritesheet does not exist
-            tk.messagebox.showinfo(self.WINDOW_TITLE, self.INVALID_HEAD_MESSAGE.format(filename=e.filename))
-
-        except InvalidBodyException as e:
-            # Body spritesheet does not exist
-            tk.messagebox.showinfo(self.WINDOW_TITLE, self.INVALID_BODY_MESSAGE.format(filename=e.filename))
+                except cv2.error:
+                    raise InvalidFilenameException
 
         except InvalidFilenameException:
             # Image format not recognized

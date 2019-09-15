@@ -51,26 +51,41 @@ def SortedSet(*lists,
 def PasteLayers(dest: np.ndarray,
                 head: dict,
                 body: dict,
-                layers: list) -> None:
+                layers: list,
+                headfirst: bool = False) -> None:
     """
     Pastes head and body subregions in proper layering order. (In-place).
 
-    :param dest:   Destination image to paste to.
-    :param head:   Head compositing data.
-    :param body:   Body compositing data.
-    :param layers: List of layers to process.
+    :param dest:      Destination image to paste to.
+    :param head:      Head compositing data.
+    :param body:      Body compositing data.
+    :param layers:    List of layers to process.
+    :param headfirst: Whether to paste head first.
 
     :return: None.
     """
     for layer in layers:
-        try:
-            Paste(dest, head[layer], (0, 0))
-        except KeyError:
-            pass
-        try:
-            Paste(dest, body[layer], (0, 0))
-        except KeyError:
-            pass
+        if headfirst:
+            # Paste head first, body second
+            try:
+                Paste(dest, head[layer], (0, 0))
+            except KeyError:
+                pass
+            try:
+                Paste(dest, body[layer], (0, 0))
+            except KeyError:
+                pass
+
+        else:
+            # Paste body first, head second
+            try:
+                Paste(dest, body[layer], (0, 0))
+            except KeyError:
+                pass
+            try:
+                Paste(dest, head[layer], (0, 0))
+            except KeyError:
+                pass
 
 
 def Split(image: np.ndarray) -> dict:
@@ -162,7 +177,7 @@ def ProcessBody(name: str,
     body_size: list = source_data["body"]["size"]
     body_where: list = source_data["body"]["where"]
 
-    layers: dict = Split(Crop(ReplaceColor(image), where, REGION_FULL_BODY))
+    layers: dict = Split(Crop(image, where, REGION_FULL_BODY))
     if is_alpha:
         layers = {k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0]) for k, v in layers.items()}
 
@@ -216,7 +231,7 @@ def ProcessHead(name: str,
     head_size: list = source_data["head"][head_type]["size"]
     head_where: list = source_data["head"][head_type]["where"]
 
-    layers: dict = Split(Crop(ReplaceColor(image), where, REGION_FULL_HEAD))
+    layers: dict = Split(Crop(image, where, REGION_FULL_HEAD))
     if is_alpha:
         layers = {k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0]) for k, v in layers.items()}
 
@@ -358,10 +373,7 @@ def CompositeIdle(head: str,
 
         # (Optional) Make grayscale based on purple
         if color == "purple":
-            new_gray: np.ndarray = cv2.cvtColor(
-                cv2.cvtColor(new_image.copy(), cv2.COLOR_BGR2GRAY),
-                cv2.COLOR_GRAY2BGR
-                )
+            new_gray: np.ndarray = cv2.cvtColor(cv2.cvtColor(new_image.copy(), cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
             if is_alpha:
                 new_gray = ReplaceColor(ConvertAlpha(new_gray), [0, 0, 0, 255], [0, 0, 0, 0])
             Paste(out_image, new_gray, (0, (y + 1) * STATE_REGION[1]))
@@ -456,10 +468,7 @@ def CompositeFull(head: str,
 
         # (Optional) Make grayscale based on purple
         if color == "purple":
-            new_gray: np.ndarray = cv2.cvtColor(
-                cv2.cvtColor(new_image.copy(), cv2.COLOR_BGR2GRAY),
-                cv2.COLOR_GRAY2BGR
-                )
+            new_gray: np.ndarray = cv2.cvtColor(cv2.cvtColor(new_image.copy(), cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
             if is_alpha:
                 new_gray = ReplaceColor(ConvertAlpha(new_gray), [0, 0, 0, 255], [0, 0, 0, 0])
             Paste(out_image, new_gray, (0, (y + 1) * COLOR_REGION[1]))
