@@ -11,8 +11,6 @@ so I could tell myself I implemented something like it.
 
 
 class NamedEnumIter:
-
-
     def __init__(self, *args, **kwargs):
         """
         A named, enumerated iterable.

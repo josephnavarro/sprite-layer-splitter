@@ -60,6 +60,7 @@ def CropImage(im: Image, x: int, y: int, w: int, h: int) -> Image:
     """
     Crops a PIL image.
 
+    :param im: Image to crop.
     :param x: Topleft x-coordinate to crop from.
     :param y: Topleft y-coordinate to crop from.
     :param w: Width to crop to.
@@ -125,6 +126,7 @@ def ProcessBody(filename: str, data: dict) -> Image:
     a single spritesheet.
 
     :param filename: Source image to crop from.
+    :param data: Body data to use.
 
     :return: Newly-generated spritesheet.
     """
@@ -167,6 +169,7 @@ def ProcessHead(filename: str, data: dict) -> Image:
     a single spritesheet.
 
     :param filename: Source image to crop from.
+    :param data: Head data to use.
 
     :return: Newly-generated spritesheet.
     """
