@@ -160,6 +160,7 @@ def Paste(dest: np.ndarray,
           pos: tuple) -> None:
     """
     Pastes one image onto another. (In-place).
+
     Preserves alpha transparency; transparent pixels won't overwrite anything.
 
     :param dest: Destination image to modify.
@@ -185,6 +186,7 @@ def ReplaceColor(image: np.ndarray,
                  replace: list = [0, 0, 0]) -> np.ndarray:
     """
     Replaces a color in an image with another one.
+
     Defaults to top-left pixel's color.
 
     :param image:   Image to modify.

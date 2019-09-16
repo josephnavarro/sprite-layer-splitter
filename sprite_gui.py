@@ -77,6 +77,8 @@ class App(tk.Frame):
     DEFAULT_BUTTON_WIDTH = 27
     PREVIEW_CANVAS_WIDTH = 384
     PREVIEW_CANVAS_HEIGHT = 96
+    PREVIEW_ANIM_WIDTH = 96
+    PREVIEW_ANIM_HEIGHT = 96
 
     # Default widget colors
     HEAD_BUTTON_FG_COLOR = [0, 0, 0]
@@ -86,9 +88,12 @@ class App(tk.Frame):
     PREVIEW_CANVAS_COLOR = [0, 0, 0]
     PREVIEW_BUTTON_FG_COLOR = [0, 0, 0]
     PREVIEW_BUTTON_BG_COLOR = [200, 255, 212]
+    SAVE_BUTTON_FG_COLOR = [0, 0, 0]
+    SAVE_BUTTON_BG_COLOR = [244, 212, 248]
 
     # Grid positions for widgets
     GRID_IMAGEPREVIEW_CANVAS = [0, 1]
+    GRID_ANIM_PREVIEW_CANVAS = [0, 2]
     GRID_SELECT_HEAD_OPTIONS = [1, 0]
     GRID_RB_SRCS_HEAD_BUTTON = [2, 0]
     GRID_RB_JSON_HEAD_BUTTON = [3, 0]
@@ -165,7 +170,10 @@ class App(tk.Frame):
         self.winfo_toplevel().title(self.WINDOW_TITLE)
 
         # Initialize local non-widget data
-        self._imageobj = None
+        self._image_obj = None
+        self._has_init_anim = False
+        self._anim_objs = []
+        self._animframe = 0
         self._head_data = {}
         self._body_data = {}
         self._head_list = [""]
@@ -173,16 +181,21 @@ class App(tk.Frame):
 
         # Initialize local widgets
         self._preview_image = tk.Canvas(self._master)
+        self._preview_anim = tk.Canvas(self._master)
 
+        # String variables
         self._head_options_string = tk.StringVar(self._master)
         self._body_options_string = tk.StringVar(self._master)
 
+        # Top frame
         self._top_frame = tk.Frame(self._master)
-        self._top_frame.config(width=640, height=480)
         self._top_frame.grid(row=1)
+
+        # Bottom frame
         self._bottom_frame = tk.Frame(self._master)
         self._bottom_frame.grid(row=2)
 
+        # Buttons and menus
         self._compose_idle_button = tk.Button()
         self._compose_full_button = tk.Button()
         self._preview_idle_button = tk.Button()
@@ -366,7 +379,13 @@ class App(tk.Frame):
             text=self.SAV_IDLE_BTN_LABEL,
             command=self.composite_idle
             )
-        self._compose_idle_button.config(width=self.DEFAULT_BUTTON_WIDTH)
+        self._compose_idle_button.config(
+            width=self.DEFAULT_BUTTON_WIDTH,
+            fg=self.FromRGB(*self.SAVE_BUTTON_FG_COLOR),
+            bg=self.FromRGB(*self.SAVE_BUTTON_BG_COLOR),
+            activebackground=self.FromRGB(*self.SAVE_BUTTON_BG_COLOR),
+            activeforeground=self.FromRGB(*self.SAVE_BUTTON_FG_COLOR)
+            )
 
         # Place button
         self._compose_idle_button.grid(
@@ -389,7 +408,13 @@ class App(tk.Frame):
             text=self.SAV_FULL_BTN_LABEL,
             command=self.composite_full
             )
-        self._compose_full_button.config(width=self.DEFAULT_BUTTON_WIDTH)
+        self._compose_full_button.config(
+            width=self.DEFAULT_BUTTON_WIDTH,
+            fg=self.FromRGB(*self.SAVE_BUTTON_FG_COLOR),
+            bg=self.FromRGB(*self.SAVE_BUTTON_BG_COLOR),
+            activebackground=self.FromRGB(*self.SAVE_BUTTON_BG_COLOR),
+            activeforeground=self.FromRGB(*self.SAVE_BUTTON_FG_COLOR)
+            )
 
         # Place button
         self._compose_full_button.grid(
@@ -406,7 +431,7 @@ class App(tk.Frame):
         :return: None.
         """
         # Initialize preview image reference
-        self._imageobj = None
+        self._image_obj = None
 
         # Initialize preview image canvas
         self._preview_image.destroy()
@@ -421,6 +446,24 @@ class App(tk.Frame):
         self._preview_image.grid(
             row=self.GRID_IMAGEPREVIEW_CANVAS[0],
             column=self.GRID_IMAGEPREVIEW_CANVAS[1]
+            )
+
+        # Initialize preview animation container
+        self._anim_objs = []
+
+        # Initialize preview animation canvas
+        self._preview_anim.destroy()
+        self._preview_anim = tk.Canvas(
+            self._top_frame,
+            width=self.PREVIEW_ANIM_WIDTH,
+            height=self.PREVIEW_ANIM_HEIGHT,
+            bg=self.FromRGB(*self.PREVIEW_CANVAS_COLOR),
+            relief=tk.SUNKEN,
+            borderwidth=16,
+            )
+        self._preview_anim.grid(
+            row=self.GRID_ANIM_PREVIEW_CANVAS[0],
+            column=self.GRID_ANIM_PREVIEW_CANVAS[1]
             )
 
     def _init_preview_idle_button(self) -> None:
@@ -706,8 +749,13 @@ class App(tk.Frame):
                         dsize=self.PREVIEW_RESIZED_DIMENS,
                         interpolation=cv2.INTER_NEAREST
                         )
-                    self._imageobj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
-                    self._preview_image.create_image((16, 16), anchor=tk.NW, image=self._imageobj)
+
+                    # Set static preview
+                    self._image_obj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
+                    self._preview_image.create_image((16, 16), anchor=tk.NW, image=self._image_obj)
+
+                    # Set animated preview
+                    self.set_animation_frames(image)
 
                 except cv2.error:
                     raise InvalidFilenameException
@@ -736,8 +784,13 @@ class App(tk.Frame):
                         dsize=self.PREVIEW_RESIZED_DIMENS,
                         interpolation=cv2.INTER_NEAREST
                         )
-                    self._imageobj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
-                    self._preview_image.create_image((16, 16), anchor=tk.NW, image=self._imageobj)
+
+                    # Generate static preview
+                    self._image_obj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
+                    self._preview_image.create_image((16, 16), anchor=tk.NW, image=self._image_obj)
+
+                    # Set animated preview
+                    self.set_animation_frames(image)
 
                 except cv2.error:
                     raise InvalidFilenameException
@@ -767,8 +820,13 @@ class App(tk.Frame):
                         dsize=self.PREVIEW_RESIZED_DIMENS,
                         interpolation=cv2.INTER_NEAREST
                         )
-                    self._imageobj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
-                    self._preview_image.create_image((16, 16), anchor=tk.NW, image=self._imageobj)
+
+                    # Set static preview
+                    self._image_obj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
+                    self._preview_image.create_image((16, 16), anchor=tk.NW, image=self._image_obj)
+
+                    # Set animated preview
+                    self.set_animation_frames(image)
 
                 except cv2.error:
                     raise InvalidFilenameException
@@ -828,6 +886,40 @@ class App(tk.Frame):
         if do_rebuild == "yes":
             PrepareHead()
             tk.messagebox.showinfo(self.WINDOW_TITLE, self.REBUILD_HIMG_MESSAGE)
+
+    def set_animation_frames(self, image) -> None:
+        """
+        Populates local animation buffer.
+
+        :param image:
+
+        :return: None
+        """
+        w, h = self.PREVIEW_ANIM_WIDTH, self.PREVIEW_ANIM_HEIGHT
+        frame1 = sprite_imaging.Crop(image, [w * 0, 0], [w, h])
+        frame2 = sprite_imaging.Crop(image, [w * 1, 0], [w, h])
+        frame3 = sprite_imaging.Crop(image, [w * 2, 0], [w, h])
+        frame4 = sprite_imaging.Crop(image, [w * 3, 0], [w, h])
+        self._anim_objs = [
+            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame1)),
+            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame2)),
+            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame3)),
+            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame4))
+            ]
+        self._animframe = -1
+        if not self._has_init_anim:
+            self._has_init_anim = True
+            self.animate()
+
+    def animate(self):
+        self._animframe += 1
+        if self._animframe >= 4:
+            self._animframe = 0
+        try:
+            self._preview_anim.create_image((16, 16), anchor=tk.NW, image=self._anim_objs[self._animframe])
+        except IndexError:
+            pass
+        self.after(100, self.animate)
 
 
 def GUIMain() -> None:

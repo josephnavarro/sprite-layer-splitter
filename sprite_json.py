@@ -29,8 +29,7 @@ PATH_JSON_GENSRC_HEAD = os.path.join("inputs", ".raw_head.json")
 
 def CreateHeadJSON() -> None:
     """
-    Automatically generates a character head JSON file.
-    JSON contents will reflect the contents of "inputs/head/".
+    Automatically generates a character head JSON file. JSON contents will reflect contents of "inputs/head/".
 
     :return: None.
     """
@@ -51,10 +50,9 @@ def CreateHeadJSON() -> None:
 
 def CreateBodyJSON() -> None:
     """
-    Automatically generates a character body JSON file.
-    JSON contents will reflect the contents of "inputs/body/".
+    Automatically generates a character body JSON file. JSON contents will reflect contents of "inputs/body/".
 
-    :return: None
+    :return: None.
     """
     newstr = ""
     for _ in glob.glob(os.path.join(ROOT_INPUT_DIRECTORY, "body", "*.png")):
@@ -118,7 +116,7 @@ def LoadGenSrcBody() -> dict:
     """
     Loads and returns cropping regions on raw body spritesheets.
 
-    :return:
+    :return: Dictionary containing cropping rules for body spritesheets.
     """
     with open(PATH_JSON_GENSRC_BODY, "r") as f:
         data = json.load(f)
@@ -128,7 +126,8 @@ def LoadGenSrcBody() -> dict:
 def LoadGenSrcHead() -> dict:
     """
     Loads and returns cropping regions on raw head spritesheets.
-    :return:
+
+    :return: Dictionary containing cropping rules for head spritesheets.
     """
     with open(PATH_JSON_GENSRC_HEAD, "r") as f:
         data = json.load(f)
@@ -150,7 +149,7 @@ def LoadSourceImgCropping() -> dict:
     """
     Loads and returns standardized cropping regions on master spritesheets.
 
-    :return: Dictionary containing cropping regions.
+    :return: Dictionary containing standard cropping regions.
     """
     with open(PATH_JSON_SOURCE_CROP, "r") as f:
         data = json.load(f)
