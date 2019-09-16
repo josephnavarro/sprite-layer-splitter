@@ -92,9 +92,9 @@ class App(tk.Frame):
     SAVE_BUTTON_BG_COLOR = [244, 212, 248]
 
     # Grid positions for widgets
-    GRID_PREVIEW_SPEED_LABEL = [0, 0]
-    GRID_PREVIEW_SPEED_SCALE = [1, 0]
-    GRID_PING_PONG_CHECK_BOX = [2, 0]
+    GRID_PREVIEW_SPEED_LABEL = [0, 1]
+    GRID_PREVIEW_SPEED_SCALE = [1, 1]
+    GRID_PING_PONG_CHECK_BOX = [2, 1]
     GRID_IMAGEPREVIEW_CANVAS = [0, 1]
     GRID_ANIM_PREVIEW_CANVAS = [0, 2]
     GRID_SELECT_HEAD_OPTIONS = [1, 0]
@@ -145,6 +145,11 @@ class App(tk.Frame):
     SAV_FULL_BTN_LABEL = "Save all frames"
     ANIMATECHECK_LABEL = "Ping-pong animation"
 
+    # Animation speeds
+    SPEED_SCALE_MIN = 0
+    SPEED_SCALE_MAX = 12
+    SPEED_SCALE_LEN = 240
+
     @staticmethod
     def FromRGB(r: int, g: int, b: int) -> str:
         """
@@ -193,11 +198,15 @@ class App(tk.Frame):
 
         # Topleft frame
         self._topleft_frame = tk.Frame(self._master)
-        self._topleft_frame.grid(row=1)
+        self._topleft_frame.grid(row=0, column=0)
 
         # Topright frame
         self._topright_frame = tk.Frame(self._topleft_frame)
         self._topright_frame.grid(row=0, column=3)
+
+        # Top frame (padding only)
+        self._top_frame = tk.Frame(self._topright_frame, width=10, height=10)
+        self._top_frame.grid(row=0, column=0)
 
         # Bottom frame
         self._bottom_frame = tk.Frame(self._master)
@@ -252,7 +261,8 @@ class App(tk.Frame):
             )
         self._anim_pingpong_check.grid(
             row=self.GRID_PING_PONG_CHECK_BOX[0],
-            column=self.GRID_PING_PONG_CHECK_BOX[1]
+            column=self.GRID_PING_PONG_CHECK_BOX[1],
+            sticky=tk.W
             )
 
     def _init_body_data(self):
@@ -287,22 +297,25 @@ class App(tk.Frame):
             )
         self._preview_speed_label.grid(
             row=self.GRID_PREVIEW_SPEED_LABEL[0],
-            column=self.GRID_PREVIEW_SPEED_LABEL[1]
+            column=self.GRID_PREVIEW_SPEED_LABEL[1],
+            sticky=tk.W
             )
 
         # Create speed scale
         self._preview_speed_scale.destroy()
         self._preview_speed_scale = tk.Scale(
             self._topright_frame,
-            from_=0,
-            to=4,
+            from_=self.SPEED_SCALE_MIN,
+            to=self.SPEED_SCALE_MAX,
             orient=tk.HORIZONTAL,
+            length=self.SPEED_SCALE_LEN,
             showvalue=0,
             command=self.update_speed
             )
         self._preview_speed_scale.grid(
             row=self.GRID_PREVIEW_SPEED_SCALE[0],
-            column=self.GRID_PREVIEW_SPEED_SCALE[1]
+            column=self.GRID_PREVIEW_SPEED_SCALE[1],
+            sticky=tk.W
             )
 
     def _init_rebuild_body_images(self) -> None:
