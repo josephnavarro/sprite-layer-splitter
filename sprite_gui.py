@@ -103,6 +103,7 @@ class App(tk.Frame):
     GRID_PREVIEW_IDLE_BUTTON = [1, 2]
     GRID_PREVIEW_LEFT_BUTTON = [2, 2]
     GRID_PREVIEW_RIGHTBUTTON = [3, 2]
+    GRID_PING_PONG_CHECK_BOX = [1, 3]
     GRID_COMPOSE_IDLE_BUTTON = [2, 3]
     GRID_COMPOSE_FULL_BUTTON = [3, 3]
 
@@ -140,6 +141,7 @@ class App(tk.Frame):
     RB_IMGS_HEAD_LABEL = "Rebuild head source images"
     SAV_IDLE_BTN_LABEL = "Save idle frames"
     SAV_FULL_BTN_LABEL = "Save all frames"
+    ANIMATECHECK_LABEL = "Ping-pong animation"
 
     @staticmethod
     def FromRGB(r: int, g: int, b: int) -> str:
@@ -171,6 +173,7 @@ class App(tk.Frame):
 
         # Initialize local non-widget data
         self._image_obj = None
+        self._anim_fwd = True
         self._has_init_anim = False
         self._anim_objs = []
         self._animframe = 0
@@ -179,13 +182,11 @@ class App(tk.Frame):
         self._head_list = [""]
         self._body_list = [""]
 
-        # Initialize local widgets
-        self._preview_image = tk.Canvas(self._master)
-        self._preview_anim = tk.Canvas(self._master)
-
-        # String variables
+        self._anim_pingpong_bool = tk.BooleanVar()
         self._head_options_string = tk.StringVar(self._master)
         self._body_options_string = tk.StringVar(self._master)
+        self._preview_image = tk.Canvas(self._master)
+        self._preview_anim = tk.Canvas(self._master)
 
         # Top frame
         self._top_frame = tk.Frame(self._master)
@@ -195,7 +196,7 @@ class App(tk.Frame):
         self._bottom_frame = tk.Frame(self._master)
         self._bottom_frame.grid(row=2)
 
-        # Buttons and menus
+        # Initialize widgets
         self._compose_idle_button = tk.Button()
         self._compose_full_button = tk.Button()
         self._preview_idle_button = tk.Button()
@@ -207,6 +208,7 @@ class App(tk.Frame):
         self._rebuild_head_images = tk.Button()
         self._select_head_options = tk.OptionMenu(self._bottom_frame, self._head_options_string, *self._head_list)
         self._select_body_options = tk.OptionMenu(self._bottom_frame, self._body_options_string, *self._body_list)
+        self._anim_pingpong_check = tk.Checkbutton()
 
         # Complete widget initialization
         self._init_head_data()
@@ -223,6 +225,23 @@ class App(tk.Frame):
         self._init_rebuild_head_images()
         self._init_select_head_options()
         self._init_select_body_options()
+        self._init_anim_pingpong_check()
+
+    def _init_anim_pingpong_check(self) -> None:
+        """
+
+        :return:
+        """
+        self._anim_pingpong_check.destroy()
+        self._anim_pingpong_check = tk.Checkbutton(
+            self._bottom_frame,
+            text=self.ANIMATECHECK_LABEL,
+            variable=self._anim_pingpong_bool
+            )
+        self._anim_pingpong_check.grid(
+            row=self.GRID_PING_PONG_CHECK_BOX[0],
+            column=self.GRID_PING_PONG_CHECK_BOX[1]
+            )
 
     def _init_head_data(self) -> None:
         """
@@ -907,19 +926,41 @@ class App(tk.Frame):
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame4))
             ]
         self._animframe = -1
+        self._anim_fwd = True
+
         if not self._has_init_anim:
             self._has_init_anim = True
             self.animate()
 
     def animate(self):
-        self._animframe += 1
-        if self._animframe >= 4:
-            self._animframe = 0
+        """
+
+        :return:
+        """
+        is_pingpong = self._anim_pingpong_bool.get()
+
+        if not is_pingpong:
+            self._anim_fwd = True
+
+        if self._anim_fwd:
+            self._animframe += 1
+            if self._animframe >= 4:
+                if not is_pingpong:
+                    self._animframe = 0
+                else:
+                    self._animframe = 2
+                    self._anim_fwd = False
+        else:
+            self._animframe -= 1
+            if self._animframe < 0:
+                self._animframe = 1
+                self._anim_fwd = True
+
         try:
             self._preview_anim.create_image((16, 16), anchor=tk.NW, image=self._anim_objs[self._animframe])
         except IndexError:
             pass
-        self.after(100, self.animate)
+        self.after(1000 // 8, self.animate)
 
 
 def GUIMain() -> None:
