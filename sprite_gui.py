@@ -113,9 +113,12 @@ class App(tk.Frame):
 
     # Grid positions for widgets
     GRID_PREVIEW_FRAME_LABEL = [0, 1]
-    GRID_PREVIEW_SPEED_LABEL = [1, 1]
-    GRID_PREVIEW_SPEED_SCALE = [2, 1]
-    GRID_PING_PONG_CHECK_BOX = [3, 1]
+    GRID_HEAD_XYOFFSET_LABEL = [1, 1]
+    GRID_BODY_XYOFFSET_LABEL = [2, 1]
+    GRID_PREVIEW_SPEED_LABEL = [3, 1]
+    GRID_PREVIEW_SPEED_SCALE = [4, 1]
+    GRID_PING_PONG_CHECK_BOX = [5, 1]
+
     GRID_IMAGEPREVIEW_CANVAS = [0, 1]
     GRID_ANIM_PREVIEW_CANVAS = [0, 2]
     GRID_SELECT_HEAD_OPTIONS = [1, 0]
@@ -165,6 +168,8 @@ class App(tk.Frame):
     SAV_IDLE_BTN_LABEL = "Save idle frames"
     SAV_FULL_BTN_LABEL = "Save all frames"
     ANIMATECHECK_LABEL = "Ping-pong animation"
+    XYHEADOFFSET_LABEL = "Head offset:"
+    XYBODYOFFSET_LABEL = "Body offset:"
 
     # Animation speeds
     SPEED_SCALE_MIN = 0
@@ -203,12 +208,19 @@ class App(tk.Frame):
         self._frame_fwd = True
         self._init_anim = False
         self._anim_objs = []
-        self._ani_frame = 0
-        self._ani_speed = 0
-        self._head_data = {}
+        self._cur_frame = 0
+        self._cur_speed = 0
+        self._cur_state = STATES[STATES.idle]
+
         self._body_data = {}
-        self._head_list = [""]
         self._body_list = [""]
+        self._body_offs = {}
+        self._cur_body = {}
+
+        self._head_data = {}
+        self._head_list = [""]
+        self._head_offs = {}
+        self._cur_head = {}
 
         self._ani_ping_pong_bool = tk.BooleanVar()
         self._head_option_string = tk.StringVar(self._master)
@@ -233,8 +245,8 @@ class App(tk.Frame):
         self._bottom_frame.grid(row=2)
 
         # Initialize widgets
-        self._save_idle_button = tk.Button()
-        self._save_full_button = tk.Button()
+        self._exports_idle_button = tk.Button()
+        self._exports_full_button = tk.Button()
         self._preview_idle_button = tk.Button()
         self._preview_left_button = tk.Button()
         self._preview_rightbutton = tk.Button()
@@ -245,6 +257,8 @@ class App(tk.Frame):
         self._select_head_options = tk.OptionMenu(self._bottom_frame, self._head_option_string, *self._head_list)
         self._select_body_options = tk.OptionMenu(self._bottom_frame, self._body_option_string, *self._body_list)
         self._anim_pingpong_check = tk.Checkbutton()
+        self._head_xyoffset_label = tk.Label()
+        self._body_xyoffset_label = tk.Label()
         self._preview_speed_label = tk.Label()
         self._preview_frame_label = tk.Label()
         self._preview_speed_scale = tk.Scale()
@@ -257,6 +271,7 @@ class App(tk.Frame):
         self._init_preview_canvas()
         self._init_preview_speed()
         self._init_preview_frame()
+        self._init_offset_labels()
         self._init_preview_idle_button()
         self._init_preview_left_button()
         self._init_preview_rightbutton()
@@ -296,6 +311,7 @@ class App(tk.Frame):
         """
         self._body_data = {v.get("name", "---"): k for k, v in LoadBodyPaths().items()}
         self._body_list = list(self._body_data)
+        self._body_offs = LoadBodyOffsets()
 
     def _init_head_data(self) -> None:
         """
@@ -305,6 +321,36 @@ class App(tk.Frame):
         """
         self._head_data = {v.get("name", "---"): k for k, v in LoadHeadPaths().items()}
         self._head_list = list(self._head_data)
+        self._head_offs = LoadHeadOffsets()
+
+    def _init_offset_labels(self) -> None:
+        """
+
+        :return:
+        """
+        self._head_xyoffset_label.destroy()
+        self._head_xyoffset_label = tk.Label(
+            self._topright_frame,
+            text="{0:s} {1:+d}, {2:+d}".format(self.XYHEADOFFSET_LABEL, 0, 0),
+            )
+
+        self._head_xyoffset_label.grid(
+            row=self.GRID_HEAD_XYOFFSET_LABEL[0],
+            column=self.GRID_HEAD_XYOFFSET_LABEL[1],
+            sticky=tk.W,
+            )
+
+        self._body_xyoffset_label.destroy()
+        self._body_xyoffset_label = tk.Label(
+            self._topright_frame,
+            text="{0:s} {1:+d}, {2:+d}".format(self.XYBODYOFFSET_LABEL, 0, 0),
+            )
+
+        self._body_xyoffset_label.grid(
+            row=self.GRID_BODY_XYOFFSET_LABEL[0],
+            column=self.GRID_BODY_XYOFFSET_LABEL[1],
+            sticky=tk.W,
+            )
 
     def _init_preview_frame(self) -> None:
         """
@@ -315,7 +361,7 @@ class App(tk.Frame):
         self._preview_frame_label.destroy()
         self._preview_frame_label = tk.Label(
             self._topright_frame,
-            text="Frame: 0"
+            text="Frame: 0",
             )
 
         self._preview_frame_label.grid(
@@ -482,14 +528,14 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._save_idle_button.destroy()
-        self._save_idle_button = tk.Button(
+        self._exports_idle_button.destroy()
+        self._exports_idle_button = tk.Button(
             self._bottom_frame,
             text=self.SAV_IDLE_BTN_LABEL,
             command=self.save_idle
             )
 
-        self._save_idle_button.config(
+        self._exports_idle_button.config(
             width=self.DEFAULT_BUTTON_WIDTH,
             fg=self.FromRGB(*self.SAVE_BUTTON_FG_COLOR),
             bg=self.FromRGB(*self.SAVE_BUTTON_BG_COLOR),
@@ -497,7 +543,7 @@ class App(tk.Frame):
             activeforeground=self.FromRGB(*self.SAVE_BUTTON_FG_COLOR)
             )
 
-        self._save_idle_button.grid(
+        self._exports_idle_button.grid(
             row=self.GRID_COMPOSE_IDLE_BUTTON[0],
             column=self.GRID_COMPOSE_IDLE_BUTTON[1],
             padx=self.PAD_COMPOSE_IDLE_BUTTON[0],
@@ -510,14 +556,14 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._save_full_button.destroy()
-        self._save_full_button = tk.Button(
+        self._exports_full_button.destroy()
+        self._exports_full_button = tk.Button(
             self._bottom_frame,
             text=self.SAV_FULL_BTN_LABEL,
             command=self.save_full,
             )
 
-        self._save_full_button.config(
+        self._exports_full_button.config(
             width=self.DEFAULT_BUTTON_WIDTH,
             fg=self.FromRGB(*self.SAVE_BUTTON_FG_COLOR),
             bg=self.FromRGB(*self.SAVE_BUTTON_BG_COLOR),
@@ -525,7 +571,7 @@ class App(tk.Frame):
             activeforeground=self.FromRGB(*self.SAVE_BUTTON_FG_COLOR),
             )
 
-        self._save_full_button.grid(
+        self._exports_full_button.grid(
             row=self.GRID_COMPOSE_FULL_BUTTON[0],
             column=self.GRID_COMPOSE_FULL_BUTTON[1],
             padx=self.PAD_COMPOSE_FULL_BUTTON[0],
@@ -741,13 +787,10 @@ class App(tk.Frame):
             # Perform sprite composition
             try:
                 return head, body, func(head, body)
-
             except sprite_splitter.NonexistentHeadException as e:
                 raise InvalidHeadException(e.filename)
-
             except sprite_splitter.NonexistentBodyException as e:
                 raise InvalidBodyException(e.filename)
-
             except cv2.error:
                 raise InvalidFilenameException
 
@@ -889,6 +932,17 @@ class App(tk.Frame):
                     # Set animated preview
                     self.set_animation_frames(image)
 
+                    # Set current state and offsets
+                    self._cur_state = STATES[STATES.idle]
+                    try:
+                        self._cur_head = self._head_offs[self._body_data[self._body_option_string.get()]]
+                    except KeyError:
+                        self._cur_head = {}
+                    try:
+                        self._cur_body = self._body_offs[self._body_data[self._body_option_string.get()]]
+                    except KeyError:
+                        self._cur_body = {}
+
                 except cv2.error:
                     raise InvalidFilenameException
 
@@ -937,6 +991,17 @@ class App(tk.Frame):
                     # Set animated preview
                     self.set_animation_frames(image)
 
+                    # Set current state and offsets
+                    self._cur_state = STATES[STATES.left]
+                    try:
+                        self._cur_head = self._head_offs[self._body_data[self._body_option_string.get()]]
+                    except KeyError:
+                        self._cur_head = {}
+                    try:
+                        self._cur_body = self._body_offs[self._body_data[self._body_option_string.get()]]
+                    except KeyError:
+                        self._cur_body = {}
+
                 except cv2.error:
                     raise InvalidFilenameException
 
@@ -979,6 +1044,17 @@ class App(tk.Frame):
 
                     # Set animated preview
                     self.set_animation_frames(image)
+
+                    # Set current state and offsets
+                    self._cur_state = STATES[STATES.right]
+                    try:
+                        self._cur_head = self._head_offs[self._body_data[self._body_option_string.get()]]
+                    except KeyError:
+                        self._cur_head = {}
+                    try:
+                        self._cur_body = self._body_offs[self._body_data[self._body_option_string.get()]]
+                    except KeyError:
+                        self._cur_body = {}
 
                 except cv2.error:
                     raise InvalidFilenameException
@@ -1062,9 +1138,9 @@ class App(tk.Frame):
             ]
 
         # Reset animation counters
-        self._ani_frame = 0
+        self._cur_frame = 0
         self._frame_fwd = True
-        self._ani_speed = self._preview_speed_scale.get()
+        self._cur_speed = self._preview_speed_scale.get()
         self._preview_ani_canvas.create_image(
             (16, 16),
             anchor=tk.NW,
@@ -1086,52 +1162,79 @@ class App(tk.Frame):
             self._frame_fwd = True
 
         # Increment frame of animation
-        cur_fps = self._ani_speed
-        frame = self._ani_frame
+        cur_speed = self._cur_speed
+        cur_frame = self._cur_frame
 
         if self._anim_objs:
             if self._frame_fwd:
-                frame += 1
-                if frame >= 4:
+                cur_frame += 1
+                if cur_frame >= 4:
                     if not is_pingpong:
-                        frame = 0
+                        cur_frame = 0
                     else:
-                        frame = 2
+                        cur_frame = 2
                         self._frame_fwd = False
             else:
-                frame -= 1
-                if frame < 0:
-                    frame = 1
+                cur_frame -= 1
+                if cur_frame < 0:
+                    cur_frame = 1
                     self._frame_fwd = True
 
         # Update frame reference
-        self._ani_frame = frame
+        self._cur_frame = cur_frame
 
         # Update frame label
-        self._preview_frame_label.config(text="Frame: {}".format(frame))
+        self._preview_frame_label.config(text="Frame: {}".format(cur_frame))
+
+        # Update offset labels
+        try:
+            state: str = self._cur_state
+
+            try:
+                # Get head offset
+                cur_head_offsets = self._cur_head["offset"][state]
+                if self._cur_head["size"] == "small":
+                    cur_head_offsets = cur_head_offsets[1:4] + [cur_head_offsets[0]]
+                hx, hy = cur_head_offsets[cur_frame]
+                self._head_xyoffset_label.config(text="{0:s} {1:+d}, {2:+d}".format(self.XYHEADOFFSET_LABEL, hx, hy))
+
+            except KeyError:
+                self._head_xyoffset_label.config(text="{0:s} {1:+d}, {2:+d}".format(self.XYHEADOFFSET_LABEL, 0, 0))
+
+            try:
+                # Get body offset
+                cur_body_offsets = self._cur_body["offset"][state]
+                bx, by = cur_body_offsets[cur_frame]
+                self._body_xyoffset_label.config(text="{0:s} {1:+d}, {2:+d}".format(self.XYBODYOFFSET_LABEL, bx, by))
+
+            except KeyError:
+                self._body_xyoffset_label.config(text="{0:s} {1:+d}, {2:+d}".format(self.XYBODYOFFSET_LABEL, 0, 0))
+
+        except KeyError:
+            pass
 
         try:
             # Draw frame to canvas
-            self._preview_ani_canvas.create_image((16, 16), anchor=tk.NW, image=self._anim_objs[frame])
+            self._preview_ani_canvas.create_image((16, 16), anchor=tk.NW, image=self._anim_objs[cur_frame])
         except IndexError:
             pass
 
         # Repeat if animation is active
-        if cur_fps > 0:
-            self.after(1000 // cur_fps, self.animate)
+        if cur_speed > 0:
+            self.after(1000 // cur_speed, self.animate)
 
-    def update_speed(self, x) -> None:
+    def update_speed(self, speed) -> None:
         """
-        Updates speed.
+        Updates current animation speed.
 
-        :param x: Framerate to update with.
+        :param speed: Framerate to update with.
 
         :return: None.
         """
-        self._preview_speed_label.config(text="Speed: {}".format(x))
-        self._ani_speed = int(x)
+        self._preview_speed_label.config(text="Speed: {}".format(speed))
+        self._cur_speed = int(speed)
 
-        if int(x) == 0:
+        if int(speed) == 0:
             self._init_anim = False
         else:
             if not self._init_anim:
