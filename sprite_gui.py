@@ -8,6 +8,7 @@ Graphical user interface layer.
 
 --------------------------------------------------------------------------------
 """
+import sys
 import cv2
 import numpy as np
 import tkinter as tk
@@ -85,8 +86,15 @@ class App(tk.Frame):
     SUCCESS_IDLE_MESSAGE = "Idle frames saved to {filename}!"
 
     # Default widget dimensions
-    DEFAULT_OPTION_WIDTH = 26
-    DEFAULT_BUTTON_WIDTH = 29
+    if sys.platform == "win32":
+        DEFAULT_OPTION_WIDTH = 26
+        DEFAULT_BUTTON_WIDTH = 27
+        SPEED_SCALE_LEN = 256
+    else:
+        DEFAULT_OPTION_WIDTH = 26
+        DEFAULT_BUTTON_WIDTH = 29
+        SPEED_SCALE_LEN = 480
+
     PREVIEW_CANVAS_WIDTH = 384
     PREVIEW_CANVAS_HEIGHT = 96
     PREVIEW_ANIM_WIDTH = 96
@@ -161,7 +169,6 @@ class App(tk.Frame):
     # Animation speeds
     SPEED_SCALE_MIN = 0
     SPEED_SCALE_MAX = 12
-    SPEED_SCALE_LEN = 480
 
     @staticmethod
     def FromRGB(r: int, g: int, b: int) -> str:
@@ -273,13 +280,13 @@ class App(tk.Frame):
             self._topright_frame,
             text=self.ANIMATECHECK_LABEL,
             variable=self._ani_ping_pong_bool
-        )
+            )
 
         self._anim_pingpong_check.grid(
             row=self.GRID_PING_PONG_CHECK_BOX[0],
             column=self.GRID_PING_PONG_CHECK_BOX[1],
             sticky=tk.W
-        )
+            )
 
     def _init_body_data(self):
         """
@@ -309,13 +316,13 @@ class App(tk.Frame):
         self._preview_frame_label = tk.Label(
             self._topright_frame,
             text="Frame: 0"
-        )
+            )
 
         self._preview_frame_label.grid(
             row=self.GRID_PREVIEW_FRAME_LABEL[0],
             column=self.GRID_PREVIEW_FRAME_LABEL[1],
             sticky=tk.W,
-        )
+            )
 
     def _init_preview_speed(self) -> None:
         """
@@ -328,13 +335,13 @@ class App(tk.Frame):
         self._preview_speed_label = tk.Label(
             self._topright_frame,
             text="Speed: 0",
-        )
+            )
 
         self._preview_speed_label.grid(
             row=self.GRID_PREVIEW_SPEED_LABEL[0],
             column=self.GRID_PREVIEW_SPEED_LABEL[1],
             sticky=tk.W,
-        )
+            )
 
         # Create speed scale
         self._preview_speed_scale.destroy()
@@ -346,12 +353,12 @@ class App(tk.Frame):
             length=self.SPEED_SCALE_LEN,
             showvalue=0,
             command=self.update_speed
-        )
+            )
         self._preview_speed_scale.grid(
             row=self.GRID_PREVIEW_SPEED_SCALE[0],
             column=self.GRID_PREVIEW_SPEED_SCALE[1],
             sticky=tk.W
-        )
+            )
 
     def _init_rebuild_body_images(self) -> None:
         """
@@ -364,7 +371,7 @@ class App(tk.Frame):
             self._bottom_frame,
             text=self.RB_IMGS_BODY_LABEL,
             command=self.rebuild_body_intermediates
-        )
+            )
 
         self._rebuild_body_images.config(
             width=self.DEFAULT_BUTTON_WIDTH,
@@ -372,14 +379,14 @@ class App(tk.Frame):
             bg=self.FromRGB(*self.BODY_BUTTON_BG_COLOR),
             activebackground=self.FromRGB(*self.BODY_BUTTON_BG_COLOR),
             activeforeground=self.FromRGB(*self.BODY_BUTTON_FG_COLOR)
-        )
+            )
 
         self._rebuild_body_images.grid(
             row=self.GRID_RB_SRCS_BODY_BUTTON[0],
             column=self.GRID_RB_SRCS_BODY_BUTTON[1],
             padx=self.PAD_RB_IMGS_BODY_BUTTON[0],
             pady=self.PAD_RB_IMGS_BODY_BUTTON[1]
-        )
+            )
 
     def _init_rebuild_head_images(self) -> None:
         """
@@ -392,7 +399,7 @@ class App(tk.Frame):
             self._bottom_frame,
             text=self.RB_IMGS_HEAD_LABEL,
             command=self.rebuild_head_intermediates
-        )
+            )
 
         self._rebuild_head_images.config(
             width=self.DEFAULT_BUTTON_WIDTH,
@@ -400,14 +407,14 @@ class App(tk.Frame):
             bg=self.FromRGB(*self.HEAD_BUTTON_BG_COLOR),
             activebackground=self.FromRGB(*self.HEAD_BUTTON_BG_COLOR),
             activeforeground=self.FromRGB(*self.HEAD_BUTTON_FG_COLOR)
-        )
+            )
 
         self._rebuild_head_images.grid(
             row=self.GRID_RB_SRCS_HEAD_BUTTON[0],
             column=self.GRID_RB_SRCS_HEAD_BUTTON[1],
             padx=self.PAD_RB_IMGS_HEAD_BUTTON[0],
             pady=self.PAD_RB_IMGS_HEAD_BUTTON[1]
-        )
+            )
 
     def _init_select_head_options(self) -> None:
         """
@@ -422,7 +429,7 @@ class App(tk.Frame):
             self._bottom_frame,
             self._head_option_string,
             *self._head_list
-        )
+            )
 
         self._select_head_options.config(
             width=self.DEFAULT_OPTION_WIDTH,
@@ -430,14 +437,14 @@ class App(tk.Frame):
             bg=self.FromRGB(*self.HEAD_BUTTON_BG_COLOR),
             activebackground=self.FromRGB(*self.HEAD_BUTTON_BG_COLOR),
             activeforeground=self.FromRGB(*self.HEAD_BUTTON_FG_COLOR)
-        )
+            )
 
         self._select_head_options.grid(
             row=self.GRID_SELECT_HEAD_OPTIONS[0],
             column=self.GRID_SELECT_HEAD_OPTIONS[1],
             padx=self.PAD_SELECT_HEAD_OPTIONS[0],
             pady=self.PAD_SELECT_HEAD_OPTIONS[1]
-        )
+            )
 
     def _init_select_body_options(self) -> None:
         """
@@ -452,7 +459,7 @@ class App(tk.Frame):
             self._bottom_frame,
             self._body_option_string,
             *self._body_list
-        )
+            )
 
         self._select_body_options.config(
             width=self.DEFAULT_OPTION_WIDTH,
@@ -460,14 +467,14 @@ class App(tk.Frame):
             bg=self.FromRGB(*self.BODY_BUTTON_BG_COLOR),
             activebackground=self.FromRGB(*self.BODY_BUTTON_BG_COLOR),
             activeforeground=self.FromRGB(*self.BODY_BUTTON_FG_COLOR)
-        )
+            )
 
         self._select_body_options.grid(
             row=self.GRID_SELECT_BODY_OPTIONS[0],
             column=self.GRID_SELECT_BODY_OPTIONS[1],
             padx=self.PAD_SELECT_BODY_OPTIONS[0],
             pady=self.PAD_SELECT_BODY_OPTIONS[1]
-        )
+            )
 
     def _init_save_idle_button(self) -> None:
         """
@@ -480,7 +487,7 @@ class App(tk.Frame):
             self._bottom_frame,
             text=self.SAV_IDLE_BTN_LABEL,
             command=self.save_idle
-        )
+            )
 
         self._save_idle_button.config(
             width=self.DEFAULT_BUTTON_WIDTH,
@@ -488,14 +495,14 @@ class App(tk.Frame):
             bg=self.FromRGB(*self.SAVE_BUTTON_BG_COLOR),
             activebackground=self.FromRGB(*self.SAVE_BUTTON_BG_COLOR),
             activeforeground=self.FromRGB(*self.SAVE_BUTTON_FG_COLOR)
-        )
+            )
 
         self._save_idle_button.grid(
             row=self.GRID_COMPOSE_IDLE_BUTTON[0],
             column=self.GRID_COMPOSE_IDLE_BUTTON[1],
             padx=self.PAD_COMPOSE_IDLE_BUTTON[0],
             pady=self.PAD_COMPOSE_IDLE_BUTTON[1]
-        )
+            )
 
     def _init_save_full_button(self) -> None:
         """
@@ -508,7 +515,7 @@ class App(tk.Frame):
             self._bottom_frame,
             text=self.SAV_FULL_BTN_LABEL,
             command=self.save_full,
-        )
+            )
 
         self._save_full_button.config(
             width=self.DEFAULT_BUTTON_WIDTH,
@@ -516,14 +523,14 @@ class App(tk.Frame):
             bg=self.FromRGB(*self.SAVE_BUTTON_BG_COLOR),
             activebackground=self.FromRGB(*self.SAVE_BUTTON_BG_COLOR),
             activeforeground=self.FromRGB(*self.SAVE_BUTTON_FG_COLOR),
-        )
+            )
 
         self._save_full_button.grid(
             row=self.GRID_COMPOSE_FULL_BUTTON[0],
             column=self.GRID_COMPOSE_FULL_BUTTON[1],
             padx=self.PAD_COMPOSE_FULL_BUTTON[0],
             pady=self.PAD_COMPOSE_FULL_BUTTON[1],
-        )
+            )
 
     def _init_preview_canvas(self) -> None:
         """
@@ -542,12 +549,12 @@ class App(tk.Frame):
             bg=self.FromRGB(*self.PREVIEW_CANVAS_COLOR),
             relief=tk.SUNKEN,
             borderwidth=16,
-        )
+            )
 
         self._preview_img_canvas.grid(
             row=self.GRID_IMAGEPREVIEW_CANVAS[0],
             column=self.GRID_IMAGEPREVIEW_CANVAS[1],
-        )
+            )
 
         # Set up animated sprite preview
         self._anim_objs = []
@@ -560,12 +567,12 @@ class App(tk.Frame):
             bg=self.FromRGB(*self.PREVIEW_CANVAS_COLOR),
             relief=tk.SUNKEN,
             borderwidth=16,
-        )
+            )
 
         self._preview_ani_canvas.grid(
             row=self.GRID_ANIM_PREVIEW_CANVAS[0],
             column=self.GRID_ANIM_PREVIEW_CANVAS[1],
-        )
+            )
 
     def _init_preview_idle_button(self) -> None:
         """
@@ -578,7 +585,7 @@ class App(tk.Frame):
             self._bottom_frame,
             text=self.PREVIEW_IDLE_LABEL,
             command=self.make_idle_preview,
-        )
+            )
 
         self._preview_idle_button.config(
             width=self.DEFAULT_BUTTON_WIDTH,
@@ -586,14 +593,14 @@ class App(tk.Frame):
             fg=self.FromRGB(*self.PREVIEW_BTN_FG_COLOR),
             activebackground=self.FromRGB(*self.PREVIEW_BTN_BG_COLOR),
             activeforeground=self.FromRGB(*self.PREVIEW_BTN_FG_COLOR)
-        )
+            )
 
         self._preview_idle_button.grid(
             row=self.GRID_PREVIEW_IDLE_BUTTON[0],
             column=self.GRID_PREVIEW_IDLE_BUTTON[1],
             padx=self.PAD_PREVIEW_IDLE_BUTTON[0],
             pady=self.PAD_PREVIEW_IDLE_BUTTON[1]
-        )
+            )
 
     def _init_preview_left_button(self) -> None:
         """
@@ -606,7 +613,7 @@ class App(tk.Frame):
             self._bottom_frame,
             text=self.PREVIEW_LEFT_LABEL,
             command=self.make_left_preview
-        )
+            )
 
         self._preview_left_button.config(
             width=self.DEFAULT_BUTTON_WIDTH,
@@ -614,14 +621,14 @@ class App(tk.Frame):
             fg=self.FromRGB(*self.PREVIEW_BTN_FG_COLOR),
             activebackground=self.FromRGB(*self.PREVIEW_BTN_BG_COLOR),
             activeforeground=self.FromRGB(*self.PREVIEW_BTN_FG_COLOR)
-        )
+            )
 
         self._preview_left_button.grid(
             row=self.GRID_PREVIEW_LEFT_BUTTON[0],
             column=self.GRID_PREVIEW_LEFT_BUTTON[1],
             padx=self.PAD_PREVIEW_LEFT_BUTTON[0],
             pady=self.PAD_PREVIEW_LEFT_BUTTON[1]
-        )
+            )
 
     def _init_preview_rightbutton(self) -> None:
         """
@@ -634,7 +641,7 @@ class App(tk.Frame):
             self._bottom_frame,
             text=self.PREVIEW_RIGHTLABEL,
             command=self.make_right_preview
-        )
+            )
 
         self._preview_rightbutton.config(
             width=self.DEFAULT_BUTTON_WIDTH,
@@ -642,14 +649,14 @@ class App(tk.Frame):
             fg=self.FromRGB(*self.PREVIEW_BTN_FG_COLOR),
             activebackground=self.FromRGB(*self.PREVIEW_BTN_BG_COLOR),
             activeforeground=self.FromRGB(*self.PREVIEW_BTN_FG_COLOR)
-        )
+            )
 
         self._preview_rightbutton.grid(
             row=self.GRID_PREVIEW_RIGHTBUTTON[0],
             column=self.GRID_PREVIEW_RIGHTBUTTON[1],
             padx=self.PAD_PREVIEW_RIGHTBUTTON[0],
             pady=self.PAD_PREVIEW_RIGHTBUTTON[1]
-        )
+            )
 
     def _init_rebuild_body_button(self) -> None:
         """
@@ -662,7 +669,7 @@ class App(tk.Frame):
             self._bottom_frame,
             text=self.RB_JSON_BODY_LABEL,
             command=self.rebuild_body_database,
-        )
+            )
 
         self._rebuild_body_button.config(
             width=self.DEFAULT_BUTTON_WIDTH,
@@ -670,14 +677,14 @@ class App(tk.Frame):
             bg=self.FromRGB(*self.BODY_BUTTON_BG_COLOR),
             activebackground=self.FromRGB(*self.BODY_BUTTON_BG_COLOR),
             activeforeground=self.FromRGB(*self.BODY_BUTTON_FG_COLOR),
-        )
+            )
 
         self._rebuild_body_button.grid(
             row=self.GRID_RB_JSON_BODY_BUTTON[0],
             column=self.GRID_RB_JSON_BODY_BUTTON[1],
             padx=self.PAD_RB_JSON_BODY_BUTTON[0],
             pady=self.PAD_RB_JSON_BODY_BUTTON[1],
-        )
+            )
 
     def _init_rebuild_head_button(self) -> None:
         """
@@ -690,7 +697,7 @@ class App(tk.Frame):
             self._bottom_frame,
             text=self.RB_JSON_HEAD_LABEL,
             command=self.rebuild_head_database
-        )
+            )
 
         self._rebuild_head_button.config(
             width=self.DEFAULT_BUTTON_WIDTH,
@@ -698,14 +705,14 @@ class App(tk.Frame):
             bg=self.FromRGB(*self.HEAD_BUTTON_BG_COLOR),
             activebackground=self.FromRGB(*self.HEAD_BUTTON_BG_COLOR),
             activeforeground=self.FromRGB(*self.HEAD_BUTTON_FG_COLOR)
-        )
+            )
 
         self._rebuild_head_button.grid(
             row=self.GRID_RB_JSON_HEAD_BUTTON[0],
             column=self.GRID_RB_JSON_HEAD_BUTTON[1],
             padx=self.PAD_RB_JSON_HEAD_BUTTON[0],
             pady=self.PAD_RB_JSON_HEAD_BUTTON[1]
-        )
+            )
 
     def _composite(self, func) -> (str, str, (np.ndarray or None)):
         """
@@ -781,7 +788,7 @@ class App(tk.Frame):
                     initialdir=ROOT_OUTPUT_DIRECTORY,
                     title="Save As",
                     filetypes=FILETYPES
-                )
+                    )
                 if not path:
                     raise EmptyFilenameException
                 sprite_splitter.SaveImage(image, path)
@@ -790,7 +797,7 @@ class App(tk.Frame):
                 tk.messagebox.showinfo(
                     self.WINDOW_TITLE,
                     self.SUCCESS_IDLE_MESSAGE.format(filename=os.path.basename(path))
-                )
+                    )
 
         except InvalidFilenameException:
             # Image format not recognized
@@ -819,7 +826,7 @@ class App(tk.Frame):
                     initialdir=ROOT_OUTPUT_DIRECTORY,
                     title="Save As",
                     filetypes=FILETYPES
-                )
+                    )
 
                 if not path:
                     raise EmptyFilenameException
@@ -831,15 +838,15 @@ class App(tk.Frame):
                     self.WINDOW_TITLE,
                     self.SUCCESS_IDLE_MESSAGE.format(
                         filename=os.path.basename(path)
+                        )
                     )
-                )
 
         except InvalidFilenameException:
             # Image format not recognized
             tk.messagebox.showinfo(
                 self.WINDOW_TITLE,
                 self.FAILURE_TYPE_MESSAGE
-            )
+                )
 
         except EmptyFilenameException:
             # Filename not specified
@@ -860,24 +867,24 @@ class App(tk.Frame):
                         image,
                         self.PREVIEW_IDLE_CROP_ORIG,
                         self.PREVIEW_IDLE_CROP_SIZE
-                    )
+                        )
 
                     image = cv2.resize(
                         cv2.cvtColor(image, cv2.COLOR_BGR2RGB),
                         dsize=self.PREVIEW_RESIZED_DIMENS,
                         interpolation=cv2.INTER_NEAREST
-                    )
+                        )
 
                     # Set static preview
                     self._image_obj = sprite_imaging.ToTkinter(
                         sprite_imaging.ToPIL(image)
-                    )
+                        )
 
                     self._preview_img_canvas.create_image(
                         (16, 16),
                         anchor=tk.NW,
                         image=self._image_obj,
-                    )
+                        )
 
                     # Set animated preview
                     self.set_animation_frames(image)
@@ -890,7 +897,7 @@ class App(tk.Frame):
             tk.messagebox.showinfo(
                 self.WINDOW_TITLE,
                 self.FAILURE_TYPE_MESSAGE,
-            )
+                )
 
         except EmptyFilenameException:
             pass
@@ -910,22 +917,22 @@ class App(tk.Frame):
                         image,
                         self.PREVIEW_LEFT_CROP_ORIG,
                         self.PREVIEW_LEFT_CROP_SIZE
-                    )
+                        )
                     image = cv2.resize(
                         cv2.cvtColor(image, cv2.COLOR_BGR2RGB),
                         dsize=self.PREVIEW_RESIZED_DIMENS,
                         interpolation=cv2.INTER_NEAREST
-                    )
+                        )
 
                     # Generate static preview
                     self._image_obj = sprite_imaging.ToTkinter(
                         sprite_imaging.ToPIL(image)
-                    )
+                        )
                     self._preview_img_canvas.create_image(
                         (16, 16),
                         anchor=tk.NW,
                         image=self._image_obj
-                    )
+                        )
 
                     # Set animated preview
                     self.set_animation_frames(image)
@@ -938,7 +945,7 @@ class App(tk.Frame):
             tk.messagebox.showinfo(
                 self.WINDOW_TITLE,
                 self.FAILURE_TYPE_MESSAGE,
-            )
+                )
 
         except EmptyFilenameException:
             # Filename not specified
@@ -959,12 +966,12 @@ class App(tk.Frame):
                         image,
                         self.PREVIEW_RIGHTCROP_ORIG,
                         self.PREVIEW_RIGHTCROP_SIZE
-                    )
+                        )
                     image = cv2.resize(
                         cv2.cvtColor(image, cv2.COLOR_BGR2RGB),
                         dsize=self.PREVIEW_RESIZED_DIMENS,
                         interpolation=cv2.INTER_NEAREST
-                    )
+                        )
 
                     # Set static preview
                     self._image_obj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
@@ -1052,7 +1059,7 @@ class App(tk.Frame):
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame2)),
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame3)),
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame4))
-        ]
+            ]
 
         # Reset animation counters
         self._ani_frame = 0
@@ -1062,7 +1069,7 @@ class App(tk.Frame):
             (16, 16),
             anchor=tk.NW,
             image=self._anim_objs[0],
-        )
+            )
 
     def animate(self) -> None:
         """
