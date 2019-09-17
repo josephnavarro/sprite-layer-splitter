@@ -1082,19 +1082,20 @@ class App(tk.Frame):
         cur_fps = self._ani_speed
         frame = self._ani_frame
 
-        if self._frame_fwd:
-            frame += 1
-            if frame >= 4:
-                if not is_pingpong:
-                    frame = 0
-                else:
-                    frame = 2
-                    self._frame_fwd = False
-        else:
-            frame -= 1
-            if frame < 0:
-                frame = 1
-                self._frame_fwd = True
+        if self._anim_objs:
+            if self._frame_fwd:
+                frame += 1
+                if frame >= 4:
+                    if not is_pingpong:
+                        frame = 0
+                    else:
+                        frame = 2
+                        self._frame_fwd = False
+            else:
+                frame -= 1
+                if frame < 0:
+                    frame = 1
+                    self._frame_fwd = True
 
         # Update frame reference
         self._ani_frame = frame
