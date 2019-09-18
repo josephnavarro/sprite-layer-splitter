@@ -1,21 +1,26 @@
 #! usr/bin/env python3
 """
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 Utilities for reading and writing local JSON files.
 
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 """
 import json
 import glob
 from sprite_constant import *
 
-
 TEMPLATE_JSON_BASE = "{{{}}}"
-TEMPLATE_JSON_CHARA = "\"{name}\":{{\"path\":[\"head\", \"{name}.png\"],\"name\":\"{full}\"}},"
-TEMPLATE_JSON_CLASS = "\"{name}\":{{\"path\":[\"body\", \"{name}.png\"],\"name\":\"{full}\"}},"
+TEMPLATE_JSON_CHARA = "\"{name}\": {{" \
+                      "\"path\": [\"head\", \"{name}.png\"]," \
+                      "\"name\": \"{full}\"" \
+                      "}},"
+TEMPLATE_JSON_CLASS = "\"{name}\": {{" \
+                      "\"path\": [\"body\", \"{name}.png\"]," \
+                      "\"name\": \"{full}\"" \
+                      "}},"
 
 PATH_JSON_CHARA = os.path.join("inputs", "head.json")
 PATH_JSON_CLASS = os.path.join("inputs", "body.json")
@@ -29,43 +34,60 @@ PATH_JSON_GENSRC_HEAD = os.path.join("inputs", ".raw_head.json")
 
 def CreateHeadJSON() -> None:
     """
-    Automatically generates a character head JSON file. JSON contents will reflect contents of "inputs/head/".
+    Automatically generates a character head JSON file.
+
+    JSON contents will reflect contents of "inputs/head/".
 
     :return: None.
     """
-    newstr = ""
-    for _ in glob.glob(os.path.join(ROOT_INPUT_DIRECTORY, "head", "*.png")):
-        n = os.path.splitext(os.path.basename(_))[0]
-        p = " ".join([
-            ("({})".format(x.capitalize()) if len(x) == 1 else (x if len(x) == 2 else x.capitalize()))
-            for x in n.split("-")
-            ])
-        newstr += TEMPLATE_JSON_CHARA.format(name=n, full=p)
+    contents: str = ""
+    for fn in glob.glob(os.path.join(ROOT_INPUT_DIR, "head", "*.png")):
+        n = os.path.splitext(os.path.basename(fn))[0]
+        p = " ".join([(
+            "({})".format(x.capitalize())
+            if len(x) == 1
+            else (
+                x
+                if len(x) == 2
+                else x.capitalize()
+            )
+        ) for x in n.split("-")
+        ])
+        contents += TEMPLATE_JSON_CHARA.format(name=n, full=p)
 
-    newstr = newstr.rstrip(",")
-    newstr = TEMPLATE_JSON_BASE.format(newstr)
+    contents = contents.rstrip(",")
+    contents = TEMPLATE_JSON_BASE.format(contents)
     with open(PATH_JSON_CHARA, "w") as f:
-        f.write(newstr)
+        f.write(contents)
 
 
 def CreateBodyJSON() -> None:
     """
-    Automatically generates a character body JSON file. JSON contents will reflect contents of "inputs/body/".
+    Automatically generates a JSON file containing paths to body spritesheets.
+
+    JSON contents will reflect contents of "inputs/body/".
 
     :return: None.
     """
-    newstr = ""
-    for _ in glob.glob(os.path.join(ROOT_INPUT_DIRECTORY, "body", "*.png")):
-        n = os.path.splitext(os.path.basename(_))[0]
-        p = " ".join(
-            [("({})".format(x.capitalize()) if len(x) == 1 else (x if len(x) == 2 else x.capitalize())) for x in
-             n.split("-")])
-        newstr += TEMPLATE_JSON_CLASS.format(name=n, full=p)
+    contents: str = ""
+    for fn in glob.glob(os.path.join(ROOT_INPUT_DIR, "body", "*.png")):
+        n = os.path.splitext(os.path.basename(fn))[0]
+        p = " ".join([(
+            "({})".format(x.capitalize())
+            if len(x) == 1
+            else (
+                x
+                if len(x) == 2
+                else x.capitalize()
+            )
+        ) for x in n.split("-")
+        ])
+        contents += TEMPLATE_JSON_CLASS.format(name=n, full=p)
 
-    newstr = newstr.rstrip(",")
-    newstr = TEMPLATE_JSON_BASE.format(newstr)
+    contents = contents.rstrip(",")
+    contents = TEMPLATE_JSON_BASE.format(contents)
     with open(PATH_JSON_CLASS, "w") as f:
-        f.write(newstr)
+        f.write(contents)
 
 
 def LoadHeadPaths() -> dict:

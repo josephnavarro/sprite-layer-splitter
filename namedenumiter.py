@@ -1,12 +1,12 @@
 """
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
-Implements an iterable container for enumerated values. Not really necessary, mainly did this just
-so I could tell myself I implemented something like it.
+Implements an iterable container for enumerated values. Not really necessary;
+mainly did this just so I could tell myself I implemented something like it.
 
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 """
 
 
@@ -22,51 +22,61 @@ class NamedEnumIter:
         self._num_items = 0
 
         for arg in args:
-            self._register_attr(arg)
+            self.RegisterAttr(arg)
 
         for key, val in kwargs.items():
-            self._register_attr(key, val)
+            self.RegisterAttr(key, val)
 
-    def _register_attr(self, attrname: str, enumeration: int = -1) -> bool:
+    def RegisterAttr(self, attrname, enumeration=-1) -> bool:
         """
-        Registers a new enumerated attribute into a NamedEnumIter object. (In-place).
+        Registers an attribute into a NamedEnumIter object.
+        (In-place).
 
-        :param attrname: Name of enumeration to set.
-        :param enumeration:
+        :param attrname:    Name of enumeration to set.
+        :param enumeration: Enumerated value.
+
         :return: True on success; false otherwise.
         """
-        if type(attrname) != str:
-            return False
-        elif type(enumeration) != int:
+        if type(attrname) not in (str, int):
             return False
         else:
             if enumeration < 0:
                 enumeration = self._num_items
 
+            # Register attribute
             setattr(self, attrname, enumeration)
             self._indices[attrname] = enumeration
             self._names[enumeration] = attrname
-            self._counter[self._num_items] = enumeration
 
+            # Increment local item count
+            self._counter[self._num_items] = enumeration
             self._num_items += 1
 
             return True
 
     def __call__(self, accessor):
-        """ Implements __call__. """
+        """
+        Implements __call__.
+        """
         return self[accessor]
 
     def __len__(self):
-        """ Implements __len__. """
+        """
+        Implements __len__.
+        """
         return self._num_items
 
     def __iter__(self):
-        """ Implements __iter__. """
+        """
+        Implements __iter__.
+        """
         self._iterator = 0
         return self
 
     def __next__(self):
-        """ Implements __next__. """
+        """
+        Implements __next__.
+        """
         if self._iterator < self._num_items:
             n = self._iterator
             self._iterator += 1
@@ -75,7 +85,9 @@ class NamedEnumIter:
             raise StopIteration
 
     def __getitem__(self, accessor):
-        """ Implements __getitem__. """
+        """
+        Implements __getitem__.
+        """
         container = None
 
         if type(accessor) == int:

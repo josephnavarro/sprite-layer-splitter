@@ -1,12 +1,12 @@
 #! usr/bin/env python3
 """
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 Filepath utility functions.
 
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 """
 import shutil
 from sprite_constant import *
@@ -19,10 +19,10 @@ def FlushOutputs() -> None:
     :return: None.
     """
     try:
-        shutil.rmtree(ROOT_OUTPUT_DIRECTORY)
-        print("Removed directory '{}'!".format(ROOT_OUTPUT_DIRECTORY))
+        shutil.rmtree(ROOT_OUTPUT_DIR)
+        print("Removed directory '{}'!".format(ROOT_OUTPUT_DIR))
     except FileNotFoundError:
-        print("Directory '{}' already removed!".format(ROOT_OUTPUT_DIRECTORY))
+        print("Directory '{}' already removed!".format(ROOT_OUTPUT_DIR))
         return
 
 

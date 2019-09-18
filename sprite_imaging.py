@@ -1,12 +1,12 @@
 #! usr/bin/env python3
 """
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 General image processing functions.
 
-------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 """
 import cv2
 import numpy as np
@@ -29,6 +29,8 @@ def ApplyMask(image: np.ndarray,
 def ConvertAlpha(image: np.ndarray) -> np.ndarray:
     """
     Adds an alpha channel to a CV2 image.
+
+    Assumes BGR color for the input image.
 
     :param image: Image to modify.
 
@@ -53,7 +55,7 @@ def Crop(image: np.ndarray,
     """
     y, x = start
     h, w = size
-    return image[x: x + w, y: y + h]
+    return image[x: (x + w), y: (y + h)]
 
 
 def GetUniqueColors(image: np.ndarray) -> np.ndarray:
@@ -77,13 +79,14 @@ def ToGrayscale(image: np.ndarray,
 
     :return: Image as converted to grayscale.
     """
-    out_image = cv2.cvtColor(cv2.cvtColor(image, cv2.COLOR_RGB2BGR), cv2.COLOR_BGR2GRAY)
+    outImage = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    outImage = cv2.cvtColor(outImage, cv2.COLOR_BGR2GRAY)
 
     # Optionally output as RGB again
     if is_color:
-        out_image = cv2.cvtColor(out_image, cv2.COLOR_GRAY2RGB)
+        outImage = cv2.cvtColor(outImage, cv2.COLOR_GRAY2RGB)
 
-    return out_image
+    return outImage
 
 
 def ToPIL(image: np.ndarray) -> Image:
@@ -173,8 +176,8 @@ def Paste(dest: np.ndarray,
     for yy in range(src.shape[0]):
         for xx in range(src.shape[1]):
             try:
+                # If alpha channel, copy if non-transparent
                 if src[yy, xx, 3]:
-                    # Copy if not transparent
                     dest[y + yy, x + xx] = src[yy, xx]
             except IndexError:
                 dest[y + yy, x + xx] = src[yy, xx]
@@ -195,8 +198,8 @@ def ReplaceColor(image: np.ndarray,
 
     :return: Copy of image with the given color replaced.
     """
-    out_image = np.copy(image)
+    outImage = np.copy(image)
     if not color:
-        color = out_image[0, 0]
-    out_image[np.where((out_image == color).all(axis=2))] = replace
-    return out_image
+        color = outImage[0, 0]
+    outImage[np.where((outImage == color).all(axis=2))] = replace
+    return outImage
