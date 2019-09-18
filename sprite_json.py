@@ -70,6 +70,9 @@ def CreateBodyJSON() -> None:
     :return: None.
     """
     contents: str = ""
+    files: list = glob.glob(os.path.join(ROOT_INPUT_DIR, "body", "*.png"))
+    files.sort()
+
     for fn in glob.glob(os.path.join(ROOT_INPUT_DIR, "body", "*.png")):
         n = os.path.splitext(os.path.basename(fn))[0]
         p = " ".join([(

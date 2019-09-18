@@ -9,7 +9,6 @@ Graphical user interface layer.
 --------------------------------------------------------------------------------
 """
 import cv2
-import sys
 import types
 import numpy as np
 import tkinter as tk
@@ -19,6 +18,7 @@ from tkinter import filedialog
 import sprite_imaging
 import sprite_splitter
 from sprite_prepare import *
+from sprite_utils import *
 
 
 class EmptyFilenameException(Exception):
@@ -89,14 +89,16 @@ class App(tk.Frame):
     SUCCESS_IDLE_MESSAGE = "Idle frames saved to {}!"
 
     # Default widget dimensions
-    if sys.platform == "win32":
+    if IsWindows():
+        # Windows
         DEFAULT_OPTION_WIDTH = 26
         DEFAULT_BUTTON_WIDTH = 27
         DEFAULT_SLIDER_WIDTH = 256
     else:
-        DEFAULT_OPTION_WIDTH = 26
-        DEFAULT_BUTTON_WIDTH = 29
-        DEFAULT_SLIDER_WIDTH = 480
+        # OS X / Linux
+        DEFAULT_OPTION_WIDTH = 19
+        DEFAULT_BUTTON_WIDTH = 22
+        DEFAULT_SLIDER_WIDTH = 256
 
     PREVIEW_CANVAS_WIDTH = 384
     PREVIEW_CANVAS_HEIGHT = 96
@@ -208,7 +210,12 @@ class App(tk.Frame):
         self._Master.resizable(False, False)
 
         self.winfo_toplevel().title(self.WINDOW_TITLE)
-        root.tk.call("wm", "iconphoto", root._w, tk.Image("photo", file="misc/icon.png"))
+
+        # Set icon for Mac OS X
+        if IsOSX():
+            image: tk.Image = tk.Image("photo", file="misc/icon.png")
+            # noinspection PyProtectedMember
+            root.tk.call("wm", "iconphoto", root._w, image)
 
         # Initialize local non-widget data
         self._AnimObjs    = []
@@ -326,7 +333,7 @@ class App(tk.Frame):
             for k, v in LoadBodyPaths().items()
         }
 
-        self._BodyList = list(self._BodyData)
+        self._BodyList = sorted(list(self._BodyData))
         self._BodyOffsets = LoadBodyOffsets()
 
     def InitHeadData(self) -> None:
@@ -340,7 +347,7 @@ class App(tk.Frame):
             for k, v in LoadHeadPaths().items()
         }
 
-        self._HeadList = list(self._HeadData)
+        self._HeadList = sorted(list(self._HeadData))
         self._HeadOffsets = LoadHeadOffsets()
 
     def InitFramewiseOffsetLabels(self) -> None:

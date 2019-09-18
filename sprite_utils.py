@@ -9,7 +9,27 @@ Filepath utility functions.
 --------------------------------------------------------------------------------
 """
 import shutil
+import sys
 from sprite_constant import *
+
+
+def IsWindows() -> bool:
+    """
+    Checks whether current platform is Windows.
+
+    :return: True if running Windows; false otherwise.
+    """
+    return sys.platform == "win32"
+
+
+def IsOSX() -> bool:
+    """
+    Checks whether current platform is OS X.
+
+    :return: True if running Mac OS X; false otherwise.
+    """
+    return sys.platform == "darwin"
+
 
 
 def FlushOutputs() -> None:

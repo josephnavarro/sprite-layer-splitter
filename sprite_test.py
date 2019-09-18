@@ -26,20 +26,20 @@ What do?
 >>> """
 
 
-def DoComposite(cmd: iter,
+def DoComposite(command: iter,
                 idle: bool = False) -> None:
     """
     Composites and saves a spritesheet.
 
-    :param cmd:  Sprite compositing functin to use.
-    :param idle: Whether to composite only idle frames. (Default False).
+    :param command: Sprite compositing functin to use.
+    :param idle:    Whether to composite only idle frames. (Default False).
 
     :return: None.
     """
-    if len(cmd) == 3:
+    if len(command) == 3:
         sprite_utils.FixPath(ROOT_OUTPUT_DIR)
-        head = cmd[1]
-        body = cmd[2]
+        head = command[1]
+        body = command[2]
         path = os.path.join(ROOT_OUTPUT_DIR, "{}_{}.png".format(head, body))
 
         if idle:
@@ -74,15 +74,15 @@ def TestMain() -> None:
     isRunning: bool = True
 
     while isRunning:
-        cmd = input(PROMPT).lower().split()
-        if cmd:
-            if cmd[0] in ("c", "composite"):
-                DoComposite(cmd)
-            elif cmd[0] in ("i", "idle"):
-                DoComposite(cmd, idle=True)
-            elif cmd[0] in ("r", "refresh"):
+        command: list = input(PROMPT).lower().split()
+        if command:
+            if command[0] in ("c", "composite"):
+                DoComposite(command)
+            elif command[0] in ("i", "idle"):
+                DoComposite(command, idle=True)
+            elif command[0] in ("r", "refresh"):
                 DoRefresh()
-            elif cmd[0] in ("q", "quit"):
+            elif command[0] in ("q", "quit"):
                 isRunning = False
 
 

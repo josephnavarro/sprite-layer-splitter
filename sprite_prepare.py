@@ -33,7 +33,7 @@ SOURCE_BODY_DIRECTORY: str = os.path.join("inputs", "raw_body")
 """
 Default key.
 """
-JSON_KEY_DEFAULT: str = "?::default"
+JSON_KEY_DEFAULT: str = "?.default"
 
 
 def CropImage(im: Image,
@@ -77,14 +77,16 @@ def PrepareBody() -> None:
     print("Now generating intermediate body spritesheets...")
 
     bodyData: dict = LoadGenSrcBody()
+    files: list = glob.glob(os.path.join(SOURCE_BODY_DIRECTORY, "*.png"))
+    files.sort()
 
-    for fn in glob.glob(os.path.join(SOURCE_BODY_DIRECTORY, "*.png")):
-        print("Generating intermediate for {}...".format(fn))
+    for filename in files:
+        print("Generating intermediate for {}...".format(filename))
 
         root: str = FixPath(BODY_DIRECTORY)
-        path: str = os.path.join(root, os.path.split(fn)[-1])
+        path: str = os.path.join(root, os.path.split(filename)[-1])
 
-        image: Image = ProcessBody(fn, bodyData)
+        image: Image = ProcessBody(filename, bodyData)
         image.save(path)
 
     print("Intermediate body spritesheets complete!")
@@ -99,14 +101,16 @@ def PrepareHead() -> None:
     print("Now generating intermediate head spritesheets...")
 
     headData: dict = LoadGenSrcHead()
+    files: list = glob.glob(os.path.join(SOURCE_HEAD_DIRECTORY, "*.png"))
+    files.sort()
 
-    for fn in glob.glob(os.path.join(SOURCE_HEAD_DIRECTORY, "*.png")):
-        print("Generating intermediate for {}...".format(fn))
+    for filename in files:
+        print("Generating intermediate for {}...".format(filename))
 
         root: str = FixPath(HEAD_DIRECTORY)
-        path: str = os.path.join(root, os.path.split(fn)[-1])
+        path: str = os.path.join(root, os.path.split(filename)[-1])
 
-        image: Image = ProcessHead(fn, headData)
+        image: Image = ProcessHead(filename, headData)
         image.save(path)
 
     print("Intermediate head spritesheets complete!")
