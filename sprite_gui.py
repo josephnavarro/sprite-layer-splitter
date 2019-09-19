@@ -188,6 +188,32 @@ class App(tk.Frame):
     SPEED_SCALE_MAX = 12
 
     @staticmethod
+    def DrawText(canvas, x, y, text) -> None:
+        """
+        Draws text to a given canvas.
+
+        :param canvas:
+        :param x:
+        :param y:
+        :param text:
+
+        :return: None.
+        """
+        for m in range(-2, 3):
+            for n in range(-2, 3):
+                canvas.create_text(x + m, y + n,
+                                   font="Arial 12 bold",
+                                   fill="black",
+                                   text=text,
+                                   anchor=tk.NW)
+
+        canvas.create_text(x, y,
+                           font="Arial 12 bold",
+                           fill="white",
+                           text=text,
+                           anchor=tk.NW)
+
+    @staticmethod
     def FromRGB(r: int, g: int, b: int) -> str:
         """
         Returns a Tkinter-friendly color code from an RGB color tuple.
@@ -426,7 +452,7 @@ class App(tk.Frame):
                     initialdir=initialdir,
                     title=title,
                     filetypes=filetypes,
-                )
+                    )
 
                 if path:
                     # Save image if path is valid
@@ -471,7 +497,7 @@ class App(tk.Frame):
                     initialdir=initialdir,
                     title=title,
                     filetypes=filetypes,
-                )
+                    )
 
                 if path:
                     # Save image if path is valid
@@ -513,7 +539,7 @@ class App(tk.Frame):
             background=bg,
             relief=relief,
             borderwidth=border,
-        )
+            )
 
         row: int = self.GRID_CANVAS_ANIM_PREVIEW[0]  # Row
         col: int = self.GRID_CANVAS_ANIM_PREVIEW[1]  # Column
@@ -547,7 +573,7 @@ class App(tk.Frame):
         self._BodyData = {
             v.get("name", "---"): k
             for k, v in LoadBodyPaths().items()
-        }
+            }
 
         self._BodyList = sorted(list(self._BodyData))
         self._BodyOffsets = LoadBodyOffsets()
@@ -594,7 +620,7 @@ class App(tk.Frame):
             background=bg,
             activebackground=bg,
             activeforeground=fg,
-        )
+            )
 
         row: int = self.GRID_BUTTON_COMPOSE_FULL[0]  # Row
         col: int = self.GRID_BUTTON_COMPOSE_FULL[1]  # Column
@@ -627,7 +653,7 @@ class App(tk.Frame):
             background=bg,
             activebackground=bg,
             activeforeground=fg,
-        )
+            )
 
         row: int = self.GRID_BUTTON_COMPOSE_IDLE[0]  # Row
         col: int = self.GRID_BUTTON_COMPOSE_IDLE[1]  # Column
@@ -660,7 +686,7 @@ class App(tk.Frame):
             foreground=fg,
             activebackground=bg,
             activeforeground=fg,
-        )
+            )
 
         row: int = self.GRID_BUTTON_PREVIEW_IDLE[0]  # Row
         col: int = self.GRID_BUTTON_PREVIEW_IDLE[1]  # Column
@@ -693,7 +719,7 @@ class App(tk.Frame):
             foreground=fg,
             activebackground=bg,
             activeforeground=fg,
-        )
+            )
 
         row: int = self.GRID_BUTTON_PREVIEW_LEFT[0]  # Row
         col: int = self.GRID_BUTTON_PREVIEW_LEFT[1]  # Column
@@ -726,7 +752,7 @@ class App(tk.Frame):
             foreground=fg,
             activebackground=bg,
             activeforeground=fg,
-        )
+            )
 
         row: int = self.GRID_BUTTON_PREVIEW_RIGH[0]  # Row
         col: int = self.GRID_BUTTON_PREVIEW_RIGH[1]  # Column
@@ -759,7 +785,7 @@ class App(tk.Frame):
             foreground=fg,
             activebackground=bg,
             activeforeground=fg,
-        )
+            )
 
         row: int = self.GRID_BUTTON_REBUILD_BDAT[0]  # Row
         col: int = self.GRID_BUTTON_REBUILD_BDAT[1]  # Column
@@ -792,7 +818,7 @@ class App(tk.Frame):
             background=bg,
             activeforeground=fg,
             activebackground=bg,
-        )
+            )
 
         row: int = self.GRID_BUTTON_REBUILD_BIMG[0]  # Row
         col: int = self.GRID_BUTTON_REBUILD_BIMG[1]  # Column
@@ -825,7 +851,7 @@ class App(tk.Frame):
             background=bg,
             activeforeground=fg,
             activebackground=bg,
-        )
+            )
 
         row: int = self.GRID_BUTTON_REBUILD_BOFF[0]  # Row
         col: int = self.GRID_BUTTON_REBUILD_BOFF[1]  # Column
@@ -858,7 +884,7 @@ class App(tk.Frame):
             foreground=fg,
             activebackground=bg,
             activeforeground=fg,
-        )
+            )
 
         row: int = self.GRID_BUTTON_REBUILD_HDAT[0]  # Row
         col: int = self.GRID_BUTTON_REBUILD_HDAT[1]  # Column
@@ -891,7 +917,7 @@ class App(tk.Frame):
             background=bg,
             activebackground=bg,
             activeforeground=fg,
-        )
+            )
 
         row: int = self.GRID_BUTTON_REBUILD_HIMG[0]  # Row
         col: int = self.GRID_BUTTON_REBUILD_HIMG[1]  # Column
@@ -916,7 +942,7 @@ class App(tk.Frame):
 
         width: int = App.DEFAULT_BUTTON_WIDTH
         fg: str = App.FromRGB(*App.HEAD_BUTTON_FG_COLOR)
-        bg: str = App.FromRGB(*App.HEAD_BUTTON_FG_COLOR)
+        bg: str = App.FromRGB(*App.HEAD_BUTTON_BG_COLOR)
 
         self._BtnRebuildHeadOffsets.config(
             width=width,
@@ -924,7 +950,7 @@ class App(tk.Frame):
             background=bg,
             activeforeground=fg,
             activebackground=bg,
-        )
+            )
 
         row: int = self.GRID_BUTTON_REBUILD_HOFF[0]  # Row
         col: int = self.GRID_BUTTON_REBUILD_HOFF[1]  # Column
@@ -968,7 +994,7 @@ class App(tk.Frame):
         self._HeadData = {
             v.get("name", "---"): k
             for k, v in LoadHeadPaths().items()
-        }
+            }
 
         self._HeadList = sorted(list(self._HeadData))
         self._HeadOffsets = LoadHeadOffsets()
@@ -1026,7 +1052,7 @@ class App(tk.Frame):
             background=bg,
             activebackground=bg,
             activeforeground=fg,
-        )
+            )
 
         row: int = self.GRID_OPTIONS_SELECT_HEAD[0]  # Row
         col: int = self.GRID_OPTIONS_SELECT_HEAD[1]  # Column
@@ -1060,7 +1086,7 @@ class App(tk.Frame):
             background=bg,
             activebackground=bg,
             activeforeground=fg,
-        )
+            )
 
         row: int = self.GRID_OPTIONS_SELECT_BODY[0]  # Row
         col: int = self.GRID_OPTIONS_SELECT_BODY[1]  # Column
@@ -1106,7 +1132,7 @@ class App(tk.Frame):
             length=length,
             showvalue=showvalue,
             command=cmd,
-        )
+            )
 
         row: int = self.GRID_SCALE_SPEED_PREVIEW[0]
         col: int = self.GRID_SCALE_SPEED_PREVIEW[1]
@@ -1138,7 +1164,7 @@ class App(tk.Frame):
             background=bg,
             relief=relief,
             borderwidth=border,
-        )
+            )
 
         row: int = self.GRID_CANVAS_IMGS_PREVIEW[0]  # Row
         col: int = self.GRID_CANVAS_IMGS_PREVIEW[1]  # Column
@@ -1165,7 +1191,7 @@ class App(tk.Frame):
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame2)),
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame3)),
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame4)),
-        ]
+            ]
 
         # Reset animation counters
         self._CurFrame: int = 0
@@ -1195,18 +1221,10 @@ class App(tk.Frame):
 
         self._CanvStaticPreview.create_image(pos, anchor=anchor, image=im)
 
-        self._CanvStaticPreview.create_text(
-            32 + 96 * 0, 32, font="Arial 20 bold", fill="white", text="0"
-        )
-        self._CanvStaticPreview.create_text(
-            32 + 96 * 1, 32, font="Arial 20 bold", fill="white", text="1"
-        )
-        self._CanvStaticPreview.create_text(
-            32 + 96 * 2, 32, font="Arial 20 bold", fill="white", text="2"
-        )
-        self._CanvStaticPreview.create_text(
-            32 + 96 * 3, 32, font="Arial 20 bold", fill="white", text="3"
-        )
+        App.DrawText(self._CanvStaticPreview, 18 + 96 * 0, 96, "(1)")
+        App.DrawText(self._CanvStaticPreview, 18 + 96 * 1, 96, "(2)")
+        App.DrawText(self._CanvStaticPreview, 18 + 96 * 2, 96, "(3)")
+        App.DrawText(self._CanvStaticPreview, 18 + 96 * 3, 96, "(4)")
 
     def MakeIdlePreview(self) -> None:
         """
