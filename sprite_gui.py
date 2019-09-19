@@ -77,16 +77,16 @@ class App(tk.Frame):
     FAILURE_TYPE_MESSAGE = "Error: Invalid image format specified!"
     INVALID_BODY_MESSAGE = "Error: Body spritesheet '{}' does not exist!"
     INVALID_HEAD_MESSAGE = "Error: Head spritesheet '{}' does not exist!"
-    REBUILD_BIMG_CONFIRM = "Rebuild body source images?"
-    REBUILD_BIMG_MESSAGE = "Successfully rebuilt body source images."
-    REBUILD_BDAT_CONFIRM = "Rebuild body listing?"
-    REBUILD_BDAT_MESSAGE = "Successfully rebuilt list of available bodies."
+    REBUILD_BIMG_CONFIRM = "Reconstruct body source images?"
+    REBUILD_BIMG_MESSAGE = "Successfully reconstructed body source images."
+    REBUILD_BDAT_CONFIRM = "Recheck body listing?"
+    REBUILD_BDAT_MESSAGE = "Reassembled list of available bodies."
     REBUILD_BOFF_CONFIRM = "Reload body offsets?"
     REBUILD_BOFF_MESSAGE = "Successfully reloaded per-frame body offsets."
-    REBUILD_HIMG_CONFIRM = "Rebuild head source images?"
-    REBUILD_HIMG_MESSAGE = "Successfully rebuilt head source images."
-    REBUILD_HDAT_CONFIRM = "Rebuild head listing?"
-    REBUILD_HDAT_MESSAGE = "Successfully rebuilt list of available heads."
+    REBUILD_HIMG_CONFIRM = "Reconstruct head source images?"
+    REBUILD_HIMG_MESSAGE = "Successfully reconstructed head source images."
+    REBUILD_HDAT_CONFIRM = "Rcheck head listing?"
+    REBUILD_HDAT_MESSAGE = "Reassembled list of available heads."
     REBUILD_HOFF_CONFIRM = "Reload head offsets?"
     REBUILD_HOFF_MESSAGE = "Successfully reloaded per-frame head offsets."
     SUCCESS_FULL_MESSAGE = "Sprite frames saved to {}!"
@@ -104,10 +104,8 @@ class App(tk.Frame):
         DEFAULT_BUTTON_WIDTH = 22
         DEFAULT_SLIDER_WIDTH = 280
 
-    PREVIEW_CANVAS_WIDTH = 384
-    PREVIEW_CANVAS_HEIGHT = 96
-    PREVIEW_ANIM_WIDTH = 96
-    PREVIEW_ANIM_HEIGHT = 96
+    PREVIEW_CANVAS_SIZE = [384, 96]
+    PREVIEW_ANIM_SIZE = [96, 96]
 
     # Default widget colors
     BODY_BUTTON_FG_COLOR = [0, 0, 0]
@@ -127,6 +125,7 @@ class App(tk.Frame):
     GRID_LABEL_SPEED_PREVIEW = [3, 1]
     GRID_SCALE_SPEED_PREVIEW = [4, 1]
     GRID_CHECK_ANIM_PINGPONG = [1, 2]
+    GRID_CHECK_LAYER_REVERSE = [1, 3]
     GRID_CANVAS_IMGS_PREVIEW = [0, 1]
     GRID_CANVAS_ANIM_PREVIEW = [0, 2]
     GRID_OPTIONS_SELECT_HEAD = [1, 0]
@@ -166,22 +165,22 @@ class App(tk.Frame):
     PREVIEW_RESIZED_DIMENS = (384, 96)
 
     # Button and menu text labels
-    DEFAULT_HEAD_LABEL = "Select head"
-    DEFAULT_BODY_LABEL = "Select body"
-    PREVIEW_IDLE_LABEL = "Preview idle frames"
-    PREVIEW_LEFT_LABEL = "Preview left frames"
-    PREVIEW_RIGHTLABEL = "Preview right frames"
-    REBUILD_BDAT_LABEL = "Recheck body listing"
-    REBUILD_HDAT_LABEL = "Recheck head listing"
-    REBUILD_BIMG_LABEL = "Reconstruct body images"
-    REBUILD_HIMG_LABEL = "Reconstruct head images"
-    REBUILD_BOFF_LABEL = "Reload body offsets"
-    REBUILD_HOFF_LABEL = "Reload head offsets"
-    SAV_IDLE_BTN_LABEL = "Export idle frames"
-    SAV_FULL_BTN_LABEL = "Export all frames"
-    ANIMATECHECK_LABEL = "Ping-pong animation"
-    XYHEADOFFSET_LABEL = "Head: "
-    XYBODYOFFSET_LABEL = "Body: "
+    LABEL_MENU_CHOICES_HEAD_NULL = "Select head"
+    LABEL_MENU_CHOICES_BODY_NULL = "Select body"
+    LABEL_PREVIEW_IDLE_FRAME_SET = "Preview idle frames"
+    LABEL_PREVIEW_LEFT_FRAME_SET = "Preview left frames"
+    LABEL_PREVIEW_RIGH_FRAME_SET = "Preview right frames"
+    LABEL_RECHECK_BODY_DIRECTORY = "Recheck body listing"
+    LABEL_RECHECK_HEAD_DIRECTORY = "Recheck head listing"
+    LABEL_RECONSTRUCT_BODY_IMAGE = "Reconstruct body images"
+    LABEL_RECONSTRUCT_HEAD_IMAGE = "Reconstruct head images"
+    LABEL_RELOAD_XY_BODY_OFFSETS = "Reload body offsets"
+    LABEL_RELOAD_XY_HEAD_OFFSETS = "Reload head offsets"
+    LABEL_BUTTON_EXPORT_IDLE_IMG = "Export idle frames"
+    LABEL_BUTTON_EXPORT_FULL_IMG = "Export all frames"
+    LABEL_CHECK_PINGPONG_ANIMATE = "Ping-pong animation"
+    LABEL_CURRENT_XY_HEAD_OFFSET = "Head: "
+    LABEL_CURRENT_XY_BODY_OFFSET = "Body: "
 
     # Animation speeds
     SPEED_SCALE_MIN = 0
@@ -531,8 +530,8 @@ class App(tk.Frame):
         self._CanvAnimPreview.destroy()
 
         master: tk.Frame = self._FrameTopleft
-        width: int = self.PREVIEW_ANIM_WIDTH
-        height: int = self.PREVIEW_ANIM_HEIGHT
+        width: int = self.PREVIEW_ANIM_SIZE[0]
+        height: int = self.PREVIEW_ANIM_SIZE[1]
         bg: str = self.FromRGB(*self.PREVIEW_CANVAS_COLOR)
         relief: str = tk.SUNKEN
         border: int = 13
@@ -560,7 +559,7 @@ class App(tk.Frame):
         self._CheckAnimPingpong.destroy()
 
         mtr: tk.Frame = self._FrameBottom  # Master
-        txt: str = self.ANIMATECHECK_LABEL  # Text
+        txt: str = self.LABEL_CHECK_PINGPONG_ANIMATE  # Text
         var: tk.BooleanVar = self._BoolAnimPingPong  # Variable
         row: int = self.GRID_CHECK_ANIM_PINGPONG[0]  # Row
         column: int = self.GRID_CHECK_ANIM_PINGPONG[1]  # Column
@@ -592,7 +591,7 @@ class App(tk.Frame):
         self._LabelOffsetBody.destroy()
 
         master: tk.Frame = self._FrameTopRight
-        label: str = self.XYBODYOFFSET_LABEL
+        label: str = self.LABEL_CURRENT_XY_BODY_OFFSET
         text: str = "{0:s} {1:+d}, {2:+d}".format(label, 0, 0)
         row: int = self.GRID_LABEL_BODY_XYOFFSET[0]
         col: int = self.GRID_LABEL_BODY_XYOFFSET[1]
@@ -611,7 +610,7 @@ class App(tk.Frame):
         self._BtnExportFull.destroy()
 
         master: tk.Frame = self._FrameBottom
-        text: str = self.SAV_FULL_BTN_LABEL
+        text: str = self.LABEL_BUTTON_EXPORT_FULL_IMG
         cmd: types.FunctionType = self.ExportFullFrames
 
         self._BtnExportFull = tk.Button(master, text=text, command=cmd)
@@ -644,7 +643,7 @@ class App(tk.Frame):
         self._BtnExportIdle.destroy()
 
         master: tk.Frame = self._FrameBottom
-        text: str = self.SAV_IDLE_BTN_LABEL
+        text: str = self.LABEL_BUTTON_EXPORT_IDLE_IMG
         cmd: types.FunctionType = self.ExportIdleFrames
 
         self._BtnExportIdle = tk.Button(master, text=text, command=cmd)
@@ -677,7 +676,7 @@ class App(tk.Frame):
         self._BtnPreviewIdle.destroy()
 
         master: tk.Frame = self._FrameBottom
-        text: str = self.PREVIEW_IDLE_LABEL
+        text: str = self.LABEL_PREVIEW_IDLE_FRAME_SET
         cmd: types.FunctionType = self.MakeIdlePreview
 
         self._BtnPreviewIdle = tk.Button(master, text=text, command=cmd)
@@ -710,7 +709,7 @@ class App(tk.Frame):
         self._BtnPreviewLeft.destroy()
 
         master: tk.Frame = self._FrameBottom
-        text: str = self.PREVIEW_LEFT_LABEL
+        text: str = self.LABEL_PREVIEW_LEFT_FRAME_SET
         cmd: types.FunctionType = self.MakeLeftPreview
 
         self._BtnPreviewLeft = tk.Button(master, text=text, command=cmd)
@@ -743,7 +742,7 @@ class App(tk.Frame):
         self._BtnPreviewRight.destroy()
 
         master: tk.Frame = self._FrameBottom
-        text: str = self.PREVIEW_RIGHTLABEL
+        text: str = self.LABEL_PREVIEW_RIGH_FRAME_SET
         cmd: types.FunctionType = self.MakeRightPreview
 
         self._BtnPreviewRight = tk.Button(master, text=text, command=cmd)
@@ -776,7 +775,7 @@ class App(tk.Frame):
         self._BtnRebuildBodyData.destroy()
 
         master: tk.Frame = self._FrameBottom
-        text: str = self.REBUILD_BDAT_LABEL
+        text: str = self.LABEL_RECHECK_BODY_DIRECTORY
         cmd: types.FunctionType = self.RebuildBodyData
 
         self._BtnRebuildBodyData = tk.Button(master, text=text, command=cmd)
@@ -809,7 +808,7 @@ class App(tk.Frame):
         self._BtnRebuildBodyImages.destroy()
 
         master: tk.Frame = self._FrameBottom
-        text: str = App.REBUILD_BIMG_LABEL
+        text: str = App.LABEL_RECONSTRUCT_BODY_IMAGE
         cmd: types.FunctionType = self.RebuildBodyImages
 
         self._BtnRebuildBodyImages = tk.Button(master, text=text, command=cmd)
@@ -842,7 +841,7 @@ class App(tk.Frame):
         self._BtnRebuildBodyOffsets.destroy()
 
         master: tk.Frame = self._FrameBottom
-        text: str = App.REBUILD_BOFF_LABEL
+        text: str = App.LABEL_RELOAD_XY_BODY_OFFSETS
         cmd: types.FunctionType = self.RebuildBodyOffsets
 
         self._BtnRebuildBodyOffsets = tk.Button(master, text=text, command=cmd)
@@ -875,7 +874,7 @@ class App(tk.Frame):
         self._BtnRebuildHeadData.destroy()
 
         master: tk.Frame = self._FrameBottom
-        text: str = self.REBUILD_HDAT_LABEL
+        text: str = self.LABEL_RECHECK_HEAD_DIRECTORY
         cmd: types.FunctionType = self.RebuildHeadData
 
         self._BtnRebuildHeadData = tk.Button(master, text=text, command=cmd)
@@ -908,7 +907,7 @@ class App(tk.Frame):
         self._BtnRebuildHeadImages.destroy()
 
         master: tk.Frame = self._FrameBottom
-        text: str = self.REBUILD_HIMG_LABEL
+        text: str = self.LABEL_RECONSTRUCT_HEAD_IMAGE
         cmd: types.FunctionType = self.RebuildHeadImages
 
         self._BtnRebuildHeadImages = tk.Button(master, text=text, command=cmd)
@@ -941,7 +940,7 @@ class App(tk.Frame):
         self._BtnRebuildHeadOffsets.destroy()
 
         master: tk.Frame = self._FrameBottom
-        text: str = App.REBUILD_HOFF_LABEL
+        text: str = App.LABEL_RELOAD_XY_HEAD_OFFSETS
         cmd: types.FunctionType = self.RebuildHeadOffsets
 
         self._BtnRebuildHeadOffsets = tk.Button(master, text=text, command=cmd)
@@ -1015,7 +1014,7 @@ class App(tk.Frame):
         self._LabelOffsetHead.destroy()
 
         master: tk.Frame = self._FrameTopRight
-        label: str = self.XYHEADOFFSET_LABEL
+        label: str = self.LABEL_CURRENT_XY_HEAD_OFFSET
         text: str = "{0:s} {1:+d}, {2:+d}".format(label, 0, 0)
         row: int = self.GRID_LABEL_HEAD_XYOFFSET[0]
         column: int = self.GRID_LABEL_HEAD_XYOFFSET[1]
@@ -1040,7 +1039,7 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._StrHeadOption.set(self.DEFAULT_HEAD_LABEL)
+        self._StrHeadOption.set(self.LABEL_MENU_CHOICES_HEAD_NULL)
 
         self._MenuSelectHead.destroy()
 
@@ -1075,7 +1074,7 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._StrBodyOption.set(self.DEFAULT_BODY_LABEL)
+        self._StrBodyOption.set(self.LABEL_MENU_CHOICES_BODY_NULL)
 
         self._MenuSelectBody.destroy()
 
@@ -1160,8 +1159,8 @@ class App(tk.Frame):
         self._CanvStaticPreview.destroy()
 
         master: tk.Frame = self._FrameTopleft
-        width: int = self.PREVIEW_CANVAS_WIDTH
-        height: int = self.PREVIEW_CANVAS_HEIGHT
+        width: int = self.PREVIEW_CANVAS_SIZE[0]
+        height: int = self.PREVIEW_CANVAS_SIZE[1]
         bg: str = self.FromRGB(*self.PREVIEW_CANVAS_COLOR)
         relief: str = tk.SUNKEN
         border: int = 13
@@ -1189,7 +1188,7 @@ class App(tk.Frame):
         :return: None
         """
         # Get animation frames
-        w, h = self.PREVIEW_ANIM_WIDTH, self.PREVIEW_ANIM_HEIGHT
+        w, h = self.PREVIEW_ANIM_SIZE[0], self.PREVIEW_ANIM_SIZE[1]
         frame1 = sprite_imaging.Crop(image, [w * 0, 0], [w, h])
         frame2 = sprite_imaging.Crop(image, [w * 1, 0], [w, h])
         frame3 = sprite_imaging.Crop(image, [w * 2, 0], [w, h])
@@ -1535,12 +1534,12 @@ class App(tk.Frame):
             bodyOffsets: list = self._CurBody["offset"][state]
             x, y = bodyOffsets[frame]
 
-            label: str = self.XYBODYOFFSET_LABEL
+            label: str = self.LABEL_CURRENT_XY_BODY_OFFSET
             text: str = "{0:s} {1:+d}, {2:+d}".format(label, x, y)
             self._LabelOffsetBody.config(text=text)
 
         except (KeyError, IndexError):
-            label: str = self.XYBODYOFFSET_LABEL
+            label: str = self.LABEL_CURRENT_XY_BODY_OFFSET
             text: str = "{0:s} {1:+d}, {2:+d}".format(label, 0, 0)
             self._LabelOffsetBody.config(text=text)
 
@@ -1595,12 +1594,12 @@ class App(tk.Frame):
             headOffsets: list = self._CurHead["offset"][state]
 
             x, y = headOffsets[frame]
-            label: str = self.XYHEADOFFSET_LABEL
+            label: str = self.LABEL_CURRENT_XY_HEAD_OFFSET
             text: str = "{0:s} {1:+d}, {2:+d}".format(label, x, y)
             self._LabelOffsetHead.config(text=text)
 
         except (KeyError, IndexError):
-            label: str = self.XYHEADOFFSET_LABEL
+            label: str = self.LABEL_CURRENT_XY_HEAD_OFFSET
             text: str = "{0:s} {1:+d}, {2:+d}".format(label, 0, 0)
             self._LabelOffsetHead.config(text=text)
 
