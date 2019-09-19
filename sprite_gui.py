@@ -1195,6 +1195,19 @@ class App(tk.Frame):
 
         self._CanvStaticPreview.create_image(pos, anchor=anchor, image=im)
 
+        self._CanvStaticPreview.create_text(
+            32 + 96 * 0, 32, font="Arial 20 bold", fill="white", text="0"
+        )
+        self._CanvStaticPreview.create_text(
+            32 + 96 * 1, 32, font="Arial 20 bold", fill="white", text="1"
+        )
+        self._CanvStaticPreview.create_text(
+            32 + 96 * 2, 32, font="Arial 20 bold", fill="white", text="2"
+        )
+        self._CanvStaticPreview.create_text(
+            32 + 96 * 3, 32, font="Arial 20 bold", fill="white", text="3"
+        )
+
     def MakeIdlePreview(self) -> None:
         """
         Generates a preview image for current sprite's "idle" frames.
@@ -1559,7 +1572,6 @@ class App(tk.Frame):
             self._LabelOffsetHead.config(text=text)
 
         except (KeyError, IndexError):
-            print("ERR")
             label: str = self.XYHEADOFFSET_LABEL
             text: str = "{0:s} {1:+d}, {2:+d}".format(label, 0, 0)
             self._LabelOffsetHead.config(text=text)
