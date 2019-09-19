@@ -452,7 +452,7 @@ class App(tk.Frame):
                     initialdir=initialdir,
                     title=title,
                     filetypes=filetypes,
-                    )
+                )
 
                 if path:
                     # Save image if path is valid
@@ -497,7 +497,7 @@ class App(tk.Frame):
                     initialdir=initialdir,
                     title=title,
                     filetypes=filetypes,
-                    )
+                )
 
                 if path:
                     # Save image if path is valid
@@ -539,7 +539,7 @@ class App(tk.Frame):
             background=bg,
             relief=relief,
             borderwidth=border,
-            )
+        )
 
         row: int = self.GRID_CANVAS_ANIM_PREVIEW[0]  # Row
         col: int = self.GRID_CANVAS_ANIM_PREVIEW[1]  # Column
@@ -573,7 +573,7 @@ class App(tk.Frame):
         self._BodyData = {
             v.get("name", "---"): k
             for k, v in LoadBodyPaths().items()
-            }
+        }
 
         self._BodyList = sorted(list(self._BodyData))
         self._BodyOffsets = LoadBodyOffsets()
@@ -620,7 +620,7 @@ class App(tk.Frame):
             background=bg,
             activebackground=bg,
             activeforeground=fg,
-            )
+        )
 
         row: int = self.GRID_BUTTON_COMPOSE_FULL[0]  # Row
         col: int = self.GRID_BUTTON_COMPOSE_FULL[1]  # Column
@@ -653,7 +653,7 @@ class App(tk.Frame):
             background=bg,
             activebackground=bg,
             activeforeground=fg,
-            )
+        )
 
         row: int = self.GRID_BUTTON_COMPOSE_IDLE[0]  # Row
         col: int = self.GRID_BUTTON_COMPOSE_IDLE[1]  # Column
@@ -686,7 +686,7 @@ class App(tk.Frame):
             foreground=fg,
             activebackground=bg,
             activeforeground=fg,
-            )
+        )
 
         row: int = self.GRID_BUTTON_PREVIEW_IDLE[0]  # Row
         col: int = self.GRID_BUTTON_PREVIEW_IDLE[1]  # Column
@@ -719,7 +719,7 @@ class App(tk.Frame):
             foreground=fg,
             activebackground=bg,
             activeforeground=fg,
-            )
+        )
 
         row: int = self.GRID_BUTTON_PREVIEW_LEFT[0]  # Row
         col: int = self.GRID_BUTTON_PREVIEW_LEFT[1]  # Column
@@ -752,7 +752,7 @@ class App(tk.Frame):
             foreground=fg,
             activebackground=bg,
             activeforeground=fg,
-            )
+        )
 
         row: int = self.GRID_BUTTON_PREVIEW_RIGH[0]  # Row
         col: int = self.GRID_BUTTON_PREVIEW_RIGH[1]  # Column
@@ -785,7 +785,7 @@ class App(tk.Frame):
             foreground=fg,
             activebackground=bg,
             activeforeground=fg,
-            )
+        )
 
         row: int = self.GRID_BUTTON_REBUILD_BDAT[0]  # Row
         col: int = self.GRID_BUTTON_REBUILD_BDAT[1]  # Column
@@ -818,7 +818,7 @@ class App(tk.Frame):
             background=bg,
             activeforeground=fg,
             activebackground=bg,
-            )
+        )
 
         row: int = self.GRID_BUTTON_REBUILD_BIMG[0]  # Row
         col: int = self.GRID_BUTTON_REBUILD_BIMG[1]  # Column
@@ -851,7 +851,7 @@ class App(tk.Frame):
             background=bg,
             activeforeground=fg,
             activebackground=bg,
-            )
+        )
 
         row: int = self.GRID_BUTTON_REBUILD_BOFF[0]  # Row
         col: int = self.GRID_BUTTON_REBUILD_BOFF[1]  # Column
@@ -884,7 +884,7 @@ class App(tk.Frame):
             foreground=fg,
             activebackground=bg,
             activeforeground=fg,
-            )
+        )
 
         row: int = self.GRID_BUTTON_REBUILD_HDAT[0]  # Row
         col: int = self.GRID_BUTTON_REBUILD_HDAT[1]  # Column
@@ -917,7 +917,7 @@ class App(tk.Frame):
             background=bg,
             activebackground=bg,
             activeforeground=fg,
-            )
+        )
 
         row: int = self.GRID_BUTTON_REBUILD_HIMG[0]  # Row
         col: int = self.GRID_BUTTON_REBUILD_HIMG[1]  # Column
@@ -950,7 +950,7 @@ class App(tk.Frame):
             background=bg,
             activeforeground=fg,
             activebackground=bg,
-            )
+        )
 
         row: int = self.GRID_BUTTON_REBUILD_HOFF[0]  # Row
         col: int = self.GRID_BUTTON_REBUILD_HOFF[1]  # Column
@@ -994,7 +994,7 @@ class App(tk.Frame):
         self._HeadData = {
             v.get("name", "---"): k
             for k, v in LoadHeadPaths().items()
-            }
+        }
 
         self._HeadList = sorted(list(self._HeadData))
         self._HeadOffsets = LoadHeadOffsets()
@@ -1052,7 +1052,7 @@ class App(tk.Frame):
             background=bg,
             activebackground=bg,
             activeforeground=fg,
-            )
+        )
 
         row: int = self.GRID_OPTIONS_SELECT_HEAD[0]  # Row
         col: int = self.GRID_OPTIONS_SELECT_HEAD[1]  # Column
@@ -1086,7 +1086,7 @@ class App(tk.Frame):
             background=bg,
             activebackground=bg,
             activeforeground=fg,
-            )
+        )
 
         row: int = self.GRID_OPTIONS_SELECT_BODY[0]  # Row
         col: int = self.GRID_OPTIONS_SELECT_BODY[1]  # Column
@@ -1132,7 +1132,7 @@ class App(tk.Frame):
             length=length,
             showvalue=showvalue,
             command=cmd,
-            )
+        )
 
         row: int = self.GRID_SCALE_SPEED_PREVIEW[0]
         col: int = self.GRID_SCALE_SPEED_PREVIEW[1]
@@ -1164,7 +1164,7 @@ class App(tk.Frame):
             background=bg,
             relief=relief,
             borderwidth=border,
-            )
+        )
 
         row: int = self.GRID_CANVAS_IMGS_PREVIEW[0]  # Row
         col: int = self.GRID_CANVAS_IMGS_PREVIEW[1]  # Column
@@ -1191,7 +1191,7 @@ class App(tk.Frame):
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame2)),
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame3)),
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame4)),
-            ]
+        ]
 
         # Reset animation counters
         self._CurFrame: int = 0

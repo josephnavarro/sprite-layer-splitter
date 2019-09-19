@@ -259,7 +259,9 @@ def ProcessBody(name: str,
             dy = +32 * 0
 
         outData[state] = {}
+
         for layer, image in layers.items():
+            # Make blank image with room for 4 sprite frames
             shape: tuple = (COLOR_REGION[1], COLOR_REGION[0], 4)
             frame: np.ndarray = np.zeros(shape, np.uint8)
 
@@ -315,7 +317,7 @@ def ProcessHead(name: str,
     outData: dict = {}
 
     for state in STATES:
-        dx: int = -24 if headType == "small" else 0
+        dx: int = 8 if headType == "small" else 0
 
         if state == "right":
             dy = +32 * 2
@@ -325,7 +327,9 @@ def ProcessHead(name: str,
             dy = +32 * 0
 
         outData[state] = {}
+
         for layer, image in layers.items():
+            # Make blank image with room for 4 sprite frames
             shape: tuple = (COLOR_REGION[1], COLOR_REGION[0], 4)
             frame: np.ndarray = np.zeros(shape, np.uint8)
 

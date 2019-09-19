@@ -69,8 +69,7 @@ def GetUniqueColors(image: np.ndarray) -> np.ndarray:
     return np.unique(image)
 
 
-def ToGrayscale(image: np.ndarray,
-                is_color: bool = False) -> np.ndarray:
+def ToGrayscale(image: np.ndarray, is_color=False) -> np.ndarray:
     """
     Converts an RGB image to grayscale.
 
@@ -123,9 +122,7 @@ def IsGrayscale(color: iter) -> bool:
     return r == g == b
 
 
-def MakeBlank(w: int,
-              h: int,
-              channels: int = 4) -> np.ndarray:
+def MakeBlank(w: int, h: int, channels=4) -> np.ndarray:
     """
     Makes a blank image of the given size.
 
@@ -138,9 +135,7 @@ def MakeBlank(w: int,
     return np.zeros((h, w, channels), np.uint8)
 
 
-def MakeMask(image: np.ndarray,
-             thresh: float,
-             maxval: int = 255) -> np.ndarray:
+def MakeMask(image: np.ndarray, thresh: float, maxval=255) -> np.ndarray:
     """
     Creates a bitmask from a grayscale CV2 image.
 
@@ -158,9 +153,7 @@ def MakeMask(image: np.ndarray,
     return image
 
 
-def Paste(dest: np.ndarray,
-          src: np.ndarray,
-          pos: tuple) -> None:
+def Paste(dest: np.ndarray, src: np.ndarray, pos: tuple) -> None:
     """
     Pastes one image onto another. (In-place).
 
@@ -189,9 +182,7 @@ def Paste(dest: np.ndarray,
 
 
 # noinspection PyUnresolvedReferences
-def ReplaceColor(image: np.ndarray,
-                 color: list = [],
-                 replace: list = [0, 0, 0]) -> np.ndarray:
+def ReplaceColor(image: np.ndarray, color=[], replace=[0, 0, 0]) -> np.ndarray:
     """
     Replaces a color in an image with another one.
 
@@ -204,7 +195,9 @@ def ReplaceColor(image: np.ndarray,
     :return: Copy of image with the given color replaced.
     """
     outImage = np.copy(image)
+
     if not color:
         color = outImage[0, 0]
     outImage[np.where((outImage == color).all(axis=2))] = replace
+
     return outImage
