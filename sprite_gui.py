@@ -173,10 +173,10 @@ class App(tk.Frame):
     PREVIEW_RIGHTLABEL = "Preview right frames"
     REBUILD_BDAT_LABEL = "Update available bodies"
     REBUILD_HDAT_LABEL = "Update available heads"
-    REBUILD_BIMG_LABEL = "Rebuild body source images"
-    REBUILD_HIMG_LABEL = "Rebuild head source images"
-    REBUILD_BOFF_LABEL = "Reload body offset data"
-    REBUILD_HOFF_LABEL = "Reload head offset data"
+    REBUILD_BIMG_LABEL = "Reload body sources"
+    REBUILD_HIMG_LABEL = "Reload head sources"
+    REBUILD_BOFF_LABEL = "Reload body offsets"
+    REBUILD_HOFF_LABEL = "Reload head offsets"
     SAV_IDLE_BTN_LABEL = "Export idle frames"
     SAV_FULL_BTN_LABEL = "Export all frames"
     ANIMATECHECK_LABEL = "Ping-pong animation"
@@ -1579,10 +1579,6 @@ class App(tk.Frame):
         """
         try:
             headOffsets: list = self._CurHead["offset"][state]
-
-            # This is necessary; don't worry about it! Don't worry.
-            if self._CurHead["size"] == "small":
-                headOffsets = headOffsets[1:4] + [headOffsets[0]]
 
             x, y = headOffsets[frame]
             label: str = self.XYHEADOFFSET_LABEL

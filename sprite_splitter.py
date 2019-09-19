@@ -145,11 +145,6 @@ def GetBodyOffsets(name: str, data: dict) -> dict:
     left: list = offsets.get("left", BASE_OFFSETS)[:]
     right: list = offsets.get("right", BASE_OFFSETS)[:]
 
-    # Rearrange offsets
-    idle = idle[1:4] + [idle[0]]
-    left = left[1:4] + [left[0]]
-    right = right[1:4] + [right[0]]
-
     return {
         "idle":  idle,
         "left":  left,
