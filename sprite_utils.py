@@ -31,7 +31,6 @@ def IsOSX() -> bool:
     return sys.platform == "darwin"
 
 
-
 def FlushOutputs() -> None:
     """
     Flushes entire image output directory.

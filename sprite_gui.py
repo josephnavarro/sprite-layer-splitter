@@ -137,9 +137,9 @@ class App(tk.Frame):
     GRID_BUTTON_REBUILD_BIMG = [2, 1]
     GRID_BUTTON_REBUILD_BDAT = [3, 1]
     GRID_BUTTON_REBUILD_BOFF = [4, 1]
-    GRID_BUTTON_PREVIEW_IDLE = [1, 2]
-    GRID_BUTTON_PREVIEW_LEFT = [2, 2]
-    GRID_BUTTON_PREVIEW_RIGH = [3, 2]
+    GRID_BUTTON_PREVIEW_IDLE = [2, 2]
+    GRID_BUTTON_PREVIEW_LEFT = [3, 2]
+    GRID_BUTTON_PREVIEW_RIGH = [4, 2]
     GRID_BUTTON_COMPOSE_IDLE = [2, 3]
     GRID_BUTTON_COMPOSE_FULL = [3, 3]
 
@@ -482,225 +482,6 @@ class App(tk.Frame):
                     message: str = self.SUCCESS_IDLE_MESSAGE.format(fn)
 
                     tk.messagebox.showinfo(title, message)
-
-        except InvalidFilenameException:
-            # Image format not recognized
-            title: str = self.WINDOW_TITLE
-            message: str = self.FAILURE_TYPE_MESSAGE
-            tk.messagebox.showinfo(title, message)
-
-    def MakeAnimationFrames(self, image) -> None:
-        """
-        Populates local animation buffer.
-
-        :param image: Spritesheet to crop frames from.
-
-        :return: None
-        """
-        # Get animation frames
-        w, h = self.PREVIEW_ANIM_WIDTH, self.PREVIEW_ANIM_HEIGHT
-        frame1 = sprite_imaging.Crop(image, [w * 0, 0], [w, h])
-        frame2 = sprite_imaging.Crop(image, [w * 1, 0], [w, h])
-        frame3 = sprite_imaging.Crop(image, [w * 2, 0], [w, h])
-        frame4 = sprite_imaging.Crop(image, [w * 3, 0], [w, h])
-
-        self._AnimObjs = [
-            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame1)),
-            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame2)),
-            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame3)),
-            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame4)),
-        ]
-
-        # Reset animation counters
-        self._CurFrame: int = 0
-        self._IsForward: bool = True
-        self._CurSpeed: str = self._ScaleAnimSpeed.get()
-
-        # Draw first frame to animation canvas
-        pos: tuple = (16, 16)
-        anchor: str = tk.NW
-        im: tk.PhotoImage = self._AnimObjs[0]
-
-        self._CanvAnimPreview.create_image(pos, anchor=anchor, image=im)
-
-    def MakeAnimationPreview(self, image) -> None:
-        """
-        Displays animation preview frames.
-
-        :param image: Image to display.
-
-        :return: None.
-        """
-        self._ImageObj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
-
-        pos: tuple = (16, 16)
-        anchor: str = tk.NW
-        im: tk.PhotoImage = self._ImageObj
-
-        self._CanvStaticPreview.create_image(pos, anchor=anchor, image=im)
-
-    def MakeIdlePreview(self) -> None:
-        """
-        Generates a preview image for current sprite's "idle" frames.
-
-        :return: None
-        """
-        try:
-            # Perform sprite composition
-            self._HeadOffsets = LoadHeadOffsets()
-            self.UpdateOffsetLabels()
-
-            head, body, image = self.DoComposite(sprite_splitter.CompositeIdle)
-
-            if image is not None:
-                try:
-                    # Crop idle frames from source spritesheet
-                    start: list = self.PREVIEW_IDLE_CROP_ORIG
-                    size: list = self.PREVIEW_IDLE_CROP_SIZE
-                    dsize: tuple = self.PREVIEW_RESIZED_DIMENS
-                    interp: int = cv2.INTER_NEAREST
-
-                    image = sprite_imaging.Crop(image, start, size)
-                    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                    image = cv2.resize(image, dsize=dsize, interpolation=interp)
-
-                    # Set static and animated previews
-                    self.MakeAnimationPreview(image)
-                    self.MakeAnimationFrames(image)
-
-                    # Set current state
-                    self._CurState = STATES[STATES.idle]
-                    try:
-                        # Populate per-frame head offset data
-                        body_name: str = self._StrBodyOption.get()
-                        body_key: str = self._BodyData[body_name]
-                        self._CurHead = self._HeadOffsets[body_key]
-                    except KeyError:
-                        self._CurHead = {}
-
-                    try:
-                        # Populate per-frame body offset data
-                        body_name: str = self._StrBodyOption.get()
-                        body_key: str = self._BodyData[body_name]
-                        self._CurBody = self._BodyOffsets[body_key]
-                    except KeyError:
-                        self._CurBody = {}
-
-                except cv2.error:
-                    raise InvalidFilenameException
-
-        except InvalidFilenameException:
-            # Image format not recognized
-            title: str = self.WINDOW_TITLE
-            message: str = self.FAILURE_TYPE_MESSAGE
-            tk.messagebox.showinfo(title, message)
-
-    def MakeLeftPreview(self) -> None:
-        """
-        Generates a preview image for current sprite's "left" frames.
-
-        :return: None
-        """
-        try:
-            # Perform sprite composition
-            self._HeadOffsets = LoadHeadOffsets()
-            self.UpdateOffsetLabels()
-
-            head, body, image = self.DoComposite(sprite_splitter.CompositeFull)
-
-            if image is not None:
-                try:
-                    # Crop left-facing frames from source spritesheet
-                    start: list = self.PREVIEW_LEFT_CROP_ORIG
-                    size: list = self.PREVIEW_LEFT_CROP_SIZE
-                    dsize: tuple = self.PREVIEW_RESIZED_DIMENS
-                    interp: int = cv2.INTER_NEAREST
-
-                    image = sprite_imaging.Crop(image, start, size)
-                    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                    image = cv2.resize(image, dsize=dsize, interpolation=interp)
-
-                    # Set static and animated previews
-                    self.MakeAnimationPreview(image)
-                    self.MakeAnimationFrames(image)
-
-                    # Set current state
-                    self._CurState = STATES[STATES.left]
-                    try:
-                        # Populate per-frame head offset data
-                        bodyName: str = self._StrBodyOption.get()
-                        bodyKey: str = self._BodyData[bodyName]
-                        self._CurHead = self._HeadOffsets[bodyKey]
-                    except KeyError:
-                        self._CurHead = {}
-
-                    try:
-                        # Populate per-frame body offset data
-                        bodyName: str = self._StrBodyOption.get()
-                        bodyKey: str = self._BodyData[bodyName]
-                        self._CurBody = self._BodyOffsets[bodyKey]
-                    except KeyError:
-                        self._CurBody = {}
-
-                except cv2.error:
-                    raise InvalidFilenameException
-
-        except InvalidFilenameException:
-            # Image format not recognized
-            title: str = self.WINDOW_TITLE
-            message: str = self.FAILURE_TYPE_MESSAGE
-            tk.messagebox.showinfo(title, message)
-
-    def MakeRightPreview(self) -> None:
-        """
-        Generates a preview image for current sprite's "right" frames.
-
-        :return: None
-        """
-        try:
-            # Perform sprite composition
-            self._HeadOffsets = LoadHeadOffsets()
-            self.UpdateOffsetLabels()
-
-            head, body, image = self.DoComposite(sprite_splitter.CompositeFull)
-
-            if image is not None:
-                try:
-                    # Crop right-facing frames from source spritesheet
-                    start: list = self.PREVIEW_RIGHTCROP_ORIG
-                    size: list = self.PREVIEW_RIGHTCROP_SIZE
-                    dsize: tuple = self.PREVIEW_RESIZED_DIMENS
-                    interp: int = cv2.INTER_NEAREST
-
-                    image = sprite_imaging.Crop(image, start, size)
-                    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                    image = cv2.resize(image, dsize=dsize, interpolation=interp)
-
-                    # Set static and animated previews
-                    self.MakeAnimationPreview(image)
-                    self.MakeAnimationFrames(image)
-
-                    # Set current state
-                    self._CurState = STATES[STATES.right]
-
-                    try:
-                        # Populate per-frame head offset data
-                        bodyName: str = self._StrBodyOption.get()
-                        bodyKey: str = self._BodyData[bodyName]
-                        self._CurHead = self._HeadOffsets[bodyKey]
-                    except KeyError:
-                        self._CurHead = {}
-
-                    try:
-                        # Populate per-frame body offset data
-                        bodyName: str = self._StrBodyOption.get()
-                        bodyKey: str = self._BodyData[bodyName]
-                        self._CurBody = self._BodyOffsets[bodyKey]
-                    except KeyError:
-                        self._CurBody = {}
-
-                except cv2.error:
-                    raise InvalidFilenameException
 
         except InvalidFilenameException:
             # Image format not recognized
@@ -1363,6 +1144,225 @@ class App(tk.Frame):
         col: int = self.GRID_CANVAS_IMGS_PREVIEW[1]  # Column
 
         self._CanvStaticPreview.grid(row=row, column=col)
+
+    def MakeAnimationFrames(self, image) -> None:
+        """
+        Populates local animation buffer.
+
+        :param image: Spritesheet to crop frames from.
+
+        :return: None
+        """
+        # Get animation frames
+        w, h = self.PREVIEW_ANIM_WIDTH, self.PREVIEW_ANIM_HEIGHT
+        frame1 = sprite_imaging.Crop(image, [w * 0, 0], [w, h])
+        frame2 = sprite_imaging.Crop(image, [w * 1, 0], [w, h])
+        frame3 = sprite_imaging.Crop(image, [w * 2, 0], [w, h])
+        frame4 = sprite_imaging.Crop(image, [w * 3, 0], [w, h])
+
+        self._AnimObjs = [
+            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame1)),
+            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame2)),
+            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame3)),
+            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame4)),
+        ]
+
+        # Reset animation counters
+        self._CurFrame: int = 0
+        self._IsForward: bool = True
+        self._CurSpeed: str = self._ScaleAnimSpeed.get()
+
+        # Draw first frame to animation canvas
+        pos: tuple = (16, 16)
+        anchor: str = tk.NW
+        im: tk.PhotoImage = self._AnimObjs[0]
+
+        self._CanvAnimPreview.create_image(pos, anchor=anchor, image=im)
+
+    def MakeAnimationPreview(self, image) -> None:
+        """
+        Displays animation preview frames.
+
+        :param image: Image to display.
+
+        :return: None.
+        """
+        self._ImageObj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
+
+        pos: tuple = (16, 16)
+        anchor: str = tk.NW
+        im: tk.PhotoImage = self._ImageObj
+
+        self._CanvStaticPreview.create_image(pos, anchor=anchor, image=im)
+
+    def MakeIdlePreview(self) -> None:
+        """
+        Generates a preview image for current sprite's "idle" frames.
+
+        :return: None
+        """
+        try:
+            # Perform sprite composition
+            self._HeadOffsets = LoadHeadOffsets()
+            self.UpdateOffsetLabels()
+
+            head, body, image = self.DoComposite(sprite_splitter.CompositeIdle)
+
+            if image is not None:
+                try:
+                    # Crop idle frames from source spritesheet
+                    start: list = self.PREVIEW_IDLE_CROP_ORIG
+                    size: list = self.PREVIEW_IDLE_CROP_SIZE
+                    dsize: tuple = self.PREVIEW_RESIZED_DIMENS
+                    interp: int = cv2.INTER_NEAREST
+
+                    image = sprite_imaging.Crop(image, start, size)
+                    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                    image = cv2.resize(image, dsize=dsize, interpolation=interp)
+
+                    # Set static and animated previews
+                    self.MakeAnimationPreview(image)
+                    self.MakeAnimationFrames(image)
+
+                    # Set current state
+                    self._CurState = STATES[STATES.idle]
+                    try:
+                        # Populate per-frame head offset data
+                        body_name: str = self._StrBodyOption.get()
+                        body_key: str = self._BodyData[body_name]
+                        self._CurHead = self._HeadOffsets[body_key]
+                    except KeyError:
+                        self._CurHead = {}
+
+                    try:
+                        # Populate per-frame body offset data
+                        body_name: str = self._StrBodyOption.get()
+                        body_key: str = self._BodyData[body_name]
+                        self._CurBody = self._BodyOffsets[body_key]
+                    except KeyError:
+                        self._CurBody = {}
+
+                except cv2.error:
+                    raise InvalidFilenameException
+
+        except InvalidFilenameException:
+            # Image format not recognized
+            title: str = self.WINDOW_TITLE
+            message: str = self.FAILURE_TYPE_MESSAGE
+            tk.messagebox.showinfo(title, message)
+
+    def MakeLeftPreview(self) -> None:
+        """
+        Generates a preview image for current sprite's "left" frames.
+
+        :return: None
+        """
+        try:
+            # Perform sprite composition
+            self._HeadOffsets = LoadHeadOffsets()
+            self.UpdateOffsetLabels()
+
+            head, body, image = self.DoComposite(sprite_splitter.CompositeFull)
+
+            if image is not None:
+                try:
+                    # Crop left-facing frames from source spritesheet
+                    start: list = self.PREVIEW_LEFT_CROP_ORIG
+                    size: list = self.PREVIEW_LEFT_CROP_SIZE
+                    dsize: tuple = self.PREVIEW_RESIZED_DIMENS
+                    interp: int = cv2.INTER_NEAREST
+
+                    image = sprite_imaging.Crop(image, start, size)
+                    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                    image = cv2.resize(image, dsize=dsize, interpolation=interp)
+
+                    # Set static and animated previews
+                    self.MakeAnimationPreview(image)
+                    self.MakeAnimationFrames(image)
+
+                    # Set current state
+                    self._CurState = STATES[STATES.left]
+                    try:
+                        # Populate per-frame head offset data
+                        bodyName: str = self._StrBodyOption.get()
+                        bodyKey: str = self._BodyData[bodyName]
+                        self._CurHead = self._HeadOffsets[bodyKey]
+                    except KeyError:
+                        self._CurHead = {}
+
+                    try:
+                        # Populate per-frame body offset data
+                        bodyName: str = self._StrBodyOption.get()
+                        bodyKey: str = self._BodyData[bodyName]
+                        self._CurBody = self._BodyOffsets[bodyKey]
+                    except KeyError:
+                        self._CurBody = {}
+
+                except cv2.error:
+                    raise InvalidFilenameException
+
+        except InvalidFilenameException:
+            # Image format not recognized
+            title: str = self.WINDOW_TITLE
+            message: str = self.FAILURE_TYPE_MESSAGE
+            tk.messagebox.showinfo(title, message)
+
+    def MakeRightPreview(self) -> None:
+        """
+        Generates a preview image for current sprite's "right" frames.
+
+        :return: None
+        """
+        try:
+            # Perform sprite composition
+            self._HeadOffsets = LoadHeadOffsets()
+            self.UpdateOffsetLabels()
+
+            head, body, image = self.DoComposite(sprite_splitter.CompositeFull)
+
+            if image is not None:
+                try:
+                    # Crop right-facing frames from source spritesheet
+                    start: list = self.PREVIEW_RIGHTCROP_ORIG
+                    size: list = self.PREVIEW_RIGHTCROP_SIZE
+                    dsize: tuple = self.PREVIEW_RESIZED_DIMENS
+                    interp: int = cv2.INTER_NEAREST
+
+                    image = sprite_imaging.Crop(image, start, size)
+                    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                    image = cv2.resize(image, dsize=dsize, interpolation=interp)
+
+                    # Set static and animated previews
+                    self.MakeAnimationPreview(image)
+                    self.MakeAnimationFrames(image)
+
+                    # Set current state
+                    self._CurState = STATES[STATES.right]
+
+                    try:
+                        # Populate per-frame head offset data
+                        bodyName: str = self._StrBodyOption.get()
+                        bodyKey: str = self._BodyData[bodyName]
+                        self._CurHead = self._HeadOffsets[bodyKey]
+                    except KeyError:
+                        self._CurHead = {}
+
+                    try:
+                        # Populate per-frame body offset data
+                        bodyName: str = self._StrBodyOption.get()
+                        bodyKey: str = self._BodyData[bodyName]
+                        self._CurBody = self._BodyOffsets[bodyKey]
+                    except KeyError:
+                        self._CurBody = {}
+
+                except cv2.error:
+                    raise InvalidFilenameException
+
+        except InvalidFilenameException:
+            # Image format not recognized
+            title: str = self.WINDOW_TITLE
+            message: str = self.FAILURE_TYPE_MESSAGE
+            tk.messagebox.showinfo(title, message)
 
     def RebuildBodyData(self) -> None:
         """
