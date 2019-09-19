@@ -96,3 +96,8 @@ HEAD_BLOCK: int = 192
 Default set of per-frame X-Y offsets.
 """
 BASE_OFFSETS: list = [(0, 0), (0, 0), (0, 0), (0, 0)]
+
+"""
+Default frame pasting order.
+"""
+BASE_ORDER: list = [0, 1, 2, 3]

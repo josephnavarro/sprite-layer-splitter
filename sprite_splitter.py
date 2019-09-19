@@ -15,7 +15,6 @@ from sprite_json import *
 from sprite_imaging import *
 from sprite_utils import *
 
-
 """
 Head source image error string.
 """
@@ -47,8 +46,7 @@ class NonexistentBodyException(Exception):
         self.filename = name
 
 
-def SortedSet(*lists,
-              reverse: bool = False) -> list:
+def SortedSet(*lists, reverse=False) -> list:
     """
     Sorts unique elements among one or more input lists.
 
@@ -133,15 +131,14 @@ def Split(image: np.ndarray) -> dict:
     return outData
 
 
-def GetBodyOffsets(name: str,
-                   data: dict) -> dict:
+def GetBodyOffsets(name: str, data: dict) -> dict:
     """
     Retrieves framewise offset data for body sprites.
 
-    :param name: Name of character or character class.
-    :param data: Body offsetting data.
+    :param name: Key mapping to desired body data.
+    :param data: Full body data.
 
-    :return: Idle, left-, and right-facing frame data.
+    :return: Offsetting data for idle, left-, and right-facing frames.
     """
     offsets: dict = data.get(name, {}).get("offset", {})
     idle: list = offsets.get("idle", BASE_OFFSETS)[:]
@@ -153,18 +150,42 @@ def GetBodyOffsets(name: str,
     left = left[1:4] + [left[0]]
     right = right[1:4] + [right[0]]
 
-    return {"idle": idle, "left": left, "right": right}
+    return {
+        "idle":  idle,
+        "left":  left,
+        "right": right,
+    }
 
 
-def GetHeadOffsets(name: str,
-                   data: dict) -> dict:
+def GetBodyOrder(name: str, data: dict) -> dict:
+    """
+    Retrieves frame ordering data for body sprites.
+
+    :param name: Key mapping to desired body data.
+    :param data: Full body data.
+
+    :return: Order of iteration for idle-, left-, and right-facing frames.
+    """
+    order: dict = data.get(name, {}).get("order", {})
+    idle: list = order.get("idle", BASE_ORDER[:])
+    left: list = order.get("left", BASE_ORDER[:])
+    right: list = order.get("right", BASE_ORDER[:])
+
+    return {
+        "idle":  idle,
+        "left":  left,
+        "right": right,
+    }
+
+
+def GetHeadOffsets(name: str, data: dict) -> dict:
     """
     Retrieves framewise offset data for head sprites.
 
-    :param name: Name of character or character class.
-    :param data: Head offsetting data.
+    :param name: Key mapping to head data.
+    :param data: Full head data.
 
-    :return: Idle, left-, and right-facing frame data.
+    :return: Offsetting data for idle, left-, and right-facing frames.
     """
     size: str = data.get(name, {}).get("size", "large")
     offsets: dict = data.get(name, {}).get("offset", {})
@@ -172,7 +193,32 @@ def GetHeadOffsets(name: str,
     left: list = offsets.get("left", BASE_OFFSETS)[:]
     right: list = offsets.get("right", BASE_OFFSETS)[:]
 
-    return {"idle": idle, "left": left, "right": right, "size": size}
+    return {
+        "idle":  idle,
+        "left":  left,
+        "right": right,
+        "size":  size,
+    }
+
+def GetHeadOrder(name: str, data: dict) -> dict:
+    """
+    Retrieves frame ordering data for head sprites.
+
+    :param name: Key mapping to desired head data.
+    :param data: Full head data.
+
+    :return: Order of iteration for idle-, left-, and right-facing frames.
+    """
+    order: dict = data.get(name, {}).get("order", {})
+    idle: list = order.get("idle", BASE_ORDER[:])
+    left: list = order.get("left", BASE_ORDER[:])
+    right: list = order.get("right", BASE_ORDER[:])
+
+    return {
+        "idle":  idle,
+        "left":  left,
+        "right": right,
+    }
 
 
 def ProcessBody(name: str,
@@ -193,7 +239,8 @@ def ProcessBody(name: str,
 
     :return: Dictionary mapping luminosities to image layers.
     """
-    newBodyData: dict = GetBodyOffsets(name, body_data)
+    bodyData: dict = GetBodyOffsets(name, body_data)
+    bodyOrder: dict = GetBodyOrder(name, body_data)
     bodySize: list = source_data["body"]["size"]
     bodyWhere: list = source_data["body"]["where"]
 
@@ -206,30 +253,35 @@ def ProcessBody(name: str,
 
     outData: dict = {}
 
-    for s in STATES:
+    for state in STATES:
         dx: int = +0
-        dy: int = +32 * (2 if s == "right" else (1 if s == "left" else 0))
 
-        outData[s] = {}
-        for k, image in layers.items():
-            newFrame: np.ndarray = np.zeros(
-                (COLOR_REGION[1], COLOR_REGION[0], 4),
-                np.uint8
-            )
+        if state == "right":
+            dy = +32 * 2
+        elif state == "left":
+            dy = +32 * 1
+        else:
+            dy = +32 * 0
 
-            for n in range(len(COLORS)):
-                offX: int = newBodyData[s][n][0]
-                offY: int = newBodyData[s][n][1]
+        outData[state] = {}
+        for layer, image in layers.items():
+            shape: tuple = (COLOR_REGION[1], COLOR_REGION[0], 4)
+            frame: np.ndarray = np.zeros(shape, np.uint8)
 
-                whereX: int = bodyWhere[s][0] + (bodySize[0] * n)
-                whereY: int = bodyWhere[s][1]
+            for n in range(4):
+                offX: int = bodyData[state][n][0]
+                offY: int = bodyData[state][n][1]
 
-                newImage: np.ndarray = Crop(image, [whereX, whereY], bodySize)
-                newPos: tuple = (dx + offX + (32 * n), dy - offY)
+                whereX: int = bodyWhere[state][0] + (bodySize[0] * bodyOrder[state][n])
+                whereY: int = bodyWhere[state][1]
 
-                Paste(newFrame, newImage, newPos)
+                newImg: np.ndarray = Crop(image, [whereX, whereY], bodySize)
+                newX: int = dx + offX + (32 * n)
+                newY: int = dy - offY
 
-            outData[s][k] = newFrame
+                Paste(frame, newImg, (newX, newY))
+
+            outData[state][layer] = frame
 
     return outData
 
@@ -252,8 +304,9 @@ def ProcessHead(name: str,
 
     :return: Dictionary mapping luminosities to image layers.
     """
-    newHeadData: dict = GetHeadOffsets(name, head_data)
-    headType: str = newHeadData["size"]
+    headData: dict = GetHeadOffsets(name, head_data)
+    headOrder: dict = GetHeadOrder(name, head_data)
+    headType: str = headData["size"]
     headSize: list = source_data["head"][headType]["size"]
     headWhere: list = source_data["head"][headType]["where"]
 
@@ -266,30 +319,35 @@ def ProcessHead(name: str,
 
     outData: dict = {}
 
-    for s in STATES:
+    for state in STATES:
         dx: int = -24 if headType == "small" else 0
-        dy: int = +32 * (2 if s == "right" else (1 if s == "left" else 0))
 
-        outData[s] = {}
-        for k, image in layers.items():
-            newFrame: np.ndarray = np.zeros(
-                (COLOR_REGION[1], COLOR_REGION[0], 4),
-                np.uint8,
-            )
+        if state == "right":
+            dy = +32 * 2
+        elif state == "left":
+            dy = +32 * 1
+        else:
+            dy = +32 * 0
 
-            for n in range(len(COLORS)):
-                offX: int = newHeadData[s][n][0]
-                offY: int = newHeadData[s][n][1]
+        outData[state] = {}
+        for layer, image in layers.items():
+            shape: tuple = (COLOR_REGION[1], COLOR_REGION[0], 4)
+            frame: np.ndarray = np.zeros(shape, np.uint8)
 
-                whereX: int = headWhere[s][0] + (headSize[0] * n)
-                whereY: int = headWhere[s][1]
+            for n in range(4):
+                offX: int = headData[state][n][0]
+                offY: int = headData[state][n][1]
 
-                newImage: np.ndarray = Crop(image, [whereX, whereY], headSize)
-                newPos: tuple = (dx + offX + (32 * n), dy - offY)
+                whereX: int = headWhere[state][0] + (headSize[0] * headOrder[state][n])
+                whereY: int = headWhere[state][1]
 
-                Paste(newFrame, newImage, newPos)
+                newImg: np.ndarray = Crop(image, [whereX, whereY], headSize)
+                newX: int = dx + offX + (32 * n)
+                newY: int = dy - offY
 
-            outData[s][k] = newFrame
+                Paste(frame, newImg, (newX, newY))
+
+            outData[state][layer] = frame
 
     return outData
 
@@ -344,7 +402,7 @@ def Process(head_path: str,
                             source_data,
                             is_alpha,
                             ),
-        }
+    }
 
 
 def CompositeIdle(head: str,
@@ -401,7 +459,7 @@ def CompositeIdle(head: str,
             bodyOffsetData,
             srcCropData,
             is_alpha,
-            )
+        )
 
         # Composite idle frames
         PasteLayers(
@@ -412,8 +470,8 @@ def CompositeIdle(head: str,
                 newData["head"]["idle"],
                 newData["body"]["idle"],
                 reverse=headOffsetData.get(body, {}).get("reverse", False),
-                )
             )
+        )
 
         # Paste onto master spritesheet
         Paste(outImage, newImage, (0, y * STATE_REGION[1]))
@@ -487,7 +545,7 @@ def CompositeFull(head: str,
             bodyOffsetData,
             srcCropData,
             is_alpha,
-            )
+        )
 
         # Composite idle frames
         PasteLayers(
@@ -498,8 +556,8 @@ def CompositeFull(head: str,
                 newData["head"]["idle"],
                 newData["body"]["idle"],
                 reverse=headOffsetData.get(body, {}).get("reverse", False),
-                )
             )
+        )
 
         # Composite left-moving frames
         PasteLayers(
@@ -507,7 +565,7 @@ def CompositeFull(head: str,
             newData["head"]["left"],
             newData["body"]["left"],
             SortedSet(newData["head"]["left"], newData["body"]["left"]),
-            )
+        )
 
         # Composite right-moving frames
         PasteLayers(
@@ -515,7 +573,7 @@ def CompositeFull(head: str,
             newData["head"]["right"],
             newData["body"]["right"],
             SortedSet(newData["head"]["right"], newData["body"]["right"]),
-            )
+        )
 
         # Place onto master spritesheet
         Paste(outImage, newImage, (0, y * COLOR_REGION[1]))

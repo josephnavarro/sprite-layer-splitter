@@ -1221,10 +1221,10 @@ class App(tk.Frame):
 
         self._CanvStaticPreview.create_image(pos, anchor=anchor, image=im)
 
-        App.DrawText(self._CanvStaticPreview, 18 + 96 * 0, 92, "(1)")
-        App.DrawText(self._CanvStaticPreview, 18 + 96 * 1, 92, "(2)")
-        App.DrawText(self._CanvStaticPreview, 18 + 96 * 2, 92, "(3)")
-        App.DrawText(self._CanvStaticPreview, 18 + 96 * 3, 92, "(4)")
+        App.DrawText(self._CanvStaticPreview, 18 + 96 * 0, 92, "(0)")
+        App.DrawText(self._CanvStaticPreview, 18 + 96 * 1, 92, "(1)")
+        App.DrawText(self._CanvStaticPreview, 18 + 96 * 2, 92, "(2)")
+        App.DrawText(self._CanvStaticPreview, 18 + 96 * 3, 92, "(3)")
 
     def MakeIdlePreview(self) -> None:
         """
