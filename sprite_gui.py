@@ -97,7 +97,7 @@ class App(tk.Frame):
         # Windows
         DEFAULT_OPTION_WIDTH = 26
         DEFAULT_BUTTON_WIDTH = 27
-        DEFAULT_SLIDER_WIDTH = 256
+        DEFAULT_SLIDER_WIDTH = 272
     else:
         # OS X / Linux
         DEFAULT_OPTION_WIDTH = 19
@@ -1221,10 +1221,10 @@ class App(tk.Frame):
 
         self._CanvStaticPreview.create_image(pos, anchor=anchor, image=im)
 
-        App.DrawText(self._CanvStaticPreview, 18 + 96 * 0, 96, "(1)")
-        App.DrawText(self._CanvStaticPreview, 18 + 96 * 1, 96, "(2)")
-        App.DrawText(self._CanvStaticPreview, 18 + 96 * 2, 96, "(3)")
-        App.DrawText(self._CanvStaticPreview, 18 + 96 * 3, 96, "(4)")
+        App.DrawText(self._CanvStaticPreview, 18 + 96 * 0, 92, "(1)")
+        App.DrawText(self._CanvStaticPreview, 18 + 96 * 1, 92, "(2)")
+        App.DrawText(self._CanvStaticPreview, 18 + 96 * 2, 92, "(3)")
+        App.DrawText(self._CanvStaticPreview, 18 + 96 * 3, 92, "(4)")
 
     def MakeIdlePreview(self) -> None:
         """
