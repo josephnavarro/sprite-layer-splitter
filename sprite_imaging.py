@@ -180,7 +180,12 @@ def Paste(dest: np.ndarray,
                 if src[yy, xx, 3]:
                     dest[y + yy, x + xx] = src[yy, xx]
             except IndexError:
-                dest[y + yy, x + xx] = src[yy, xx]
+                # Has no alpha channel
+                try:
+                    dest[y + yy, x + xx] = src[yy, xx]
+                except IndexError:
+                    # Out of bounds
+                    pass
 
 
 # noinspection PyUnresolvedReferences
