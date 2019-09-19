@@ -126,7 +126,7 @@ class App(tk.Frame):
     GRID_LABEL_BODY_XYOFFSET = [2, 1]
     GRID_LABEL_SPEED_PREVIEW = [3, 1]
     GRID_SCALE_SPEED_PREVIEW = [4, 1]
-    GRID_CHECK_ANIM_PINGPONG = [5, 1]
+    GRID_CHECK_ANIM_PINGPONG = [1, 2]
     GRID_CANVAS_IMGS_PREVIEW = [0, 1]
     GRID_CANVAS_ANIM_PREVIEW = [0, 2]
     GRID_OPTIONS_SELECT_HEAD = [1, 0]
@@ -180,8 +180,8 @@ class App(tk.Frame):
     SAV_IDLE_BTN_LABEL = "Export idle frames"
     SAV_FULL_BTN_LABEL = "Export all frames"
     ANIMATECHECK_LABEL = "Ping-pong animation"
-    XYHEADOFFSET_LABEL = "Head offset:"
-    XYBODYOFFSET_LABEL = "Body offset:"
+    XYHEADOFFSET_LABEL = "Head: "
+    XYBODYOFFSET_LABEL = "Body: "
 
     # Animation speeds
     SPEED_SCALE_MIN = 0
@@ -199,16 +199,17 @@ class App(tk.Frame):
 
         :return: None.
         """
+        font: str = "Courier 14 bold"
         for m in range(-2, 3):
             for n in range(-2, 3):
                 canvas.create_text(x + m, y + n,
-                                   font="Arial 12 bold",
+                                   font=font,
                                    fill="black",
                                    text=text,
                                    anchor=tk.NW)
 
         canvas.create_text(x, y,
-                           font="Arial 12 bold",
+                           font=font,
                            fill="white",
                            text=text,
                            anchor=tk.NW)
@@ -358,6 +359,10 @@ class App(tk.Frame):
             anchor: str = tk.NW
             im: tk.PhotoImage = self._AnimObjs[self._CurFrame]
             self._CanvAnimPreview.create_image(pos, anchor=anchor, image=im)
+
+            # FONT RENDERING IS EXPENSIVE!!!!!!!!!!!!!!!!!!!!
+            #text: str = "({})".format(self._CurFrame)
+            #App.DrawText(self._CanvAnimPreview, 18, 92, text)
 
         except IndexError:
             pass
@@ -554,12 +559,12 @@ class App(tk.Frame):
         """
         self._CheckAnimPingpong.destroy()
 
-        mtr: tk.Frame = self._FrameTopRight  # Master
+        mtr: tk.Frame = self._FrameBottom  # Master
         txt: str = self.ANIMATECHECK_LABEL  # Text
         var: tk.BooleanVar = self._BoolAnimPingPong  # Variable
         row: int = self.GRID_CHECK_ANIM_PINGPONG[0]  # Row
         column: int = self.GRID_CHECK_ANIM_PINGPONG[1]  # Column
-        sticky: str = tk.W  # Sticky
+        sticky: str = tk.NS  # Sticky
 
         self._CheckAnimPingpong = tk.Checkbutton(mtr, text=txt, variable=var)
         self._CheckAnimPingpong.grid(row=row, column=column, sticky=sticky)
@@ -592,8 +597,9 @@ class App(tk.Frame):
         row: int = self.GRID_LABEL_BODY_XYOFFSET[0]
         col: int = self.GRID_LABEL_BODY_XYOFFSET[1]
         sticky: str = tk.W
+        font: tuple = ("Courier", 14)
 
-        self._LabelOffsetBody = tk.Label(master, text=text)
+        self._LabelOffsetBody = tk.Label(master, font=font, text=text)
         self._LabelOffsetBody.grid(row=row, column=col, sticky=sticky)
 
     def InitBtnExportFull(self) -> None:
@@ -977,12 +983,13 @@ class App(tk.Frame):
         self._LabelAnimFrame.destroy()
 
         master: tk.Frame = self._FrameTopRight
-        text: str = "Frame: 0"
+        text: str = "Frame: (0)  1   2   3"
         row: int = self.GRID_LABEL_FRAME_PREVIEW[0]
         col: int = self.GRID_LABEL_FRAME_PREVIEW[1]
         sticky: str = tk.W
+        font: tuple = ("Courier", 14)
 
-        self._LabelAnimFrame = tk.Label(master, text=text)
+        self._LabelAnimFrame = tk.Label(master, font=font, text=text)
         self._LabelAnimFrame.grid(row=row, column=col, sticky=sticky)
 
     def InitHeadData(self) -> None:
@@ -1013,8 +1020,9 @@ class App(tk.Frame):
         row: int = self.GRID_LABEL_HEAD_XYOFFSET[0]
         column: int = self.GRID_LABEL_HEAD_XYOFFSET[1]
         sticky: str = tk.W
+        font: tuple = ("Courier", 14)
 
-        self._LabelOffsetHead = tk.Label(master, text=text)
+        self._LabelOffsetHead = tk.Label(master, font=font, text=text)
         self._LabelOffsetHead.grid(row=row, column=column, sticky=sticky)
 
     def InitLabelOffsets(self) -> None:
@@ -1109,8 +1117,9 @@ class App(tk.Frame):
         row: int = self.GRID_LABEL_SPEED_PREVIEW[0]
         col: int = self.GRID_LABEL_SPEED_PREVIEW[1]
         sticky: str = tk.W
+        font: tuple = ("Courier", 14)
 
-        self._LabelAnimSpeed = tk.Label(master, text=text)
+        self._LabelAnimSpeed = tk.Label(master, font=font, text=text)
         self._LabelAnimSpeed.grid(row=row, column=col, sticky=sticky)
 
         # Create speed scale
@@ -1138,7 +1147,7 @@ class App(tk.Frame):
         col: int = self.GRID_SCALE_SPEED_PREVIEW[1]
         sticky: str = tk.W
 
-        self._ScaleAnimSpeed.grid(row=row, column=col, sticky=sticky)
+        self._ScaleAnimSpeed.grid(row=row, column=col, sticky=sticky, pady=4)
 
     def InitStaticPreview(self) -> None:
         """
@@ -1204,6 +1213,10 @@ class App(tk.Frame):
         im: tk.PhotoImage = self._AnimObjs[0]
 
         self._CanvAnimPreview.create_image(pos, anchor=anchor, image=im)
+
+        # FONT RENDERING IS EXPENSIVE!!!!!!!!!!!!!!!!!!!!!!!
+        #text: str = "({})".format(self._CurFrame)
+        #App.DrawText(self._CanvAnimPreview, 18, 92, text)
 
     def MakeAnimationPreview(self, image) -> None:
         """
@@ -1565,7 +1578,8 @@ class App(tk.Frame):
         self._CurFrame = curFrame
 
         # Update frame count label
-        text: str = "Frame: {}".format(curFrame)
+        text: str =  "Frame: " + " ".join(["({})".format(x) if x == curFrame else " {} ".format(x) for x in range(4)])
+
         self._LabelAnimFrame.config(text=text)
 
     def UpdateHeadOffsetLabel(self, state, frame) -> None:
