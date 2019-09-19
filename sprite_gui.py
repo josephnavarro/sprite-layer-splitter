@@ -102,7 +102,7 @@ class App(tk.Frame):
         # OS X / Linux
         DEFAULT_OPTION_WIDTH = 19
         DEFAULT_BUTTON_WIDTH = 22
-        DEFAULT_SLIDER_WIDTH = 256
+        DEFAULT_SLIDER_WIDTH = 280
 
     PREVIEW_CANVAS_WIDTH = 384
     PREVIEW_CANVAS_HEIGHT = 96
@@ -530,7 +530,7 @@ class App(tk.Frame):
         height: int = self.PREVIEW_ANIM_HEIGHT
         bg: str = self.FromRGB(*self.PREVIEW_CANVAS_COLOR)
         relief: str = tk.SUNKEN
-        border: int = 16
+        border: int = 13
 
         self._CanvAnimPreview = tk.Canvas(
             master,
@@ -1155,7 +1155,7 @@ class App(tk.Frame):
         height: int = self.PREVIEW_CANVAS_HEIGHT
         bg: str = self.FromRGB(*self.PREVIEW_CANVAS_COLOR)
         relief: str = tk.SUNKEN
-        border: int = 16
+        border: int = 13
 
         self._CanvStaticPreview = tk.Canvas(
             master,
