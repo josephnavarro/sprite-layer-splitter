@@ -119,15 +119,14 @@ class App(tk.Frame):
     BG_COLOR_BUTTON_SAVE = [244, 212, 248]
 
     # Grid positions for widgets
-    GRID_LABEL_FRAME_PREVIEW = [0, 1]
-    GRID_LABEL_HEAD_XYOFFSET = [1, 1]
-    GRID_LABEL_BODY_XYOFFSET = [2, 1]
-    GRID_LABEL_SPEED_PREVIEW = [3, 1]
     GRID_SCALE_SPEED_PREVIEW = [4, 1]
+
     GRID_CHECK_ANIM_PINGPONG = [1, 2]
     GRID_CHECK_LAYER_REVERSE = [1, 3]
+
     GRID_CANVAS_IMGS_PREVIEW = [0, 1]
     GRID_CANVAS_ANIM_PREVIEW = [0, 2]
+
     GRID_OPTIONS_SELECT_HEAD = [1, 0]
 
     GRID = {
@@ -142,6 +141,10 @@ class App(tk.Frame):
         "rebuild-head-data":    [3, 0],
         "rebuild-head-images":  [2, 0],
         "rebuild-head-offsets": [4, 0],
+        "offset-body":          [2, 1],
+        "offset-head":          [1, 1],
+        "frame-anim":           [0, 1],
+        "speed-anim":           [3, 1],
     }
 
     GRID_OPTIONS_SELECT_BODY = [1, 1]
@@ -186,6 +189,10 @@ class App(tk.Frame):
         "rebuild-head-data":    "Recheck head listing",
         "rebuild-head-images":  "Reconstruct head images",
         "rebuild-head-offsets": "Reload head offsets",
+        "offset-body":          "Body: {0:+d}, {1:+d}",
+        "offset-head":          "Head: {0:+d}, {1:+d}",
+        "speed-anim":           "Speed: {0:d}",
+        "frame-anim":           "Frame: ({0:d})  {1:d}  {2:d}  {3:d}"
     }
 
     COLORS = {
@@ -205,7 +212,6 @@ class App(tk.Frame):
     LABEL_CHECK_PINGPONG_ANIMATE = "Ping-pong animation"
     LABEL_CHECK_REVERSE_LAYERING = "Reverse layering"
     LABEL_CURRENT_XY_HEAD_OFFSET = "Head: "
-    LABEL_CURRENT_XY_BODY_OFFSET = "Body: "
     LABEL_MENU_CHOICES_HEAD_NULL = "Select head"
     LABEL_MENU_CHOICES_BODY_NULL = "Select body"
 
@@ -340,32 +346,46 @@ class App(tk.Frame):
                                              *self._BodyList)
 
         # Labels
-        self._LabelOffsetHead = tk.Label()
-        self._LabelOffsetBody = tk.Label()
-        self._LabelAnimSpeed = tk.Label()
-        self._LabelAnimFrame = tk.Label()
+        self._Labels = {
+            "offset-head": tk.Label(),
+            "offset-body": tk.Label(),
+            "speed-anim":  tk.Label(),
+            "frame-anim":  tk.Label(),
+        }
 
         # Sliders
         self._ScaleAnimSpeed = tk.Scale()
 
         # Complete widget initialization
-        self.InitHeadData()
+        self.InitDataHead()
         self.InitBodyData()
-        self.InitButtonExportIdle()
-        self.InitButtonExportFull()
-        self.InitCanvasPreviews()
-        self.InitSpeedWidgets()
+        self.InitButton(self._FrameBottom, "export-idle", self.ExportIdleFrames)
+        self.InitButton(self._FrameBottom, "export-full", self.ExportFullFrames)
+        self.InitPreviewStatic()
+        self.InitPreviewAnimation()
+        self.InitSliderSpeed()
+        self.InitLabel(self._FrameTopRight, "speed-anim", ("Courier", 14), tk.W,
+                       0)
         self.InitFrameReadout()
-        self.InitOffsetLabels()
-        self.InitButtonPreviewIdle()
-        self.InitButtonPreviewLeft()
-        self.InitButtonPreviewRight()
-        self.InitButtonRebuildBodyData()
-        self.InitButtonRebuildBodyImages()
-        self.InitButtonRebuildBodyOffsets()
-        self.InitButtonRebuildHeadData()
-        self.InitButtonRebuildHeadImages()
-        self.InitButtonRebuildHeadOffsets()
+        self.InitLabel(self._FrameTopRight, "offset-head", ("Courier", 14),
+                       tk.W, 0, 0)
+        self.InitBodyOffsetLabel()
+        self.InitButton(self._FrameBottom, "preview-idle", self.MakeIdlePreview)
+        self.InitButton(self._FrameBottom, "preview-left", self.MakeLeftPreview)
+        self.InitButton(self._FrameBottom, "preview-right",
+                        self.MakeRightPreview)
+        self.InitButton(self._FrameBottom, "rebuild-body-data",
+                        self.RebuildBodyData)
+        self.InitButton(self._FrameBottom, "rebuild-body-images",
+                        self.RebuildBodyImages)
+        self.InitButton(self._FrameBottom, "rebuild-body-offsets",
+                        self.RebuildBodyOffsets)
+        self.InitButton(self._FrameBottom, "rebuild-head-data",
+                        self.RebuildHeadData)
+        self.InitButton(self._FrameBottom, "rebuild-head-images",
+                        self.RebuildHeadImages)
+        self.InitButton(self._FrameBottom, "rebuild-head-offsets",
+                        self.RebuildHeadOffsets)
         self.InitOptionSelectHead()
         self.InitOptionSelectBody()
         self.InitCheckAnimPingpong()
@@ -528,7 +548,7 @@ class App(tk.Frame):
         message = self.MESSAGE_SUCCESS_IDLE
         self.ExportFrames(func, message)
 
-    def InitAnimatedPreview(self) -> None:
+    def InitPreviewAnimation(self) -> None:
         """
         Initializes animated image preview canvas.
 
@@ -638,115 +658,8 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._LabelOffsetBody.destroy()
-
-        master: tk.Frame = self._FrameTopRight
-        label: str = self.LABEL_CURRENT_XY_BODY_OFFSET
-        text: str = "{0:s} {1:+d}, {2:+d}".format(label, 0, 0)
-        row: int = self.GRID_LABEL_BODY_XYOFFSET[0]
-        col: int = self.GRID_LABEL_BODY_XYOFFSET[1]
-        sticky: str = tk.W
-        font: tuple = ("Courier", 14)
-
-        self._LabelOffsetBody = tk.Label(master, font=font, text=text)
-        self._LabelOffsetBody.grid(row=row, column=col, sticky=sticky)
-
-    def InitButtonExportFull(self) -> None:
-        """
-        Completes initialization of "full composition" button.
-
-        :return: None.
-        """
-        self.InitButton(self._FrameBottom, "export-full", self.ExportFullFrames)
-
-    def InitButtonExportIdle(self) -> None:
-        """
-        Completes initialization of "save idle frames" button.
-
-        :return: None.
-        """
-        self.InitButton(self._FrameBottom, "export-idle", self.ExportIdleFrames)
-
-    def InitButtonPreviewIdle(self) -> None:
-        """
-        Completes initialization of "preview idle" button.
-
-        :return: None
-        """
-        self.InitButton(self._FrameBottom, "preview-idle", self.MakeIdlePreview)
-
-    def InitButtonPreviewLeft(self) -> None:
-        """
-        Completes initialization of "preview left" button.
-
-        :return: None
-        """
-        self.InitButton(self._FrameBottom, "preview-left", self.MakeLeftPreview)
-
-    def InitButtonPreviewRight(self) -> None:
-        """
-        Completes initialization of "preview right" button.
-
-        :return: None
-        """
-        self.InitButton(self._FrameBottom, "preview-right", self.MakeRightPreview)
-
-    def InitButtonRebuildBodyData(self) -> None:
-        """
-        Completes initialization of "rebuild body" button.
-
-        :return: None.
-        """
-        self.InitButton(self._FrameBottom, "rebuild-body-data", self.RebuildBodyData)
-
-    def InitButtonRebuildBodyImages(self) -> None:
-        """
-        Completes initialization of "rebuild body intermediates" button.
-
-        :return: None.
-        """
-        self.InitButton(self._FrameBottom, "rebuild-body-images", self.RebuildBodyImages)
-
-    def InitButtonRebuildBodyOffsets(self) -> None:
-        """
-        Completes initialization of "rebuild body offsets" button.
-
-        :return: None.
-        """
-        self.InitButton(self._FrameBottom, "rebuild-body-offsets", self.RebuildBodyOffsets)
-
-    def InitButtonRebuildHeadData(self) -> None:
-        """
-        Completes initialization of "rebuild head" button.
-
-        :return: None.
-        """
-        self.InitButton(self._FrameBottom, "rebuild-head-data", self.RebuildHeadData)
-
-    def InitButtonRebuildHeadImages(self) -> None:
-        """
-        Completes initialization of "rebuild head intermediates" button.
-
-        :return: None.
-        """
-        self.InitButton(self._FrameBottom, "rebuild-head-images", self.RebuildHeadImages)
-
-    def InitButtonRebuildHeadOffsets(self) -> None:
-        """
-        Completes initialization of "rebuild head offsets" button.
-
-        :return: None.
-        """
-        self.InitButton(self._FrameBottom, "rebuild-head-offsets", self.RebuildHeadOffsets)
-
-    def InitCanvasPreviews(self) -> None:
-        """
-        Completes initialization of preview image canvas.
-
-        :return: None.
-        """
-        self.InitStaticPreview()
-        self.InitAnimatedPreview()
+        self.InitLabel(self._FrameTopRight,
+                       "offset-body", ("Courier", 14), tk.W, 0, 0)
 
     def InitFrameReadout(self) -> None:
         """
@@ -754,19 +667,13 @@ class App(tk.Frame):
 
         :return: None
         """
-        self._LabelAnimFrame.destroy()
+        self.InitLabel(self._FrameTopRight,
+                       "frame-anim",
+                       ("Courier", 14),
+                       tk.W, 0, 1, 2, 3,
+                       )
 
-        master: tk.Frame = self._FrameTopRight
-        text: str = "Frame: (0)  1   2   3"
-        row: int = self.GRID_LABEL_FRAME_PREVIEW[0]
-        col: int = self.GRID_LABEL_FRAME_PREVIEW[1]
-        sticky: str = tk.W
-        font: tuple = ("Courier", 14)
-
-        self._LabelAnimFrame = tk.Label(master, font=font, text=text)
-        self._LabelAnimFrame.grid(row=row, column=col, sticky=sticky)
-
-    def InitHeadData(self) -> None:
+    def InitDataHead(self) -> None:
         """
         Completes initialization of head data (from file).
 
@@ -780,33 +687,35 @@ class App(tk.Frame):
         self._HeadList = sorted(list(self._HeadData))
         self._HeadOffsets = LoadHeadOffsets()
 
-    def InitHeadOffsetLabel(self) -> None:
+    def InitLabel(self,
+                  master: tk.Frame,
+                  tag: str,
+                  font: tuple,
+                  sticky: str,
+                  *args) -> None:
         """
-        Completes initialization of framewise (x,y) head offsets.
+        Initializes a label.
+
+        :param master:
+        :param tag:
+        :param font:
+        :param sticky:
+        :param args:
 
         :return: None.
         """
-        self._LabelOffsetHead.destroy()
+        self._Labels[tag].destroy()
 
-        master: tk.Frame = self._FrameTopRight
-        label: str = self.LABEL_CURRENT_XY_HEAD_OFFSET
-        text: str = "{0:s} {1:+d}, {2:+d}".format(label, 0, 0)
-        row: int = self.GRID_LABEL_HEAD_XYOFFSET[0]
-        column: int = self.GRID_LABEL_HEAD_XYOFFSET[1]
-        sticky: str = tk.W
-        font: tuple = ("Courier", 14)
+        row: int = App.GRID[tag][0]
+        col: int = App.GRID[tag][1]
+        label: str = App.LABELS[tag]
+        try:
+            text: str = label.format(*args)
+        except IndexError:
+            text = label
 
-        self._LabelOffsetHead = tk.Label(master, font=font, text=text)
-        self._LabelOffsetHead.grid(row=row, column=column, sticky=sticky)
-
-    def InitOffsetLabels(self) -> None:
-        """
-        Completes initialization of per-frame (x,y) offset labels.
-
-        :return: None.
-        """
-        self.InitHeadOffsetLabel()
-        self.InitBodyOffsetLabel()
+        self._Labels[tag] = tk.Label(master, font=font, text=text)
+        self._Labels[tag].grid(row=row, column=col, sticky=sticky)
 
     def InitOptionSelectHead(self) -> None:
         """
@@ -877,35 +786,22 @@ class App(tk.Frame):
 
         self._MenuSelectBody.grid(row=row, column=col, padx=px, pady=py)
 
-    def InitSpeedWidgets(self) -> None:
+    def InitSliderSpeed(self) -> None:
         """
         Completes initialization of framerate adjustment widgets.
 
         :return: None.
         """
-        # Create speed label
-        self._LabelAnimSpeed.destroy()
-
-        master: tk.Frame = self._FrameTopRight
-        text: str = "Speed: 0"
-        row: int = self.GRID_LABEL_SPEED_PREVIEW[0]
-        col: int = self.GRID_LABEL_SPEED_PREVIEW[1]
-        sticky: str = tk.W
-        font: tuple = ("Courier", 14)
-
-        self._LabelAnimSpeed = tk.Label(master, font=font, text=text)
-        self._LabelAnimSpeed.grid(row=row, column=col, sticky=sticky)
-
-        # Create speed scale
         self._ScaleAnimSpeed.destroy()
 
         master: tk.Frame = self._FrameTopRight
-        from_: int = self.SPEED_SCALE_MIN
-        to: int = self.SPEED_SCALE_MAX
-        orient: str = tk.HORIZONTAL
-        length: int = self.DEFAULT_SLIDER_WIDTH
-        showvalue: int = 0
         cmd: types.FunctionType = self.UpdateSpeed
+
+        from_: int = App.SPEED_SCALE_MIN
+        to: int = App.SPEED_SCALE_MAX
+        orient: str = tk.HORIZONTAL
+        length: int = App.DEFAULT_SLIDER_WIDTH
+        showvalue: int = 0
 
         self._ScaleAnimSpeed = tk.Scale(
             master,
@@ -917,13 +813,13 @@ class App(tk.Frame):
             command=cmd,
         )
 
-        row: int = self.GRID_SCALE_SPEED_PREVIEW[0]
-        col: int = self.GRID_SCALE_SPEED_PREVIEW[1]
+        row: int = App.GRID_SCALE_SPEED_PREVIEW[0]
+        col: int = App.GRID_SCALE_SPEED_PREVIEW[1]
         sticky: str = tk.W
 
         self._ScaleAnimSpeed.grid(row=row, column=col, sticky=sticky, pady=4)
 
-    def InitStaticPreview(self) -> None:
+    def InitPreviewStatic(self) -> None:
         """
         Initializes static image preview canvas.
 
@@ -934,9 +830,9 @@ class App(tk.Frame):
         self._CanvStaticPreview.destroy()
 
         master: tk.Frame = self._FrameTopleft
-        width: int = self.PREVIEW_CANVAS_SIZE[0]
-        height: int = self.PREVIEW_CANVAS_SIZE[1]
-        bg: str = self.FromRGB(*self.FG_COLOR_PREVIEW_CVS)
+        width: int = App.PREVIEW_CANVAS_SIZE[0]
+        height: int = App.PREVIEW_CANVAS_SIZE[1]
+        bg: str = App.FromRGB(*App.FG_COLOR_PREVIEW_CVS)
         relief: str = tk.SUNKEN
         border: int = 13
 
@@ -949,8 +845,8 @@ class App(tk.Frame):
             borderwidth=border,
         )
 
-        row: int = self.GRID_CANVAS_IMGS_PREVIEW[0]  # Row
-        col: int = self.GRID_CANVAS_IMGS_PREVIEW[1]  # Column
+        row: int = App.GRID_CANVAS_IMGS_PREVIEW[0]  # Row
+        col: int = App.GRID_CANVAS_IMGS_PREVIEW[1]  # Column
 
         self._CanvStaticPreview.grid(row=row, column=col)
 
@@ -1188,8 +1084,8 @@ class App(tk.Frame):
 
         :return: None
         """
-        title: str = self.WINDOW_TITLE
-        query: str = self.CONFIRM_REBUILD_BDAT
+        title: str = App.WINDOW_TITLE
+        query: str = App.CONFIRM_REBUILD_BDAT
 
         if tk.messagebox.askquestion(title, query) == "yes":
             CreateBodyJSON()
@@ -1206,14 +1102,14 @@ class App(tk.Frame):
 
         :return: None.
         """
-        title: str = self.WINDOW_TITLE
-        message: str = self.CONFIRM_REBUILD_BIMG
+        title: str = App.WINDOW_TITLE
+        query: str = App.CONFIRM_REBUILD_BIMG
 
-        if tk.messagebox.askquestion(title, message) == "yes":
+        if tk.messagebox.askquestion(title, query) == "yes":
             PrepareBody()
 
-            message = self.MESSAGE_REBUILD_BIMG
-            tk.messagebox.showinfo(title, message)
+            query = self.MESSAGE_REBUILD_BIMG
+            tk.messagebox.showinfo(title, query)
 
     def RebuildBodyOffsets(self) -> None:
         """
@@ -1245,13 +1141,13 @@ class App(tk.Frame):
 
         :return: None.
         """
-        title: str = self.WINDOW_TITLE
-        message: str = self.CONFIRM_REBUILD_HDAT
+        title: str = App.WINDOW_TITLE
+        message: str = App.CONFIRM_REBUILD_HDAT
 
         if tk.messagebox.askquestion(title, message) == "yes":
             CreateHeadJSON()
 
-            self.InitHeadData()
+            self.InitDataHead()
             self.InitOptionSelectHead()
 
             message = self.MESSAGE_REBUILD_HDAT
@@ -1309,14 +1205,12 @@ class App(tk.Frame):
             bodyOffsets: list = self._CurBody["offset"][state]
             x, y = bodyOffsets[frame]
 
-            label: str = self.LABEL_CURRENT_XY_BODY_OFFSET
-            text: str = "{0:s} {1:+d}, {2:+d}".format(label, x, y)
-            self._LabelOffsetBody.config(text=text)
+            text: str = App.LABELS["offset-body"].format(x, y)
+            self._Labels["offset-body"].config(text=text)
 
         except (KeyError, IndexError):
-            label: str = self.LABEL_CURRENT_XY_BODY_OFFSET
-            text: str = "{0:s} {1:+d}, {2:+d}".format(label, 0, 0)
-            self._LabelOffsetBody.config(text=text)
+            text: str = App.LABELS["offset-body"].format(0, 0)
+            self._Labels["offset-body"].config(text=text)
 
     def UpdateCurrentFrame(self) -> None:
         """
@@ -1356,7 +1250,7 @@ class App(tk.Frame):
             ["({})".format(x) if x == curFrame else " {} ".format(x) for x in
              range(4)])
 
-        self._LabelAnimFrame.config(text=text)
+        self._Labels["frame-anim"].config(text=text)
 
     def UpdateHeadOffsetLabel(self, state, frame) -> None:
         """
@@ -1371,14 +1265,12 @@ class App(tk.Frame):
             headOffsets: list = self._CurHead["offset"][state]
 
             x, y = headOffsets[frame]
-            label: str = self.LABEL_CURRENT_XY_HEAD_OFFSET
-            text: str = "{0:s} {1:+d}, {2:+d}".format(label, x, y)
-            self._LabelOffsetHead.config(text=text)
+            text: str = App.LABELS["offset-head"].format(x, y)
+            self._Labels["offset-head"].config(text=text)
 
         except (KeyError, IndexError):
-            label: str = self.LABEL_CURRENT_XY_HEAD_OFFSET
-            text: str = "{0:s} {1:+d}, {2:+d}".format(label, 0, 0)
-            self._LabelOffsetHead.config(text=text)
+            text: str = App.LABELS["offset-head"].format(0, 0)
+            self._Labels["offset-head"].config(text=text)
 
     def UpdateOffsetLabels(self) -> None:
         """
@@ -1399,8 +1291,8 @@ class App(tk.Frame):
 
         :return: None.
         """
-        text: str = "Speed: {}".format(speed)
-        self._LabelAnimSpeed.config(text=text)
+        text: str = App.LABELS["speed-anim"].format(int(speed))
+        self._Labels["speed-anim"].config(text=text)
         self._CurSpeed = int(speed)
 
         if int(speed) == 0:
