@@ -72,25 +72,25 @@ class App(tk.Frame):
     WINDOW_TITLE = "Fire Emblem 3DS Sprite Tool"
 
     # Popup message text content
-    FAILURE_BODY_MESSAGE = "Error: Body not specified!"
-    FAILURE_HEAD_MESSAGE = "Error: Head not specified!"
-    FAILURE_TYPE_MESSAGE = "Error: Invalid image format specified!"
-    INVALID_BODY_MESSAGE = "Error: Body spritesheet '{}' does not exist!"
-    INVALID_HEAD_MESSAGE = "Error: Head spritesheet '{}' does not exist!"
-    REBUILD_BIMG_CONFIRM = "Reconstruct body source images?"
-    REBUILD_BIMG_MESSAGE = "Successfully reconstructed body source images."
-    REBUILD_BDAT_CONFIRM = "Recheck body listing?"
-    REBUILD_BDAT_MESSAGE = "Reassembled list of available bodies."
-    REBUILD_BOFF_CONFIRM = "Reload body offsets?"
-    REBUILD_BOFF_MESSAGE = "Successfully reloaded per-frame body offsets."
-    REBUILD_HIMG_CONFIRM = "Reconstruct head source images?"
-    REBUILD_HIMG_MESSAGE = "Successfully reconstructed head source images."
-    REBUILD_HDAT_CONFIRM = "Rcheck head listing?"
-    REBUILD_HDAT_MESSAGE = "Reassembled list of available heads."
-    REBUILD_HOFF_CONFIRM = "Reload head offsets?"
-    REBUILD_HOFF_MESSAGE = "Successfully reloaded per-frame head offsets."
-    SUCCESS_FULL_MESSAGE = "Sprite frames saved to {}!"
-    SUCCESS_IDLE_MESSAGE = "Idle frames saved to {}!"
+    CONFIRM_REBUILD_BDAT = "Recheck body listing?"
+    CONFIRM_REBUILD_BIMG = "Reconstruct body source images?"
+    CONFIRM_REBUILD_BOFF = "Reload body offsets?"
+    CONFIRM_REBUILD_HDAT = "Recheck head listing?"
+    CONFIRM_REBUILD_HIMG = "Reconstruct head source images?"
+    CONFIRM_REBUILD_HOFF = "Reload head offsets?"
+    MESSAGE_FAILURE_BODY = "Error: Body not specified!"
+    MESSAGE_FAILURE_HEAD = "Error: Head not specified!"
+    MESSAGE_FAILURE_TYPE = "Error: Invalid image format specified!"
+    MESSAGE_INVALID_BODY = "Error: Body spritesheet '{}' does not exist!"
+    MESSAGE_INVALID_HEAD = "Error: Head spritesheet '{}' does not exist!"
+    MESSAGE_REBUILD_BIMG = "Successfully reconstructed body source images."
+    MESSAGE_REBUILD_BDAT = "Reassembled list of available bodies."
+    MESSAGE_REBUILD_BOFF = "Successfully reloaded per-frame body offsets."
+    MESSAGE_REBUILD_HIMG = "Successfully reconstructed head source images."
+    MESSAGE_REBUILD_HDAT = "Reassembled list of available heads."
+    MESSAGE_REBUILD_HOFF = "Successfully reloaded per-frame head offsets."
+    MESSAGE_SUCCESS_FULL = "Sprite frames saved to {}!"
+    MESSAGE_SUCCESS_IDLE = "Idle frames saved to {}!"
 
     # Default widget dimensions
     if IsWindows():
@@ -108,15 +108,15 @@ class App(tk.Frame):
     PREVIEW_ANIM_SIZE = [96, 96]
 
     # Default widget colors
-    BODY_BUTTON_FG_COLOR = [0, 0, 0]
-    HEAD_BUTTON_FG_COLOR = [0, 0, 0]
-    PREVIEW_BTN_FG_COLOR = [0, 0, 0]
-    PREVIEW_CANVAS_COLOR = [0, 0, 0]
-    SAVE_BUTTON_FG_COLOR = [0, 0, 0]
-    BODY_BUTTON_BG_COLOR = [255, 200, 200]
-    HEAD_BUTTON_BG_COLOR = [200, 224, 255]
-    PREVIEW_BTN_BG_COLOR = [200, 255, 212]
-    SAVE_BUTTON_BG_COLOR = [244, 212, 248]
+    FG_COLOR_BUTTON_BODY = [0, 0, 0]
+    FG_COLOR_BUTTON_HEAD = [0, 0, 0]
+    FG_COLOR_BUTTON_PREV = [0, 0, 0]
+    FG_COLOR_PREVIEW_CVS = [0, 0, 0]
+    FG_COLOR_BUTTON_SAVE = [0, 0, 0]
+    BG_COLOR_BUTTON_BODY = [255, 200, 200]
+    BG_COLOR_BUTTON_HEAD = [200, 224, 255]
+    BG_COLOR_BUTTON_PREV = [200, 255, 212]
+    BG_COLOR_BUTTON_SAVE = [244, 212, 248]
 
     # Grid positions for widgets
     GRID_LABEL_FRAME_PREVIEW = [0, 1]
@@ -129,58 +129,85 @@ class App(tk.Frame):
     GRID_CANVAS_IMGS_PREVIEW = [0, 1]
     GRID_CANVAS_ANIM_PREVIEW = [0, 2]
     GRID_OPTIONS_SELECT_HEAD = [1, 0]
-    GRID_BUTTON_REBUILD_HIMG = [2, 0]
-    GRID_BUTTON_REBUILD_HDAT = [3, 0]
-    GRID_BUTTON_REBUILD_HOFF = [4, 0]
+
+    GRID = {
+        "export-full":          [3, 3],
+        "export-idle":          [2, 3],
+        "preview-idle":         [2, 2],
+        "preview-left":         [3, 2],
+        "preview-right":        [4, 2],
+        "rebuild-body-data":    [3, 1],
+        "rebuild-body-images":  [2, 1],
+        "rebuild-body-offsets": [4, 1],
+        "rebuild-head-data":    [3, 0],
+        "rebuild-head-images":  [2, 0],
+        "rebuild-head-offsets": [4, 0],
+    }
+
     GRID_OPTIONS_SELECT_BODY = [1, 1]
-    GRID_BUTTON_REBUILD_BIMG = [2, 1]
-    GRID_BUTTON_REBUILD_BDAT = [3, 1]
-    GRID_BUTTON_REBUILD_BOFF = [4, 1]
-    GRID_BUTTON_PREVIEW_IDLE = [2, 2]
-    GRID_BUTTON_PREVIEW_LEFT = [3, 2]
-    GRID_BUTTON_PREVIEW_RIGH = [4, 2]
-    GRID_BUTTON_COMPOSE_IDLE = [2, 3]
-    GRID_BUTTON_COMPOSE_FULL = [3, 3]
 
     # Padding for widgets
-    PAD_COMPOSE_FULL_BUTTON = [4, 4]
-    PAD_COMPOSE_IDLE_BUTTON = [4, 4]
-    PAD_PREVIEW_IDLE_BUTTON = [4, 4]
-    PAD_PREVIEW_LEFT_BUTTON = [4, 4]
-    PAD_PREVIEW_RIGHTBUTTON = [4, 4]
-    PAD_RB_JSON_BODY_BUTTON = [4, 4]
-    PAD_RB_JSON_HEAD_BUTTON = [4, 4]
-    PAD_RB_IMGS_BODY_BUTTON = [4, 4]
-    PAD_RB_IMGS_HEAD_BUTTON = [4, 4]
-    PAD_SELECT_BODY_OPTIONS = [4, 4]
-    PAD_SELECT_HEAD_OPTIONS = [4, 4]
+    PAD = {
+        "export-full":          [4, 4],
+        "export-idle":          [4, 4],
+        "preview-idle":         [4, 4],
+        "preview-left":         [4, 4],
+        "preview-right":        [4, 4],
+        "rebuild-body-data":    [4, 4],
+        "rebuild-head-data":    [4, 4],
+        "rebuild-body-images":  [4, 4],
+        "rebuild-head-images":  [4, 4],
+        "rebuild-body-offsets": [4, 4],
+        "rebuild-head-offsets": [4, 4],
+    }
+
+    PAD_OPTIONS_SELECT_BODY = [4, 4]
+    PAD_OPTIONS_SELECT_HEAD = [4, 4]
 
     # Preview composition dimensions
-    PREVIEW_IDLE_CROP_ORIG = [0, 0]
-    PREVIEW_IDLE_CROP_SIZE = [128, 32]
-    PREVIEW_LEFT_CROP_ORIG = [0, 32]
-    PREVIEW_LEFT_CROP_SIZE = [128, 32]
-    PREVIEW_RIGHTCROP_ORIG = [0, 64]
-    PREVIEW_RIGHTCROP_SIZE = [128, 32]
-    PREVIEW_RESIZED_DIMENS = (384, 96)
+    ORIG_PREVIEW_CROP_IDLE = [0, 0]
+    ORIG_PREVIEW_CROP_LEFT = [0, 32]
+    ORIG_PREVIEW_CROP_RIGH = [0, 64]
+    SIZE_PREVIEW_CROP_IDLE = [128, 32]
+    SIZE_PREVIEW_CROP_LEFT = [128, 32]
+    SIZE_PREVIEW_CROP_RIGH = [128, 32]
+    SIZE_PREVIEW_RESIZE_UP = (384, 96)
 
     # Button and menu text labels
-    LABEL_MENU_CHOICES_HEAD_NULL = "Select head"
-    LABEL_MENU_CHOICES_BODY_NULL = "Select body"
-    LABEL_PREVIEW_IDLE_FRAME_SET = "Preview idle frames"
-    LABEL_PREVIEW_LEFT_FRAME_SET = "Preview left frames"
-    LABEL_PREVIEW_RIGH_FRAME_SET = "Preview right frames"
-    LABEL_RECHECK_BODY_DIRECTORY = "Recheck body listing"
-    LABEL_RECHECK_HEAD_DIRECTORY = "Recheck head listing"
-    LABEL_RECONSTRUCT_BODY_IMAGE = "Reconstruct body images"
-    LABEL_RECONSTRUCT_HEAD_IMAGE = "Reconstruct head images"
-    LABEL_RELOAD_XY_BODY_OFFSETS = "Reload body offsets"
-    LABEL_RELOAD_XY_HEAD_OFFSETS = "Reload head offsets"
-    LABEL_BUTTON_EXPORT_IDLE_IMG = "Export idle frames"
-    LABEL_BUTTON_EXPORT_FULL_IMG = "Export all frames"
+    LABELS = {
+        "export-full":          "Export all frames",
+        "export-idle":          "Export idle frames",
+        "preview-idle":         "Preview idle frames",
+        "preview-left":         "Preview left frames",
+        "preview-right":        "Preview right frames",
+        "rebuild-body-data":    "Recheck body listing",
+        "rebuild-body-images":  "Reconstruct body images",
+        "rebuild-body-offsets": "Reload body offsets",
+        "rebuild-head-data":    "Recheck head listing",
+        "rebuild-head-images":  "Reconstruct head images",
+        "rebuild-head-offsets": "Reload head offsets",
+    }
+
+    COLORS = {
+        "export-full":          {"fg": [0, 0, 0], "bg": [244, 212, 248]},
+        "export-idle":          {"fg": [0, 0, 0], "bg": [244, 212, 248]},
+        "preview-idle":         {"fg": [0, 0, 0], "bg": [200, 255, 212]},
+        "preview-left":         {"fg": [0, 0, 0], "bg": [200, 255, 212]},
+        "preview-right":        {"fg": [0, 0, 0], "bg": [200, 255, 212]},
+        "rebuild-body-data":    {"fg": [0, 0, 0], "bg": [255, 200, 200]},
+        "rebuild-body-images":  {"fg": [0, 0, 0], "bg": [255, 200, 200]},
+        "rebuild-body-offsets": {"fg": [0, 0, 0], "bg": [255, 200, 200]},
+        "rebuild-head-data":    {"fg": [0, 0, 0], "bg": [200, 224, 255]},
+        "rebuild-head-images":  {"fg": [0, 0, 0], "bg": [200, 224, 255]},
+        "rebuild-head-offsets": {"fg": [0, 0, 0], "bg": [200, 224, 255]},
+    }
+
     LABEL_CHECK_PINGPONG_ANIMATE = "Ping-pong animation"
+    LABEL_CHECK_REVERSE_LAYERING = "Reverse layering"
     LABEL_CURRENT_XY_HEAD_OFFSET = "Head: "
     LABEL_CURRENT_XY_BODY_OFFSET = "Body: "
+    LABEL_MENU_CHOICES_HEAD_NULL = "Select head"
+    LABEL_MENU_CHOICES_BODY_NULL = "Select body"
 
     # Animation speeds
     SPEED_SCALE_MIN = 0
@@ -191,10 +218,10 @@ class App(tk.Frame):
         """
         Draws text to a given canvas.
 
-        :param canvas:
-        :param x:
-        :param y:
-        :param text:
+        :param canvas: Canvas to modify.
+        :param x:      Topleft x-coordinate to draw at.
+        :param y:      Topleft y-coordinate to draw at.
+        :param text:   Text to render.
 
         :return: None.
         """
@@ -285,17 +312,23 @@ class App(tk.Frame):
         self._FrameBottom.grid(row=2)
 
         # Buttons
-        self._BtnExportIdle = tk.Button()
-        self._BtnExportFull = tk.Button()
-        self._BtnPreviewIdle = tk.Button()
-        self._BtnPreviewLeft = tk.Button()
-        self._BtnPreviewRight = tk.Button()
-        self._BtnRebuildBodyData = tk.Button()
-        self._BtnRebuildBodyImages = tk.Button()
-        self._BtnRebuildBodyOffsets = tk.Button()
-        self._BtnRebuildHeadData = tk.Button()
-        self._BtnRebuildHeadImages = tk.Button()
-        self._BtnRebuildHeadOffsets = tk.Button()
+        self._Buttons = {
+            "export-idle":          tk.Button(),
+            "export-full":          tk.Button(),
+            "preview-idle":         tk.Button(),
+            "preview-left":         tk.Button(),
+            "preview-right":        tk.Button(),
+            "rebuild-body-data":    tk.Button(),
+            "rebuild-body-images":  tk.Button(),
+            "rebuild-body-offsets": tk.Button(),
+            "rebuild-head-data":    tk.Button(),
+            "rebuild-head-images":  tk.Button(),
+            "rebuild-head-offsets": tk.Button(),
+        }
+
+        # Check buttons
+        self._CheckAnimPingpong = tk.Checkbutton()
+        self._CheckLayerReverse = tk.Checkbutton()
 
         # Menus
         self._MenuSelectHead = tk.OptionMenu(self._FrameBottom,
@@ -305,9 +338,6 @@ class App(tk.Frame):
         self._MenuSelectBody = tk.OptionMenu(self._FrameBottom,
                                              self._StrBodyOption,
                                              *self._BodyList)
-
-        # Check buttons
-        self._CheckAnimPingpong = tk.Checkbutton()
 
         # Labels
         self._LabelOffsetHead = tk.Label()
@@ -321,31 +351,29 @@ class App(tk.Frame):
         # Complete widget initialization
         self.InitHeadData()
         self.InitBodyData()
-        self.InitBtnExportIdle()
-        self.InitBtnExportFull()
+        self.InitButtonExportIdle()
+        self.InitButtonExportFull()
         self.InitCanvasPreviews()
         self.InitSpeedWidgets()
         self.InitFrameReadout()
-        self.InitLabelOffsets()
-        self.InitBtnPreviewIdle()
-        self.InitBtnPreviewLeft()
-        self.InitBtnPreviewRight()
-        self.InitBtnRebuildBodyData()
-        self.InitBtnRebuildBodyImages()
-        self.InitBtnRebuildBodyOffsets()
-        self.InitBtnRebuildHeadData()
-        self.InitBtnRebuildHeadImages()
-        self.InitBtnRebuildHeadOffsets()
-        self.InitSelectHeadOptions()
-        self.InitSelectBodyOptions()
-        self.InitAnimPingpongCheck()
+        self.InitOffsetLabels()
+        self.InitButtonPreviewIdle()
+        self.InitButtonPreviewLeft()
+        self.InitButtonPreviewRight()
+        self.InitButtonRebuildBodyData()
+        self.InitButtonRebuildBodyImages()
+        self.InitButtonRebuildBodyOffsets()
+        self.InitButtonRebuildHeadData()
+        self.InitButtonRebuildHeadImages()
+        self.InitButtonRebuildHeadOffsets()
+        self.InitOptionSelectHead()
+        self.InitOptionSelectBody()
+        self.InitCheckAnimPingpong()
+        self.InitCheckLayerReverse()
 
     def DoAnimate(self) -> None:
         """
         Local animation callback function.
-
-        This function calls itself periodically, and thus should only be
-        manually invoked once.
 
         :return: None
         """
@@ -354,14 +382,14 @@ class App(tk.Frame):
 
         try:
             # Draw frame to canvas
-            pos: tuple = (16, 16)
-            anchor: str = tk.NW
-            im: tk.PhotoImage = self._AnimObjs[self._CurFrame]
-            self._CanvAnimPreview.create_image(pos, anchor=anchor, image=im)
+            p: tuple = (16, 16)
+            a: str = tk.NW
+            i: tk.PhotoImage = self._AnimObjs[self._CurFrame]
+            self._CanvAnimPreview.create_image(p, anchor=a, image=i)
 
             # FONT RENDERING IS EXPENSIVE!!!!!!!!!!!!!!!!!!!!
-            #text: str = "({})".format(self._CurFrame)
-            #App.DrawText(self._CanvAnimPreview, 18, 92, text)
+            # text: str = "({})".format(self._CurFrame)
+            # App.DrawText(self._CanvAnimPreview, 18, 92, text)
 
         except IndexError:
             pass
@@ -378,27 +406,27 @@ class App(tk.Frame):
 
         :return: Tuple of head key, body key, and numpy image.
         """
-        head_key: str = ""
-        body_key: str = ""
+        headKey: str = ""
+        bodyKey: str = ""
 
         try:
             # Get head key
             try:
-                head_name: str = self._StrHeadOption.get()
-                head_key: str = self._HeadData[head_name]
+                headName: str = self._StrHeadOption.get()
+                headKey: str = self._HeadData[headName]
             except KeyError:
                 raise UnspecifiedHeadException
 
             # Get body key
             try:
-                body_name: str = self._StrBodyOption.get()
-                body_key: str = self._BodyData[body_name]
+                bodyName: str = self._StrBodyOption.get()
+                bodyKey: str = self._BodyData[bodyName]
             except KeyError:
                 raise UnspecifiedBodyException
 
             # Perform sprite composition
             try:
-                return head_key, body_key, func(head_key, body_key)
+                return headKey, bodyKey, func(headKey, bodyKey)
             except sprite_splitter.NonexistentHeadException as e:
                 raise InvalidHeadException(e.filename)
             except sprite_splitter.NonexistentBodyException as e:
@@ -409,28 +437,76 @@ class App(tk.Frame):
         except UnspecifiedHeadException:
             # Head not specified
             title: str = self.WINDOW_TITLE
-            message: str = self.FAILURE_HEAD_MESSAGE
+            message: str = self.MESSAGE_FAILURE_HEAD
             tk.messagebox.showinfo(title, message)
 
         except UnspecifiedBodyException:
             # Body not specified
             title: str = self.WINDOW_TITLE
-            message: str = self.FAILURE_BODY_MESSAGE
+            message: str = self.MESSAGE_FAILURE_BODY
             tk.messagebox.showinfo(title, message)
 
         except InvalidHeadException as e:
             # Head spritesheet does not exist
             title: str = self.WINDOW_TITLE
-            message: str = self.INVALID_HEAD_MESSAGE.format(e.filename)
+            message: str = self.MESSAGE_INVALID_HEAD.format(e.filename)
             tk.messagebox.showinfo(title, message)
 
         except InvalidBodyException as e:
             # Body spritesheet does not exist
             title: str = self.WINDOW_TITLE
-            message: str = self.INVALID_BODY_MESSAGE.format(e.filename)
+            message: str = self.MESSAGE_INVALID_BODY.format(e.filename)
             tk.messagebox.showinfo(title, message)
 
-        return head_key, body_key, None
+        return headKey, bodyKey, None
+
+    def ExportFrames(self, func, message) -> None:
+        """
+        Composites and exports all frames to file.
+
+        :param func:
+        :param message:
+
+        :return: None.
+        """
+        try:
+            # Perform sprite composition
+            head, body, image = self.DoComposite(func)
+
+            if image is not None:
+                # Prompt user for destination filename
+                FixPath(ROOT_OUTPUT_DIR)
+
+                initialfile: str = "{}_{}.png".format(head, body)
+                initialdir: str = ROOT_OUTPUT_DIR
+                title: str = "Save As"
+                filetypes: list = FILETYPES
+
+                path: str = filedialog.asksaveasfilename(
+                    initialfile=initialfile,
+                    initialdir=initialdir,
+                    title=title,
+                    filetypes=filetypes,
+                )
+
+                if path:
+                    # Save image if path is valid
+                    sprite_splitter.SaveImage(image, path)
+
+                    title: str = self.WINDOW_TITLE
+                    name: str = os.path.basename(path)
+                    message: str = message.format(name)
+                    tk.messagebox.showinfo(title, message)
+
+        except InvalidFilenameException:
+            # Image format not recognized
+            title: str = self.WINDOW_TITLE
+            message: str = self.MESSAGE_FAILURE_TYPE
+            tk.messagebox.showinfo(title, message)
+
+        except EmptyFilenameException:
+            # Filename not specified
+            pass
 
     def ExportFullFrames(self) -> None:
         """
@@ -438,44 +514,9 @@ class App(tk.Frame):
 
         :return: None.
         """
-        try:
-            # Perform sprite composition
-            head, body, image = self.DoComposite(sprite_splitter.CompositeFull)
-
-            if image is not None:
-                # Prompt user for destination filename
-                FixPath(ROOT_OUTPUT_DIR)
-
-                initialfile: str = "{}_{}.png".format(head, body)
-                initialdir: str = ROOT_OUTPUT_DIR
-                title: str = "Save As"
-                filetypes: list = FILETYPES
-
-                path: str = filedialog.asksaveasfilename(
-                    initialfile=initialfile,
-                    initialdir=initialdir,
-                    title=title,
-                    filetypes=filetypes,
-                )
-
-                if path:
-                    # Save image if path is valid
-                    sprite_splitter.SaveImage(image, path)
-
-                    title: str = self.WINDOW_TITLE
-                    fn: str = os.path.basename(path)
-                    message: str = self.SUCCESS_IDLE_MESSAGE.format(fn)
-                    tk.messagebox.showinfo(title, message)
-
-        except InvalidFilenameException:
-            # Image format not recognized
-            title: str = self.WINDOW_TITLE
-            message: str = self.FAILURE_TYPE_MESSAGE
-            tk.messagebox.showinfo(title, message)
-
-        except EmptyFilenameException:
-            # Filename not specified
-            pass
+        func = sprite_splitter.CompositeFull
+        message = self.MESSAGE_SUCCESS_FULL
+        self.ExportFrames(func, message)
 
     def ExportIdleFrames(self) -> None:
         """
@@ -483,41 +524,9 @@ class App(tk.Frame):
 
         :return: None.
         """
-        try:
-            # Perform image composition
-            head, body, image = self.DoComposite(sprite_splitter.CompositeIdle)
-
-            if image is not None:
-                # Prompt user for destination filename
-                FixPath(ROOT_OUTPUT_DIR)
-
-                initialfile: str = "{}_{}.png".format(head, body)
-                initialdir: str = ROOT_OUTPUT_DIR
-                title: str = "Save As"
-                filetypes: list = FILETYPES
-
-                path: str = filedialog.asksaveasfilename(
-                    initialfile=initialfile,
-                    initialdir=initialdir,
-                    title=title,
-                    filetypes=filetypes,
-                )
-
-                if path:
-                    # Save image if path is valid
-                    sprite_splitter.SaveImage(image, path)
-
-                    title: str = self.WINDOW_TITLE
-                    fn: str = os.path.basename(path)
-                    message: str = self.SUCCESS_IDLE_MESSAGE.format(fn)
-
-                    tk.messagebox.showinfo(title, message)
-
-        except InvalidFilenameException:
-            # Image format not recognized
-            title: str = self.WINDOW_TITLE
-            message: str = self.FAILURE_TYPE_MESSAGE
-            tk.messagebox.showinfo(title, message)
+        func = sprite_splitter.CompositeIdle
+        message = self.MESSAGE_SUCCESS_IDLE
+        self.ExportFrames(func, message)
 
     def InitAnimatedPreview(self) -> None:
         """
@@ -532,7 +541,7 @@ class App(tk.Frame):
         master: tk.Frame = self._FrameTopleft
         width: int = self.PREVIEW_ANIM_SIZE[0]
         height: int = self.PREVIEW_ANIM_SIZE[1]
-        bg: str = self.FromRGB(*self.PREVIEW_CANVAS_COLOR)
+        background: str = self.FromRGB(*self.FG_COLOR_PREVIEW_CVS)
         relief: str = tk.SUNKEN
         border: int = 13
 
@@ -540,7 +549,7 @@ class App(tk.Frame):
             master,
             width=width,
             height=height,
-            background=bg,
+            background=background,
             relief=relief,
             borderwidth=border,
         )
@@ -550,7 +559,41 @@ class App(tk.Frame):
 
         self._CanvAnimPreview.grid(row=row, column=col)
 
-    def InitAnimPingpongCheck(self) -> None:
+    def InitButton(self, master, tag, cmd) -> None:
+        """
+        Initializes a specific local button.
+
+        :param master: Tkinter root frame for button.
+        :param tag:    Tag of button to initialize.
+        :param cmd:    Callback function for button.
+
+        :return: None.
+        """
+        self._Buttons[tag].destroy()
+
+        text: str = App.LABELS[tag]
+        self._Buttons[tag] = tk.Button(master, text=text, command=cmd)
+
+        width: int = App.DEFAULT_BUTTON_WIDTH
+        foreground: str = App.FromRGB(*App.COLORS[tag]["fg"])
+        background: str = App.FromRGB(*App.COLORS[tag]["bg"])
+
+        self._Buttons[tag].config(
+            width=width,
+            foreground=foreground,
+            background=background,
+            activebackground=background,
+            activeforeground=foreground,
+        )
+
+        row: int = App.GRID[tag][0]  # Row
+        col: int = App.GRID[tag][1]  # Column
+        px: int = App.PAD[tag][0]  # Horizontal padding
+        py: int = App.PAD[tag][1]  # Vertical padding
+
+        self._Buttons[tag].grid(row=row, column=col, padx=px, pady=py)
+
+    def InitCheckAnimPingpong(self) -> None:
         """
         Completes initialization of checkbox for toggling animation ping-pong.
 
@@ -567,6 +610,13 @@ class App(tk.Frame):
 
         self._CheckAnimPingpong = tk.Checkbutton(mtr, text=txt, variable=var)
         self._CheckAnimPingpong.grid(row=row, column=column, sticky=sticky)
+
+    def InitCheckLayerReverse(self):
+        """
+
+        :return: None.
+        """
+        return
 
     def InitBodyData(self):
         """
@@ -601,368 +651,93 @@ class App(tk.Frame):
         self._LabelOffsetBody = tk.Label(master, font=font, text=text)
         self._LabelOffsetBody.grid(row=row, column=col, sticky=sticky)
 
-    def InitBtnExportFull(self) -> None:
+    def InitButtonExportFull(self) -> None:
         """
         Completes initialization of "full composition" button.
 
         :return: None.
         """
-        self._BtnExportFull.destroy()
+        self.InitButton(self._FrameBottom, "export-full", self.ExportFullFrames)
 
-        master: tk.Frame = self._FrameBottom
-        text: str = self.LABEL_BUTTON_EXPORT_FULL_IMG
-        cmd: types.FunctionType = self.ExportFullFrames
-
-        self._BtnExportFull = tk.Button(master, text=text, command=cmd)
-
-        width: int = self.DEFAULT_BUTTON_WIDTH
-        fg: str = self.FromRGB(*self.SAVE_BUTTON_FG_COLOR)
-        bg: str = self.FromRGB(*self.SAVE_BUTTON_BG_COLOR)
-
-        self._BtnExportFull.config(
-            width=width,
-            foreground=fg,
-            background=bg,
-            activebackground=bg,
-            activeforeground=fg,
-        )
-
-        row: int = self.GRID_BUTTON_COMPOSE_FULL[0]  # Row
-        col: int = self.GRID_BUTTON_COMPOSE_FULL[1]  # Column
-        px: int = self.PAD_COMPOSE_FULL_BUTTON[0]  # Horizontal padding
-        py: int = self.PAD_COMPOSE_FULL_BUTTON[1]  # Vertical padding
-
-        self._BtnExportFull.grid(row=row, column=col, padx=px, pady=py)
-
-    def InitBtnExportIdle(self) -> None:
+    def InitButtonExportIdle(self) -> None:
         """
         Completes initialization of "save idle frames" button.
 
         :return: None.
         """
-        self._BtnExportIdle.destroy()
+        self.InitButton(self._FrameBottom, "export-idle", self.ExportIdleFrames)
 
-        master: tk.Frame = self._FrameBottom
-        text: str = self.LABEL_BUTTON_EXPORT_IDLE_IMG
-        cmd: types.FunctionType = self.ExportIdleFrames
-
-        self._BtnExportIdle = tk.Button(master, text=text, command=cmd)
-
-        width: int = self.DEFAULT_BUTTON_WIDTH
-        fg: str = self.FromRGB(*self.SAVE_BUTTON_FG_COLOR)
-        bg: str = self.FromRGB(*self.SAVE_BUTTON_BG_COLOR)
-
-        self._BtnExportIdle.config(
-            width=width,
-            foreground=fg,
-            background=bg,
-            activebackground=bg,
-            activeforeground=fg,
-        )
-
-        row: int = self.GRID_BUTTON_COMPOSE_IDLE[0]  # Row
-        col: int = self.GRID_BUTTON_COMPOSE_IDLE[1]  # Column
-        px: int = self.PAD_COMPOSE_IDLE_BUTTON[0]  # Horizontal padding
-        py: int = self.PAD_COMPOSE_IDLE_BUTTON[1]  # Vertical padding
-
-        self._BtnExportIdle.grid(row=row, column=col, padx=px, pady=py)
-
-    def InitBtnPreviewIdle(self) -> None:
+    def InitButtonPreviewIdle(self) -> None:
         """
         Completes initialization of "preview idle" button.
 
         :return: None
         """
-        self._BtnPreviewIdle.destroy()
+        self.InitButton(self._FrameBottom, "preview-idle", self.MakeIdlePreview)
 
-        master: tk.Frame = self._FrameBottom
-        text: str = self.LABEL_PREVIEW_IDLE_FRAME_SET
-        cmd: types.FunctionType = self.MakeIdlePreview
-
-        self._BtnPreviewIdle = tk.Button(master, text=text, command=cmd)
-
-        width: int = self.DEFAULT_BUTTON_WIDTH
-        bg: str = self.FromRGB(*self.PREVIEW_BTN_BG_COLOR)
-        fg: str = self.FromRGB(*self.PREVIEW_BTN_FG_COLOR)
-
-        self._BtnPreviewIdle.config(
-            width=width,
-            background=bg,
-            foreground=fg,
-            activebackground=bg,
-            activeforeground=fg,
-        )
-
-        row: int = self.GRID_BUTTON_PREVIEW_IDLE[0]  # Row
-        col: int = self.GRID_BUTTON_PREVIEW_IDLE[1]  # Column
-        px: int = self.PAD_PREVIEW_IDLE_BUTTON[0]  # Horizontal padding
-        py: int = self.PAD_PREVIEW_IDLE_BUTTON[1]  # Vertical padding
-
-        self._BtnPreviewIdle.grid(row=row, column=col, padx=px, pady=py)
-
-    def InitBtnPreviewLeft(self) -> None:
+    def InitButtonPreviewLeft(self) -> None:
         """
-        Completes initialization of "preview idle" button.
+        Completes initialization of "preview left" button.
 
         :return: None
         """
-        self._BtnPreviewLeft.destroy()
+        self.InitButton(self._FrameBottom, "preview-left", self.MakeLeftPreview)
 
-        master: tk.Frame = self._FrameBottom
-        text: str = self.LABEL_PREVIEW_LEFT_FRAME_SET
-        cmd: types.FunctionType = self.MakeLeftPreview
-
-        self._BtnPreviewLeft = tk.Button(master, text=text, command=cmd)
-
-        width: int = self.DEFAULT_BUTTON_WIDTH
-        bg: str = self.FromRGB(*self.PREVIEW_BTN_BG_COLOR)
-        fg: str = self.FromRGB(*self.PREVIEW_BTN_FG_COLOR)
-
-        self._BtnPreviewLeft.config(
-            width=width,
-            background=bg,
-            foreground=fg,
-            activebackground=bg,
-            activeforeground=fg,
-        )
-
-        row: int = self.GRID_BUTTON_PREVIEW_LEFT[0]  # Row
-        col: int = self.GRID_BUTTON_PREVIEW_LEFT[1]  # Column
-        px: int = self.PAD_PREVIEW_LEFT_BUTTON[0]  # Horizontal padding
-        py: int = self.PAD_PREVIEW_LEFT_BUTTON[1]  # Vertical padding
-
-        self._BtnPreviewLeft.grid(row=row, column=col, padx=px, pady=py)
-
-    def InitBtnPreviewRight(self) -> None:
+    def InitButtonPreviewRight(self) -> None:
         """
-        Completes initialization of "preview idle" button.
+        Completes initialization of "preview right" button.
 
         :return: None
         """
-        self._BtnPreviewRight.destroy()
+        self.InitButton(self._FrameBottom, "preview-right", self.MakeRightPreview)
 
-        master: tk.Frame = self._FrameBottom
-        text: str = self.LABEL_PREVIEW_RIGH_FRAME_SET
-        cmd: types.FunctionType = self.MakeRightPreview
-
-        self._BtnPreviewRight = tk.Button(master, text=text, command=cmd)
-
-        width: int = self.DEFAULT_BUTTON_WIDTH
-        bg: str = self.FromRGB(*self.PREVIEW_BTN_BG_COLOR)
-        fg: str = self.FromRGB(*self.PREVIEW_BTN_FG_COLOR)
-
-        self._BtnPreviewRight.config(
-            width=width,
-            background=bg,
-            foreground=fg,
-            activebackground=bg,
-            activeforeground=fg,
-        )
-
-        row: int = self.GRID_BUTTON_PREVIEW_RIGH[0]  # Row
-        col: int = self.GRID_BUTTON_PREVIEW_RIGH[1]  # Column
-        px: int = self.PAD_PREVIEW_RIGHTBUTTON[0]  # Horizontal padding
-        py: int = self.PAD_PREVIEW_RIGHTBUTTON[1]  # Vertical padding
-
-        self._BtnPreviewRight.grid(row=row, column=col, padx=px, pady=py)
-
-    def InitBtnRebuildBodyData(self) -> None:
+    def InitButtonRebuildBodyData(self) -> None:
         """
         Completes initialization of "rebuild body" button.
 
         :return: None.
         """
-        self._BtnRebuildBodyData.destroy()
+        self.InitButton(self._FrameBottom, "rebuild-body-data", self.RebuildBodyData)
 
-        master: tk.Frame = self._FrameBottom
-        text: str = self.LABEL_RECHECK_BODY_DIRECTORY
-        cmd: types.FunctionType = self.RebuildBodyData
-
-        self._BtnRebuildBodyData = tk.Button(master, text=text, command=cmd)
-
-        width: int = self.DEFAULT_BUTTON_WIDTH
-        fg: str = self.FromRGB(*self.BODY_BUTTON_FG_COLOR)
-        bg: str = self.FromRGB(*self.BODY_BUTTON_BG_COLOR)
-
-        self._BtnRebuildBodyData.config(
-            width=width,
-            background=bg,
-            foreground=fg,
-            activebackground=bg,
-            activeforeground=fg,
-        )
-
-        row: int = self.GRID_BUTTON_REBUILD_BDAT[0]  # Row
-        col: int = self.GRID_BUTTON_REBUILD_BDAT[1]  # Column
-        px: int = self.PAD_RB_JSON_BODY_BUTTON[0]  # Horizontal padding
-        py: int = self.PAD_RB_JSON_BODY_BUTTON[1]  # Vertical padding
-
-        self._BtnRebuildBodyData.grid(row=row, column=col, padx=px, pady=py)
-
-    def InitBtnRebuildBodyImages(self) -> None:
+    def InitButtonRebuildBodyImages(self) -> None:
         """
         Completes initialization of "rebuild body intermediates" button.
 
         :return: None.
         """
-        self._BtnRebuildBodyImages.destroy()
+        self.InitButton(self._FrameBottom, "rebuild-body-images", self.RebuildBodyImages)
 
-        master: tk.Frame = self._FrameBottom
-        text: str = App.LABEL_RECONSTRUCT_BODY_IMAGE
-        cmd: types.FunctionType = self.RebuildBodyImages
-
-        self._BtnRebuildBodyImages = tk.Button(master, text=text, command=cmd)
-
-        width: int = App.DEFAULT_BUTTON_WIDTH
-        fg: str = App.FromRGB(*App.BODY_BUTTON_FG_COLOR)
-        bg: str = App.FromRGB(*App.BODY_BUTTON_BG_COLOR)
-
-        self._BtnRebuildBodyImages.config(
-            width=width,
-            foreground=fg,
-            background=bg,
-            activeforeground=fg,
-            activebackground=bg,
-        )
-
-        row: int = self.GRID_BUTTON_REBUILD_BIMG[0]  # Row
-        col: int = self.GRID_BUTTON_REBUILD_BIMG[1]  # Column
-        px: int = self.PAD_RB_IMGS_BODY_BUTTON[0]  # Horizontal padding
-        py: int = self.PAD_RB_IMGS_BODY_BUTTON[1]  # Vertical padding
-
-        self._BtnRebuildBodyImages.grid(row=row, column=col, padx=px, pady=py)
-
-    def InitBtnRebuildBodyOffsets(self) -> None:
+    def InitButtonRebuildBodyOffsets(self) -> None:
         """
         Completes initialization of "rebuild body offsets" button.
 
         :return: None.
         """
-        self._BtnRebuildBodyOffsets.destroy()
+        self.InitButton(self._FrameBottom, "rebuild-body-offsets", self.RebuildBodyOffsets)
 
-        master: tk.Frame = self._FrameBottom
-        text: str = App.LABEL_RELOAD_XY_BODY_OFFSETS
-        cmd: types.FunctionType = self.RebuildBodyOffsets
-
-        self._BtnRebuildBodyOffsets = tk.Button(master, text=text, command=cmd)
-
-        width: int = App.DEFAULT_BUTTON_WIDTH
-        fg: str = App.FromRGB(*App.BODY_BUTTON_FG_COLOR)
-        bg: str = App.FromRGB(*App.BODY_BUTTON_BG_COLOR)
-
-        self._BtnRebuildBodyOffsets.config(
-            width=width,
-            foreground=fg,
-            background=bg,
-            activeforeground=fg,
-            activebackground=bg,
-        )
-
-        row: int = self.GRID_BUTTON_REBUILD_BOFF[0]  # Row
-        col: int = self.GRID_BUTTON_REBUILD_BOFF[1]  # Column
-        px: int = self.PAD_RB_IMGS_BODY_BUTTON[0]  # Horizontal padding
-        py: int = self.PAD_RB_IMGS_BODY_BUTTON[1]  # Vertical padding
-
-        self._BtnRebuildBodyOffsets.grid(row=row, column=col, padx=px, pady=py)
-
-    def InitBtnRebuildHeadData(self) -> None:
+    def InitButtonRebuildHeadData(self) -> None:
         """
         Completes initialization of "rebuild head" button.
 
         :return: None.
         """
-        self._BtnRebuildHeadData.destroy()
+        self.InitButton(self._FrameBottom, "rebuild-head-data", self.RebuildHeadData)
 
-        master: tk.Frame = self._FrameBottom
-        text: str = self.LABEL_RECHECK_HEAD_DIRECTORY
-        cmd: types.FunctionType = self.RebuildHeadData
-
-        self._BtnRebuildHeadData = tk.Button(master, text=text, command=cmd)
-
-        width: int = self.DEFAULT_BUTTON_WIDTH
-        fg: str = self.FromRGB(*self.HEAD_BUTTON_FG_COLOR)
-        bg: str = self.FromRGB(*self.HEAD_BUTTON_BG_COLOR)
-
-        self._BtnRebuildHeadData.config(
-            width=width,
-            background=bg,
-            foreground=fg,
-            activebackground=bg,
-            activeforeground=fg,
-        )
-
-        row: int = self.GRID_BUTTON_REBUILD_HDAT[0]  # Row
-        col: int = self.GRID_BUTTON_REBUILD_HDAT[1]  # Column
-        px: int = self.PAD_RB_JSON_HEAD_BUTTON[0]  # Horizontal padding
-        py: int = self.PAD_RB_JSON_HEAD_BUTTON[1]  # Vertical padding
-
-        self._BtnRebuildHeadData.grid(row=row, column=col, padx=px, pady=py)
-
-    def InitBtnRebuildHeadImages(self) -> None:
+    def InitButtonRebuildHeadImages(self) -> None:
         """
         Completes initialization of "rebuild head intermediates" button.
 
         :return: None.
         """
-        self._BtnRebuildHeadImages.destroy()
+        self.InitButton(self._FrameBottom, "rebuild-head-images", self.RebuildHeadImages)
 
-        master: tk.Frame = self._FrameBottom
-        text: str = self.LABEL_RECONSTRUCT_HEAD_IMAGE
-        cmd: types.FunctionType = self.RebuildHeadImages
-
-        self._BtnRebuildHeadImages = tk.Button(master, text=text, command=cmd)
-
-        width: int = self.DEFAULT_BUTTON_WIDTH
-        fg: str = self.FromRGB(*self.HEAD_BUTTON_FG_COLOR)
-        bg: str = self.FromRGB(*self.HEAD_BUTTON_BG_COLOR)
-
-        self._BtnRebuildHeadImages.config(
-            width=width,
-            foreground=fg,
-            background=bg,
-            activebackground=bg,
-            activeforeground=fg,
-        )
-
-        row: int = self.GRID_BUTTON_REBUILD_HIMG[0]  # Row
-        col: int = self.GRID_BUTTON_REBUILD_HIMG[1]  # Column
-        px: int = self.PAD_RB_IMGS_HEAD_BUTTON[0]  # Horizontal padding
-        py: int = self.PAD_RB_IMGS_HEAD_BUTTON[1]  # Vertical padding
-
-        self._BtnRebuildHeadImages.grid(row=row, column=col, padx=px, pady=py)
-
-    def InitBtnRebuildHeadOffsets(self) -> None:
+    def InitButtonRebuildHeadOffsets(self) -> None:
         """
         Completes initialization of "rebuild head offsets" button.
 
         :return: None.
         """
-        self._BtnRebuildHeadOffsets.destroy()
-
-        master: tk.Frame = self._FrameBottom
-        text: str = App.LABEL_RELOAD_XY_HEAD_OFFSETS
-        cmd: types.FunctionType = self.RebuildHeadOffsets
-
-        self._BtnRebuildHeadOffsets = tk.Button(master, text=text, command=cmd)
-
-        width: int = App.DEFAULT_BUTTON_WIDTH
-        fg: str = App.FromRGB(*App.HEAD_BUTTON_FG_COLOR)
-        bg: str = App.FromRGB(*App.HEAD_BUTTON_BG_COLOR)
-
-        self._BtnRebuildHeadOffsets.config(
-            width=width,
-            foreground=fg,
-            background=bg,
-            activeforeground=fg,
-            activebackground=bg,
-        )
-
-        row: int = self.GRID_BUTTON_REBUILD_HOFF[0]  # Row
-        col: int = self.GRID_BUTTON_REBUILD_HOFF[1]  # Column
-        px: int = self.PAD_RB_IMGS_HEAD_BUTTON[0]  # Horizontal padding
-        py: int = self.PAD_RB_IMGS_HEAD_BUTTON[1]  # Vertical padding
-
-        self._BtnRebuildHeadOffsets.grid(row=row, column=col, padx=px, pady=py)
+        self.InitButton(self._FrameBottom, "rebuild-head-offsets", self.RebuildHeadOffsets)
 
     def InitCanvasPreviews(self) -> None:
         """
@@ -1024,7 +799,7 @@ class App(tk.Frame):
         self._LabelOffsetHead = tk.Label(master, font=font, text=text)
         self._LabelOffsetHead.grid(row=row, column=column, sticky=sticky)
 
-    def InitLabelOffsets(self) -> None:
+    def InitOffsetLabels(self) -> None:
         """
         Completes initialization of per-frame (x,y) offset labels.
 
@@ -1033,7 +808,7 @@ class App(tk.Frame):
         self.InitHeadOffsetLabel()
         self.InitBodyOffsetLabel()
 
-    def InitSelectHeadOptions(self) -> None:
+    def InitOptionSelectHead(self) -> None:
         """
         Completes initialization of character head dropdown menu.
 
@@ -1050,8 +825,8 @@ class App(tk.Frame):
         self._MenuSelectHead = tk.OptionMenu(master, label, *options)
 
         width: int = self.DEFAULT_OPTION_WIDTH
-        fg: str = self.FromRGB(*self.HEAD_BUTTON_FG_COLOR)
-        bg: str = self.FromRGB(*self.HEAD_BUTTON_BG_COLOR)
+        fg: str = self.FromRGB(*self.FG_COLOR_BUTTON_HEAD)
+        bg: str = self.FromRGB(*self.BG_COLOR_BUTTON_HEAD)
 
         self._MenuSelectHead.config(
             width=width,
@@ -1063,12 +838,12 @@ class App(tk.Frame):
 
         row: int = self.GRID_OPTIONS_SELECT_HEAD[0]  # Row
         col: int = self.GRID_OPTIONS_SELECT_HEAD[1]  # Column
-        px: int = self.PAD_SELECT_HEAD_OPTIONS[0]  # Horizontal padding
-        py: int = self.PAD_SELECT_HEAD_OPTIONS[1]  # Vertical padding
+        px: int = self.PAD_OPTIONS_SELECT_HEAD[0]  # Horizontal padding
+        py: int = self.PAD_OPTIONS_SELECT_HEAD[1]  # Vertical padding
 
         self._MenuSelectHead.grid(row=row, column=col, padx=px, pady=py)
 
-    def InitSelectBodyOptions(self) -> None:
+    def InitOptionSelectBody(self) -> None:
         """
         Completes initialization of character body dropdown menu.
 
@@ -1082,8 +857,8 @@ class App(tk.Frame):
         text: tk.StringVar = self._StrBodyOption
         options: list = self._BodyList
         width: int = self.DEFAULT_OPTION_WIDTH
-        fg: str = self.FromRGB(*self.BODY_BUTTON_FG_COLOR)
-        bg: str = self.FromRGB(*self.BODY_BUTTON_BG_COLOR)
+        fg: str = self.FromRGB(*self.FG_COLOR_BUTTON_BODY)
+        bg: str = self.FromRGB(*self.BG_COLOR_BUTTON_BODY)
 
         self._MenuSelectBody = tk.OptionMenu(master, text, *options)
 
@@ -1097,8 +872,8 @@ class App(tk.Frame):
 
         row: int = self.GRID_OPTIONS_SELECT_BODY[0]  # Row
         col: int = self.GRID_OPTIONS_SELECT_BODY[1]  # Column
-        px: int = self.PAD_SELECT_BODY_OPTIONS[0]  # Horizontal padding
-        py: int = self.PAD_SELECT_BODY_OPTIONS[1]  # Vertical padding
+        px: int = self.PAD_OPTIONS_SELECT_BODY[0]  # Horizontal padding
+        py: int = self.PAD_OPTIONS_SELECT_BODY[1]  # Vertical padding
 
         self._MenuSelectBody.grid(row=row, column=col, padx=px, pady=py)
 
@@ -1161,7 +936,7 @@ class App(tk.Frame):
         master: tk.Frame = self._FrameTopleft
         width: int = self.PREVIEW_CANVAS_SIZE[0]
         height: int = self.PREVIEW_CANVAS_SIZE[1]
-        bg: str = self.FromRGB(*self.PREVIEW_CANVAS_COLOR)
+        bg: str = self.FromRGB(*self.FG_COLOR_PREVIEW_CVS)
         relief: str = tk.SUNKEN
         border: int = 13
 
@@ -1214,8 +989,8 @@ class App(tk.Frame):
         self._CanvAnimPreview.create_image(pos, anchor=anchor, image=im)
 
         # FONT RENDERING IS EXPENSIVE!!!!!!!!!!!!!!!!!!!!!!!
-        #text: str = "({})".format(self._CurFrame)
-        #App.DrawText(self._CanvAnimPreview, 18, 92, text)
+        # text: str = "({})".format(self._CurFrame)
+        # App.DrawText(self._CanvAnimPreview, 18, 92, text)
 
     def MakeAnimationPreview(self, image) -> None:
         """
@@ -1254,9 +1029,9 @@ class App(tk.Frame):
             if image is not None:
                 try:
                     # Crop idle frames from source spritesheet
-                    start: list = self.PREVIEW_IDLE_CROP_ORIG
-                    size: list = self.PREVIEW_IDLE_CROP_SIZE
-                    dsize: tuple = self.PREVIEW_RESIZED_DIMENS
+                    start: list = self.ORIG_PREVIEW_CROP_IDLE
+                    size: list = self.SIZE_PREVIEW_CROP_IDLE
+                    dsize: tuple = self.SIZE_PREVIEW_RESIZE_UP
                     interp: int = cv2.INTER_NEAREST
 
                     image = sprite_imaging.Crop(image, start, size)
@@ -1291,7 +1066,7 @@ class App(tk.Frame):
         except InvalidFilenameException:
             # Image format not recognized
             title: str = self.WINDOW_TITLE
-            message: str = self.FAILURE_TYPE_MESSAGE
+            message: str = self.MESSAGE_FAILURE_TYPE
             tk.messagebox.showinfo(title, message)
 
     def MakeLeftPreview(self) -> None:
@@ -1310,9 +1085,9 @@ class App(tk.Frame):
             if image is not None:
                 try:
                     # Crop left-facing frames from source spritesheet
-                    start: list = self.PREVIEW_LEFT_CROP_ORIG
-                    size: list = self.PREVIEW_LEFT_CROP_SIZE
-                    dsize: tuple = self.PREVIEW_RESIZED_DIMENS
+                    start: list = self.ORIG_PREVIEW_CROP_LEFT
+                    size: list = self.SIZE_PREVIEW_CROP_LEFT
+                    dsize: tuple = self.SIZE_PREVIEW_RESIZE_UP
                     interp: int = cv2.INTER_NEAREST
 
                     image = sprite_imaging.Crop(image, start, size)
@@ -1347,7 +1122,7 @@ class App(tk.Frame):
         except InvalidFilenameException:
             # Image format not recognized
             title: str = self.WINDOW_TITLE
-            message: str = self.FAILURE_TYPE_MESSAGE
+            message: str = self.MESSAGE_FAILURE_TYPE
             tk.messagebox.showinfo(title, message)
 
     def MakeRightPreview(self) -> None:
@@ -1366,9 +1141,9 @@ class App(tk.Frame):
             if image is not None:
                 try:
                     # Crop right-facing frames from source spritesheet
-                    start: list = self.PREVIEW_RIGHTCROP_ORIG
-                    size: list = self.PREVIEW_RIGHTCROP_SIZE
-                    dsize: tuple = self.PREVIEW_RESIZED_DIMENS
+                    start: list = self.ORIG_PREVIEW_CROP_RIGH
+                    size: list = self.SIZE_PREVIEW_CROP_RIGH
+                    dsize: tuple = self.SIZE_PREVIEW_RESIZE_UP
                     interp: int = cv2.INTER_NEAREST
 
                     image = sprite_imaging.Crop(image, start, size)
@@ -1404,7 +1179,7 @@ class App(tk.Frame):
         except InvalidFilenameException:
             # Image format not recognized
             title: str = self.WINDOW_TITLE
-            message: str = self.FAILURE_TYPE_MESSAGE
+            message: str = self.MESSAGE_FAILURE_TYPE
             tk.messagebox.showinfo(title, message)
 
     def RebuildBodyData(self) -> None:
@@ -1414,15 +1189,15 @@ class App(tk.Frame):
         :return: None
         """
         title: str = self.WINDOW_TITLE
-        query: str = self.REBUILD_BDAT_CONFIRM
+        query: str = self.CONFIRM_REBUILD_BDAT
 
         if tk.messagebox.askquestion(title, query) == "yes":
             CreateBodyJSON()
 
             self.InitBodyData()
-            self.InitSelectBodyOptions()
+            self.InitOptionSelectBody()
 
-            message: str = self.REBUILD_BDAT_MESSAGE
+            message: str = self.MESSAGE_REBUILD_BDAT
             tk.messagebox.showinfo(title, message)
 
     def RebuildBodyImages(self) -> None:
@@ -1432,12 +1207,12 @@ class App(tk.Frame):
         :return: None.
         """
         title: str = self.WINDOW_TITLE
-        message: str = self.REBUILD_BIMG_CONFIRM
+        message: str = self.CONFIRM_REBUILD_BIMG
 
         if tk.messagebox.askquestion(title, message) == "yes":
             PrepareBody()
 
-            message = self.REBUILD_BIMG_MESSAGE
+            message = self.MESSAGE_REBUILD_BIMG
             tk.messagebox.showinfo(title, message)
 
     def RebuildBodyOffsets(self) -> None:
@@ -1447,7 +1222,7 @@ class App(tk.Frame):
         :return: None.
         """
         title: str = App.WINDOW_TITLE
-        message: str = App.REBUILD_BOFF_CONFIRM
+        message: str = App.CONFIRM_REBUILD_BOFF
 
         if tk.messagebox.askquestion(title, message) == "yes":
             self._BodyOffsets = LoadBodyOffsets()
@@ -1461,7 +1236,7 @@ class App(tk.Frame):
                 elif self._CurState == STATES[STATES.right]:
                     self.MakeRightPreview()
 
-            message = App.REBUILD_BOFF_MESSAGE
+            message = App.MESSAGE_REBUILD_BOFF
             tk.messagebox.showinfo(title, message)
 
     def RebuildHeadData(self) -> None:
@@ -1471,15 +1246,15 @@ class App(tk.Frame):
         :return: None.
         """
         title: str = self.WINDOW_TITLE
-        message: str = self.REBUILD_HDAT_CONFIRM
+        message: str = self.CONFIRM_REBUILD_HDAT
 
         if tk.messagebox.askquestion(title, message) == "yes":
             CreateHeadJSON()
 
             self.InitHeadData()
-            self.InitSelectHeadOptions()
+            self.InitOptionSelectHead()
 
-            message = self.REBUILD_HDAT_MESSAGE
+            message = self.MESSAGE_REBUILD_HDAT
             tk.messagebox.showinfo(title, message)
 
     def RebuildHeadImages(self) -> None:
@@ -1489,12 +1264,12 @@ class App(tk.Frame):
         :return: None.
         """
         title: str = App.WINDOW_TITLE
-        message: str = App.REBUILD_HIMG_CONFIRM
+        message: str = App.CONFIRM_REBUILD_HIMG
 
         if tk.messagebox.askquestion(title, message) == "yes":
             PrepareHead()
 
-            message = self.REBUILD_HIMG_MESSAGE
+            message = self.MESSAGE_REBUILD_HIMG
             tk.messagebox.showinfo(title, message)
 
     def RebuildHeadOffsets(self) -> None:
@@ -1504,7 +1279,7 @@ class App(tk.Frame):
         :return: None.
         """
         title: str = App.WINDOW_TITLE
-        message: str = App.REBUILD_HOFF_CONFIRM
+        message: str = App.CONFIRM_REBUILD_HOFF
 
         if tk.messagebox.askquestion(title, message) == "yes":
             self._HeadOffsets = LoadHeadOffsets()
@@ -1518,7 +1293,7 @@ class App(tk.Frame):
                 elif self._CurState == STATES[STATES.right]:
                     self.MakeRightPreview()
 
-            message = App.REBUILD_HOFF_MESSAGE
+            message = App.MESSAGE_REBUILD_HOFF
             tk.messagebox.showinfo(title, message)
 
     def UpdateBodyOffsetLabel(self, state, frame) -> None:
@@ -1577,7 +1352,9 @@ class App(tk.Frame):
         self._CurFrame = curFrame
 
         # Update frame count label
-        text: str =  "Frame: " + " ".join(["({})".format(x) if x == curFrame else " {} ".format(x) for x in range(4)])
+        text: str = "Frame: " + " ".join(
+            ["({})".format(x) if x == curFrame else " {} ".format(x) for x in
+             range(4)])
 
         self._LabelAnimFrame.config(text=text)
 
