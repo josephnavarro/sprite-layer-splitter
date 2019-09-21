@@ -69,6 +69,9 @@ class UnspecifiedHeadException(Exception):
 class App(tk.Frame):
     WINDOW_TITLE = "Fire Emblem 3DS Sprite Tool"
 
+    # Compositing tags
+    DEFAULT_NAME = "None"
+
     # Popup message text content
     CONFIRM_REBUILD_BDAT = "Recheck body listing?"
     CONFIRM_REBUILD_BIMG = "Reconstruct body source images?"
@@ -200,8 +203,6 @@ class App(tk.Frame):
         "preview-anim":         {"fg": [0, 0, 0], "bg": [0, 0, 0]},
     }
 
-    LABEL_CHECK_REVERSE_LAYERING = "Reverse layering"
-
     # Animation speeds
     SPEED_SCALE_MIN = 0
     SPEED_SCALE_MAX = 12
@@ -287,18 +288,6 @@ class App(tk.Frame):
         self._HeadOffsets = {}
         self._CurHead = {}
 
-        # Boolean variables
-        self._BooleanVars = {
-            "pingpong-animation": tk.BooleanVar(),
-            "reverse-layers":     tk.BooleanVar(),
-        }
-
-        # String variables
-        self._StringVars = {
-            "select-head": tk.StringVar(self._Master),
-            "select-body": tk.StringVar(self._Master),
-        }
-
         # Frames
         self._FrameTopleft = tk.Frame(self._Master)
         self._FrameTopleft.grid(row=0, column=0)
@@ -311,6 +300,18 @@ class App(tk.Frame):
 
         self._FrameBottom = tk.Frame(self._Master)
         self._FrameBottom.grid(row=2)
+
+        # Boolean variables
+        self._BooleanVars = {
+            "pingpong-animation": tk.BooleanVar(),
+            "reverse-layers":     tk.BooleanVar(),
+        }
+
+        # String variables
+        self._StringVars = {
+            "select-head": tk.StringVar(self._Master),
+            "select-body": tk.StringVar(self._Master),
+        }
 
         # Buttons
         self._Buttons = {
@@ -472,14 +473,16 @@ class App(tk.Frame):
             try:
                 # Get head key
                 headName = self._StringVars["select-head"].get()
-                headKey = self._HeadData[headName]
+                if headName != App.DEFAULT_NAME:
+                    headKey = self._HeadData[headName]
             except KeyError:
                 raise UnspecifiedHeadException
 
             try:
                 # Get body key
                 bodyName = self._StringVars["select-body"].get()
-                bodyKey = self._BodyData[bodyName]
+                if bodyName != App.DEFAULT_NAME:
+                    bodyKey = self._BodyData[bodyName]
             except KeyError:
                 raise UnspecifiedBodyException
 
@@ -495,10 +498,12 @@ class App(tk.Frame):
 
         except UnspecifiedHeadException:
             # Head not specified
-            tk.messagebox.showinfo(App.WINDOW_TITLE, App.MESSAGE_FAILURE_HEAD)
+            tk.messagebox.showinfo(App.WINDOW_TITLE,
+                                   App.MESSAGE_FAILURE_HEAD)
         except UnspecifiedBodyException:
             # Body not specified
-            tk.messagebox.showinfo(App.WINDOW_TITLE, App.MESSAGE_FAILURE_BODY)
+            tk.messagebox.showinfo(App.WINDOW_TITLE,
+                                   App.MESSAGE_FAILURE_BODY)
         except InvalidHeadException as e:
             # Head spritesheet does not exist
             tk.messagebox.showinfo(App.WINDOW_TITLE,
@@ -656,7 +661,7 @@ class App(tk.Frame):
         """
         self._BodyData = {v.get("name", "---"): k
                           for k, v in LoadBodyPaths().items()}
-        self._BodyList = sorted(list(self._BodyData))
+        self._BodyList = [App.DEFAULT_NAME] + sorted(list(self._BodyData))
         self._BodyOffsets = LoadBodyOffsets()
 
     def InitDataHead(self):
@@ -667,7 +672,7 @@ class App(tk.Frame):
         """
         self._HeadData = {v.get("name", "---"): k
                           for k, v in LoadHeadPaths().items()}
-        self._HeadList = sorted(list(self._HeadData))
+        self._HeadList = [App.DEFAULT_NAME] + sorted(list(self._HeadData))
         self._HeadOffsets = LoadHeadOffsets()
 
     def InitLabel(self, master, tag, font, sticky, *args):
@@ -695,7 +700,7 @@ class App(tk.Frame):
                                column=App.GRID[tag][1],
                                sticky=sticky)
 
-    def InitMenu(self, master, tag, options) -> None:
+    def InitMenu(self, master, tag, options):
         """
         Initializes a menu.
 
@@ -887,7 +892,7 @@ class App(tk.Frame):
         self.MakePreview(sprite_splitter.CompositeFull,
                          "right", headfirst=headfirst)
 
-    def RebuildBodyData(self) -> None:
+    def RebuildBodyData(self):
         """
         Rebuilds JSON database for body spritesheet filepaths.
 
@@ -904,7 +909,7 @@ class App(tk.Frame):
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_BDAT)
 
     # noinspection PyMethodMayBeStatic
-    def RebuildBodyImages(self) -> None:
+    def RebuildBodyImages(self):
         """
         Callback function. Rebuilds intermediate body spritesheets.
 
@@ -917,7 +922,7 @@ class App(tk.Frame):
             PrepareBody()
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_BIMG)
 
-    def RebuildBodyOffsets(self) -> None:
+    def RebuildBodyOffsets(self):
         """
         Callback function. Rebuilds body offset database.
 
@@ -940,7 +945,7 @@ class App(tk.Frame):
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_BOFF)
 
-    def RebuildHeadData(self) -> None:
+    def RebuildHeadData(self):
         """
         Callback function. Rebuilds head JSON database.
 
@@ -957,7 +962,7 @@ class App(tk.Frame):
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HDAT)
 
     # noinspection PyMethodMayBeStatic
-    def RebuildHeadImages(self) -> None:
+    def RebuildHeadImages(self):
         """
         Callback function. Rebuilds intermediate head spritesheets.
 
@@ -970,7 +975,7 @@ class App(tk.Frame):
             PrepareHead()
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HIMG)
 
-    def RebuildHeadOffsets(self) -> None:
+    def RebuildHeadOffsets(self):
         """
         Callback function. Rebuilds head offset database.
 
@@ -994,7 +999,7 @@ class App(tk.Frame):
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HOFF)
 
     # noinspection PyUnusedLocal
-    def ToggleLayerOrder(self, event) -> None:
+    def ToggleLayerOrder(self, event):
         """
         Callback function. Toggles sprite compositing layer order.
 
@@ -1010,7 +1015,7 @@ class App(tk.Frame):
             elif self._CurState == STATES[STATES.right]:
                 self.MakeRightPreview()
 
-    def UpdateBodyOffsetLabel(self, state, frame) -> None:
+    def UpdateBodyOffsetLabel(self, state, frame):
         """
         Updates label for current (x,y) body offset.
 

@@ -1,12 +1,10 @@
 #! usr/bin/env python3
 """
---------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 Creates intermediate spritesheets used during the final compositing process.
 
---------------------------------------------------------------------------------
 """
 from PIL import Image
 from sprite_json import *
@@ -36,27 +34,22 @@ Default key.
 JSON_KEY_DEFAULT: str = "?.default"
 
 
-def CropImage(im: Image,
-              x: int,
-              y: int,
-              w: int,
-              h: int) -> Image:
+def CropImage(im, x, y, w, h):
     """
     Crops a PIL image.
 
     :param im: Image to crop.
-    :param x: Topleft x-coordinate to crop from.
-    :param y: Topleft y-coordinate to crop from.
-    :param w: Width to crop to.
-    :param h: Height to crop to.
+    :param x:  Topleft x-coordinate to crop from.
+    :param y:  Topleft y-coordinate to crop from.
+    :param w:  Width to crop to.
+    :param h:  Height to crop to.
 
-    :return: Image cropped to the given bounds.
+    :return: Specified subregion from image.
     """
     return im.crop((x, y, w + x, h + y))
 
 
-def MakeImage(w: int,
-              h: int) -> Image:
+def MakeImage(w, h):
     """
     Creates a blank PIL image.
 
@@ -68,7 +61,7 @@ def MakeImage(w: int,
     return Image.new(MODE, (w, h), (0, 0, 0, 255))
 
 
-def PrepareBody() -> None:
+def PrepareBody():
     """
     Create body source images.
 
@@ -76,23 +69,23 @@ def PrepareBody() -> None:
     """
     print("Now generating intermediate body spritesheets...")
 
-    bodyData: dict = LoadGenSrcBody()
-    files: list = glob.glob(os.path.join(SOURCE_BODY_DIRECTORY, "*.png"))
+    bodyData = LoadGenSrcBody()
+    files = glob.glob(os.path.join(SOURCE_BODY_DIRECTORY, "*.png"))
     files.sort()
 
     for filename in files:
         print("Generating intermediate for {}...".format(filename))
 
-        root: str = FixPath(BODY_DIRECTORY)
-        path: str = os.path.join(root, os.path.split(filename)[-1])
+        root = FixPath(BODY_DIRECTORY)
+        path = os.path.join(root, os.path.split(filename)[-1])
 
-        image: Image = ProcessBody(filename, bodyData)
+        image = ProcessBody(filename, bodyData)
         image.save(path)
 
     print("Intermediate body spritesheets complete!")
 
 
-def PrepareHead() -> None:
+def PrepareHead():
     """
     Create head source images.
 
@@ -100,24 +93,23 @@ def PrepareHead() -> None:
     """
     print("Now generating intermediate head spritesheets...")
 
-    headData: dict = LoadGenSrcHead()
-    files: list = glob.glob(os.path.join(SOURCE_HEAD_DIRECTORY, "*.png"))
+    headData = LoadGenSrcHead()
+    files = glob.glob(os.path.join(SOURCE_HEAD_DIRECTORY, "*.png"))
     files.sort()
 
     for filename in files:
         print("Generating intermediate for {}...".format(filename))
 
-        root: str = FixPath(HEAD_DIRECTORY)
-        path: str = os.path.join(root, os.path.split(filename)[-1])
+        root = FixPath(HEAD_DIRECTORY)
+        path = os.path.join(root, os.path.split(filename)[-1])
 
-        image: Image = ProcessHead(filename, headData)
+        image = ProcessHead(filename, headData)
         image.save(path)
 
     print("Intermediate head spritesheets complete!")
 
 
-def ProcessBody(filename: str,
-                data: dict) -> Image:
+def ProcessBody(filename, data):
     """
     Processes an input "body" image.
 
@@ -126,17 +118,17 @@ def ProcessBody(filename: str,
     a single spritesheet.
 
     :param filename: Source image to crop from.
-    :param data: Body data to use.
+    :param data:     Body data to use.
 
     :return: Newly-generated spritesheet.
     """
-    img: Image = Image.open(filename)
+    img = Image.open(filename)
 
     try:
-        key: str = os.path.splitext(os.path.basename(filename))[0]
-        rectData: dict = data[key]
+        key = os.path.splitext(os.path.basename(filename))[0]
+        rectData = data[key]
     except KeyError:
-        rectData: dict = data[JSON_KEY_DEFAULT]
+        rectData = data[JSON_KEY_DEFAULT]
 
     rects = [
         CropImage(img, *rectData["0"]["idle"]),
@@ -153,14 +145,14 @@ def ProcessBody(filename: str,
         CropImage(img, *rectData["3"]["right"]),
         ]
 
-    output: Image = MakeImage(256, len(rects) * 32)
+    output = MakeImage(256, len(rects) * 32)
     for n, r in enumerate(rects):
         output.paste(r, (0, n * 32))
 
     return output
 
 
-def ProcessHead(filename: str, data: dict) -> Image:
+def ProcessHead(filename, data):
     """
     Processes an input "head" image.
 
@@ -169,17 +161,17 @@ def ProcessHead(filename: str, data: dict) -> Image:
     a single spritesheet.
 
     :param filename: Source image to crop from.
-    :param data: Head data to use.
+    :param data:     Head data to use.
 
     :return: Newly-generated spritesheet.
     """
     img = Image.open(filename)
 
     try:
-        key: str = os.path.splitext(os.path.basename(filename))[0]
-        rectData: dict = data[key]
+        key = os.path.splitext(os.path.basename(filename))[0]
+        rectData = data[key]
     except KeyError:
-        rectData: dict = data[JSON_KEY_DEFAULT]
+        rectData = data[JSON_KEY_DEFAULT]
 
     rects = [
         CropImage(img, *rectData["0"]["idle"]),
@@ -196,7 +188,7 @@ def ProcessHead(filename: str, data: dict) -> Image:
         CropImage(img, *rectData["3"]["right"]),
         ]
 
-    output: Image = MakeImage(256, len(rects) * 64)
+    output = MakeImage(256, len(rects) * 64)
     for n, r in enumerate(rects):
         output.paste(r, (0, n * 64))
 

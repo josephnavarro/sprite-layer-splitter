@@ -46,7 +46,7 @@ class NonexistentBodyException(Exception):
         self.filename = name
 
 
-def SortedSet(*lists, reverse=False) -> list:
+def SortedSet(*lists, reverse=False):
     """
     Sorts unique elements among one or more input lists.
 
@@ -61,7 +61,7 @@ def SortedSet(*lists, reverse=False) -> list:
     return outList
 
 
-def PasteLayers(dest, head, body, layers, headfirst=True) -> None:
+def PasteLayers(dest, head, body, layers, headfirst=True):
     """
     Pastes head and body subregions in proper layering order.
     (In-place).
@@ -98,7 +98,7 @@ def PasteLayers(dest, head, body, layers, headfirst=True) -> None:
                 pass
 
 
-def Split(image) -> dict:
+def Split(image):
     """
     Isolates irregular regions on an image, then sorts by luminosity.
 
@@ -118,7 +118,7 @@ def Split(image) -> dict:
                       if q not in IGNORED_COLORS]}
 
 
-def GetBodyOffsets(name, data) -> dict:
+def GetBodyOffsets(name, data):
     """
     Retrieves framewise offset data for body sprites.
 
@@ -128,14 +128,12 @@ def GetBodyOffsets(name, data) -> dict:
     :return: Offsetting data for idle, left-, and right-facing frames.
     """
     offsets = data.get(name, {}).get("offset", {})
-    return {
-        "idle":  offsets.get("idle", BASE_OFFSETS)[:],
-        "left":  offsets.get("left", BASE_OFFSETS)[:],
-        "right": offsets.get("right", BASE_OFFSETS)[:],
-    }
+    return {"idle":  offsets.get("idle", BASE_OFFSETS)[:],
+            "left":  offsets.get("left", BASE_OFFSETS)[:],
+            "right": offsets.get("right", BASE_OFFSETS)[:]}
 
 
-def GetBodyOrder(name, data) -> dict:
+def GetBodyOrder(name, data):
     """
     Retrieves frame ordering data for body sprites.
 
@@ -145,14 +143,12 @@ def GetBodyOrder(name, data) -> dict:
     :return: Order of iteration for idle-, left-, and right-facing frames.
     """
     order = data.get(name, {}).get("order", {})
-    return {
-        "idle":  order.get("idle", BASE_ORDER[:]),
-        "left":  order.get("left", BASE_ORDER[:]),
-        "right": order.get("right", BASE_ORDER[:]),
-    }
+    return {"idle":  order.get("idle", BASE_ORDER[:]),
+            "left":  order.get("left", BASE_ORDER[:]),
+            "right": order.get("right", BASE_ORDER[:])}
 
 
-def GetHeadOffsets(name, data) -> dict:
+def GetHeadOffsets(name, data):
     """
     Retrieves framewise offset data for head sprites.
 
@@ -162,15 +158,13 @@ def GetHeadOffsets(name, data) -> dict:
     :return: Offsetting data for idle, left-, and right-facing frames.
     """
     offsets = data.get(name, {}).get("offset", {})
-    return {
-        "idle":  offsets.get("idle", BASE_OFFSETS)[:],
-        "left":  offsets.get("left", BASE_OFFSETS)[:],
-        "right": offsets.get("right", BASE_OFFSETS)[:],
-        "size":  data.get(name, {}).get("size", "large"),
-    }
+    return {"idle":  offsets.get("idle", BASE_OFFSETS)[:],
+            "left":  offsets.get("left", BASE_OFFSETS)[:],
+            "right": offsets.get("right", BASE_OFFSETS)[:],
+            "size":  data.get(name, {}).get("size", "large")}
 
 
-def GetHeadOrder(name, data) -> dict:
+def GetHeadOrder(name, data):
     """
     Retrieves frame ordering data for head sprites.
 
@@ -180,14 +174,12 @@ def GetHeadOrder(name, data) -> dict:
     :return: Order of iteration for idle-, left-, and right-facing frames.
     """
     order = data.get(name, {}).get("order", {})
-    return {
-        "idle":  order.get("idle", BASE_ORDER[:]),
-        "left":  order.get("left", BASE_ORDER[:]),
-        "right": order.get("right", BASE_ORDER[:]),
-    }
+    return {"idle":  order.get("idle", BASE_ORDER[:]),
+            "left":  order.get("left", BASE_ORDER[:]),
+            "right": order.get("right", BASE_ORDER[:])}
 
 
-def ProcessBody(name, image, where, body_data, source_data, is_alpha) -> dict:
+def ProcessBody(name, image, where, body_data, source_data, is_alpha):
     """
     Processes a unit's body sprite.
 
@@ -200,17 +192,17 @@ def ProcessBody(name, image, where, body_data, source_data, is_alpha) -> dict:
 
     :return: Dictionary mapping luminosities to image layers.
     """
-    data = GetBodyOffsets(name, body_data)
-    order = GetBodyOrder(name, body_data)
-    size = source_data["body"]["size"]
-    bodyWhere = source_data["body"]["where"]
-
     layers = Split(Crop(image, where, REGION_FULL_BODY))
     if is_alpha:
         layers = {k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0])
                   for k, v in layers.items()}
 
-    outData = {}
+    data = GetBodyOffsets(name, body_data)
+    order = GetBodyOrder(name, body_data)
+    size = source_data["body"]["size"]
+    where = source_data["body"]["where"]
+
+    output = {}
     for state in STATES:
         dx = +0
         if state == "right":
@@ -220,26 +212,26 @@ def ProcessBody(name, image, where, body_data, source_data, is_alpha) -> dict:
         else:
             dy = +32 * 0
 
-        outData[state] = {}
+        output[state] = {}
         for layer, image in layers.items():
             # Make blank image with room for 4 sprite frames
             shape = (COLOR_REGION[1], COLOR_REGION[0], 4)
             frame = np.zeros(shape, np.uint8)
 
             for n in range(4):
-                whereX = bodyWhere[state][0] + (size[0] * order[state][n])
-                whereY = bodyWhere[state][1]
-                newImage = Crop(image, [whereX, whereY], size)
+                whereX = where[state][0] + (size[0] * order[state][n])
+                whereY = where[state][1]
+                new = Crop(image, [whereX, whereY], size)
                 x = dx + data[state][n][0] + (32 * n)
                 y = dy - data[state][n][1]
-                Paste(frame, newImage, (x, y))
+                Paste(frame, new, (x, y))
 
-            outData[state][layer] = frame
+            output[state][layer] = frame
 
-    return outData
+    return output
 
 
-def ProcessHead(name, image, where, head_data, source_data, is_alpha) -> dict:
+def ProcessHead(name, image, where, head_data, source_data, is_alpha):
     """
     Processes a unit's head sprite.
 
@@ -252,20 +244,20 @@ def ProcessHead(name, image, where, head_data, source_data, is_alpha) -> dict:
 
     :return: Dictionary mapping luminosities to image layers.
     """
-    data = GetHeadOffsets(name, head_data)
-    order = GetHeadOrder(name, head_data)
-    headType = data["size"]
-    size = source_data["head"][headType]["size"]
-    headWhere: list = source_data["head"][headType]["where"]
-
     layers = Split(Crop(image, where, REGION_FULL_HEAD))
     if is_alpha:
         layers = {k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0])
                   for k, v in layers.items()}
 
-    outData = {}
+    data = GetHeadOffsets(name, head_data)
+    order = GetHeadOrder(name, head_data)
+    type = data["size"]
+    size = source_data["head"][type]["size"]
+    where = source_data["head"][type]["where"]
+
+    output = {}
     for state in STATES:
-        dx = 8 if headType == "small" else 0
+        dx = 8 if type == "small" else 0
         if state == "right":
             dy = +32 * 2
         elif state == "left":
@@ -273,33 +265,33 @@ def ProcessHead(name, image, where, head_data, source_data, is_alpha) -> dict:
         else:
             dy = +32 * 0
 
-        outData[state] = {}
+        output[state] = {}
         for layer, image in layers.items():
             # Make blank image with room for 4 sprite frames
             shape = (COLOR_REGION[1], COLOR_REGION[0], 4)
             frame = np.zeros(shape, np.uint8)
 
             for n in range(4):
-                whereX = headWhere[state][0] + (size[0] * order[state][n])
-                whereY = headWhere[state][1]
-                newImage = Crop(image, [whereX, whereY], size)
+                whereX = where[state][0] + (size[0] * order[state][n])
+                whereY = where[state][1]
+                new = Crop(image, [whereX, whereY], size)
                 x = dx + data[state][n][0] + (32 * n)
                 y = dy - data[state][n][1]
-                Paste(frame, newImage, (x, y))
+                Paste(frame, new, (x, y))
 
-            outData[state][layer] = frame
+            output[state][layer] = frame
 
-    return outData
+    return output
 
 
-def Process(head_path: str,
-            body_path: str,
-            head_offset: list,
-            body_offset: list,
-            head_data: dict,
-            body_data: dict,
-            source_data: dict,
-            is_alpha: bool) -> dict:
+def Process(head_path,
+            body_path,
+            head_offset,
+            body_offset,
+            head_data,
+            body_data,
+            source_data,
+            is_alpha) -> dict:
     """
     Assembles sprite data for both head and body images.
 
@@ -315,16 +307,24 @@ def Process(head_path: str,
     :return: Dictionary containing head and body compositing rules.
     """
     # Load head spritesheet from file
-    headImage = cv2.imread(head_path)
-    if headImage.size == 0:
-        print(HEAD_SRC_NOT_FOUND.format(head_path))
-        raise SystemExit
+    if not head_path:
+        headImage = np.zeros([256, 384, 3], dtype=np.uint8)
+        headImage[:, :] = (0, 0, 0)
+    else:
+        headImage = cv2.imread(head_path)
+        if headImage.size == 0:
+            print(HEAD_SRC_NOT_FOUND.format(head_path))
+            raise SystemExit
 
     # Load body spritesheet from file
-    bodyImage = cv2.imread(body_path)
-    if bodyImage.size == 0:
-        print(BODY_SRC_NOT_FOUND.format(body_path))
-        raise SystemExit
+    if not body_path:
+        bodyImage = np.zeros([256, 384, 3], dtype=np.uint8)
+        bodyImage[:, :] = (0, 0, 0)
+    else:
+        bodyImage = cv2.imread(body_path)
+        if bodyImage.size == 0:
+            print(BODY_SRC_NOT_FOUND.format(body_path))
+            raise SystemExit
 
     baseName = os.path.splitext(os.path.basename(body_path))[0]
     return {"head": ProcessHead(baseName,
@@ -356,16 +356,22 @@ def CompositeIdle(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
     # Load head compositing data from JSON
     headOffsets = LoadHeadOffsets()
     headPaths = LoadHeadPaths()
-    headPath = os.path.join(ROOT_INPUT_DIR, *headPaths[head]["path"])
-    if not os.path.isfile(headPath):
-        raise NonexistentHeadException(headPath)
+    if not head:
+        headPath = ""
+    else:
+        headPath = os.path.join(ROOT_INPUT_DIR, *headPaths[head]["path"])
+        if not os.path.isfile(headPath):
+            raise NonexistentHeadException(headPath)
 
     # Load body compositing data from JSON
     bodyOffsets = LoadBodyOffsets()
     bodyPaths = LoadBodyPaths()
-    bodyPath = os.path.join(ROOT_INPUT_DIR, *bodyPaths[body]["path"])
-    if not os.path.isfile(bodyPath):
-        raise NonexistentBodyException(bodyPath)
+    if not body:
+        bodyPath = ""
+    else:
+        bodyPath = os.path.join(ROOT_INPUT_DIR, *bodyPaths[body]["path"])
+        if not os.path.isfile(bodyPath):
+            raise NonexistentBodyException(bodyPath)
 
     # Load source processing rules from JSON
     srcColors = LoadSourceImgColors()
@@ -432,16 +438,22 @@ def CompositeFull(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
     # Load head compositing data from JSON
     headOffsets = LoadHeadOffsets()
     headPaths = LoadHeadPaths()
-    headPath = os.path.join(ROOT_INPUT_DIR, *headPaths[head]["path"])
-    if not os.path.isfile(headPath):
-        raise NonexistentHeadException(headPath)
+    if not head:
+        headPath = ""
+    else:
+        headPath = os.path.join(ROOT_INPUT_DIR, *headPaths[head]["path"])
+        if not os.path.isfile(headPath):
+            raise NonexistentHeadException(headPath)
 
     # Load body compositing data from JSON
     bodyOffsets = LoadBodyOffsets()
     bodyPaths = LoadBodyPaths()
-    bodyPath = os.path.join(ROOT_INPUT_DIR, *bodyPaths[body]["path"])
-    if not os.path.isfile(bodyPath):
-        raise NonexistentBodyException(bodyPath)
+    if not body:
+        bodyPath = ""
+    else:
+        bodyPath = os.path.join(ROOT_INPUT_DIR, *bodyPaths[body]["path"])
+        if not os.path.isfile(bodyPath):
+            raise NonexistentBodyException(bodyPath)
 
     # Load compositing rules from JSON
     srcColorData = LoadSourceImgColors()
@@ -509,7 +521,7 @@ def CompositeFull(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
     return outImage
 
 
-def SaveImage(image, path) -> None:
+def SaveImage(image, path):
     """
     Saves a CV2-format image to file.
 

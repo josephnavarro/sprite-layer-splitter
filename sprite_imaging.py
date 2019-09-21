@@ -78,14 +78,17 @@ def ToGrayscale(image: np.ndarray, is_color=False) -> np.ndarray:
 
     :return: Image as converted to grayscale.
     """
-    outImage = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-    outImage = cv2.cvtColor(outImage, cv2.COLOR_BGR2GRAY)
+    try:
+        outImage = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        outImage = cv2.cvtColor(outImage, cv2.COLOR_BGR2GRAY)
 
-    # Optionally output as RGB again
-    if is_color:
-        outImage = cv2.cvtColor(outImage, cv2.COLOR_GRAY2RGB)
+        # Optionally output as RGB again
+        if is_color:
+            outImage = cv2.cvtColor(outImage, cv2.COLOR_GRAY2RGB)
 
-    return outImage
+        return outImage
+    except cv2.error:
+        return image
 
 
 def ToPIL(image: np.ndarray) -> Image:
@@ -198,6 +201,10 @@ def ReplaceColor(image: np.ndarray, color=[], replace=[0, 0, 0]) -> np.ndarray:
 
     if not color:
         color = outImage[0, 0]
-    outImage[np.where((outImage == color).all(axis=2))] = replace
+
+    try:
+        outImage[np.where((outImage == color).all(axis=2))] = replace
+    except AttributeError:
+        outImage[:, :] = replace
 
     return outImage

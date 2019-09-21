@@ -15,7 +15,7 @@ from namedenumiter import NamedEnumIter
 """ 
 Colors to avoid copying at all. 
 """
-IGNORED_COLORS: list = [
+IGNORED_COLORS = [
     0x00,  # Black
     0xFF,  # White
     ]
@@ -23,17 +23,17 @@ IGNORED_COLORS: list = [
 """
 Root input directory.
 """
-ROOT_INPUT_DIR: str = os.path.join("inputs", "")
+ROOT_INPUT_DIR = os.path.join("inputs", "")
 
 """ 
 Root spritesheet output directory. 
 """
-ROOT_OUTPUT_DIR: str = os.path.join("outputs", "")
+ROOT_OUTPUT_DIR = os.path.join("outputs", "")
 
 """ 
 Recognized file types.
 """
-FILETYPES: list = [
+FILETYPES = [
     ("PNG", "*.png"),
     ("JPEG", "*.jpg; *.jpeg; *.jpe; *.jfif; *.exif"),
     ("BMP", "*.bmp; *.dib; *.rle"),
@@ -65,39 +65,39 @@ STATES = NamedEnumIter(
 """ 
 Dimensions of complete head region (layer mask and sprites). 
 """
-REGION_FULL_HEAD: list = [256, 192]
+REGION_FULL_HEAD = [256, 192]
 
 """
 Dimensions of complete body region (layer mask and sprites).
 """
-REGION_FULL_BODY: list = [256, 96]
+REGION_FULL_BODY = [256, 96]
 
 """
 Dimensions of a state region (e.g. idle/left/right).
 """
-STATE_REGION: list = [128, 32]
+STATE_REGION = [128, 32]
 
 """
 Dimensions of a color region.
 """
-COLOR_REGION: list = [STATE_REGION[0], STATE_REGION[1] * len(STATES)]
+COLOR_REGION = [STATE_REGION[0], STATE_REGION[1] * len(STATES)]
 
 """
 Vertical distance between color regions on 'body' sheet.
 """
-BODY_BLOCK: int = 96
+BODY_BLOCK = 96
 
 """
 Vertical distance between color regions on 'head' sheet.
 """
-HEAD_BLOCK: int = 192
+HEAD_BLOCK = 192
 
 """
 Default set of per-frame X-Y offsets.
 """
-BASE_OFFSETS: list = [(0, 0), (0, 0), (0, 0), (0, 0)]
+BASE_OFFSETS = [(0, 0), (0, 0), (0, 0), (0, 0)]
 
 """
 Default frame pasting order.
 """
-BASE_ORDER: list = [0, 1, 2, 3]
+BASE_ORDER = [0, 1, 2, 3]
