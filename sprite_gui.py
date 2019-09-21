@@ -111,22 +111,10 @@ class App(tk.Frame):
         DEFAULT_BUTTON_WIDTH = 22
         DEFAULT_SLIDER_WIDTH = 280
 
-    PREVIEW_CANVAS_SIZE = [384, 96]
-    PREVIEW_ANIM_SIZE = [96, 96]
-
-    # Default widget colors
-    FG_COLOR_PREVIEW_CVS = [0, 0, 0]
-
     # Grid positions for widgets
     GRID_SCALE_SPEED_PREVIEW = [4, 1]
-
     GRID_CHECK_ANIM_PINGPONG = [1, 2]
     GRID_CHECK_LAYER_REVERSE = [1, 3]
-
-    GRID_CANVAS_ANIM_PREVIEW = [0, 2]
-
-    GRID_OPTIONS_SELECT_HEAD = [1, 0]
-    GRID_OPTIONS_SELECT_BODY = [1, 1]
 
     GRID = {
         "export-full":          [3, 3],
@@ -167,23 +155,12 @@ class App(tk.Frame):
         "select-head":          [4, 4],
     }
 
-    PAD_OPTIONS_SELECT_BODY = [4, 4]
-    PAD_OPTIONS_SELECT_HEAD = [4, 4]
-
     # Preview composition dimensions
     RECTS = {
         "idle":  [0, 0, 128, 32],
         "left":  [0, 32, 128, 32],
         "right": [0, 64, 128, 32],
     }
-    ORIG_PREVIEW_CROP_IDLE = [0, 0]
-    SIZE_PREVIEW_CROP_IDLE = [128, 32]
-    ORIG_PREVIEW_CROP_LEFT = [0, 32]
-    SIZE_PREVIEW_CROP_LEFT = [128, 32]
-    ORIG_PREVIEW_CROP_RIGH = [0, 64]
-    SIZE_PREVIEW_CROP_RIGH = [128, 32]
-
-    SIZE_PREVIEW_RESIZE_UP = (384, 96)
 
     # Button and menu text labels
     LABELS = {
@@ -226,9 +203,6 @@ class App(tk.Frame):
 
     LABEL_CHECK_PINGPONG_ANIMATE = "Ping-pong animation"
     LABEL_CHECK_REVERSE_LAYERING = "Reverse layering"
-    LABEL_CURRENT_XY_HEAD_OFFSET = "Head: "
-    LABEL_MENU_CHOICES_HEAD_NULL = "Select head"
-    LABEL_MENU_CHOICES_BODY_NULL = "Select body"
 
     # Animation speeds
     SPEED_SCALE_MIN = 0
@@ -287,8 +261,7 @@ class App(tk.Frame):
         # Maintain reference to root Frame
         self._Master = root
         self._Master.resizable(False, False)
-
-        self.winfo_toplevel().title(self.WINDOW_TITLE)
+        self.winfo_toplevel().title(App.WINDOW_TITLE)
 
         # Set icon for Mac OS X
         if IsOSX():
@@ -297,8 +270,8 @@ class App(tk.Frame):
             root.tk.call("wm", "iconphoto", root._w, image)
 
         # Initialize local non-widget data
-        self._AnimObjs = []
-        self._ImageObj = None
+        self._AnimObjects = []
+        self._ImageObject = None
         self._IsForwards = True
         self._HasInitAnim = False
         self._CurFrame = 0
@@ -325,13 +298,15 @@ class App(tk.Frame):
 
         # Frames
         self._FrameTopleft = tk.Frame(self._Master)
-        self._FrameTopRight = tk.Frame(self._FrameTopleft)
-        self._FrameTop = tk.Frame(self._FrameTopRight, width=10, height=10)
-        self._FrameBottom = tk.Frame(self._Master)
-
         self._FrameTopleft.grid(row=0, column=0)
+
+        self._FrameTopRight = tk.Frame(self._FrameTopleft)
         self._FrameTopRight.grid(row=0, column=3)
+
+        self._FrameTop = tk.Frame(self._FrameTopRight, width=10, height=10)
         self._FrameTop.grid(row=0, column=0)
+
+        self._FrameBottom = tk.Frame(self._Master)
         self._FrameBottom.grid(row=2)
 
         # Buttons
@@ -360,12 +335,14 @@ class App(tk.Frame):
 
         # Menus
         self._Menus = {
-            "select-head": tk.OptionMenu(self._FrameBottom,
-                                         self._StringVars["select-head"],
-                                         *self._HeadList),
-            "select-body": tk.OptionMenu(self._FrameBottom,
-                                         self._StringVars["select-body"],
-                                         *self._BodyList),
+            "select-head": tk.OptionMenu(
+                self._FrameBottom,
+                self._StringVars["select-head"],
+                *self._HeadList),
+            "select-body": tk.OptionMenu(
+                self._FrameBottom,
+                self._StringVars["select-body"],
+                *self._BodyList),
         }
 
         # Labels
@@ -456,7 +433,7 @@ class App(tk.Frame):
             # Draw frame to canvas
             topleft: tuple = (16, 16)
             anchor: str = tk.NW
-            image: tk.PhotoImage = self._AnimObjs[self._CurFrame]
+            image: tk.PhotoImage = self._AnimObjects[self._CurFrame]
             self._Canvases["preview-anim"].create_image(topleft,
                                                         anchor=anchor,
                                                         image=image)
@@ -585,7 +562,7 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._AnimObjs = []
+        self._AnimObjects = []
         self.InitCanvas(self._FrameTopleft, "preview-anim", 13)
 
     def InitButton(self, master, tag, cmd) -> None:
@@ -765,7 +742,7 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._ImageObj = None  ## !!
+        self._ImageObject = None  ## !!
         self.InitCanvas(self._FrameTopleft, "preview-static", 13)
 
     def MakeAnimationFrames(self, image) -> None:
@@ -783,7 +760,7 @@ class App(tk.Frame):
         frame3 = sprite_imaging.Crop(image, [w * 2, 0], [w, h])
         frame4 = sprite_imaging.Crop(image, [w * 3, 0], [w, h])
 
-        self._AnimObjs = [
+        self._AnimObjects = [
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame1)),
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame2)),
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame3)),
@@ -796,7 +773,7 @@ class App(tk.Frame):
         self._CurSpeed = self._ScaleAnimSpeed.get()
         self._Canvases["preview-anim"].create_image((16, 16),
                                                     anchor=tk.NW,
-                                                    image=self._AnimObjs[0])
+                                                    image=self._AnimObjects[0])
 
     def MakeAnimationPreview(self, image) -> None:
         """
@@ -806,10 +783,10 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._ImageObj = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
+        self._ImageObject = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
         self._Canvases["preview-static"].create_image((16, 16),
                                                       anchor=tk.NW,
-                                                      image=self._ImageObj)
+                                                      image=self._ImageObject)
 
         App.DrawText(self._Canvases["preview-static"], 18 + 96 * 0, 92, "(0)")
         App.DrawText(self._Canvases["preview-static"], 18 + 96 * 1, 92, "(1)")
@@ -944,7 +921,7 @@ class App(tk.Frame):
             self._BodyOffsets = LoadBodyOffsets()
             self.UpdateOffsetLabels()
 
-            if self._AnimObjs:
+            if self._AnimObjects:
                 if self._CurState == STATES[STATES.idle]:
                     self.MakeIdlePreview()
                 elif self._CurState == STATES[STATES.left]:
@@ -997,7 +974,7 @@ class App(tk.Frame):
             self._HeadOffsets = LoadHeadOffsets()
             self.UpdateOffsetLabels()
 
-            if self._AnimObjs:
+            if self._AnimObjects:
                 if self._CurState == STATES[STATES.idle]:
                     self.MakeIdlePreview()
                 elif self._CurState == STATES[STATES.left]:
@@ -1039,7 +1016,7 @@ class App(tk.Frame):
 
         # Increment frame
         curFrame = self._CurFrame
-        if self._AnimObjs:
+        if self._AnimObjects:
             if isForwards:
                 curFrame += 1
                 if curFrame >= 4:
