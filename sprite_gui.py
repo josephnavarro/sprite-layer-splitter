@@ -9,7 +9,6 @@ Graphical user interface layer.
 --------------------------------------------------------------------------------
 """
 import cv2
-import numpy as np
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import filedialog
@@ -458,7 +457,7 @@ class App(tk.Frame):
         if self._CurSpeed > 0:
             self.after(1000 // self._CurSpeed, self.DoAnimate)
 
-    def DoComposite(self, func) -> (str, str, (np.ndarray or None)):
+    def DoComposite(self, func):
         """
         Performs a general-purpose image composition routine.
 
@@ -496,12 +495,10 @@ class App(tk.Frame):
 
         except UnspecifiedHeadException:
             # Head not specified
-            tk.messagebox.showinfo(App.WINDOW_TITLE,
-                                   App.MESSAGE_FAILURE_HEAD)
+            tk.messagebox.showinfo(App.WINDOW_TITLE, App.MESSAGE_FAILURE_HEAD)
         except UnspecifiedBodyException:
             # Body not specified
-            tk.messagebox.showinfo(App.WINDOW_TITLE,
-                                   App.MESSAGE_FAILURE_BODY)
+            tk.messagebox.showinfo(App.WINDOW_TITLE, App.MESSAGE_FAILURE_BODY)
         except InvalidHeadException as e:
             # Head spritesheet does not exist
             tk.messagebox.showinfo(App.WINDOW_TITLE,
@@ -804,7 +801,7 @@ class App(tk.Frame):
         App.DrawText(self._Canvases["preview-static"], 18 + 96 * 2, 92, "(2)")
         App.DrawText(self._Canvases["preview-static"], 18 + 96 * 3, 92, "(3)")
 
-    def MakePreview(self, func, state) -> None:
+    def MakePreview(self, func, state):
         """
         Generates a static preview image.
 
@@ -823,35 +820,33 @@ class App(tk.Frame):
             if image is not None:
                 try:
                     # Crop idle frames from source spritesheet
-                    start = App.RECTS[state][0:2]
-                    size = App.RECTS[state][2:4]
-                    dsize = tuple(App.SIZES["preview-resize"])
-                    interp = cv2.INTER_NEAREST
-
-                    image = sprite_imaging.Crop(image, start, size)
-                    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-                    image = cv2.resize(image, dsize=dsize, interpolation=interp)
+                    image = cv2.resize(
+                        cv2.cvtColor(
+                            sprite_imaging.Crop(
+                                image,
+                                App.RECTS[state][0:2],
+                                App.RECTS[state][2:4]),
+                            cv2.COLOR_BGR2RGB),
+                        dsize=tuple(App.SIZES["preview-resize"]),
+                        interpolation=cv2.INTER_NEAREST,
+                    )
 
                     # Set static and animated previews
                     self.MakeAnimationPreview(image)
                     self.MakeAnimationFrames(image)
 
                     # Set current state
-                    self._CurState = STATES[STATES.idle]
+                    self._CurState = state
 
                     try:
                         # Populate per-frame head offset data
-                        headName = self._StringVars["select-head"].get()
-                        headKey = self._BodyData[headName]
-                        self._CurHead = self._HeadOffsets[headKey]
+                        self._CurHead = self._HeadOffsets[head]
                     except KeyError:
                         self._CurHead = {}
 
                     try:
                         # Populate per-frame body offset data
-                        bodyName = self._StringVars["select-body"].get()
-                        bodyKey = self._BodyData[bodyName]
-                        self._CurBody = self._BodyOffsets[bodyKey]
+                        self._CurBody = self._BodyOffsets[body]
                     except KeyError:
                         self._CurBody = {}
 
@@ -860,8 +855,7 @@ class App(tk.Frame):
 
         except InvalidFilenameException:
             # Image format not recognized
-            tk.messagebox.showinfo(App.WINDOW_TITLE,
-                                   App.MESSAGE_FAILURE_TYPE)
+            tk.messagebox.showinfo(App.WINDOW_TITLE, App.MESSAGE_FAILURE_TYPE)
 
     def MakeIdlePreview(self) -> None:
         """
@@ -993,6 +987,7 @@ class App(tk.Frame):
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HOFF)
 
+    # noinspection PyUnusedLocal
     def ToggleLayerOrder(self, event) -> None:
         """
         Callback function. Toggles sprite compositing layer order.
