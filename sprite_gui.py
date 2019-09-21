@@ -100,21 +100,17 @@ class App(tk.Frame):
 
     if IsWindows():
         # Windows
-        SIZES["select-head"] = [26, 0]
-        SIZES["select-body"] = [26, 0]
-        DEFAULT_BUTTON_WIDTH = 27
-        DEFAULT_SLIDER_WIDTH = 272
+        SIZES["default-menu"] = [26, 0]
+        SIZES["default-button"] = [27, 0]
+        SIZES["default-slider"] = [272, 0]
     else:
         # OS X / Linux
-        SIZES["select-head"] = [19, 0]
-        SIZES["select-body"] = [19, 0]
-        DEFAULT_BUTTON_WIDTH = 22
-        DEFAULT_SLIDER_WIDTH = 280
+        SIZES["default-menu"] = [19, 0]
+        SIZES["default-button"] = [22, 0]
+        SIZES["default-slider"] = [280, 0]
 
     # Grid positions for widgets
     GRID_SCALE_SPEED_PREVIEW = [4, 1]
-    GRID_CHECK_ANIM_PINGPONG = [1, 2]
-    GRID_CHECK_LAYER_REVERSE = [1, 3]
 
     GRID = {
         "export-full":          [3, 3],
@@ -136,6 +132,7 @@ class App(tk.Frame):
         "select-body":          [1, 1],
         "preview-static":       [0, 1],
         "preview-anim":         [0, 2],
+        "pingpong-animation":   [1, 2],
     }
 
     # Padding for widgets
@@ -181,6 +178,7 @@ class App(tk.Frame):
         "frame-anim":           "Frame: ({0:d})  {1:d}  {2:d}  {3:d}",
         "select-head":          "Select head",
         "select-body":          "Select body",
+        "pingpong-animation":   "Ping-pong animation",
     }
 
     COLORS = {
@@ -201,7 +199,6 @@ class App(tk.Frame):
         "preview-anim":         {"fg": [0, 0, 0], "bg": [0, 0, 0]},
     }
 
-    LABEL_CHECK_PINGPONG_ANIMATE = "Ping-pong animation"
     LABEL_CHECK_REVERSE_LAYERING = "Reverse layering"
 
     # Animation speeds
@@ -324,25 +321,30 @@ class App(tk.Frame):
             "rebuild-head-offsets": tk.Button(),
         }
 
+        # Canvases
         self._Canvases = {
             "preview-static": tk.Canvas(self._Master),
             "preview-anim":   tk.Canvas(self._Master),
         }
 
         # Check buttons
-        self._CheckAnimPingpong = tk.Checkbutton()
-        self._CheckLayerReverse = tk.Checkbutton()
+        self._Checkboxes = {
+            "pingpong-animation": tk.Checkbutton(),
+            "reverse-layers":     tk.Checkbutton(),
+        }
 
         # Menus
         self._Menus = {
             "select-head": tk.OptionMenu(
                 self._FrameBottom,
                 self._StringVars["select-head"],
-                *self._HeadList),
+                *self._HeadList
+            ),
             "select-body": tk.OptionMenu(
                 self._FrameBottom,
                 self._StringVars["select-body"],
-                *self._BodyList),
+                *self._BodyList
+            ),
         }
 
         # Labels
@@ -366,8 +368,8 @@ class App(tk.Frame):
                         "export-full",
                         self.ExportFullFrames)
         self.InitPreviewStatic()
-        self.InitPreviewAnimation()
-        self.InitSliderSpeed()
+        self.InitPreviewAnim()
+        self.InitSliderFramerate()
         self.InitLabel(self._FrameTopRight,
                        "speed-anim",
                        ("Courier", 14),
@@ -431,13 +433,13 @@ class App(tk.Frame):
 
         try:
             # Draw frame to canvas
-            topleft: tuple = (16, 16)
-            anchor: str = tk.NW
-            image: tk.PhotoImage = self._AnimObjects[self._CurFrame]
-            self._Canvases["preview-anim"].create_image(topleft,
-                                                        anchor=anchor,
-                                                        image=image)
+            self._Canvases["preview-anim"].create_image(
+                (16, 16),
+                anchor=tk.NW,
+                image=self._AnimObjects[self._CurFrame],
+            )
         except IndexError:
+            # Current frame is invalid
             pass
 
         # Repeat if animation is active
@@ -456,15 +458,15 @@ class App(tk.Frame):
         bodyKey = ""
 
         try:
-            # Get head key
             try:
+                # Get head key
                 headName = self._StringVars["select-head"].get()
                 headKey = self._HeadData[headName]
             except KeyError:
                 raise UnspecifiedHeadException
 
-            # Get body key
             try:
+                # Get body key
                 bodyName = self._StringVars["select-body"].get()
                 bodyKey = self._BodyData[bodyName]
             except KeyError:
@@ -482,20 +484,20 @@ class App(tk.Frame):
 
         except UnspecifiedHeadException:
             # Head not specified
-            tk.messagebox.showinfo(self.WINDOW_TITLE,
-                                   self.MESSAGE_FAILURE_HEAD)
+            tk.messagebox.showinfo(App.WINDOW_TITLE,
+                                   App.MESSAGE_FAILURE_HEAD)
         except UnspecifiedBodyException:
             # Body not specified
-            tk.messagebox.showinfo(self.WINDOW_TITLE,
-                                   self.MESSAGE_FAILURE_BODY)
+            tk.messagebox.showinfo(App.WINDOW_TITLE,
+                                   App.MESSAGE_FAILURE_BODY)
         except InvalidHeadException as e:
             # Head spritesheet does not exist
-            tk.messagebox.showinfo(self.WINDOW_TITLE,
-                                   self.MESSAGE_INVALID_HEAD.format(e.filename))
+            tk.messagebox.showinfo(App.WINDOW_TITLE,
+                                   App.MESSAGE_INVALID_HEAD.format(e.filename))
         except InvalidBodyException as e:
             # Body spritesheet does not exist
-            tk.messagebox.showinfo(self.WINDOW_TITLE,
-                                   self.MESSAGE_INVALID_BODY.format(e.filename))
+            tk.messagebox.showinfo(App.WINDOW_TITLE,
+                                   App.MESSAGE_INVALID_BODY.format(e.filename))
 
         return headKey, bodyKey, None
 
@@ -503,8 +505,8 @@ class App(tk.Frame):
         """
         Composites and exports all frames to file.
 
-        :param func:
-        :param message:
+        :param func:    Frame compositing callback function.
+        :param message: Success message.
 
         :return: None.
         """
@@ -515,7 +517,6 @@ class App(tk.Frame):
             if image is not None:
                 # Prompt user for destination filename
                 FixPath(ROOT_OUTPUT_DIR)
-
                 initialfile = "{}_{}.png".format(head, body)
                 initialdir = ROOT_OUTPUT_DIR
                 title = "Save As"
@@ -528,11 +529,12 @@ class App(tk.Frame):
                     # Save image if path is valid
                     sprite_splitter.SaveImage(image, path)
                     message = message.format(os.path.basename(path))
-                    tk.messagebox.showinfo(self.WINDOW_TITLE, message)
+                    tk.messagebox.showinfo(App.WINDOW_TITLE, message)
 
         except InvalidFilenameException:
             # Image format not recognized
-            tk.messagebox.showinfo(self.WINDOW_TITLE, self.MESSAGE_FAILURE_TYPE)
+            tk.messagebox.showinfo(App.WINDOW_TITLE,
+                                   App.MESSAGE_FAILURE_TYPE)
 
         except EmptyFilenameException:
             # Filename not specified
@@ -545,7 +547,7 @@ class App(tk.Frame):
         :return: None.
         """
         self.ExportFrames(sprite_splitter.CompositeFull,
-                          self.MESSAGE_SUCCESS_FULL)
+                          App.MESSAGE_SUCCESS_FULL)
 
     def ExportIdleFrames(self) -> None:
         """
@@ -554,9 +556,9 @@ class App(tk.Frame):
         :return: None.
         """
         self.ExportFrames(sprite_splitter.CompositeIdle,
-                          self.MESSAGE_SUCCESS_IDLE)
+                          App.MESSAGE_SUCCESS_IDLE)
 
-    def InitPreviewAnimation(self) -> None:
+    def InitPreviewAnim(self) -> None:
         """
         Initializes animated image preview canvas.
 
@@ -575,15 +577,14 @@ class App(tk.Frame):
 
         :return: None.
         """
+        width = App.SIZES["default-button"][0]  # Button width
+        foreground = App.FromRGB(*App.COLORS[tag]["fg"])  # FG color
+        background = App.FromRGB(*App.COLORS[tag]["bg"])  # BG color
+
         self._Buttons[tag].destroy()
         self._Buttons[tag] = tk.Button(master,
                                        text=App.LABELS[tag],
                                        command=cmd)
-
-        width = App.DEFAULT_BUTTON_WIDTH  # Button width
-        foreground = App.FromRGB(*App.COLORS[tag]["fg"])  # FG color
-        background = App.FromRGB(*App.COLORS[tag]["bg"])  # BG color
-
         self._Buttons[tag].config(width=width,
                                   foreground=foreground,
                                   background=background,
@@ -616,23 +617,35 @@ class App(tk.Frame):
         self._Canvases[tag].grid(row=App.GRID[tag][0],
                                  column=App.GRID[tag][1])
 
+    def InitCheckbox(self, master, tag, variable, sticky) -> None:
+        """
+        Initializes a checkbox.
+
+        :param master:
+        :param tag:
+        :param variable:
+        :param sticky:
+
+        :return:
+        """
+        self._Checkboxes[tag].destroy()
+        self._Checkboxes[tag] = tk.Checkbutton(master,
+                                               text=App.LABELS[tag],
+                                               variable=variable)
+        self._Checkboxes[tag].grid(row=App.GRID[tag][0],
+                                   column=App.GRID[tag][1],
+                                   sticky=sticky)
+
     def InitCheckAnimPingpong(self) -> None:
         """
         Completes initialization of checkbox for toggling animation ping-pong.
 
         :return: None.
         """
-        self._CheckAnimPingpong.destroy()
-
-        mtr = self._FrameBottom  # Master
-        txt = self.LABEL_CHECK_PINGPONG_ANIMATE  # Text
-        var = self._BoolAnimPingPong  # Variable
-        row = self.GRID_CHECK_ANIM_PINGPONG[0]  # Row
-        column = self.GRID_CHECK_ANIM_PINGPONG[1]  # Column
-        sticky = tk.NS  # Sticky
-
-        self._CheckAnimPingpong = tk.Checkbutton(mtr, text=txt, variable=var)
-        self._CheckAnimPingpong.grid(row=row, column=column, sticky=sticky)
+        self.InitCheckbox(self._FrameBottom,
+                          "pingpong-animation",
+                          self._BoolAnimPingPong,
+                          tk.NS)
 
     def InitCheckLayerReverse(self):
         """
@@ -682,42 +695,43 @@ class App(tk.Frame):
             text = App.LABELS[tag]
 
         self._Labels[tag].destroy()
-        self._Labels[tag] = tk.Label(master, font=font, text=text)
+        self._Labels[tag] = tk.Label(master,
+                                     font=font,
+                                     text=text)
         self._Labels[tag].grid(row=App.GRID[tag][0],
                                column=App.GRID[tag][1],
                                sticky=sticky)
 
-    def InitMenu(self, master, key, options) -> None:
+    def InitMenu(self, master, tag, options) -> None:
         """
         Initializes a menu.
 
         :param master:  Root of widget.
-        :param key:     Key of menu to initialize.
+        :param tag:     Tag of menu to initialize.
         :param options: Options to populate menu with.
 
         :return: None.
         """
-        self._StringVars[key].set(App.LABELS[key])
+        width = App.SIZES["default-menu"][0]
+        foreground = App.FromRGB(*App.COLORS[tag]["fg"])
+        background = App.FromRGB(*App.COLORS[tag]["bg"])
 
-        width = App.SIZES[key][0]
-        foreground = App.FromRGB(*App.COLORS[key]["fg"])
-        background = App.FromRGB(*App.COLORS[key]["bg"])
-
-        self._Menus[key].destroy()
-        self._Menus[key] = tk.OptionMenu(master,
-                                         self._StringVars[key],
+        self._StringVars[tag].set(App.LABELS[tag])
+        self._Menus[tag].destroy()
+        self._Menus[tag] = tk.OptionMenu(master,
+                                         self._StringVars[tag],
                                          *options)
-        self._Menus[key].config(width=width,
+        self._Menus[tag].config(width=width,
                                 foreground=foreground,
                                 background=background,
                                 activebackground=background,
                                 activeforeground=foreground)
-        self._Menus[key].grid(row=App.GRID[key][0],
-                              column=App.GRID[key][1],
-                              padx=App.PAD[key][0],
-                              pady=App.PAD[key][1])
+        self._Menus[tag].grid(row=App.GRID[tag][0],
+                              column=App.GRID[tag][1],
+                              padx=App.PAD[tag][0],
+                              pady=App.PAD[tag][1])
 
-    def InitSliderSpeed(self) -> None:
+    def InitSliderFramerate(self) -> None:
         """
         Completes initialization of framerate slider.
 
@@ -728,7 +742,7 @@ class App(tk.Frame):
                                         from_=App.SPEED_SCALE_MIN,
                                         to=App.SPEED_SCALE_MAX,
                                         orient=tk.HORIZONTAL,
-                                        length=App.DEFAULT_SLIDER_WIDTH,
+                                        length=App.SIZES["default-slider"][0],
                                         showvalue=0,
                                         command=self.UpdateSpeed)
         self._ScaleAnimSpeed.grid(row=App.GRID_SCALE_SPEED_PREVIEW[0],
@@ -783,7 +797,8 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._ImageObject = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
+        self._ImageObject = sprite_imaging.ToTkinter(
+            sprite_imaging.ToPIL(image))
         self._Canvases["preview-static"].create_image((16, 16),
                                                       anchor=tk.NW,
                                                       image=self._ImageObject)
@@ -827,12 +842,12 @@ class App(tk.Frame):
 
                     # Set current state
                     self._CurState = STATES[STATES.idle]
+
                     try:
                         # Populate per-frame head offset data
                         headName = self._StringVars["select-head"].get()
                         headKey = self._BodyData[headName]
                         self._CurHead = self._HeadOffsets[headKey]
-
                     except KeyError:
                         self._CurHead = {}
 
@@ -841,7 +856,6 @@ class App(tk.Frame):
                         bodyName = self._StringVars["select-body"].get()
                         bodyKey = self._BodyData[bodyName]
                         self._CurBody = self._BodyOffsets[bodyKey]
-
                     except KeyError:
                         self._CurBody = {}
 
@@ -850,8 +864,8 @@ class App(tk.Frame):
 
         except InvalidFilenameException:
             # Image format not recognized
-            tk.messagebox.showinfo(self.WINDOW_TITLE,
-                                   self.MESSAGE_FAILURE_TYPE)
+            tk.messagebox.showinfo(App.WINDOW_TITLE,
+                                   App.MESSAGE_FAILURE_TYPE)
 
     def MakeIdlePreview(self) -> None:
         """
@@ -888,7 +902,6 @@ class App(tk.Frame):
 
         if tk.messagebox.askquestion(title, query) == "yes":
             CreateBodyJSON()
-
             self.InitDataBody()
             self.InitMenu(self._FrameBottom, "select-body", self._BodyList)
 
@@ -1018,16 +1031,21 @@ class App(tk.Frame):
         curFrame = self._CurFrame
         if self._AnimObjects:
             if isForwards:
+                # Forwards iteration
                 curFrame += 1
                 if curFrame >= 4:
                     if not isPingpong:
+                        # Wrap to beginning
                         curFrame = 0
                     else:
+                        # Switch iteration direction
                         curFrame = 2
                         isForwards = False
             else:
+                # Backwards iteration
                 curFrame -= 1
                 if curFrame < 0:
+                    # Switch iteration direction
                     curFrame = 1
                     isForwards = True
 
