@@ -531,6 +531,15 @@ class App(tk.Frame):
             if image is not None:
                 # Prompt user for destination filename
                 FixPath(ROOT_OUTPUT_DIR)
+
+                if not head and not body:
+                    head = "blank"
+                    body = "blank"
+                elif not head:
+                    head = "body"
+                elif not body:
+                    body = "head"
+
                 initialfile = "{}_{}.png".format(head, body)
                 initialdir = ROOT_OUTPUT_DIR
                 title = "Save As"
