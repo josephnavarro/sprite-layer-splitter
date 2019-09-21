@@ -92,25 +92,27 @@ class App(tk.Frame):
     MESSAGE_SUCCESS_IDLE = "Idle frames saved to {}!"
 
     # Default widget dimensions
-    if IsWindows():
-        # Windows
-        DEFAULT_OPTION_WIDTH = 26
-        DEFAULT_BUTTON_WIDTH = 27
-        DEFAULT_SLIDER_WIDTH = 272
-    else:
-        # OS X / Linux
-        DEFAULT_OPTION_WIDTH = 19
-        DEFAULT_BUTTON_WIDTH = 22
-        DEFAULT_SLIDER_WIDTH = 280
-
-    PREVIEW_CANVAS_SIZE = [384, 96]
-    PREVIEW_ANIM_SIZE = [96, 96]
-
     SIZES = {
         "preview-static": [384, 96],
         "preview-anim":   [96, 96],
         "preview-resize": [384, 96],
     }
+
+    if IsWindows():
+        # Windows
+        SIZES["select-head"] = [26, 0]
+        SIZES["select-body"] = [26, 0]
+        DEFAULT_BUTTON_WIDTH = 27
+        DEFAULT_SLIDER_WIDTH = 272
+    else:
+        # OS X / Linux
+        SIZES["select-head"] = [19, 0]
+        SIZES["select-body"] = [19, 0]
+        DEFAULT_BUTTON_WIDTH = 22
+        DEFAULT_SLIDER_WIDTH = 280
+
+    PREVIEW_CANVAS_SIZE = [384, 96]
+    PREVIEW_ANIM_SIZE = [96, 96]
 
     # Default widget colors
     FG_COLOR_PREVIEW_CVS = [0, 0, 0]
@@ -161,6 +163,8 @@ class App(tk.Frame):
         "rebuild-head-images":  [4, 4],
         "rebuild-body-offsets": [4, 4],
         "rebuild-head-offsets": [4, 4],
+        "select-body":          [4, 4],
+        "select-head":          [4, 4],
     }
 
     PAD_OPTIONS_SELECT_BODY = [4, 4]
@@ -197,7 +201,9 @@ class App(tk.Frame):
         "offset-body":          "Body: {0:+d}, {1:+d}",
         "offset-head":          "Head: {0:+d}, {1:+d}",
         "speed-anim":           "Speed: {0:d}",
-        "frame-anim":           "Frame: ({0:d})  {1:d}  {2:d}  {3:d}"
+        "frame-anim":           "Frame: ({0:d})  {1:d}  {2:d}  {3:d}",
+        "select-head":          "Select head",
+        "select-body":          "Select body",
     }
 
     COLORS = {
@@ -310,8 +316,12 @@ class App(tk.Frame):
         self._CurHead = {}
 
         self._BoolAnimPingPong = tk.BooleanVar()
-        self._StrHeadOption = tk.StringVar(self._Master)
-        self._StrBodyOption = tk.StringVar(self._Master)
+
+        # String variables
+        self._StringVars = {
+            "select-head": tk.StringVar(self._Master),
+            "select-body": tk.StringVar(self._Master),
+        }
 
         # Frames
         self._FrameTopleft = tk.Frame(self._Master)
@@ -351,10 +361,10 @@ class App(tk.Frame):
         # Menus
         self._Menus = {
             "select-head": tk.OptionMenu(self._FrameBottom,
-                                         self._StrHeadOption,
+                                         self._StringVars["select-head"],
                                          *self._HeadList),
             "select-body": tk.OptionMenu(self._FrameBottom,
-                                         self._StrBodyOption,
+                                         self._StringVars["select-body"],
                                          *self._BodyList),
         }
 
@@ -424,8 +434,12 @@ class App(tk.Frame):
         self.InitButton(self._FrameBottom,
                         "rebuild-head-offsets",
                         self.RebuildHeadOffsets)
-        self.InitOptionSelectHead()
-        self.InitOptionSelectBody()
+        self.InitMenu(self._FrameBottom,
+                      "select-head",
+                      self._HeadList)
+        self.InitMenu(self._FrameBottom,
+                      "select-body",
+                      self._BodyList)
         self.InitCheckAnimPingpong()
         self.InitCheckLayerReverse()
 
@@ -446,11 +460,6 @@ class App(tk.Frame):
             self._Canvases["preview-anim"].create_image(topleft,
                                                         anchor=anchor,
                                                         image=image)
-
-            # FONT RENDERING IS EXPENSIVE!!!!!!!!!!!!!!!!!!!!
-            # text: str = "({})".format(self._CurFrame)
-            # App.DrawText(self._CanvAnimPreview, 18, 92, text)
-
         except IndexError:
             pass
 
@@ -472,14 +481,14 @@ class App(tk.Frame):
         try:
             # Get head key
             try:
-                headName = self._StrHeadOption.get()
+                headName = self._StringVars["select-head"].get()
                 headKey = self._HeadData[headName]
             except KeyError:
                 raise UnspecifiedHeadException
 
             # Get body key
             try:
-                bodyName = self._StrBodyOption.get()
+                bodyName = self._StringVars["select-body"].get()
                 bodyKey = self._BodyData[bodyName]
             except KeyError:
                 raise UnspecifiedBodyException
@@ -701,75 +710,39 @@ class App(tk.Frame):
                                column=App.GRID[tag][1],
                                sticky=sticky)
 
-    def InitOptionSelectHead(self) -> None:
+    def InitMenu(self, master, key, options) -> None:
         """
-        Completes initialization of character head dropdown menu.
+        Initializes a menu.
+
+        :param master:  Root of widget.
+        :param key:     Key of menu to initialize.
+        :param options: Options to populate menu with.
 
         :return: None.
         """
-        self._StrHeadOption.set(App.LABEL_MENU_CHOICES_HEAD_NULL)
+        self._StringVars[key].set(App.LABELS[key])
 
-        self._Menus["select-head"].destroy()
+        width = App.SIZES[key][0]
+        foreground = App.FromRGB(*App.COLORS[key]["fg"])
+        background = App.FromRGB(*App.COLORS[key]["bg"])
 
-        master = self._FrameBottom
-        label = self._StrHeadOption
-        options = self._HeadList
-
-        self._Menus["select-head"] = tk.OptionMenu(master, label, *options)
-
-        width = App.DEFAULT_OPTION_WIDTH
-        foreground = App.FromRGB(*App.COLORS["select-head"]["fg"])
-        background = App.FromRGB(*App.COLORS["select-head"]["bg"])
-
-        self._Menus["select-head"].config(width=width,
-                                          foreground=foreground,
-                                          background=background,
-                                          activebackground=background,
-                                          activeforeground=foreground)
-
-        px = App.PAD_OPTIONS_SELECT_HEAD[0]  # Horizontal padding
-        py = App.PAD_OPTIONS_SELECT_HEAD[1]  # Vertical padding
-
-        self._Menus["select-head"].grid(row=App.GRID["select-head"][0],
-                                        column=App.GRID["select-head"][1],
-                                        padx=px,
-                                        pady=py)
-
-    def InitOptionSelectBody(self) -> None:
-        """
-        Completes initialization of character body dropdown menu.
-
-        :return: None.
-        """
-        self._StrBodyOption.set(App.LABEL_MENU_CHOICES_BODY_NULL)
-
-        master = self._FrameBottom
-        options = self._BodyList
-        text = self._StrBodyOption
-
-        width = App.DEFAULT_OPTION_WIDTH
-        foreground = App.FromRGB(*App.COLORS["select-body"]["fg"])
-        background = App.FromRGB(*App.COLORS["select-body"]["bg"])
-
-        self._Menus["select-body"].destroy()
-        self._Menus["select-body"] = tk.OptionMenu(master, text, *options)
-        self._Menus["select-body"].config(width=width,
-                                          foreground=foreground,
-                                          background=background,
-                                          activebackground=background,
-                                          activeforeground=foreground)
-
-        px = App.PAD_OPTIONS_SELECT_BODY[0]  # Horizontal padding
-        py = App.PAD_OPTIONS_SELECT_BODY[1]  # Vertical padding
-
-        self._Menus["select-body"].grid(row=App.GRID["select-body"][0],
-                                        column=App.GRID["select-body"][1],
-                                        padx=px,
-                                        pady=py)
+        self._Menus[key].destroy()
+        self._Menus[key] = tk.OptionMenu(master,
+                                         self._StringVars[key],
+                                         *options)
+        self._Menus[key].config(width=width,
+                                foreground=foreground,
+                                background=background,
+                                activebackground=background,
+                                activeforeground=foreground)
+        self._Menus[key].grid(row=App.GRID[key][0],
+                              column=App.GRID[key][1],
+                              padx=App.PAD[key][0],
+                              pady=App.PAD[key][1])
 
     def InitSliderSpeed(self) -> None:
         """
-        Completes initialization of framerate adjustment widgets.
+        Completes initialization of framerate slider.
 
         :return: None.
         """
@@ -825,10 +798,6 @@ class App(tk.Frame):
                                                     anchor=tk.NW,
                                                     image=self._AnimObjs[0])
 
-        # FONT RENDERING IS EXPENSIVE!!!!!!!!!!!!!!!!!!!!!!!
-        # text: str = "({})".format(self._CurFrame)
-        # App.DrawText(self._CanvAnimPreview, 18, 92, text)
-
     def MakeAnimationPreview(self, image) -> None:
         """
         Displays static preview frames.
@@ -883,16 +852,16 @@ class App(tk.Frame):
                     self._CurState = STATES[STATES.idle]
                     try:
                         # Populate per-frame head offset data
-                        bodyName = self._StrBodyOption.get()
-                        bodyKey = self._BodyData[bodyName]
-                        self._CurHead = self._HeadOffsets[bodyKey]
+                        headName = self._StringVars["select-head"].get()
+                        headKey = self._BodyData[headName]
+                        self._CurHead = self._HeadOffsets[headKey]
 
                     except KeyError:
                         self._CurHead = {}
 
                     try:
                         # Populate per-frame body offset data
-                        bodyName = self._StrBodyOption.get()
+                        bodyName = self._StringVars["select-body"].get()
                         bodyKey = self._BodyData[bodyName]
                         self._CurBody = self._BodyOffsets[bodyKey]
 
@@ -944,10 +913,11 @@ class App(tk.Frame):
             CreateBodyJSON()
 
             self.InitDataBody()
-            self.InitOptionSelectBody()
+            self.InitMenu(self._FrameBottom, "select-body", self._BodyList)
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_BDAT)
 
+    # noinspection PyMethodMayBeStatic
     def RebuildBodyImages(self) -> None:
         """
         Callback function. Rebuilds intermediate body spritesheets.
@@ -996,10 +966,11 @@ class App(tk.Frame):
         if tk.messagebox.askquestion(title, query) == "yes":
             CreateHeadJSON()
             self.InitDataHead()
-            self.InitOptionSelectHead()
+            self.InitMenu(self._FrameBottom, "select-head", self._HeadList)
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HDAT)
 
+    # noinspection PyMethodMayBeStatic
     def RebuildHeadImages(self) -> None:
         """
         Callback function. Rebuilds intermediate head spritesheets.
