@@ -457,7 +457,7 @@ class App(tk.Frame):
         if self._CurSpeed > 0:
             self.after(1000 // self._CurSpeed, self.DoAnimate)
 
-    def DoComposite(self, func):
+    def DoComposite(self, func, **kwargs):
         """
         Performs a general-purpose image composition routine.
 
@@ -483,9 +483,9 @@ class App(tk.Frame):
             except KeyError:
                 raise UnspecifiedBodyException
 
-            # Perform sprite composition
             try:
-                return headKey, bodyKey, func(headKey, bodyKey)
+                # Perform sprite composition
+                return headKey, bodyKey, func(headKey, bodyKey, **kwargs)
             except sprite_splitter.NonexistentHeadException as e:
                 raise InvalidHeadException(e.filename)
             except sprite_splitter.NonexistentBodyException as e:
@@ -510,7 +510,7 @@ class App(tk.Frame):
 
         return headKey, bodyKey, None
 
-    def ExportFrames(self, func, message) -> None:
+    def ExportFrames(self, func, message):
         """
         Composites and exports all frames to file.
 
@@ -549,7 +549,7 @@ class App(tk.Frame):
             # Filename not specified
             pass
 
-    def ExportFullFrames(self) -> None:
+    def ExportFullFrames(self):
         """
         Composites and exports all frames to file.
 
@@ -558,7 +558,7 @@ class App(tk.Frame):
         self.ExportFrames(sprite_splitter.CompositeFull,
                           App.MESSAGE_SUCCESS_FULL)
 
-    def ExportIdleFrames(self) -> None:
+    def ExportIdleFrames(self):
         """
         Composites and exports idle frames to file.
 
@@ -567,7 +567,7 @@ class App(tk.Frame):
         self.ExportFrames(sprite_splitter.CompositeIdle,
                           App.MESSAGE_SUCCESS_IDLE)
 
-    def InitPreviewAnim(self) -> None:
+    def InitPreviewAnim(self):
         """
         Initializes animated image preview canvas.
 
@@ -576,13 +576,13 @@ class App(tk.Frame):
         self._AnimObjects = []
         self.InitCanvas(self._FrameTopleft, "preview-anim", 13)
 
-    def InitButton(self, master, tag, cmd) -> None:
+    def InitButton(self, master, tag, command):
         """
         Locally initializes a button.
 
-        :param master: Tkinter root frame for button.
-        :param tag:    Tag of button to initialize.
-        :param cmd:    Callback function for button.
+        :param master:  Tkinter root frame for button.
+        :param tag:     Tag of button to initialize.
+        :param command: Callback function for button.
 
         :return: None.
         """
@@ -593,7 +593,7 @@ class App(tk.Frame):
         self._Buttons[tag].destroy()
         self._Buttons[tag] = tk.Button(master,
                                        text=App.LABELS[tag],
-                                       command=cmd)
+                                       command=command)
         self._Buttons[tag].config(width=width,
                                   foreground=foreground,
                                   background=background,
@@ -604,7 +604,7 @@ class App(tk.Frame):
                                 padx=App.PAD[tag][0],
                                 pady=App.PAD[tag][1])
 
-    def InitCanvas(self, master, tag, border) -> None:
+    def InitCanvas(self, master, tag, border):
         """
         Locally initializes a canvas.
 
@@ -626,7 +626,7 @@ class App(tk.Frame):
         self._Canvases[tag].grid(row=App.GRID[tag][0],
                                  column=App.GRID[tag][1])
 
-    def InitCheckbox(self, master, tag, sticky, command=None) -> None:
+    def InitCheckbox(self, master, tag, sticky, command=None):
         """
         Initializes a checkbox.
 
@@ -659,7 +659,7 @@ class App(tk.Frame):
         self._BodyList = sorted(list(self._BodyData))
         self._BodyOffsets = LoadBodyOffsets()
 
-    def InitDataHead(self) -> None:
+    def InitDataHead(self):
         """
         Completes initialization of head data (from file).
 
@@ -670,7 +670,7 @@ class App(tk.Frame):
         self._HeadList = sorted(list(self._HeadData))
         self._HeadOffsets = LoadHeadOffsets()
 
-    def InitLabel(self, master, tag, font, sticky, *args) -> None:
+    def InitLabel(self, master, tag, font, sticky, *args):
         """
         Initializes a label.
 
@@ -801,7 +801,7 @@ class App(tk.Frame):
         App.DrawText(self._Canvases["preview-static"], 18 + 96 * 2, 92, "(2)")
         App.DrawText(self._Canvases["preview-static"], 18 + 96 * 3, 92, "(3)")
 
-    def MakePreview(self, func, state):
+    def MakePreview(self, func, state, **kwargs):
         """
         Generates a static preview image.
 
@@ -815,7 +815,7 @@ class App(tk.Frame):
             self._HeadOffsets = LoadHeadOffsets()
             self.UpdateOffsetLabels()
 
-            head, body, image = self.DoComposite(func)
+            head, body, image = self.DoComposite(func, **kwargs)
 
             if image is not None:
                 try:
@@ -857,29 +857,35 @@ class App(tk.Frame):
             # Image format not recognized
             tk.messagebox.showinfo(App.WINDOW_TITLE, App.MESSAGE_FAILURE_TYPE)
 
-    def MakeIdlePreview(self) -> None:
+    def MakeIdlePreview(self):
         """
         Generates a preview image for current sprite's "idle" frames.
 
         :return: None
         """
-        self.MakePreview(sprite_splitter.CompositeIdle, "idle")
+        headfirst = not self._BooleanVars["reverse-layers"].get()
+        self.MakePreview(sprite_splitter.CompositeIdle,
+                         "idle", headfirst=headfirst)
 
-    def MakeLeftPreview(self) -> None:
+    def MakeLeftPreview(self):
         """
         Generates a preview image for current sprite's "left" frames.
 
         :return: None
         """
-        self.MakePreview(sprite_splitter.CompositeFull, "left")
+        headfirst = not self._BooleanVars["reverse-layers"].get()
+        self.MakePreview(sprite_splitter.CompositeFull,
+                         "left", headfirst=headfirst)
 
-    def MakeRightPreview(self) -> None:
+    def MakeRightPreview(self):
         """
         Generates a preview image for current sprite's "right" frames.
 
         :return: None
         """
-        self.MakePreview(sprite_splitter.CompositeFull, "right")
+        headfirst = not self._BooleanVars["reverse-layers"].get()
+        self.MakePreview(sprite_splitter.CompositeFull,
+                         "right", headfirst=headfirst)
 
     def RebuildBodyData(self) -> None:
         """
