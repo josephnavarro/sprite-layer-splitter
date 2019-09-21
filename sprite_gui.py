@@ -1,12 +1,10 @@
 #! usr/bin/env python3
 """
---------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 Graphical user interface layer.
 
---------------------------------------------------------------------------------
 """
 import cv2
 import tkinter as tk
@@ -60,7 +58,7 @@ class UnspecifiedBodyException(Exception):
 
 class UnspecifiedHeadException(Exception):
     """
-    Exception thrown  when sprite composition is attempted while no head is
+    Exception thrown when sprite composition is attempted while no head is
     selected.
     """
     pass
@@ -105,11 +103,13 @@ class App(tk.Frame):
         SIZES["default-menu"] = [26, 0]
         SIZES["default-button"] = [27, 0]
         SIZES["default-slider"] = [272, 0]
+        FONTSIZE_MONO = 10
     else:
         # OS X / Linux
         SIZES["default-menu"] = [19, 0]
         SIZES["default-button"] = [22, 0]
         SIZES["default-slider"] = [280, 0]
+        FONTSIZE_MONO = 14
 
     # Grid positions for widgets
     GRID_SCALE_SPEED_PREVIEW = [4, 1]
@@ -219,7 +219,7 @@ class App(tk.Frame):
 
         :return: None.
         """
-        font: str = "Courier 14 bold"
+        font: str = "Courier {} bold".format(App.FONTSIZE_MONO)
         for m in range(-2, 3):
             for n in range(-2, 3):
                 canvas.create_text(x + m, y + n,
@@ -379,19 +379,19 @@ class App(tk.Frame):
         self.InitSliderFramerate()
         self.InitLabel(self._FrameTopRight,
                        "speed-anim",
-                       ("Courier", 14),
+                       ("Courier", App.FONTSIZE_MONO),
                        tk.W, 0)
         self.InitLabel(self._FrameTopRight,
                        "frame-anim",
-                       ("Courier", 14),
+                       ("Courier", App.FONTSIZE_MONO),
                        tk.W, 0, 1, 2, 3)
         self.InitLabel(self._FrameTopRight,
                        "offset-head",
-                       ("Courier", 14),
+                       ("Courier", App.FONTSIZE_MONO),
                        tk.W, 0, 0)
         self.InitLabel(self._FrameTopRight,
                        "offset-body",
-                       ("Courier", 14),
+                       ("Courier", App.FONTSIZE_MONO),
                        tk.W, 0, 0)
         self.InitButton(self._FrameBottom,
                         "preview-idle",
@@ -826,8 +826,8 @@ class App(tk.Frame):
         """
         try:
             # Perform sprite composition
+            self._CurState = state
             self._HeadOffsets = LoadHeadOffsets()
-            self.UpdateOffsetLabels()
 
             head, body, image = self.DoComposite(func, **kwargs)
 
@@ -843,18 +843,15 @@ class App(tk.Frame):
                             cv2.COLOR_BGR2RGB),
                         dsize=tuple(App.SIZES["preview-resize"]),
                         interpolation=cv2.INTER_NEAREST,
-                    )
+                        )
 
                     # Set static and animated previews
                     self.MakeAnimationPreview(image)
                     self.MakeAnimationFrames(image)
 
-                    # Set current state
-                    self._CurState = state
-
                     try:
                         # Populate per-frame head offset data
-                        self._CurHead = self._HeadOffsets[head]
+                        self._CurHead = self._HeadOffsets[body]
                     except KeyError:
                         self._CurHead = {}
 
@@ -863,6 +860,8 @@ class App(tk.Frame):
                         self._CurBody = self._BodyOffsets[body]
                     except KeyError:
                         self._CurBody = {}
+
+                    self.UpdateOffsetLabels()
 
                 except cv2.error:
                     raise InvalidFilenameException
