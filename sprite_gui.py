@@ -133,6 +133,7 @@ class App(tk.Frame):
         "preview-static":       [0, 1],
         "preview-anim":         [0, 2],
         "pingpong-animation":   [1, 2],
+        "reverse-layers":       [1, 3],
     }
 
     # Padding for widgets
@@ -179,6 +180,7 @@ class App(tk.Frame):
         "select-head":          "Select head",
         "select-body":          "Select body",
         "pingpong-animation":   "Ping-pong animation",
+        "reverse-layers":       "Reverse layering order",
     }
 
     COLORS = {
@@ -270,6 +272,7 @@ class App(tk.Frame):
         self._AnimObjects = []
         self._ImageObject = None
         self._IsForwards = True
+        self._IsReversed = False
         self._HasInitAnim = False
         self._CurFrame = 0
         self._CurSpeed = 0
@@ -285,7 +288,11 @@ class App(tk.Frame):
         self._HeadOffsets = {}
         self._CurHead = {}
 
-        self._BoolAnimPingPong = tk.BooleanVar()
+        # Boolean variables
+        self._BooleanVars = {
+            "pingpong-animation": tk.BooleanVar(),
+            "reverse-layers":     tk.BooleanVar(),
+        }
 
         # String variables
         self._StringVars = {
@@ -419,8 +426,13 @@ class App(tk.Frame):
         self.InitMenu(self._FrameBottom,
                       "select-body",
                       self._BodyList)
-        self.InitCheckAnimPingpong()
-        self.InitCheckLayerReverse()
+        self.InitCheckbox(self._FrameBottom,
+                          "pingpong-animation",
+                          tk.NS)
+        self.InitCheckbox(self._FrameBottom,
+                          "reverse-layers",
+                          tk.NS)
+        # self.InitCheckLayerReverse()
 
     def DoAnimate(self) -> None:
         """
@@ -617,43 +629,27 @@ class App(tk.Frame):
         self._Canvases[tag].grid(row=App.GRID[tag][0],
                                  column=App.GRID[tag][1])
 
-    def InitCheckbox(self, master, tag, variable, sticky) -> None:
+    def InitCheckbox(self, master, tag, sticky, command=None) -> None:
         """
         Initializes a checkbox.
 
-        :param master:
-        :param tag:
-        :param variable:
-        :param sticky:
+        :param master:  Widget root.
+        :param tag:     Tag of checkbox to initialize.
+        :param sticky:  Anchoring string.
+        :param command: Callback function. (Default None).
 
         :return:
         """
         self._Checkboxes[tag].destroy()
         self._Checkboxes[tag] = tk.Checkbutton(master,
                                                text=App.LABELS[tag],
-                                               variable=variable)
+                                               variable=self._BooleanVars[tag])
         self._Checkboxes[tag].grid(row=App.GRID[tag][0],
                                    column=App.GRID[tag][1],
                                    sticky=sticky)
 
-    def InitCheckAnimPingpong(self) -> None:
-        """
-        Completes initialization of checkbox for toggling animation ping-pong.
-
-        :return: None.
-        """
-        self.InitCheckbox(self._FrameBottom,
-                          "pingpong-animation",
-                          self._BoolAnimPingPong,
-                          tk.NS)
-
-    def InitCheckLayerReverse(self):
-        """
-        Callback function. TODO
-
-        :return: None.
-        """
-        return
+        if command is not None:
+            self._Checkboxes[tag].config(command=command)
 
     def InitDataBody(self):
         """
@@ -997,6 +993,22 @@ class App(tk.Frame):
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HOFF)
 
+    def ToggleLayerOrder(self, event) -> None:
+        """
+        Callback function. Toggles sprite compositing layer order.
+
+        :param event: Tkinter event.
+
+        :return: None.
+        """
+        if self._AnimObjects:
+            if self._CurState == STATES[STATES.idle]:
+                self.MakeIdlePreview()
+            elif self._CurState == STATES[STATES.left]:
+                self.MakeLeftPreview()
+            elif self._CurState == STATES[STATES.right]:
+                self.MakeRightPreview()
+
     def UpdateBodyOffsetLabel(self, state, frame) -> None:
         """
         Updates label for current (x,y) body offset.
@@ -1023,7 +1035,7 @@ class App(tk.Frame):
         """
         # Check frame iteration type
         isForwards = self._IsForwards
-        isPingpong = self._BoolAnimPingPong.get()
+        isPingpong = self._BooleanVars["pingpong-animation"].get()
         if not isPingpong:
             isForwards = True
 

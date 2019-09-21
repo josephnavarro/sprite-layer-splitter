@@ -61,11 +61,7 @@ def SortedSet(*lists, reverse=False) -> list:
     return outList
 
 
-def PasteLayers(dest: np.ndarray,
-                head: dict,
-                body: dict,
-                layers: list,
-                headfirst: bool = True) -> None:
+def PasteLayers(dest, head, body, layers, headfirst=True) -> None:
     """
     Pastes head and body subregions in proper layering order.
     (In-place).
@@ -80,8 +76,8 @@ def PasteLayers(dest: np.ndarray,
     """
     for layer in layers:
         if headfirst:
-            # Paste head first, body second
             try:
+                # Paste head first, body second
                 Paste(dest, head[layer], (0, 0))
             except KeyError:
                 pass
@@ -91,8 +87,8 @@ def PasteLayers(dest: np.ndarray,
                 pass
 
         else:
-            # Paste body first, head second
             try:
+                # Paste body first, head second
                 Paste(dest, body[layer], (0, 0))
             except KeyError:
                 pass
@@ -102,7 +98,7 @@ def PasteLayers(dest: np.ndarray,
                 pass
 
 
-def Split(image: np.ndarray) -> dict:
+def Split(image) -> dict:
     """
     Isolates irregular regions on an image, then sorts by luminosity.
 
@@ -111,27 +107,18 @@ def Split(image: np.ndarray) -> dict:
     :return: Dictionary mapping luminosity to sprite layers.
     """
     h, w, channels = image.shape
-
-    # Generate `base` and `mask` images
-    base: np.ndarray = Crop(image, [0, 0], [w >> 1, h])
-    mask: np.ndarray = Crop(image, [w >> 1, 0], [w >> 1, h])
-    mask: np.ndarray = ReplaceColor(mask, [255, 255, 255], [252, 252, 252])
+    base = Crop(image, [0, 0], [w >> 1, h])
+    mask = ReplaceColor(Crop(image, [w >> 1, 0], [w >> 1, h]),
+                        [255, 255, 255],
+                        [252, 252, 252])
 
     # Isolate regions and sort into layers
-    outData: dict = {}
-    values: list = [
-        v for v in GetUniqueColors(ToGrayscale(mask))
-        if v not in IGNORED_COLORS
-    ]
-
-    for v in values:
-        outData[v] = ConvertAlpha(ApplyMask(base, MakeMask(mask, v)))
-
-    # Return ordered layers
-    return outData
+    return {p: ConvertAlpha(ApplyMask(base, MakeMask(mask, p)))
+            for p in [q for q in GetUniqueColors(ToGrayscale(mask))
+                      if q not in IGNORED_COLORS]}
 
 
-def GetBodyOffsets(name: str, data: dict) -> dict:
+def GetBodyOffsets(name, data) -> dict:
     """
     Retrieves framewise offset data for body sprites.
 
@@ -140,19 +127,15 @@ def GetBodyOffsets(name: str, data: dict) -> dict:
 
     :return: Offsetting data for idle, left-, and right-facing frames.
     """
-    offsets: dict = data.get(name, {}).get("offset", {})
-    idle: list = offsets.get("idle", BASE_OFFSETS)[:]
-    left: list = offsets.get("left", BASE_OFFSETS)[:]
-    right: list = offsets.get("right", BASE_OFFSETS)[:]
-
+    offsets = data.get(name, {}).get("offset", {})
     return {
-        "idle":  idle,
-        "left":  left,
-        "right": right,
+        "idle":  offsets.get("idle", BASE_OFFSETS)[:],
+        "left":  offsets.get("left", BASE_OFFSETS)[:],
+        "right": offsets.get("right", BASE_OFFSETS)[:],
     }
 
 
-def GetBodyOrder(name: str, data: dict) -> dict:
+def GetBodyOrder(name, data) -> dict:
     """
     Retrieves frame ordering data for body sprites.
 
@@ -161,19 +144,15 @@ def GetBodyOrder(name: str, data: dict) -> dict:
 
     :return: Order of iteration for idle-, left-, and right-facing frames.
     """
-    order: dict = data.get(name, {}).get("order", {})
-    idle: list = order.get("idle", BASE_ORDER[:])
-    left: list = order.get("left", BASE_ORDER[:])
-    right: list = order.get("right", BASE_ORDER[:])
-
+    order = data.get(name, {}).get("order", {})
     return {
-        "idle":  idle,
-        "left":  left,
-        "right": right,
+        "idle":  order.get("idle", BASE_ORDER[:]),
+        "left":  order.get("left", BASE_ORDER[:]),
+        "right": order.get("right", BASE_ORDER[:]),
     }
 
 
-def GetHeadOffsets(name: str, data: dict) -> dict:
+def GetHeadOffsets(name, data) -> dict:
     """
     Retrieves framewise offset data for head sprites.
 
@@ -182,20 +161,16 @@ def GetHeadOffsets(name: str, data: dict) -> dict:
 
     :return: Offsetting data for idle, left-, and right-facing frames.
     """
-    size: str = data.get(name, {}).get("size", "large")
-    offsets: dict = data.get(name, {}).get("offset", {})
-    idle: list = offsets.get("idle", BASE_OFFSETS)[:]
-    left: list = offsets.get("left", BASE_OFFSETS)[:]
-    right: list = offsets.get("right", BASE_OFFSETS)[:]
-
+    offsets = data.get(name, {}).get("offset", {})
     return {
-        "idle":  idle,
-        "left":  left,
-        "right": right,
-        "size":  size,
+        "idle":  offsets.get("idle", BASE_OFFSETS)[:],
+        "left":  offsets.get("left", BASE_OFFSETS)[:],
+        "right": offsets.get("right", BASE_OFFSETS)[:],
+        "size":  data.get(name, {}).get("size", "large"),
     }
 
-def GetHeadOrder(name: str, data: dict) -> dict:
+
+def GetHeadOrder(name, data) -> dict:
     """
     Retrieves frame ordering data for head sprites.
 
@@ -204,24 +179,15 @@ def GetHeadOrder(name: str, data: dict) -> dict:
 
     :return: Order of iteration for idle-, left-, and right-facing frames.
     """
-    order: dict = data.get(name, {}).get("order", {})
-    idle: list = order.get("idle", BASE_ORDER[:])
-    left: list = order.get("left", BASE_ORDER[:])
-    right: list = order.get("right", BASE_ORDER[:])
-
+    order = data.get(name, {}).get("order", {})
     return {
-        "idle":  idle,
-        "left":  left,
-        "right": right,
+        "idle":  order.get("idle", BASE_ORDER[:]),
+        "left":  order.get("left", BASE_ORDER[:]),
+        "right": order.get("right", BASE_ORDER[:]),
     }
 
 
-def ProcessBody(name: str,
-                image: np.ndarray,
-                where: list,
-                body_data: dict,
-                source_data: dict,
-                is_alpha: bool) -> dict:
+def ProcessBody(name, image, where, body_data, source_data, is_alpha) -> dict:
     """
     Processes a unit's body sprite.
 
@@ -234,23 +200,19 @@ def ProcessBody(name: str,
 
     :return: Dictionary mapping luminosities to image layers.
     """
-    bodyData: dict = GetBodyOffsets(name, body_data)
-    bodyOrder: dict = GetBodyOrder(name, body_data)
-    bodySize: list = source_data["body"]["size"]
-    bodyWhere: list = source_data["body"]["where"]
+    data = GetBodyOffsets(name, body_data)
+    order = GetBodyOrder(name, body_data)
+    size = source_data["body"]["size"]
+    bodyWhere = source_data["body"]["where"]
 
-    layers: dict = Split(Crop(image, where, REGION_FULL_BODY))
+    layers = Split(Crop(image, where, REGION_FULL_BODY))
     if is_alpha:
-        layers = {
-            k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0])
-            for k, v in layers.items()
-        }
+        layers = {k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0])
+                  for k, v in layers.items()}
 
-    outData: dict = {}
-
+    outData = {}
     for state in STATES:
-        dx: int = +0
-
+        dx = +0
         if state == "right":
             dy = +32 * 2
         elif state == "left":
@@ -259,36 +221,25 @@ def ProcessBody(name: str,
             dy = +32 * 0
 
         outData[state] = {}
-
         for layer, image in layers.items():
             # Make blank image with room for 4 sprite frames
-            shape: tuple = (COLOR_REGION[1], COLOR_REGION[0], 4)
-            frame: np.ndarray = np.zeros(shape, np.uint8)
+            shape = (COLOR_REGION[1], COLOR_REGION[0], 4)
+            frame = np.zeros(shape, np.uint8)
 
             for n in range(4):
-                offX: int = bodyData[state][n][0]
-                offY: int = bodyData[state][n][1]
-
-                whereX: int = bodyWhere[state][0] + (bodySize[0] * bodyOrder[state][n])
-                whereY: int = bodyWhere[state][1]
-
-                newImg: np.ndarray = Crop(image, [whereX, whereY], bodySize)
-                newX: int = dx + offX + (32 * n)
-                newY: int = dy - offY
-
-                Paste(frame, newImg, (newX, newY))
+                whereX = bodyWhere[state][0] + (size[0] * order[state][n])
+                whereY = bodyWhere[state][1]
+                newImage = Crop(image, [whereX, whereY], size)
+                x = dx + data[state][n][0] + (32 * n)
+                y = dy - data[state][n][1]
+                Paste(frame, newImage, (x, y))
 
             outData[state][layer] = frame
 
     return outData
 
 
-def ProcessHead(name: str,
-                image: np.ndarray,
-                where: list,
-                head_data: dict,
-                source_data: dict,
-                is_alpha: bool) -> dict:
+def ProcessHead(name, image, where, head_data, source_data, is_alpha) -> dict:
     """
     Processes a unit's head sprite.
 
@@ -301,24 +252,20 @@ def ProcessHead(name: str,
 
     :return: Dictionary mapping luminosities to image layers.
     """
-    headData: dict = GetHeadOffsets(name, head_data)
-    headOrder: dict = GetHeadOrder(name, head_data)
-    headType: str = headData["size"]
-    headSize: list = source_data["head"][headType]["size"]
+    data = GetHeadOffsets(name, head_data)
+    order = GetHeadOrder(name, head_data)
+    headType = data["size"]
+    size = source_data["head"][headType]["size"]
     headWhere: list = source_data["head"][headType]["where"]
 
-    layers: dict = Split(Crop(image, where, REGION_FULL_HEAD))
+    layers = Split(Crop(image, where, REGION_FULL_HEAD))
     if is_alpha:
-        layers = {
-            k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0])
-            for k, v in layers.items()
-        }
+        layers = {k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0])
+                  for k, v in layers.items()}
 
-    outData: dict = {}
-
+    outData = {}
     for state in STATES:
-        dx: int = 8 if headType == "small" else 0
-
+        dx = 8 if headType == "small" else 0
         if state == "right":
             dy = +32 * 2
         elif state == "left":
@@ -327,24 +274,18 @@ def ProcessHead(name: str,
             dy = +32 * 0
 
         outData[state] = {}
-
         for layer, image in layers.items():
             # Make blank image with room for 4 sprite frames
-            shape: tuple = (COLOR_REGION[1], COLOR_REGION[0], 4)
-            frame: np.ndarray = np.zeros(shape, np.uint8)
+            shape = (COLOR_REGION[1], COLOR_REGION[0], 4)
+            frame = np.zeros(shape, np.uint8)
 
             for n in range(4):
-                offX: int = headData[state][n][0]
-                offY: int = headData[state][n][1]
-
-                whereX: int = headWhere[state][0] + (headSize[0] * headOrder[state][n])
-                whereY: int = headWhere[state][1]
-
-                newImg: np.ndarray = Crop(image, [whereX, whereY], headSize)
-                newX: int = dx + offX + (32 * n)
-                newY: int = dy - offY
-
-                Paste(frame, newImg, (newX, newY))
+                whereX = headWhere[state][0] + (size[0] * order[state][n])
+                whereY = headWhere[state][1]
+                newImage = Crop(image, [whereX, whereY], size)
+                x = dx + data[state][n][0] + (32 * n)
+                y = dy - data[state][n][1]
+                Paste(frame, newImage, (x, y))
 
             outData[state][layer] = frame
 
@@ -374,7 +315,7 @@ def Process(head_path: str,
     :return: Dictionary containing head and body compositing rules.
     """
     # Load head spritesheet from file
-    headImage: np.ndarray = cv2.imread(head_path)
+    headImage = cv2.imread(head_path)
     if headImage.size == 0:
         print(HEAD_SRC_NOT_FOUND.format(head_path))
         raise SystemExit
@@ -386,99 +327,85 @@ def Process(head_path: str,
         raise SystemExit
 
     baseName = os.path.splitext(os.path.basename(body_path))[0]
-    return {
-        "head": ProcessHead(baseName,
-                            headImage,
-                            head_offset,
-                            head_data,
-                            source_data,
-                            is_alpha,
-                            ),
-        "body": ProcessBody(baseName,
-                            bodyImage,
-                            body_offset,
-                            body_data,
-                            source_data,
-                            is_alpha,
-                            ),
-    }
+    return {"head": ProcessHead(baseName,
+                                headImage,
+                                head_offset,
+                                head_data,
+                                source_data,
+                                is_alpha),
+            "body": ProcessBody(baseName,
+                                bodyImage,
+                                body_offset,
+                                body_data,
+                                source_data,
+                                is_alpha)}
 
 
-def CompositeIdle(head: str,
-                  body: str,
-                  offset: tuple = (0, 0),
-                  is_alpha: bool = True) -> np.ndarray:
+def CompositeIdle(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
     """
     Composites spritesheet (idle frames only).
 
-    :param head:     Head name.
-    :param body:     Body name.
-    :param offset:   Manual X-Y offset onto master sheet. (Default (0, 0)).
-    :param is_alpha: Whether to make black pixels transparent. (Default True).
+    :param head:      Head name.
+    :param body:      Body name.
+    :param offset:    Manual X-Y offset onto master sheet. (Default (0, 0)).
+    :param is_alpha:  Whether to make black pixels transparent. (Default True).
+    :param headfirst: Whether to paste heads before bodies. (Default True).
 
     :return: Composited image.
     """
-    # Load compositing data from JSON
-    headOffsetData: dict = LoadHeadOffsets()
-    bodyOffsetData: dict = LoadBodyOffsets()
-
-    # Load filepaths from JSON
-    headPathData: dict = LoadHeadPaths()
-    bodyPathData: dict = LoadBodyPaths()
-
-    # Load compositing rules from JSON
-    srcColorData: dict = LoadSourceImgColors()
-    srcCropData: dict = LoadSourceImgCropping()
-
-    # Check path to head spritesheet
-    headPath: str = os.path.join(ROOT_INPUT_DIR, *headPathData[head]["path"])
+    # Load head compositing data from JSON
+    headOffsets = LoadHeadOffsets()
+    headPaths = LoadHeadPaths()
+    headPath = os.path.join(ROOT_INPUT_DIR, *headPaths[head]["path"])
     if not os.path.isfile(headPath):
         raise NonexistentHeadException(headPath)
 
-    # Check path to body spritesheet
-    bodyPath: str = os.path.join(ROOT_INPUT_DIR, *bodyPathData[body]["path"])
+    # Load body compositing data from JSON
+    bodyOffsets = LoadBodyOffsets()
+    bodyPaths = LoadBodyPaths()
+    bodyPath = os.path.join(ROOT_INPUT_DIR, *bodyPaths[body]["path"])
     if not os.path.isfile(bodyPath):
         raise NonexistentBodyException(bodyPath)
 
+    # Load source processing rules from JSON
+    srcColors = LoadSourceImgColors()
+    srcCrops = LoadSourceImgCropping()
+
     # Make master spritesheet
-    outImage: np.ndarray = MakeBlank(
-        COLOR_REGION[0],
-        STATE_REGION[1] * (len(COLORS) + 1),
-    )
+    outImage = MakeBlank(COLOR_REGION[0], STATE_REGION[1] * (len(COLORS) + 1))
 
     # Process each color
     for y, color in enumerate(COLORS):
-        newImage: np.ndarray = MakeBlank(*COLOR_REGION)
-        newData: dict = Process(
+        newImage = MakeBlank(*COLOR_REGION)
+        newData = Process(
             headPath,
             bodyPath,
-            [offset[0], offset[1] + HEAD_BLOCK * srcColorData[color]],
-            [offset[0], offset[1] + BODY_BLOCK * srcColorData[color]],
-            headOffsetData,
-            bodyOffsetData,
-            srcCropData,
+            [offset[0], offset[1] + HEAD_BLOCK * srcColors[color]],
+            [offset[0], offset[1] + BODY_BLOCK * srcColors[color]],
+            headOffsets,
+            bodyOffsets,
+            srcCrops,
             is_alpha,
         )
 
         # Composite idle frames
-        PasteLayers(
-            newImage,
-            newData["head"]["idle"],
-            newData["body"]["idle"],
-            SortedSet(
-                newData["head"]["idle"],
-                newData["body"]["idle"],
-                reverse=headOffsetData.get(body, {}).get("reverse", False),
-            )
-        )
+        PasteLayers(newImage,
+                    newData["head"]["idle"],
+                    newData["body"]["idle"],
+                    SortedSet(
+                        newData["head"]["idle"],
+                        newData["body"]["idle"],
+                        reverse=headOffsets.get(
+                            body, {}).get("reverse", False)),
+                    headfirst)
 
         # Paste onto master spritesheet
         Paste(outImage, newImage, (0, y * STATE_REGION[1]))
 
         # (Optional) Make grayscale based on purple sprite
         if color == "purple":
-            newGray: np.ndarray = cv2.cvtColor(newImage, cv2.COLOR_BGR2GRAY)
-            newGray: np.ndarray = cv2.cvtColor(newGray, cv2.COLOR_GRAY2BGR)
+            newGray = cv2.cvtColor(newImage, cv2.COLOR_BGR2GRAY)
+            newGray = cv2.cvtColor(newGray, cv2.COLOR_GRAY2BGR)
 
             if is_alpha:
                 newGray = ConvertAlpha(newGray)
@@ -490,97 +417,87 @@ def CompositeIdle(head: str,
     return outImage
 
 
-def CompositeFull(head: str,
-                  body: str,
-                  offset: tuple = (0, 0),
-                  is_alpha: bool = True) -> np.ndarray:
+def CompositeFull(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
     """
     Composites spritesheet.
 
-    :param head:     Head spritesheet name.
-    :param body:     Body spritesheet name.
-    :param offset:   Manual X-Y offset onto master sheet. (Default (0,0)).
-    :param is_alpha: Whether to make black pixels transparent. (Default False).
+    :param head:      Head spritesheet name.
+    :param body:      Body spritesheet name.
+    :param offset:    Manual X-Y offset onto master sheet. (Default (0,0)).
+    :param is_alpha:  Whether to make black pixels transparent. (Default True).
+    :param headfirst: Whether to paste heads before bodies. (Default True).
 
     :return: Composited image.
     """
-    # Load compositing data from JSON files
-    headOffsetData: dict = LoadHeadOffsets()
-    bodyOffsetData: dict = LoadBodyOffsets()
-
-    # Load filepath data from JSON
-    headPathData: dict = LoadHeadPaths()
-    bodyPathData: dict = LoadBodyPaths()
-
-    # Load compositing rules from JSON
-    srcColorData: dict = LoadSourceImgColors()
-    srcCropData: dict = LoadSourceImgCropping()
-
-    # Check path to head spritesheet
-    headPath: str = os.path.join(ROOT_INPUT_DIR, *headPathData[head]["path"])
+    # Load head compositing data from JSON
+    headOffsets = LoadHeadOffsets()
+    headPaths = LoadHeadPaths()
+    headPath = os.path.join(ROOT_INPUT_DIR, *headPaths[head]["path"])
     if not os.path.isfile(headPath):
         raise NonexistentHeadException(headPath)
 
-    # Check path to body spritesheet
-    bodyPath: str = os.path.join(ROOT_INPUT_DIR, *bodyPathData[body]["path"])
+    # Load body compositing data from JSON
+    bodyOffsets = LoadBodyOffsets()
+    bodyPaths = LoadBodyPaths()
+    bodyPath = os.path.join(ROOT_INPUT_DIR, *bodyPaths[body]["path"])
     if not os.path.isfile(bodyPath):
         raise NonexistentBodyException(bodyPath)
 
+    # Load compositing rules from JSON
+    srcColorData = LoadSourceImgColors()
+    srcCropData = LoadSourceImgCropping()
+
     # Make master spritesheet
-    outImage: np.ndarray = MakeBlank(
-        COLOR_REGION[0],
-        COLOR_REGION[1] * (len(COLORS) + 1),
-    )
+    outImage = MakeBlank(COLOR_REGION[0], COLOR_REGION[1] * (len(COLORS) + 1))
 
     # Process frames for each color
     for y, color in enumerate(COLORS):
-        newImage: np.ndarray = MakeBlank(*COLOR_REGION)
-        newData: dict = Process(
+        newImage = MakeBlank(*COLOR_REGION)
+        newData = Process(
             headPath,
             bodyPath,
             [offset[0], offset[1] + HEAD_BLOCK * srcColorData[color]],
             [offset[0], offset[1] + BODY_BLOCK * srcColorData[color]],
-            headOffsetData,
-            bodyOffsetData,
+            headOffsets,
+            bodyOffsets,
             srcCropData,
             is_alpha,
         )
 
         # Composite idle frames
-        PasteLayers(
-            newImage,
-            newData["head"]["idle"],
-            newData["body"]["idle"],
-            SortedSet(
-                newData["head"]["idle"],
-                newData["body"]["idle"],
-                reverse=headOffsetData.get(body, {}).get("reverse", False),
-            )
-        )
+        PasteLayers(newImage,
+                    newData["head"]["idle"],
+                    newData["body"]["idle"],
+                    SortedSet(
+                        newData["head"]["idle"],
+                        newData["body"]["idle"],
+                        reverse=headOffsets.get(
+                            body, {}).get("reverse", False)),
+                    headfirst)
 
         # Composite left-moving frames
-        PasteLayers(
-            newImage,
-            newData["head"]["left"],
-            newData["body"]["left"],
-            SortedSet(newData["head"]["left"], newData["body"]["left"]),
-        )
+        PasteLayers(newImage,
+                    newData["head"]["left"],
+                    newData["body"]["left"],
+                    SortedSet(newData["head"]["left"],
+                              newData["body"]["left"]),
+                    headfirst)
 
         # Composite right-moving frames
-        PasteLayers(
-            newImage,
-            newData["head"]["right"],
-            newData["body"]["right"],
-            SortedSet(newData["head"]["right"], newData["body"]["right"]),
-        )
+        PasteLayers(newImage,
+                    newData["head"]["right"],
+                    newData["body"]["right"],
+                    SortedSet(newData["head"]["right"],
+                              newData["body"]["right"]),
+                    headfirst)
 
-        # Place onto master spritesheet
+        # Paste onto master spritesheet
         Paste(outImage, newImage, (0, y * COLOR_REGION[1]))
 
-        # (Optional) Make grayscale based on purple
+        # (Optional) Make grayscale based on purple sprite
         if color == "purple":
-            newGray: np.ndarray = cv2.cvtColor(newImage, cv2.COLOR_BGR2GRAY)
-            newGray: np.ndarray = cv2.cvtColor(newGray, cv2.COLOR_GRAY2BGR)
+            newGray = cv2.cvtColor(newImage, cv2.COLOR_BGR2GRAY)
+            newGray = cv2.cvtColor(newGray, cv2.COLOR_GRAY2BGR)
 
             if is_alpha:
                 newGray = ConvertAlpha(newGray)
@@ -592,8 +509,7 @@ def CompositeFull(head: str,
     return outImage
 
 
-def SaveImage(image: np.ndarray,
-              path: str) -> None:
+def SaveImage(image, path) -> None:
     """
     Saves a CV2-format image to file.
 
