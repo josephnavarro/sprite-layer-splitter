@@ -383,8 +383,8 @@ def CompositeIdle(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
             raise NonexistentBodyException(bodyPath)
 
     # Load source processing rules from JSON
-    srcColors = LoadSourceImgColors()
-    srcCrops = LoadSourceImgCropping()
+    srcColors = LoadSourceColoring()
+    srcCrops = LoadSourceCropping()
 
     # Make master spritesheet
     outImage = MakeBlank(COLOR_REGION[0], STATE_REGION[1] * (len(COLORS) + 1))
@@ -465,8 +465,8 @@ def CompositeFull(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
             raise NonexistentBodyException(bodyPath)
 
     # Load compositing rules from JSON
-    srcColorData = LoadSourceImgColors()
-    srcCropData = LoadSourceImgCropping()
+    srcColorData = LoadSourceColoring()
+    srcCropData = LoadSourceCropping()
 
     # Make master spritesheet
     outImage = MakeBlank(COLOR_REGION[0], COLOR_REGION[1] * (len(COLORS) + 1))

@@ -45,13 +45,13 @@ def MakeImage(w, h):
 
 def PrepareBody():
     """
-    Create body source images.
+    Creates body source images.
 
     :return: None.
     """
     print("Now generating intermediate body spritesheets...")
 
-    bodyData = LoadGenSrcBody()
+    bodyData = LoadCreateBody()
     files = glob.glob(os.path.join(PATH_SOURCE_BODY, "*.png"))
     files.sort()
 
@@ -69,13 +69,13 @@ def PrepareBody():
 
 def PrepareHead():
     """
-    Create head source images.
+    Creates head source images.
 
     :return: None.
     """
     print("Now generating intermediate head spritesheets...")
 
-    headData = LoadGenSrcHead()
+    headData = LoadCreateHead()
     files = glob.glob(os.path.join(PATH_SOURCE_HEAD, "*.png"))
     files.sort()
 

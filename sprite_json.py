@@ -22,6 +22,7 @@ TEMPLATE_JSON_BODY = "\"{name}\": {{" \
 
 HEAD_DIRECTORY = os.path.join("inputs", "images", "head")
 BODY_DIRECTORY = os.path.join("inputs", "images", "body")
+
 IMPATH_DIRECTORY = os.path.join("inputs", "paths")
 OFFSET_DIRECTORY = os.path.join("inputs", "offsets")
 SOURCE_DIRECTORY = os.path.join("inputs", "sources")
@@ -146,7 +147,7 @@ def LoadHeadOffsets():
     return data
 
 
-def LoadGenSrcBody():
+def LoadCreateBody():
     """
     Loads and returns cropping regions on raw body spritesheets.
 
@@ -157,7 +158,7 @@ def LoadGenSrcBody():
     return data
 
 
-def LoadGenSrcHead():
+def LoadCreateHead():
     """
     Loads and returns cropping regions on raw head spritesheets.
 
@@ -168,7 +169,7 @@ def LoadGenSrcHead():
     return data
 
 
-def LoadSourceImgColors():
+def LoadSourceColoring():
     """
     Loads and returns standardized color order on master spritesheets.
 
@@ -179,7 +180,7 @@ def LoadSourceImgColors():
     return data
 
 
-def LoadSourceImgCropping():
+def LoadSourceCropping():
     """
     Loads and returns standardized cropping regions on master spritesheets.
 

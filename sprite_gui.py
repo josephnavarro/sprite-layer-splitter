@@ -533,7 +533,7 @@ class App(tk.Frame):
 
                 if not head and not body:
                     head = "blank"
-                    body = "blank"
+                    body = "sheet"
                 elif not head:
                     head = "body"
                 elif not body:
