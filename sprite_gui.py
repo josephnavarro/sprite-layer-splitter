@@ -241,10 +241,18 @@ class App(tk.Frame):
 
         :return: None.
         """
+        timeout = 1000
+
         for proc in psutil.process_iter():
-            if proc.name() == "iTunes":
-                proc.kill()
-        self.after(1000, self.KillITunes)
+            try:
+                if proc.name() == "iTunes":
+                    proc.kill()
+            except psutil.ZombieProcess:
+                print("iTunes has already been reaped.")
+                timeout = 60000
+                break
+
+        self.after(timeout, self.KillITunes)
 
     @staticmethod
     def FromRGB(r: int, g: int, b: int):
