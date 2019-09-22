@@ -1,12 +1,10 @@
 #! usr/bin/env python3
 """
---------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 Definitions of constant values.
 
---------------------------------------------------------------------------------
 """
 import os
 from namedenumiter import NamedEnumIter

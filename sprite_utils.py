@@ -1,19 +1,17 @@
 #! usr/bin/env python3
 """
---------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 Filepath utility functions.
 
---------------------------------------------------------------------------------
 """
 import shutil
 import sys
 from sprite_constant import *
 
 
-def IsWindows() -> bool:
+def IsWindows():
     """
     Checks whether current platform is Windows.
 
@@ -22,7 +20,7 @@ def IsWindows() -> bool:
     return sys.platform == "win32"
 
 
-def IsOSX() -> bool:
+def IsOSX():
     """
     Checks whether current platform is OS X.
 
@@ -31,7 +29,7 @@ def IsOSX() -> bool:
     return sys.platform == "darwin"
 
 
-def FlushOutputs() -> None:
+def FlushOutputs():
     """
     Flushes entire image output directory.
 
@@ -45,7 +43,7 @@ def FlushOutputs() -> None:
         return
 
 
-def FixPath(path: str) -> str:
+def FixPath(path):
     """
     Ensures existence of an output directory.
 

@@ -208,7 +208,7 @@ class App(tk.Frame):
     SPEED_SCALE_MAX = 12
 
     @staticmethod
-    def DrawText(canvas, x, y, text) -> None:
+    def DrawText(canvas, x, y, text):
         """
         Draws text to a given canvas.
 
@@ -235,7 +235,7 @@ class App(tk.Frame):
                            anchor=tk.NW)
 
     @staticmethod
-    def FromRGB(r: int, g: int, b: int) -> str:
+    def FromRGB(r: int, g: int, b: int):
         """
         Returns a Tkinter-friendly color code from an RGB color tuple.
 
@@ -432,9 +432,8 @@ class App(tk.Frame):
         self.InitCheckbox(self._FrameBottom,
                           "reverse-layers",
                           tk.NS)
-        # self.InitCheckLayerReverse()
 
-    def DoAnimate(self) -> None:
+    def DoAnimate(self):
         """
         Local animation callback function.
 
@@ -738,7 +737,7 @@ class App(tk.Frame):
                               padx=App.PAD[tag][0],
                               pady=App.PAD[tag][1])
 
-    def InitSliderFramerate(self) -> None:
+    def InitSliderFramerate(self):
         """
         Completes initialization of framerate slider.
 
@@ -757,7 +756,7 @@ class App(tk.Frame):
                                   sticky=tk.W,
                                   pady=4)
 
-    def InitPreviewStatic(self) -> None:
+    def InitPreviewStatic(self):
         """
         Initializes static image preview canvas.
 
@@ -766,7 +765,7 @@ class App(tk.Frame):
         self._ImageObject = None  ## !!
         self.InitCanvas(self._FrameTopleft, "preview-static", 13)
 
-    def MakeAnimationFrames(self, image) -> None:
+    def MakeAnimationFrames(self, image):
         """
         Populates local animation buffer.
 
@@ -796,7 +795,7 @@ class App(tk.Frame):
                                                     anchor=tk.NW,
                                                     image=self._AnimObjects[0])
 
-    def MakeAnimationPreview(self, image) -> None:
+    def MakeAnimationPreview(self, image):
         """
         Displays static preview frames.
 
@@ -1041,7 +1040,7 @@ class App(tk.Frame):
             self._Labels["offset-body"].config(
                 text=App.LABELS["offset-body"].format(0, 0))
 
-    def UpdateCurrentFrame(self) -> None:
+    def UpdateCurrentFrame(self):
         """
         Increments current animation frame.
 
@@ -1086,7 +1085,7 @@ class App(tk.Frame):
                                        else " {} ".format(x)
                                        for x in range(4)]))
 
-    def UpdateHeadOffsetLabel(self, state, frame) -> None:
+    def UpdateHeadOffsetLabel(self, state, frame):
         """
         Updates label for current (x,y) head offset.
 
@@ -1104,7 +1103,7 @@ class App(tk.Frame):
             self._Labels["offset-head"].config(
                 text=App.LABELS["offset-head"].format(0, 0))
 
-    def UpdateOffsetLabels(self) -> None:
+    def UpdateOffsetLabels(self):
         """
         Updates per-frame (x,y) head and body offset labels.
 
@@ -1115,7 +1114,7 @@ class App(tk.Frame):
         self.UpdateHeadOffsetLabel(state, frame)
         self.UpdateBodyOffsetLabel(state, frame)
 
-    def UpdateSpeed(self, speed) -> None:
+    def UpdateSpeed(self, speed):
         """
         Updates current animation speed.
 
@@ -1135,7 +1134,7 @@ class App(tk.Frame):
                 self.DoAnimate()
 
 
-def GUIMain() -> None:
+def GUIMain():
     """
     Entrypoint for GUI version of Sprite Compositing Tool.
 

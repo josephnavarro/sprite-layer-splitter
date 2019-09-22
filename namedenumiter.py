@@ -1,12 +1,10 @@
 """
---------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 Implements an iterable container for enumerated values. Not really necessary;
 mainly did this just so I could tell myself I implemented something like it.
 
---------------------------------------------------------------------------------
 """
 
 
@@ -27,7 +25,7 @@ class NamedEnumIter:
         for key, val in kwargs.items():
             self.RegisterAttr(key, val)
 
-    def RegisterAttr(self, attrname, enumeration=-1) -> bool:
+    def RegisterAttr(self, attrname, enumeration=-1):
         """
         Registers an attribute into a NamedEnumIter object.
         (In-place).

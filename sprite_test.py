@@ -1,6 +1,5 @@
 #! usr/bin/env python3
 """
---------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
@@ -8,12 +7,12 @@ Image splitting tests.
 
 All spritesheets used were taken from The Spriters Resource.
 
---------------------------------------------------------------------------------
 """
 import sprite_splitter
 import sprite_utils
 import importlib
 from sprite_constant import *
+
 
 PROMPT = """
 Commands:
@@ -26,8 +25,7 @@ What do?
 >>> """
 
 
-def DoComposite(command: iter,
-                idle: bool = False) -> None:
+def DoComposite(command, idle=False):
     """
     Composites and saves a spritesheet.
 
@@ -52,7 +50,7 @@ def DoComposite(command: iter,
             print("Composited {}!".format(path))
 
 
-def DoRefresh() -> None:
+def DoRefresh():
     """
     Refreshes imported Python library `sprite_splitter`.
 
@@ -65,16 +63,16 @@ def DoRefresh() -> None:
     print("Refreshed sprite loader!")
 
 
-def TestMain() -> None:
+def TestMain():
     """
     Main testing function.
 
     :return: None.
     """
-    isRunning: bool = True
+    isRunning = True
 
     while isRunning:
-        command: list = input(PROMPT).lower().split()
+        command = input(PROMPT).lower().split()
         if command:
             if command[0] in ("c", "composite"):
                 DoComposite(command)

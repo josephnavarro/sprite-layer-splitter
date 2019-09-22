@@ -1,20 +1,17 @@
 #! usr/bin/env python3
 """
---------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 General image processing functions.
 
---------------------------------------------------------------------------------
 """
 import cv2
 import numpy as np
 from PIL import Image, ImageTk
 
 
-def ApplyMask(image: np.ndarray,
-              mask: np.ndarray) -> np.ndarray:
+def ApplyMask(image, mask):
     """
     Applies an alpha mask to a colored image.
 
@@ -26,7 +23,7 @@ def ApplyMask(image: np.ndarray,
     return cv2.bitwise_and(image, mask)
 
 
-def ConvertAlpha(image: np.ndarray) -> np.ndarray:
+def ConvertAlpha(image):
     """
     Adds an alpha channel to a CV2 image.
 
@@ -40,9 +37,7 @@ def ConvertAlpha(image: np.ndarray) -> np.ndarray:
     return cv2.merge((b, g, r, np.ones(b.shape, dtype=b.dtype) * 255))
 
 
-def Crop(image: np.ndarray,
-         start: list,
-         size: list) -> np.ndarray:
+def Crop(image, start, size):
     """
     Returns a subregion from a CV2 image.
     (Does not modify the original image).
@@ -69,7 +64,7 @@ def GetUniqueColors(image: np.ndarray) -> np.ndarray:
     return np.unique(image)
 
 
-def ToGrayscale(image: np.ndarray, is_color=False) -> np.ndarray:
+def ToGrayscale(image, is_color=False):
     """
     Converts an RGB image to grayscale.
 
@@ -91,7 +86,7 @@ def ToGrayscale(image: np.ndarray, is_color=False) -> np.ndarray:
         return image
 
 
-def ToPIL(image: np.ndarray) -> Image:
+def ToPIL(image):
     """
     Converts a numpy array to a PIL image.
 
@@ -102,7 +97,7 @@ def ToPIL(image: np.ndarray) -> Image:
     return Image.fromarray(image)
 
 
-def ToTkinter(image: Image) -> ImageTk.PhotoImage:
+def ToTkinter(image):
     """
     Converts a PIL image to a Tkinter-compatible object.
 
@@ -113,7 +108,7 @@ def ToTkinter(image: Image) -> ImageTk.PhotoImage:
     return ImageTk.PhotoImage(image)
 
 
-def IsGrayscale(color: iter) -> bool:
+def IsGrayscale(color):
     """
     Checks whether a color is monochrome.
 
@@ -125,7 +120,7 @@ def IsGrayscale(color: iter) -> bool:
     return r == g == b
 
 
-def MakeBlank(w: int, h: int, channels=4) -> np.ndarray:
+def MakeBlank(w, h, channels=4):
     """
     Makes a blank image of the given size.
 
@@ -138,7 +133,7 @@ def MakeBlank(w: int, h: int, channels=4) -> np.ndarray:
     return np.zeros((h, w, channels), np.uint8)
 
 
-def MakeMask(image: np.ndarray, thresh: float, maxval=255) -> np.ndarray:
+def MakeMask(image, thresh, maxval=255):
     """
     Creates a bitmask from a grayscale CV2 image.
 
@@ -156,7 +151,7 @@ def MakeMask(image: np.ndarray, thresh: float, maxval=255) -> np.ndarray:
     return image
 
 
-def Paste(dest: np.ndarray, src: np.ndarray, pos: tuple) -> None:
+def Paste(dest, src, pos):
     """
     Pastes one image onto another. (In-place).
 
@@ -185,7 +180,7 @@ def Paste(dest: np.ndarray, src: np.ndarray, pos: tuple) -> None:
 
 
 # noinspection PyUnresolvedReferences
-def ReplaceColor(image: np.ndarray, color=[], replace=[0, 0, 0]) -> np.ndarray:
+def ReplaceColor(image, color=[], replace=[0, 0, 0]):
     """
     Replaces a color in an image with another one.
 

@@ -1,12 +1,10 @@
 #! usr/bin/env python3
 """
---------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
 Utilities for reading and writing local JSON files.
 
---------------------------------------------------------------------------------
 """
 import json
 import glob
@@ -32,7 +30,7 @@ PATH_JSON_GENSRC_BODY = os.path.join("inputs", ".raw_body.json")
 PATH_JSON_GENSRC_HEAD = os.path.join("inputs", ".raw_head.json")
 
 
-def CreateHeadJSON() -> None:
+def CreateHeadJSON():
     """
     Automatically generates a character head JSON file.
 
@@ -61,7 +59,7 @@ def CreateHeadJSON() -> None:
         f.write(contents)
 
 
-def CreateBodyJSON() -> None:
+def CreateBodyJSON():
     """
     Automatically generates a JSON file containing paths to body spritesheets.
 
@@ -93,7 +91,7 @@ def CreateBodyJSON() -> None:
         f.write(contents)
 
 
-def LoadHeadPaths() -> dict:
+def LoadHeadPaths():
     """
     Loads and returns relative filepaths to character head spritesheets.
 
@@ -104,7 +102,7 @@ def LoadHeadPaths() -> dict:
     return data
 
 
-def LoadBodyPaths() -> dict:
+def LoadBodyPaths():
     """
     Loads and returns relative filepaths to character body spritesheets.
 
@@ -115,7 +113,7 @@ def LoadBodyPaths() -> dict:
     return data
 
 
-def LoadBodyOffsets() -> dict:
+def LoadBodyOffsets():
     """
     Loads and returns per-frame character body offsets.
 
@@ -126,7 +124,7 @@ def LoadBodyOffsets() -> dict:
     return data
 
 
-def LoadHeadOffsets() -> dict:
+def LoadHeadOffsets():
     """
     Loads and returns per-frame character head offsets.
 
@@ -137,7 +135,7 @@ def LoadHeadOffsets() -> dict:
     return data
 
 
-def LoadGenSrcBody() -> dict:
+def LoadGenSrcBody():
     """
     Loads and returns cropping regions on raw body spritesheets.
 
@@ -148,7 +146,7 @@ def LoadGenSrcBody() -> dict:
     return data
 
 
-def LoadGenSrcHead() -> dict:
+def LoadGenSrcHead():
     """
     Loads and returns cropping regions on raw head spritesheets.
 
@@ -159,7 +157,7 @@ def LoadGenSrcHead() -> dict:
     return data
 
 
-def LoadSourceImgColors() -> dict:
+def LoadSourceImgColors():
     """
     Loads and returns standardized color order on master spritesheets.
 
@@ -170,7 +168,7 @@ def LoadSourceImgColors() -> dict:
     return data
 
 
-def LoadSourceImgCropping() -> dict:
+def LoadSourceImgCropping():
     """
     Loads and returns standardized cropping regions on master spritesheets.
 

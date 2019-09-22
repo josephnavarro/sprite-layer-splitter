@@ -1,6 +1,5 @@
 #! usr/bin/env python3
 """
---------------------------------------------------------------------------------
 Fire Emblem 3DS Sprite Compositing Tool
 (c) 2019 Joey Navarro
 
@@ -8,12 +7,12 @@ Intended for Fire Emblem Fates and Fire Emblem Echoes sprites. Map sprites in
 Fire Emblem Fates and Echoes store head and body sprites separately, and store
 layer information using grayscale masks. This program puts them together.
 
---------------------------------------------------------------------------------
 """
 import itertools
 from sprite_json import *
 from sprite_imaging import *
 from sprite_utils import *
+
 
 """
 Head source image error string.
@@ -128,9 +127,11 @@ def GetBodyOffsets(name, data):
     :return: Offsetting data for idle, left-, and right-facing frames.
     """
     offsets = data.get(name, {}).get("offset", {})
-    return {"idle":  offsets.get("idle", BASE_OFFSETS)[:],
-            "left":  offsets.get("left", BASE_OFFSETS)[:],
-            "right": offsets.get("right", BASE_OFFSETS)[:]}
+    return {
+        "idle":  offsets.get("idle", BASE_OFFSETS)[:],
+        "left":  offsets.get("left", BASE_OFFSETS)[:],
+        "right": offsets.get("right", BASE_OFFSETS)[:]
+    }
 
 
 def GetBodyOrder(name, data):
@@ -143,9 +144,11 @@ def GetBodyOrder(name, data):
     :return: Order of iteration for idle-, left-, and right-facing frames.
     """
     order = data.get(name, {}).get("order", {})
-    return {"idle":  order.get("idle", BASE_ORDER[:]),
-            "left":  order.get("left", BASE_ORDER[:]),
-            "right": order.get("right", BASE_ORDER[:])}
+    return {
+        "idle":  order.get("idle", BASE_ORDER[:]),
+        "left":  order.get("left", BASE_ORDER[:]),
+        "right": order.get("right", BASE_ORDER[:])
+    }
 
 
 def GetHeadOffsets(name, data):
@@ -158,10 +161,12 @@ def GetHeadOffsets(name, data):
     :return: Offsetting data for idle, left-, and right-facing frames.
     """
     offsets = data.get(name, {}).get("offset", {})
-    return {"idle":  offsets.get("idle", BASE_OFFSETS)[:],
-            "left":  offsets.get("left", BASE_OFFSETS)[:],
-            "right": offsets.get("right", BASE_OFFSETS)[:],
-            "size":  data.get(name, {}).get("size", "large")}
+    return {
+        "idle":  offsets.get("idle", BASE_OFFSETS)[:],
+        "left":  offsets.get("left", BASE_OFFSETS)[:],
+        "right": offsets.get("right", BASE_OFFSETS)[:],
+        "size":  data.get(name, {}).get("size", "large")
+    }
 
 
 def GetHeadOrder(name, data):
@@ -174,9 +179,11 @@ def GetHeadOrder(name, data):
     :return: Order of iteration for idle-, left-, and right-facing frames.
     """
     order = data.get(name, {}).get("order", {})
-    return {"idle":  order.get("idle", BASE_ORDER[:]),
-            "left":  order.get("left", BASE_ORDER[:]),
-            "right": order.get("right", BASE_ORDER[:])}
+    return {
+        "idle":  order.get("idle", BASE_ORDER[:]),
+        "left":  order.get("left", BASE_ORDER[:]),
+        "right": order.get("right", BASE_ORDER[:])
+    }
 
 
 def ProcessBody(name, image, where, body_data, source_data, is_alpha):
@@ -291,7 +298,7 @@ def Process(head_path,
             head_data,
             body_data,
             source_data,
-            is_alpha) -> dict:
+            is_alpha):
     """
     Assembles sprite data for both head and body images.
 
@@ -327,18 +334,20 @@ def Process(head_path,
             raise SystemExit
 
     baseName = os.path.splitext(os.path.basename(body_path))[0]
-    return {"head": ProcessHead(baseName,
-                                headImage,
-                                head_offset,
-                                head_data,
-                                source_data,
-                                is_alpha),
-            "body": ProcessBody(baseName,
-                                bodyImage,
-                                body_offset,
-                                body_data,
-                                source_data,
-                                is_alpha)}
+    return {
+        "head": ProcessHead(baseName,
+                            headImage,
+                            head_offset,
+                            head_data,
+                            source_data,
+                            is_alpha),
+        "body": ProcessBody(baseName,
+                            bodyImage,
+                            body_offset,
+                            body_data,
+                            source_data,
+                            is_alpha)
+    }
 
 
 def CompositeIdle(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
@@ -392,7 +401,7 @@ def CompositeIdle(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
             bodyOffsets,
             srcCrops,
             is_alpha,
-        )
+            )
 
         # Composite idle frames
         PasteLayers(newImage,
@@ -474,7 +483,7 @@ def CompositeFull(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
             bodyOffsets,
             srcCropData,
             is_alpha,
-        )
+            )
 
         # Composite idle frames
         PasteLayers(newImage,
