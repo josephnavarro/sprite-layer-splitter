@@ -1,1 +1,190 @@
-{"arcanist": {"path": ["images", "body", "arcanist.png"],"name": "Arcanist"},"archer": {"path": ["images", "body", "archer.png"],"name": "Archer"},"baron": {"path": ["images", "body", "baron.png"],"name": "Baron"},"bow-knight": {"path": ["images", "body", "bow-knight.png"],"name": "Bow Knight"},"boy": {"path": ["images", "body", "boy.png"],"name": "Boy"},"brigand": {"path": ["images", "body", "brigand.png"],"name": "Brigand"},"cantor": {"path": ["images", "body", "cantor.png"],"name": "Cantor"},"cleric": {"path": ["images", "body", "cleric.png"],"name": "Cleric"},"corrin-f": {"path": ["images", "body", "corrin-f.png"],"name": "Corrin (F)"},"corrin-m": {"path": ["images", "body", "corrin-m.png"],"name": "Corrin (M)"},"dread-fighter": {"path": ["images", "body", "dread-fighter.png"],"name": "Dread Fighter"},"enchantress": {"path": ["images", "body", "enchantress.png"],"name": "Enchantress"},"exemplar": {"path": ["images", "body", "exemplar.png"],"name": "Exemplar"},"falcon-knight": {"path": ["images", "body", "falcon-knight.png"],"name": "Falcon Knight"},"fighter": {"path": ["images", "body", "fighter.png"],"name": "Fighter"},"girl": {"path": ["images", "body", "girl.png"],"name": "Girl"},"gold-knight": {"path": ["images", "body", "gold-knight.png"],"name": "Gold Knight"},"guru": {"path": ["images", "body", "guru.png"],"name": "Guru"},"harrier": {"path": ["images", "body", "harrier.png"],"name": "Harrier"},"hero": {"path": ["images", "body", "hero.png"],"name": "Hero"},"ike": {"path": ["images", "body", "ike.png"],"name": "Ike"},"knight-1": {"path": ["images", "body", "knight-1.png"],"name": "Knight (1)"},"knight-2": {"path": ["images", "body", "knight-2.png"],"name": "Knight (2)"},"lucina": {"path": ["images", "body", "lucina.png"],"name": "Lucina"},"mage-f": {"path": ["images", "body", "mage-f.png"],"name": "Mage (F)"},"mage-m": {"path": ["images", "body", "mage-m.png"],"name": "Mage (M)"},"marth": {"path": ["images", "body", "marth.png"],"name": "Marth"},"mercenary": {"path": ["images", "body", "mercenary.png"],"name": "Mercenary"},"myrmidon": {"path": ["images", "body", "myrmidon.png"],"name": "Myrmidon"},"oliphantier": {"path": ["images", "body", "oliphantier.png"],"name": "Oliphantier"},"paladin": {"path": ["images", "body", "paladin.png"],"name": "Paladin"},"pegasus-knight": {"path": ["images", "body", "pegasus-knight.png"],"name": "Pegasus Knight"},"priestess-celica": {"path": ["images", "body", "priestess-celica.png"],"name": "Priestess Celica"},"priestess": {"path": ["images", "body", "priestess.png"],"name": "Priestess"},"princess": {"path": ["images", "body", "princess.png"],"name": "Princess"},"robin": {"path": ["images", "body", "robin.png"],"name": "Robin"},"roy": {"path": ["images", "body", "roy.png"],"name": "Roy"},"sage": {"path": ["images", "body", "sage.png"],"name": "Sage"},"saint": {"path": ["images", "body", "saint.png"],"name": "Saint"},"skogul": {"path": ["images", "body", "skogul.png"],"name": "Skogul"},"sniper": {"path": ["images", "body", "sniper.png"],"name": "Sniper"},"soldier": {"path": ["images", "body", "soldier.png"],"name": "Soldier"},"spartan": {"path": ["images", "body", "spartan.png"],"name": "Spartan"},"villager-f": {"path": ["images", "body", "villager-f.png"],"name": "Villager (F)"},"villager-m": {"path": ["images", "body", "villager-m.png"],"name": "Villager (M)"},"witch": {"path": ["images", "body", "witch.png"],"name": "Witch"},"yasha": {"path": ["images", "body", "yasha.png"],"name": "Yasha"}}
+{
+    "arcanist":         {
+        "path": ["images", "body", "arcanist.png"],
+        "name": "Arcanist"
+    },
+    "archer":           {
+        "path": ["images", "body", "archer.png"],
+        "name": "Archer"
+    },
+    "baron":            {
+        "path": ["images", "body", "baron.png"],
+        "name": "Baron"
+    },
+    "bow-knight":       {
+        "path": ["images", "body", "bow-knight.png"],
+        "name": "Bow Knight"
+    },
+    "boy":              {
+        "path": ["images", "body", "boy.png"],
+        "name": "Boy"
+    },
+    "brigand":          {
+        "path": ["images", "body", "brigand.png"],
+        "name": "Brigand"
+    },
+    "cantor":           {
+        "path": ["images", "body", "cantor.png"],
+        "name": "Cantor"
+    },
+    "cleric":           {
+        "path": ["images", "body", "cleric.png"],
+        "name": "Cleric"
+    },
+    "corrin-f":         {
+        "path": ["images", "body", "corrin-f.png"],
+        "name": "Corrin (F)"
+    },
+    "corrin-m":         {
+        "path": ["images", "body", "corrin-m.png"],
+        "name": "Corrin (M)"
+    },
+    "dread-fighter":    {
+        "path": ["images", "body", "dread-fighter.png"],
+        "name": "Dread Fighter"
+    },
+    "enchantress":      {
+        "path": ["images", "body", "enchantress.png"],
+        "name": "Enchantress"
+    },
+    "exemplar":         {
+        "path": ["images", "body", "exemplar.png"],
+        "name": "Exemplar"
+    },
+    "falcon-knight":    {
+        "path": ["images", "body", "falcon-knight.png"],
+        "name": "Falcon Knight"
+    },
+    "fighter":          {
+        "path": ["images", "body", "fighter.png"],
+        "name": "Fighter"
+    },
+    "girl":             {
+        "path": ["images", "body", "girl.png"],
+        "name": "Girl"
+    },
+    "gold-knight":      {
+        "path": ["images", "body", "gold-knight.png"],
+        "name": "Gold Knight"
+    },
+    "guru":             {
+        "path": ["images", "body", "guru.png"],
+        "name": "Guru"
+    },
+    "harrier":          {
+        "path": ["images", "body", "harrier.png"],
+        "name": "Harrier"
+    },
+    "hero":             {
+        "path": ["images", "body", "hero.png"],
+        "name": "Hero"
+    },
+    "ike":              {
+        "path": ["images", "body", "ike.png"],
+        "name": "Ike"
+    },
+    "knight-1":         {
+        "path": ["images", "body", "knight-1.png"],
+        "name": "Knight (1)"
+    },
+    "knight-2":         {
+        "path": ["images", "body", "knight-2.png"],
+        "name": "Knight (2)"
+    },
+    "lucina":           {
+        "path": ["images", "body", "lucina.png"],
+        "name": "Lucina"
+    },
+    "mage-f":           {
+        "path": ["images", "body", "mage-f.png"],
+        "name": "Mage (F)"
+    },
+    "mage-m":           {
+        "path": ["images", "body", "mage-m.png"],
+        "name": "Mage (M)"
+    },
+    "marth":            {
+        "path": ["images", "body", "marth.png"],
+        "name": "Marth"
+    },
+    "mercenary":        {
+        "path": ["images", "body", "mercenary.png"],
+        "name": "Mercenary"
+    },
+    "myrmidon":         {
+        "path": ["images", "body", "myrmidon.png"],
+        "name": "Myrmidon"
+    },
+    "oliphantier":      {
+        "path": ["images", "body", "oliphantier.png"],
+        "name": "Oliphantier"
+    },
+    "paladin":          {
+        "path": ["images", "body", "paladin.png"],
+        "name": "Paladin"
+    },
+    "pegasus-knight":   {
+        "path": ["images", "body", "pegasus-knight.png"],
+        "name": "Pegasus Knight"
+    },
+    "priestess-celica": {
+        "path": ["images", "body", "priestess-celica.png"],
+        "name": "Priestess Celica"
+    },
+    "priestess":        {
+        "path": ["images", "body", "priestess.png"],
+        "name": "Priestess"
+    },
+    "princess":         {
+        "path": ["images", "body", "princess.png"],
+        "name": "Princess"
+    },
+    "robin":            {
+        "path": ["images", "body", "robin.png"],
+        "name": "Robin"
+    },
+    "roy":              {
+        "path": ["images", "body", "roy.png"],
+        "name": "Roy"
+    },
+    "sage":             {
+        "path": ["images", "body", "sage.png"],
+        "name": "Sage"
+    },
+    "saint":            {
+        "path": ["images", "body", "saint.png"],
+        "name": "Saint"
+    },
+    "skogul":           {
+        "path": ["images", "body", "skogul.png"],
+        "name": "Skogul"
+    },
+    "sniper":           {
+        "path": ["images", "body", "sniper.png"],
+        "name": "Sniper"
+    },
+    "soldier":          {
+        "path": ["images", "body", "soldier.png"],
+        "name": "Soldier"
+    },
+    "spartan":          {
+        "path": ["images", "body", "spartan.png"],
+        "name": "Spartan"
+    },
+    "villager-f":       {
+        "path": ["images", "body", "villager-f.png"],
+        "name": "Villager (F)"
+    },
+    "villager-m":       {
+        "path": ["images", "body", "villager-m.png"],
+        "name": "Villager (M)"
+    },
+    "witch":            {
+        "path": ["images", "body", "witch.png"],
+        "name": "Witch"
+    },
+    "yasha":            {
+        "path": ["images", "body", "yasha.png"],
+        "name": "Yasha"
+    }
+}
