@@ -52,7 +52,7 @@ def PrepareBody():
     print("Now generating intermediate body spritesheets...")
 
     bodyData = LoadGenSrcBody()
-    files = glob.glob(os.path.join(SOURCE_BODY_DIRECTORY, "*.png"))
+    files = glob.glob(os.path.join(PATH_SOURCE_BODY, "*.png"))
     files.sort()
 
     for filename in files:
@@ -76,7 +76,7 @@ def PrepareHead():
     print("Now generating intermediate head spritesheets...")
 
     headData = LoadGenSrcHead()
-    files = glob.glob(os.path.join(SOURCE_HEAD_DIRECTORY, "*.png"))
+    files = glob.glob(os.path.join(PATH_SOURCE_HEAD, "*.png"))
     files.sort()
 
     for filename in files:

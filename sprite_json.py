@@ -11,29 +11,31 @@ import glob
 from sprite_utils import *
 
 TEMPLATE_JSON_BASE = "{{{}}}"
-TEMPLATE_JSON_CHARA = "\"{name}\": {{" \
-                      "\"path\": [\"images\", \"head\", \"{name}.png\"]," \
-                      "\"name\": \"{full}\"" \
-                      "}},"
-TEMPLATE_JSON_CLASS = "\"{name}\": {{" \
-                      "\"path\": [\"images\", \"body\", \"{name}.png\"]," \
-                      "\"name\": \"{full}\"" \
-                      "}},"
-
-PATH_JSON_CHARA = os.path.join("inputs", "paths", "head.json")
-PATH_JSON_CLASS = os.path.join("inputs", "paths", "body.json")
-PATH_JSON_OFFSET_HEAD = os.path.join("inputs", "offsets", "head_offsets.json")
-PATH_JSON_OFFSET_BODY = os.path.join("inputs", "offsets", "body_offsets.json")
-PATH_JSON_SOURCE_COLOR = os.path.join("inputs", "sources", ".color.json")
-PATH_JSON_SOURCE_CROP = os.path.join("inputs", "sources", ".crop.json")
-PATH_JSON_GENSRC_BODY = os.path.join("inputs", "sources", ".body.json")
-PATH_JSON_GENSRC_HEAD = os.path.join("inputs", "sources", ".head.json")
+TEMPLATE_JSON_HEAD = "\"{name}\": {{" \
+                     "\"path\": [\"images\", \"head\", \"{name}.png\"]," \
+                     "\"name\": \"{full}\"" \
+                     "}},"
+TEMPLATE_JSON_BODY = "\"{name}\": {{" \
+                     "\"path\": [\"images\", \"body\", \"{name}.png\"]," \
+                     "\"name\": \"{full}\"" \
+                     "}},"
 
 HEAD_DIRECTORY = os.path.join("inputs", "images", "head")
 BODY_DIRECTORY = os.path.join("inputs", "images", "body")
+IMPATH_DIRECTORY = os.path.join("inputs", "paths")
+OFFSET_DIRECTORY = os.path.join("inputs", "offsets")
+SOURCE_DIRECTORY = os.path.join("inputs", "sources")
 
-SOURCE_HEAD_DIRECTORY = os.path.join("inputs", "sources", "head")
-SOURCE_BODY_DIRECTORY = os.path.join("inputs", "sources", "body")
+JSON_IMPATH_HEAD = os.path.join(IMPATH_DIRECTORY, "head.json")
+JSON_IMPATH_BODY = os.path.join(IMPATH_DIRECTORY, "body.json")
+JSON_OFFSET_HEAD = os.path.join(OFFSET_DIRECTORY, "head_offsets.json")
+JSON_OFFSET_BODY = os.path.join(OFFSET_DIRECTORY, "body_offsets.json")
+JSON_SOURCE_COLR = os.path.join(SOURCE_DIRECTORY, ".color.json")
+JSON_SOURCE_CROP = os.path.join(SOURCE_DIRECTORY, ".crop.json")
+JSON_CREATE_BODY = os.path.join(SOURCE_DIRECTORY, ".body.json")
+JSON_CREATE_HEAD = os.path.join(SOURCE_DIRECTORY, ".head.json")
+PATH_SOURCE_HEAD = os.path.join(SOURCE_DIRECTORY, "head")
+PATH_SOURCE_BODY = os.path.join(SOURCE_DIRECTORY, "body")
 
 JSON_KEY_DEFAULT = "?.default"
 
@@ -46,12 +48,10 @@ def CreateHeadJSON():
 
     :return: None.
     """
-    contents = ""
     path = os.path.join(HEAD_DIRECTORY, "*.png")
-    files = glob.glob(path)
-    files.sort()
 
-    for fn in files:
+    contents = ""
+    for fn in sorted(glob.glob(path)):
         n = os.path.splitext(os.path.basename(fn))[0]
         p = " ".join([(
             "({})".format(x.capitalize())
@@ -63,11 +63,11 @@ def CreateHeadJSON():
             )
         ) for x in n.split("-")
         ])
-        contents += TEMPLATE_JSON_CHARA.format(name=n, full=p)
+        contents += TEMPLATE_JSON_HEAD.format(name=n, full=p)
 
     contents = contents.rstrip(",")
     contents = TEMPLATE_JSON_BASE.format(contents)
-    with open(PATH_JSON_CHARA, "w") as f:
+    with open(JSON_IMPATH_HEAD, "w") as f:
         f.write(contents)
 
 
@@ -79,12 +79,10 @@ def CreateBodyJSON():
 
     :return: None.
     """
-    contents = ""
     path = os.path.join(BODY_DIRECTORY, "*.png")
-    files = glob.glob(path)
-    files.sort()
 
-    for fn in glob.glob(path):
+    contents = ""
+    for fn in sorted(glob.glob(path)):
         n = os.path.splitext(os.path.basename(fn))[0]
         p = " ".join([(
             "({})".format(x.capitalize())
@@ -96,11 +94,11 @@ def CreateBodyJSON():
             )
         ) for x in n.split("-")
         ])
-        contents += TEMPLATE_JSON_CLASS.format(name=n, full=p)
+        contents += TEMPLATE_JSON_BODY.format(name=n, full=p)
 
     contents = contents.rstrip(",")
     contents = TEMPLATE_JSON_BASE.format(contents)
-    with open(PATH_JSON_CLASS, "w") as f:
+    with open(JSON_IMPATH_BODY, "w") as f:
         f.write(contents)
 
 
@@ -110,7 +108,7 @@ def LoadHeadPaths():
 
     :return: Dictionary containing character head filepaths.
     """
-    with open(PATH_JSON_CHARA, "r") as f:
+    with open(JSON_IMPATH_HEAD, "r") as f:
         data = json.load(f)
     return data
 
@@ -121,7 +119,7 @@ def LoadBodyPaths():
 
     :return: Dictionary containing character body filepaths.
     """
-    with open(PATH_JSON_CLASS, "r") as f:
+    with open(JSON_IMPATH_BODY, "r") as f:
         data = json.load(f)
     return data
 
@@ -132,7 +130,7 @@ def LoadBodyOffsets():
 
     :return: Dictionary containing all characters' body offsets.
     """
-    with open(PATH_JSON_OFFSET_BODY, "r") as f:
+    with open(JSON_OFFSET_BODY, "r") as f:
         data = json.load(f)
     return data
 
@@ -143,7 +141,7 @@ def LoadHeadOffsets():
 
     :return: Dictionary containing all characters' head offsets.
     """
-    with open(PATH_JSON_OFFSET_HEAD, "r") as f:
+    with open(JSON_OFFSET_HEAD, "r") as f:
         data = json.load(f)
     return data
 
@@ -154,7 +152,7 @@ def LoadGenSrcBody():
 
     :return: Dictionary containing cropping rules for body spritesheets.
     """
-    with open(PATH_JSON_GENSRC_BODY, "r") as f:
+    with open(JSON_CREATE_BODY, "r") as f:
         data = json.load(f)
     return data
 
@@ -165,7 +163,7 @@ def LoadGenSrcHead():
 
     :return: Dictionary containing cropping rules for head spritesheets.
     """
-    with open(PATH_JSON_GENSRC_HEAD, "r") as f:
+    with open(JSON_CREATE_HEAD, "r") as f:
         data = json.load(f)
     return data
 
@@ -176,7 +174,7 @@ def LoadSourceImgColors():
 
     :return: Dictionary containing color region order.
     """
-    with open(PATH_JSON_SOURCE_COLOR, "r") as f:
+    with open(JSON_SOURCE_COLR, "r") as f:
         data = json.load(f)
     return data
 
@@ -187,7 +185,7 @@ def LoadSourceImgCropping():
 
     :return: Dictionary containing standard cropping regions.
     """
-    with open(PATH_JSON_SOURCE_CROP, "r") as f:
+    with open(JSON_SOURCE_CROP, "r") as f:
         data = json.load(f)
     return data
 
