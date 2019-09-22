@@ -10,28 +10,10 @@ from PIL import Image
 from sprite_json import *
 from sprite_utils import *
 
-
 """ 
 Default PIL image mode.
 """
 MODE = "RGBA"
-
-"""
-Root "output" directories.
-"""
-HEAD_DIRECTORY: str = os.path.join("inputs", "head")
-BODY_DIRECTORY: str = os.path.join("inputs", "body")
-
-"""
-Source spritesheet directories.
-"""
-SOURCE_HEAD_DIRECTORY: str = os.path.join("inputs", "raw_head")
-SOURCE_BODY_DIRECTORY: str = os.path.join("inputs", "raw_body")
-
-"""
-Default key.
-"""
-JSON_KEY_DEFAULT: str = "?.default"
 
 
 def CropImage(im, x, y, w, h):
@@ -143,7 +125,7 @@ def ProcessBody(filename, data):
         CropImage(img, *rectData["3"]["idle"]),
         CropImage(img, *rectData["3"]["left"]),
         CropImage(img, *rectData["3"]["right"]),
-        ]
+    ]
 
     output = MakeImage(256, len(rects) * 32)
     for n, r in enumerate(rects):
@@ -186,7 +168,7 @@ def ProcessHead(filename, data):
         CropImage(img, *rectData["3"]["idle"]),
         CropImage(img, *rectData["3"]["left"]),
         CropImage(img, *rectData["3"]["right"]),
-        ]
+    ]
 
     output = MakeImage(256, len(rects) * 64)
     for n, r in enumerate(rects):

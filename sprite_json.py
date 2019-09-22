@@ -8,26 +8,34 @@ Utilities for reading and writing local JSON files.
 """
 import json
 import glob
-from sprite_constant import *
+from sprite_utils import *
 
 TEMPLATE_JSON_BASE = "{{{}}}"
 TEMPLATE_JSON_CHARA = "\"{name}\": {{" \
-                      "\"path\": [\"head\", \"{name}.png\"]," \
+                      "\"path\": [\"images\", \"head\", \"{name}.png\"]," \
                       "\"name\": \"{full}\"" \
                       "}},"
 TEMPLATE_JSON_CLASS = "\"{name}\": {{" \
-                      "\"path\": [\"body\", \"{name}.png\"]," \
+                      "\"path\": [\"images\", \"body\", \"{name}.png\"]," \
                       "\"name\": \"{full}\"" \
                       "}},"
 
-PATH_JSON_CHARA = os.path.join("inputs", "head.json")
-PATH_JSON_CLASS = os.path.join("inputs", "body.json")
-PATH_JSON_OFFSET_HEAD = os.path.join("inputs", "head_offsets.json")
-PATH_JSON_OFFSET_BODY = os.path.join("inputs", "body_offsets.json")
-PATH_JSON_SOURCE_COLOR = os.path.join("inputs", ".src_color.json")
-PATH_JSON_SOURCE_CROP = os.path.join("inputs", ".src_crop.json")
-PATH_JSON_GENSRC_BODY = os.path.join("inputs", ".raw_body.json")
-PATH_JSON_GENSRC_HEAD = os.path.join("inputs", ".raw_head.json")
+PATH_JSON_CHARA = os.path.join("inputs", "paths", "head.json")
+PATH_JSON_CLASS = os.path.join("inputs", "paths", "body.json")
+PATH_JSON_OFFSET_HEAD = os.path.join("inputs", "offsets", "head_offsets.json")
+PATH_JSON_OFFSET_BODY = os.path.join("inputs", "offsets", "body_offsets.json")
+PATH_JSON_SOURCE_COLOR = os.path.join("inputs", "sources", ".color.json")
+PATH_JSON_SOURCE_CROP = os.path.join("inputs", "sources", ".crop.json")
+PATH_JSON_GENSRC_BODY = os.path.join("inputs", "sources", ".body.json")
+PATH_JSON_GENSRC_HEAD = os.path.join("inputs", "sources", ".head.json")
+
+HEAD_DIRECTORY = os.path.join("inputs", "images", "head")
+BODY_DIRECTORY = os.path.join("inputs", "images", "body")
+
+SOURCE_HEAD_DIRECTORY = os.path.join("inputs", "sources", "head")
+SOURCE_BODY_DIRECTORY = os.path.join("inputs", "sources", "body")
+
+JSON_KEY_DEFAULT = "?.default"
 
 
 def CreateHeadJSON():
@@ -38,8 +46,12 @@ def CreateHeadJSON():
 
     :return: None.
     """
-    contents: str = ""
-    for fn in glob.glob(os.path.join(ROOT_INPUT_DIR, "head", "*.png")):
+    contents = ""
+    path = os.path.join(HEAD_DIRECTORY, "*.png")
+    files = glob.glob(path)
+    files.sort()
+
+    for fn in files:
         n = os.path.splitext(os.path.basename(fn))[0]
         p = " ".join([(
             "({})".format(x.capitalize())
@@ -67,11 +79,12 @@ def CreateBodyJSON():
 
     :return: None.
     """
-    contents: str = ""
-    files: list = glob.glob(os.path.join(ROOT_INPUT_DIR, "body", "*.png"))
+    contents = ""
+    path = os.path.join(BODY_DIRECTORY, "*.png")
+    files = glob.glob(path)
     files.sort()
 
-    for fn in glob.glob(os.path.join(ROOT_INPUT_DIR, "body", "*.png")):
+    for fn in glob.glob(path):
         n = os.path.splitext(os.path.basename(fn))[0]
         p = " ".join([(
             "({})".format(x.capitalize())
