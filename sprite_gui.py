@@ -6,6 +6,7 @@ Fire Emblem 3DS Sprite Compositing Tool
 Graphical user interface layer.
 
 """
+import psutil
 import cv2
 import tkinter as tk
 from tkinter import messagebox
@@ -234,6 +235,17 @@ class App(tk.Frame):
                            text=text,
                            anchor=tk.NW)
 
+    def KillITunes(self):
+        """
+        Kills any iTunes instance. Checks periodically.
+
+        :return: None.
+        """
+        for proc in psutil.process_iter():
+            if proc.name() == "iTunes":
+                proc.kill()
+        self.after(1000, self.KillITunes)
+
     @staticmethod
     def FromRGB(r: int, g: int, b: int):
         """
@@ -432,6 +444,9 @@ class App(tk.Frame):
         self.InitCheckbox(self._FrameBottom,
                           "reverse-layers",
                           tk.NS)
+
+        # Kills any iTunes instance
+        self.KillITunes()
 
     def DoAnimate(self):
         """
