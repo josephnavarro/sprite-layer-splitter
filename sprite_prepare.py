@@ -45,7 +45,7 @@ def MakeImage(w, h):
 
 def PrepareBody():
     """
-    Creates body source images.
+    Creates intermediate body spritesheets.
 
     :return: None.
     """
@@ -69,7 +69,7 @@ def PrepareBody():
 
 def PrepareHead():
     """
-    Creates head source images.
+    Creates intermediate head spritesheets.
 
     :return: None.
     """
@@ -97,7 +97,7 @@ def ProcessBody(filename, data):
 
     Specifically, takes a Fire Emblem spritesheet formatted in a certain way,
     then extracts the idle, left-, and right-moving frames to composite into
-    a single spritesheet.
+    a single intermediate spritesheet.
 
     :param filename: Source image to crop from.
     :param data:     Body data to use.
@@ -140,7 +140,7 @@ def ProcessHead(filename, data):
 
     Specifically, takes a Fire Emblem spritesheet formatted in a certain way,
     then extracts the idle, left-, and right-moving frames to composite into
-    a single spritesheet.
+    a single intermediate spritesheet.
 
     :param filename: Source image to crop from.
     :param data:     Head data to use.
@@ -157,17 +157,17 @@ def ProcessHead(filename, data):
 
     rects = [
         CropImage(img, *rectData["0"]["idle"]),
-        CropImage(img, *rectData["0"]["left"]),
-        CropImage(img, *rectData["0"]["right"]),
+        CropImage(img, *rectData["0"]["large-direction"]),
+        CropImage(img, *rectData["0"]["small-direction"]),
         CropImage(img, *rectData["1"]["idle"]),
-        CropImage(img, *rectData["1"]["left"]),
-        CropImage(img, *rectData["1"]["right"]),
+        CropImage(img, *rectData["1"]["large-direction"]),
+        CropImage(img, *rectData["1"]["small-direction"]),
         CropImage(img, *rectData["2"]["idle"]),
-        CropImage(img, *rectData["2"]["left"]),
-        CropImage(img, *rectData["2"]["right"]),
+        CropImage(img, *rectData["2"]["large-direction"]),
+        CropImage(img, *rectData["2"]["small-direction"]),
         CropImage(img, *rectData["3"]["idle"]),
-        CropImage(img, *rectData["3"]["left"]),
-        CropImage(img, *rectData["3"]["right"]),
+        CropImage(img, *rectData["3"]["large-direction"]),
+        CropImage(img, *rectData["3"]["small-direction"]),
     ]
 
     output = MakeImage(256, len(rects) * 64)
