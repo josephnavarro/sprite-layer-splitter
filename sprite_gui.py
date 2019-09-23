@@ -351,7 +351,7 @@ class App(tk.Frame):
         self._HasInitAnim = False
         self._CurFrame = 0
         self._CurSpeed = 0
-        self._CurState = STATES[STATES.idle]
+        self._CurState = str(STATES.idle)
 
         self._BodyData = {}
         self._BodyList = [""]
@@ -637,7 +637,7 @@ class App(tk.Frame):
                     headKey = self._HeadData[headName]
             except KeyError:
                 # raise UnspecifiedHeadException
-                headName = App.DEFAULT_NAME
+                pass
 
             try:
                 # Get body key
@@ -646,7 +646,7 @@ class App(tk.Frame):
                     bodyKey = self._BodyData[bodyName]
             except KeyError:
                 # raise UnspecifiedBodyException
-                bodyName = App.DEFAULT_NAME
+                pass
 
             try:
                 # Perform sprite composition
@@ -660,24 +660,28 @@ class App(tk.Frame):
 
         except UnspecifiedHeadException:
             # Head not specified
-            tk.messagebox.showinfo(App.WINDOW_TITLE,
-                                   App.MESSAGE_FAILURE_HEAD,
-                                   )
+            tk.messagebox.showinfo(
+                App.WINDOW_TITLE,
+                App.MESSAGE_FAILURE_HEAD,
+            )
         except UnspecifiedBodyException:
             # Body not specified
-            tk.messagebox.showinfo(App.WINDOW_TITLE,
-                                   App.MESSAGE_FAILURE_BODY,
-                                   )
+            tk.messagebox.showinfo(
+                App.WINDOW_TITLE,
+                App.MESSAGE_FAILURE_BODY,
+            )
         except InvalidHeadException as e:
             # Head spritesheet does not exist
-            tk.messagebox.showinfo(App.WINDOW_TITLE,
-                                   App.MESSAGE_INVALID_HEAD.format(e.filename),
-                                   )
+            tk.messagebox.showinfo(
+                App.WINDOW_TITLE,
+                App.MESSAGE_INVALID_HEAD.format(e.filename),
+            )
         except InvalidBodyException as e:
             # Body spritesheet does not exist
-            tk.messagebox.showinfo(App.WINDOW_TITLE,
-                                   App.MESSAGE_INVALID_BODY.format(e.filename),
-                                   )
+            tk.messagebox.showinfo(
+                App.WINDOW_TITLE,
+                App.MESSAGE_INVALID_BODY.format(e.filename),
+            )
 
         return headKey, bodyKey, None
 
@@ -710,11 +714,12 @@ class App(tk.Frame):
                 initialdir = ROOT_OUTPUT_DIR
                 title = "Save As"
                 filetypes = FILETYPES
-                path = filedialog.asksaveasfilename(initialfile=initialfile,
-                                                    initialdir=initialdir,
-                                                    title=title,
-                                                    filetypes=filetypes,
-                                                    )
+                path = filedialog.asksaveasfilename(
+                    initialfile=initialfile,
+                    initialdir=initialdir,
+                    title=title,
+                    filetypes=filetypes,
+                )
                 if path:
                     # Save image if path is valid
                     sprite_splitter.SaveImage(image, path)
@@ -738,11 +743,12 @@ class App(tk.Frame):
         """
         reverse = not self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
-        self.ExportFrames(sprite_splitter.CompositeFull,
-                          App.MESSAGE_SUCCESS_FULL,
-                          headfirst=headfirst,
-                          reverse=reverse,
-                          )
+        self.ExportFrames(
+            sprite_splitter.CompositeFull,
+            App.MESSAGE_SUCCESS_FULL,
+            headfirst=headfirst,
+            reverse=reverse,
+        )
 
     def ExportIdleFrames(self):
         """
@@ -752,11 +758,12 @@ class App(tk.Frame):
         """
         reverse = self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
-        self.ExportFrames(sprite_splitter.CompositeIdle,
-                          App.MESSAGE_SUCCESS_IDLE,
-                          headfirst=headfirst,
-                          reverse=reverse,
-                          )
+        self.ExportFrames(
+            sprite_splitter.CompositeIdle,
+            App.MESSAGE_SUCCESS_IDLE,
+            headfirst=headfirst,
+            reverse=reverse,
+        )
 
     def InitPreviewAnim(self):
         """
@@ -782,21 +789,24 @@ class App(tk.Frame):
         background = App.FromRGB(*App.COLORS[tag]["bg"])  # BG color
 
         self._Buttons[tag].destroy()
-        self._Buttons[tag] = tk.Button(master,
-                                       text=App.LABELS[tag],
-                                       command=command,
-                                       )
-        self._Buttons[tag].config(width=width,
-                                  foreground=foreground,
-                                  background=background,
-                                  activebackground=background,
-                                  activeforeground=foreground,
-                                  )
-        self._Buttons[tag].grid(row=App.GRID[tag][0],
-                                column=App.GRID[tag][1],
-                                padx=App.PAD[tag][0],
-                                pady=App.PAD[tag][1],
-                                )
+        self._Buttons[tag] = tk.Button(
+            master,
+            text=App.LABELS[tag],
+            command=command,
+        )
+        self._Buttons[tag].config(
+            width=width,
+            foreground=foreground,
+            background=background,
+            activebackground=background,
+            activeforeground=foreground,
+        )
+        self._Buttons[tag].grid(
+            row=App.GRID[tag][0],
+            column=App.GRID[tag][1],
+            padx=App.PAD[tag][0],
+            pady=App.PAD[tag][1],
+        )
 
     def InitCanvas(self, master, tag, border):
         """
@@ -811,16 +821,18 @@ class App(tk.Frame):
         background = App.FromRGB(*App.COLORS[tag]["bg"])
 
         self._Canvases[tag].destroy()
-        self._Canvases[tag] = tk.Canvas(master,
-                                        width=App.SIZES[tag][0],
-                                        height=App.SIZES[tag][1],
-                                        background=background,
-                                        relief=tk.SUNKEN,
-                                        borderwidth=border,
-                                        )
-        self._Canvases[tag].grid(row=App.GRID[tag][0],
-                                 column=App.GRID[tag][1],
-                                 )
+        self._Canvases[tag] = tk.Canvas(
+            master,
+            width=App.SIZES[tag][0],
+            height=App.SIZES[tag][1],
+            background=background,
+            relief=tk.SUNKEN,
+            borderwidth=border,
+        )
+        self._Canvases[tag].grid(
+            row=App.GRID[tag][0],
+            column=App.GRID[tag][1],
+        )
 
     def InitCheckbox(self, master, tag, sticky, command=None):
         """
@@ -834,14 +846,16 @@ class App(tk.Frame):
         :return:
         """
         self._Checkboxes[tag].destroy()
-        self._Checkboxes[tag] = tk.Checkbutton(master,
-                                               text=App.LABELS[tag],
-                                               variable=self._BooleanVars[tag],
-                                               )
-        self._Checkboxes[tag].grid(row=App.GRID[tag][0],
-                                   column=App.GRID[tag][1],
-                                   sticky=sticky,
-                                   )
+        self._Checkboxes[tag] = tk.Checkbutton(
+            master,
+            text=App.LABELS[tag],
+            variable=self._BooleanVars[tag],
+        )
+        self._Checkboxes[tag].grid(
+            row=App.GRID[tag][0],
+            column=App.GRID[tag][1],
+            sticky=sticky,
+        )
 
         if command is not None:
             self._Checkboxes[tag].config(command=command)
@@ -852,8 +866,10 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._BodyData = {v.get("name", "---"): k
-                          for k, v in LoadBodyPaths().items()}
+        self._BodyData = {
+            v.get("name", "---"): k
+            for k, v in LoadBodyPaths().items()
+        }
         self._BodyList = [App.DEFAULT_NAME] + sorted(list(self._BodyData))
         self._BodyOffsets = LoadBodyOffsets()
 
@@ -863,8 +879,10 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._HeadData = {v.get("name", "---"): k
-                          for k, v in LoadHeadPaths().items()}
+        self._HeadData = {
+            v.get("name", "---"): k
+            for k, v in LoadHeadPaths().items()
+        }
         self._HeadList = [App.DEFAULT_NAME] + sorted(list(self._HeadData))
         self._HeadOffsets = LoadHeadOffsets()
 
@@ -886,14 +904,16 @@ class App(tk.Frame):
             text = App.LABELS[tag]
 
         self._Labels[tag].destroy()
-        self._Labels[tag] = tk.Label(master,
-                                     font=font,
-                                     text=text,
-                                     )
-        self._Labels[tag].grid(row=App.GRID[tag][0],
-                               column=App.GRID[tag][1],
-                               sticky=sticky,
-                               )
+        self._Labels[tag] = tk.Label(
+            master,
+            font=font,
+            text=text,
+        )
+        self._Labels[tag].grid(
+            row=App.GRID[tag][0],
+            column=App.GRID[tag][1],
+            sticky=sticky,
+        )
 
     def InitMenu(self, master, tag, options):
         """
@@ -1186,15 +1206,16 @@ class App(tk.Frame):
             self.UpdateOffsetLabels()
 
             if self._AnimObjects:
-                if self._CurState == STATES[STATES.idle]:
+                if self._CurState == STATES.idle.str():
                     self.MakeIdlePreview()
-                elif self._CurState == STATES[STATES.left]:
+                elif self._CurState == STATES.left.str():
                     self.MakeLeftPreview()
-                elif self._CurState == STATES[STATES.right]:
+                elif self._CurState == STATES.right.str():
                     self.MakeRightPreview()
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_BOFF)
 
+    # noinspection PyMethodMayBeStatic
     def DestroyBodyImages(self):
         """
         Callback function. Destroys intermediate head spritesheets.
@@ -1252,15 +1273,16 @@ class App(tk.Frame):
             self.UpdateOffsetLabels()
 
             if self._AnimObjects:
-                if self._CurState == STATES[STATES.idle]:
+                if self._CurState == STATES.idle:
                     self.MakeIdlePreview()
-                elif self._CurState == STATES[STATES.left]:
+                elif self._CurState == STATES.left:
                     self.MakeLeftPreview()
-                elif self._CurState == STATES[STATES.right]:
+                elif self._CurState == STATES.right:
                     self.MakeRightPreview()
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HOFF)
 
+    # noinspection PyMethodMayBeStatic
     def DestroyHeadImages(self):
         """
         Callback function. Destroys intermediate head spritesheets.
@@ -1284,11 +1306,11 @@ class App(tk.Frame):
         :return: None.
         """
         if self._AnimObjects:
-            if self._CurState == STATES[STATES.idle]:
+            if self._CurState == STATES.idle:
                 self.MakeIdlePreview()
-            elif self._CurState == STATES[STATES.left]:
+            elif self._CurState == STATES.left:
                 self.MakeLeftPreview()
-            elif self._CurState == STATES[STATES.right]:
+            elif self._CurState == STATES.right:
                 self.MakeRightPreview()
 
     def UpdateBodyOffsetLabel(self, state, frame):

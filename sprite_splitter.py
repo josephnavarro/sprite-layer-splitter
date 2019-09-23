@@ -413,20 +413,21 @@ def CompositeIdle(head,
             bodyOffsets,
             srcCrops,
             is_alpha,
-            )
+        )
 
         # Composite idle frames
-        PasteLayers(newImage,
-                    newData["head"]["idle"],
-                    newData["body"]["idle"],
-                    SortedSet(
-                        newData["head"]["idle"],
-                        newData["body"]["idle"],
-                        reverse=headOffsets.get(
-                            body, {}).get("reverse", False)),
-                    headfirst=headfirst,
-                    reverse=reverse,
-                    )
+        PasteLayers(
+            newImage,
+            newData["head"]["idle"],
+            newData["body"]["idle"],
+            SortedSet(
+                newData["head"]["idle"],
+                newData["body"]["idle"],
+                reverse=headOffsets.get(
+                    body, {}).get("reverse", False)),
+            headfirst=headfirst,
+            reverse=reverse,
+        )
 
         # Paste onto master spritesheet
         Paste(outImage, newImage, (0, y * STATE_REGION[1]))
@@ -504,7 +505,7 @@ def CompositeFull(head,
             bodyOffsets,
             srcCropData,
             is_alpha,
-            )
+        )
 
         # Composite idle frames
         PasteLayers(newImage,

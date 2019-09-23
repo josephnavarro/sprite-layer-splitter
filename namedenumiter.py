@@ -8,16 +8,185 @@ mainly did this just so I could tell myself I implemented something like it.
 """
 
 
+class EnumItem:
+
+
+    def __init__(self, attr, enum):
+        self._Attr = attr
+        self._Enum = enum
+
+    def __int__(self):
+        return self._Enum
+
+    def __str__(self):
+        return self._Attr
+
+    def __float__(self):
+        return float(self._Enum)
+
+    def __eq__(self, other):
+        return self._Enum == other or self._Attr == other
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __gt__(self, other):
+        return self._Enum > other
+
+    def __lt__(self, other):
+        return self._Enum < other
+
+    def __le__(self, other):
+        return self._Enum <= other
+
+    def __ge__(self, other):
+        return self._Enum >= other
+
+    def __repr__(self):
+        return "{}:{}".format(self._Enum, self._Attr)
+
+    def __add__(self, other):
+        try:
+            return int(self) + other
+        except TypeError:
+            try:
+                return str(self) + other
+            except TypeError:
+                return NotImplemented
+
+    def __sub__(self, other):
+        try:
+            return int(self) - other
+        except TypeError:
+            return NotImplemented
+
+    def __mul__(self, other):
+        try:
+            return int(self) * other
+        except TypeError:
+            return NotImplemented
+
+    def __truediv__(self, other):
+        try:
+            return float(self) / other
+        except TypeError:
+            return NotImplemented
+
+    def __floordiv__(self, other):
+        try:
+            return int(self) // other
+        except TypeError:
+            return NotImplemented
+
+    def __lshift__(self, other):
+        try:
+            return int(self) << other
+        except TypeError:
+            return NotImplemented
+
+    def __rshift__(self, other):
+        try:
+            return int(self) >> other
+        except TypeError:
+            return NotImplemented
+
+    def __and__(self, other):
+        try:
+            return int(self) & other
+        except TypeError:
+            return NotImplemented
+
+    def __or__(self, other):
+        try:
+            return int(self) | other
+        except TypeError:
+            return NotImplemented
+
+    def __xor__(self, other):
+        try:
+            return int(self) ^ other
+        except TypeError:
+            return NotImplemented
+
+    def __radd__(self, other):
+        try:
+            return other + int(self)
+        except TypeError:
+            try:
+                return other + str(self)
+            except TypeError:
+                return NotImplemented
+
+    def __rsub__(self, other):
+        try:
+            return other - int(self)
+        except TypeError:
+            return NotImplemented
+
+    def __rmul__(self, other):
+        try:
+            return other * int(self)
+        except TypeError:
+            return NotImplemented
+
+    def __rtruediv__(self, other):
+        try:
+            return other / float(self)
+        except TypeError:
+            return NotImplemented
+
+    def __rfloordiv__(self, other):
+        try:
+            return other // int(self)
+        except TypeError:
+            return NotImplemented
+
+    def __rand__(self, other):
+        try:
+            return other & int(self)
+        except TypeError:
+            return NotImplemented
+
+    def __ror__(self, other):
+        try:
+            return other | int(self)
+        except TypeError:
+            return NotImplemented
+
+    def __rxor__(self, other):
+        try:
+            return other ^ int(self)
+        except TypeError:
+            return NotImplemented
+
+    def __index__(self):
+        return int(self)
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def str(self):
+        return str(self)
+
+    def int(self):
+        return int(self)
+
+    def float(self):
+        return float(self)
+
+
 class NamedEnumIter:
+
+
     def __init__(self, *args, **kwargs):
         """
         A named, enumerated iterable.
         """
-        self._iterator = 0
-        self._counter = {}
-        self._names = {}
-        self._indices = {}
-        self._num_items = 0
+        self._Counter = {}
+        self._Strings = {}
+        self._Indices = {}
+        self._NumItems = 0
+        self._Iterator = 0
 
         for arg in args:
             self.RegisterAttr(arg)
@@ -25,30 +194,32 @@ class NamedEnumIter:
         for key, val in kwargs.items():
             self.RegisterAttr(key, val)
 
-    def RegisterAttr(self, attrname, enumeration=-1):
+    def RegisterAttr(self, attr, enum=-1):
         """
         Registers an attribute into a NamedEnumIter object.
         (In-place).
 
-        :param attrname:    Name of enumeration to set.
-        :param enumeration: Enumerated value.
+        :param attr: Name of enumeration to set.
+        :param enum: Enumerated value.
 
         :return: True on success; false otherwise.
         """
-        if type(attrname) not in (str, int):
+        if type(attr) not in (str, int):
             return False
         else:
-            if enumeration < 0:
-                enumeration = self._num_items
+            if enum < 0:
+                enum = self._NumItems
 
             # Register attribute
-            setattr(self, attrname, enumeration)
-            self._indices[attrname] = enumeration
-            self._names[enumeration] = attrname
+            item = EnumItem(attr, enum)
+
+            setattr(self, attr, item)
+            self._Indices[attr] = item
+            self._Strings[enum] = item
 
             # Increment local item count
-            self._counter[self._num_items] = enumeration
-            self._num_items += 1
+            self._Counter[self._NumItems] = enum
+            self._NumItems += 1
 
             return True
 
@@ -62,23 +233,23 @@ class NamedEnumIter:
         """
         Implements __len__.
         """
-        return self._num_items
+        return self._NumItems
 
     def __iter__(self):
         """
         Implements __iter__.
         """
-        self._iterator = 0
+        self._Iterator = 0
         return self
 
     def __next__(self):
         """
         Implements __next__.
         """
-        if self._iterator < self._num_items:
-            n = self._iterator
-            self._iterator += 1
-            return self._names[self._counter[n]]
+        if self._Iterator < self._NumItems:
+            n = self._Iterator
+            self._Iterator += 1
+            return self._Strings[self._Counter[n]]
         else:
             raise StopIteration
 
@@ -89,10 +260,12 @@ class NamedEnumIter:
         container = None
 
         if type(accessor) == int:
-            container = self._names
+            # Access by integer
+            container = self._Strings
 
         elif type(accessor) == str:
-            container = self._indices
+            # Access by string
+            container = self._Indices
 
         if container:
             try:
