@@ -213,7 +213,7 @@ class App(tk.Frame):
         "rebuild-head-offsets": "Refresh head offsets",
         "destroy-head-images":  "Clean head sources",
 
-        "frame-anim":           "Frame: ({0:d})  {1:d}  {2:d}  {3:d}",
+        "frame-anim":           "Frame: ({0:d})  {1:d}   {2:d}   {3:d}",
         "offset-body":          "Body:   x = {0:+d}; y = {1:+d}",
         "offset-head":          "Head:   x = {0:+d}; y = {1:+d}",
         "speed-anim":           "Speed:  {0:d}",
@@ -1012,10 +1012,14 @@ class App(tk.Frame):
         self._CurFrame = 0
         self._IsForwards = True
         self._CurSpeed = self._ScaleAnimSpeed.get()
-        self._Canvases["preview-anim"].create_image((16, 16),
-                                                    anchor=tk.NW,
-                                                    image=self._AnimObjects[0],
-                                                    )
+        self._Canvases["preview-anim"].create_image(
+            (16, 16),
+            anchor=tk.NW,
+            image=self._AnimObjects[0],
+        )
+
+        self.UpdateOffsetLabels()
+        self.UpdateFrameCountLabel()
 
     def MakeAnimationPreview(self, image):
         """
@@ -1027,9 +1031,11 @@ class App(tk.Frame):
         """
         self._ImageObject = sprite_imaging.ToTkinter(
             sprite_imaging.ToPIL(image))
-        self._Canvases["preview-static"].create_image((16, 16),
-                                                      anchor=tk.NW,
-                                                      image=self._ImageObject)
+        self._Canvases["preview-static"].create_image(
+            (16, 16),
+            anchor=tk.NW,
+            image=self._ImageObject,
+        )
 
         App.DrawText(self._Canvases["preview-static"], 18 + 96 * 0, 92, "(0)")
         App.DrawText(self._Canvases["preview-static"], 18 + 96 * 1, 92, "(1)")
@@ -1099,11 +1105,12 @@ class App(tk.Frame):
         """
         reverse = self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
-        self.MakePreview(sprite_splitter.CompositeIdle,
-                         "idle",
-                         headfirst=headfirst,
-                         reverse=reverse,
-                         )
+        self.MakePreview(
+            sprite_splitter.CompositeIdle,
+            "idle",
+            headfirst=headfirst,
+            reverse=reverse,
+        )
 
     def MakeLeftPreview(self):
         """
@@ -1113,11 +1120,12 @@ class App(tk.Frame):
         """
         reverse = self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
-        self.MakePreview(sprite_splitter.CompositeFull,
-                         "left",
-                         headfirst=headfirst,
-                         reverse=reverse,
-                         )
+        self.MakePreview(
+            sprite_splitter.CompositeFull,
+            "left",
+            headfirst=headfirst,
+            reverse=reverse,
+        )
 
     def MakeRightPreview(self):
         """
@@ -1127,11 +1135,12 @@ class App(tk.Frame):
         """
         reverse = self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
-        self.MakePreview(sprite_splitter.CompositeFull,
-                         "right",
-                         headfirst=headfirst,
-                         reverse=reverse,
-                         )
+        self.MakePreview(
+            sprite_splitter.CompositeFull,
+            "right",
+            headfirst=headfirst,
+            reverse=reverse,
+        )
 
     def RebuildBodyData(self):
         """
@@ -1294,11 +1303,14 @@ class App(tk.Frame):
         try:
             self._Labels["offset-body"].config(
                 text=App.LABELS["offset-body"].format(
-                    *self._CurBody["offset"][state][frame]))
+                    *self._CurBody["offset"][state][frame]
+                )
+            )
 
         except (KeyError, IndexError):
             self._Labels["offset-body"].config(
-                text=App.LABELS["offset-body"].format(0, 0))
+                text=App.LABELS["offset-body"].format(0, 0)
+            )
 
     def UpdateCurrentFrame(self):
         """
@@ -1339,11 +1351,22 @@ class App(tk.Frame):
         self._CurFrame = curFrame
 
         # Update frame count label
+        self.UpdateFrameCountLabel()
+
+    def UpdateFrameCountLabel(self):
+        """
+        Updates label for currently-iterated frame.
+
+        :return: None.
+        """
         self._Labels["frame-anim"].config(
-            text="Frame: " + " ".join(["({})".format(x)
-                                       if x == curFrame
-                                       else " {} ".format(x)
-                                       for x in range(4)]))
+            text="Frame: " + " ".join([
+                "({})".format(x)
+                if x == self._CurFrame
+                else " {} ".format(x)
+                for x in range(4)
+            ])
+        )
 
     def UpdateHeadOffsetLabel(self, state, frame):
         """
@@ -1357,11 +1380,14 @@ class App(tk.Frame):
         try:
             self._Labels["offset-head"].config(
                 text=App.LABELS["offset-head"].format(
-                    *self._CurHead["offset"][state][frame]))
+                    *self._CurHead["offset"][state][frame]
+                )
+            )
 
         except (KeyError, IndexError):
             self._Labels["offset-head"].config(
-                text=App.LABELS["offset-head"].format(0, 0))
+                text=App.LABELS["offset-head"].format(0, 0)
+            )
 
     def UpdateOffsetLabels(self):
         """
@@ -1382,11 +1408,14 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._Labels["speed-anim"].config(
-            text=App.LABELS["speed-anim"].format(int(speed)))
-        self._CurSpeed = int(speed)
+        speed = int(speed)
 
-        if int(speed) == 0:
+        self._Labels["speed-anim"].config(
+            text=App.LABELS["speed-anim"].format(speed)
+        )
+        self._CurSpeed = speed
+
+        if speed == 0:
             self._HasInitAnim = False
         else:
             if not self._HasInitAnim:
