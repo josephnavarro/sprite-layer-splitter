@@ -544,8 +544,9 @@ class App(tk.Frame):
                        tk.NS,
                        )
 
-        # Kills any iTunes instance
-        self.KillITunes()
+        # Kills any iTunes instance if on Mac
+        if IsOSX():
+            self.KillITunes()
 
     def DoAnimate(self):
         """
