@@ -20,12 +20,9 @@ TEMPLATE_JSON_BODY = "\"{name}\": {{" \
                      "\"name\": \"{full}\"" \
                      "}},"
 
-HEAD_DIRECTORY = os.path.join("inputs", "images", "head")
-BODY_DIRECTORY = os.path.join("inputs", "images", "body")
-
-IMPATH_DIRECTORY = os.path.join("inputs", "paths")
-OFFSET_DIRECTORY = os.path.join("inputs", "offsets")
-SOURCE_DIRECTORY = os.path.join("inputs", "sources")
+IMPATH_DIRECTORY = os.path.join(ROOT_INPUT_DIR, "paths")
+OFFSET_DIRECTORY = os.path.join(ROOT_INPUT_DIR, "offsets")
+SOURCE_DIRECTORY = os.path.join(ROOT_INPUT_DIR, "sources")
 
 JSON_IMPATH_HEAD = os.path.join(IMPATH_DIRECTORY, "head.json")
 JSON_IMPATH_BODY = os.path.join(IMPATH_DIRECTORY, "body.json")

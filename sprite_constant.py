@@ -9,14 +9,13 @@ Definitions of constant values.
 import os
 from namedenumiter import NamedEnumIter
 
-
 """ 
 Colors to avoid copying at all. 
 """
 IGNORED_COLORS = [
     0x00,  # Black
     0xFF,  # White
-    ]
+]
 
 """
 Root input directory.
@@ -27,6 +26,16 @@ ROOT_INPUT_DIR = os.path.join("inputs", "")
 Root spritesheet output directory. 
 """
 ROOT_OUTPUT_DIR = os.path.join("outputs", "")
+
+"""
+Head spritesheet directory.
+"""
+HEAD_DIRECTORY = os.path.join(ROOT_INPUT_DIR, "images", "head")
+
+"""
+Body spritesheet directory.
+"""
+BODY_DIRECTORY = os.path.join(ROOT_INPUT_DIR, "images", "body")
 
 """ 
 Recognized file types.
@@ -39,7 +48,7 @@ FILETYPES = [
     ("GIF", "*.gif"),
     ("TGA", "*.tga"),
     ("DirectDraw Surface (DDS)", "*.dds"),
-    ]
+]
 
 """ 
 Recognized color names. 
@@ -49,7 +58,7 @@ COLORS = NamedEnumIter(
     "red",
     "green",
     "purple",
-    )
+)
 
 """ 
 Recognized sprite states. 
@@ -58,7 +67,7 @@ STATES = NamedEnumIter(
     "idle",
     "left",
     "right",
-    )
+)
 
 """ 
 Dimensions of complete head region (layer mask and sprites). 

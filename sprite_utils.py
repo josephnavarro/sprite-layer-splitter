@@ -29,6 +29,34 @@ def IsOSX():
     return sys.platform == "darwin"
 
 
+def FlushBodies():
+    """
+    Flushes entire body input directory.
+
+    :return: None.
+    """
+    try:
+        shutil.rmtree(BODY_DIRECTORY)
+        print("Removed directory '{}'!".format(BODY_DIRECTORY))
+    except FileNotFoundError:
+        print("Directory '{}' already removed!".format(BODY_DIRECTORY))
+        return
+
+
+def FlushHeads():
+    """
+    Flushes entire head input directory.
+
+    :return:
+    """
+    try:
+        shutil.rmtree(HEAD_DIRECTORY)
+        print("Removed directory '{}'!".format(HEAD_DIRECTORY))
+    except FileNotFoundError:
+        print("Directory '{}' already removed!".format(HEAD_DIRECTORY))
+        return
+
+
 def FlushOutputs():
     """
     Flushes entire image output directory.

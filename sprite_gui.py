@@ -78,6 +78,8 @@ class App(tk.Frame):
     CONFIRM_REBUILD_HDAT = "Recheck head listing?"
     CONFIRM_REBUILD_HIMG = "Reconstruct head source images?"
     CONFIRM_REBUILD_HOFF = "Reload head offsets?"
+    CONFIRM_DESTROY_HEAD = "Delete all head source images?"
+    CONFIRM_DESTROY_BODY = "Delete all body source images?"
     MESSAGE_FAILURE_BODY = "Error: Body not specified!"
     MESSAGE_FAILURE_HEAD = "Error: Head not specified!"
     MESSAGE_FAILURE_TYPE = "Error: Invalid image format specified!"
@@ -89,6 +91,8 @@ class App(tk.Frame):
     MESSAGE_REBUILD_HIMG = "Successfully reconstructed head source images."
     MESSAGE_REBUILD_HDAT = "Reassembled list of available heads."
     MESSAGE_REBUILD_HOFF = "Successfully reloaded per-frame head offsets."
+    MESSAGE_DESTROY_HEAD = "Completely deleted all head sources."
+    MESSAGE_DESTROY_BODY = "Completely deleted all body sources."
     MESSAGE_SUCCESS_FULL = "Sprite frames saved to {}!"
     MESSAGE_SUCCESS_IDLE = "Idle frames saved to {}!"
 
@@ -118,34 +122,40 @@ class App(tk.Frame):
     GRID_SCALE_SPEED_PREVIEW = [4, 1]
 
     GRID = {
+        "head-options":         [1, 0],
+        "select-head":          [2, 0],
+        "rebuild-head-images":  [3, 0],
+        "rebuild-head-data":    [4, 0],
+        "rebuild-head-offsets": [5, 0],
+        "destroy-head-images":  [6, 0],
+
+        "body-options":         [1, 1],
+        "select-body":          [2, 1],
+        "rebuild-body-images":  [3, 1],
+        "rebuild-body-data":    [4, 1],
+        "rebuild-body-offsets": [5, 1],
+        "destroy-body-images":  [6, 1],
+
+        "export-options":       [1, 2],
         "export-full":          [2, 2],
         "export-idle":          [3, 2],
-        "preview-idle":         [2, 3],
-        "preview-left":         [3, 3],
-        "preview-right":        [4, 3],
-        "rebuild-body-data":    [4, 1],
-        "rebuild-body-images":  [3, 1],
-        "rebuild-body-offsets": [5, 1],
-        "rebuild-head-data":    [4, 0],
-        "rebuild-head-images":  [3, 0],
-        "rebuild-head-offsets": [5, 0],
-        "offset-body":          [2, 1],
-        "offset-head":          [1, 1],
-        "frame-anim":           [0, 1],
-        "speed-anim":           [3, 1],
-        "select-head":          [2, 0],
-        "select-body":          [2, 1],
-        "preview-static":       [0, 1],
-        "preview-anim":         [0, 2],
-        "pingpong-animation":   [5, 3],
-        "reverse-layers":       [6, 3],
         "prioritize-label":     [4, 2],
         "prioritize-1":         [5, 2],
         "prioritize-2":         [6, 2],
-        "head-options":         [1, 0],
-        "body-options":         [1, 1],
+
         "preview-options":      [1, 3],
-        "export-options":       [1, 2],
+        "preview-idle":         [2, 3],
+        "preview-left":         [3, 3],
+        "preview-right":        [4, 3],
+        "pingpong-animation":   [5, 3],
+        "reverse-layers":       [6, 3],
+
+        "preview-static":       [0, 1],
+        "preview-anim":         [0, 2],
+        "frame-anim":           [0, 1],
+        "offset-head":          [1, 1],
+        "offset-body":          [2, 1],
+        "speed-anim":           [3, 1],
     }
 
     # Padding for widgets
@@ -163,6 +173,8 @@ class App(tk.Frame):
         "rebuild-head-offsets": [4, 4],
         "select-body":          [4, 4],
         "select-head":          [4, 4],
+        "destroy-body-images":  [4, 4],
+        "destroy-head-images":  [4, 4],
     }
 
     # Preview composition dimensions
@@ -200,6 +212,8 @@ class App(tk.Frame):
         "body-options":         "Body options",
         "preview-options":      "Preview options",
         "export-options":       "Export",
+        "destroy-body-images":  "Delete body images",
+        "destroy-head-images":  "Delete head images",
     }
 
     COLORS = {
@@ -211,9 +225,11 @@ class App(tk.Frame):
         "rebuild-body-data":    {"fg": [0, 0, 0], "bg": [255, 200, 200]},
         "rebuild-body-images":  {"fg": [0, 0, 0], "bg": [255, 200, 200]},
         "rebuild-body-offsets": {"fg": [0, 0, 0], "bg": [255, 200, 200]},
+        "destroy-body-images":  {"fg": [0, 0, 0], "bg": [255, 200, 200]},
         "rebuild-head-data":    {"fg": [0, 0, 0], "bg": [200, 224, 255]},
         "rebuild-head-images":  {"fg": [0, 0, 0], "bg": [200, 224, 255]},
         "rebuild-head-offsets": {"fg": [0, 0, 0], "bg": [200, 224, 255]},
+        "destroy-head-images":  {"fg": [0, 0, 0], "bg": [200, 224, 255]},
         "select-head":          {"fg": [0, 0, 0], "bg": [200, 224, 255]},
         "select-body":          {"fg": [0, 0, 0], "bg": [255, 200, 200]},
         "preview-static":       {"fg": [0, 0, 0], "bg": [0, 0, 0]},
@@ -259,17 +275,29 @@ class App(tk.Frame):
 
         :return: None.
         """
-        timeout = 1000
+        found = False
+        zombie = False
 
         for proc in psutil.process_iter():
             try:
                 if proc.name() == "iTunes":
+                    found = True
                     proc.kill()
                     print("iTunes has been put in its place.")
             except psutil.ZombieProcess:
-                timeout = 900000
+                zombie = True
                 print("iTunes has already been reaped.")
                 break
+
+        if zombie:
+            # Process was already killed; check again in 15 minutes
+            timeout = 900000
+        elif found:
+            # iTunes was found; check again in 1 second
+            timeout = 1000
+        else:
+            # iTunes not found; check again in 1 minute
+            timeout = 60000
 
         self.after(timeout, self.KillITunes)
 
@@ -366,9 +394,11 @@ class App(tk.Frame):
             "rebuild-body-data":    tk.Button(),
             "rebuild-body-images":  tk.Button(),
             "rebuild-body-offsets": tk.Button(),
+            "destroy-body-images":  tk.Button(),
             "rebuild-head-data":    tk.Button(),
             "rebuild-head-images":  tk.Button(),
             "rebuild-head-offsets": tk.Button(),
+            "destroy-head-images":  tk.Button(),
         }
 
         # Canvases
@@ -492,6 +522,10 @@ class App(tk.Frame):
                         "rebuild-body-offsets",
                         self.RebuildBodyOffsets,
                         )
+        self.InitButton(self._FrameBottom,
+                        "destroy-body-images",
+                        self.DestroyBodyImages,
+                        )
         self.InitLabel(self._FrameBottom,
                        "head-options",
                        ("sans-serif", App.FONTSIZE_VAR, "bold"),
@@ -508,6 +542,10 @@ class App(tk.Frame):
         self.InitButton(self._FrameBottom,
                         "rebuild-head-offsets",
                         self.RebuildHeadOffsets,
+                        )
+        self.InitButton(self._FrameBottom,
+                        "destroy-head-images",
+                        self.DestroyHeadImages,
                         )
         self.InitMenu(self._FrameBottom,
                       "select-head",
@@ -1138,6 +1176,19 @@ class App(tk.Frame):
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_BOFF)
 
+    def DestroyBodyImages(self):
+        """
+        Callback function. Destroys intermediate head spritesheets.
+
+        :return: None.
+        """
+        title = App.WINDOW_TITLE
+        query = App.CONFIRM_DESTROY_BODY
+
+        if tk.messagebox.askquestion(title, query) == "yes":
+            FlushBodies()
+            tk.messagebox.showinfo(title, App.MESSAGE_DESTROY_BODY)
+
     def RebuildHeadData(self):
         """
         Callback function. Rebuilds head JSON database.
@@ -1190,6 +1241,19 @@ class App(tk.Frame):
                     self.MakeRightPreview()
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HOFF)
+
+    def DestroyHeadImages(self):
+        """
+        Callback function. Destroys intermediate head spritesheets.
+
+        :return: None.
+        """
+        title = App.WINDOW_TITLE
+        query = App.CONFIRM_DESTROY_HEAD
+
+        if tk.messagebox.askquestion(title, query) == "yes":
+            FlushHeads()
+            tk.messagebox.showinfo(title, App.MESSAGE_DESTROY_HEAD)
 
     # noinspection PyUnusedLocal
     def ToggleLayerOrder(self, event):
