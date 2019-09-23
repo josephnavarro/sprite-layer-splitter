@@ -249,7 +249,7 @@ class App(tk.Frame):
                     proc.kill()
             except psutil.ZombieProcess:
                 print("iTunes has already been reaped.")
-                timeout = 60000
+                timeout = 900000
                 break
 
         self.after(timeout, self.KillITunes)
