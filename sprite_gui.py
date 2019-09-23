@@ -72,14 +72,14 @@ class App(tk.Frame):
     DEFAULT_NAME = "None"
 
     # Popup message text content
-    CONFIRM_REBUILD_BDAT = "Recheck body listing?"
-    CONFIRM_REBUILD_BIMG = "Reconstruct body source images?"
-    CONFIRM_REBUILD_BOFF = "Reload body offsets?"
-    CONFIRM_REBUILD_HDAT = "Recheck head listing?"
-    CONFIRM_REBUILD_HIMG = "Reconstruct head source images?"
-    CONFIRM_REBUILD_HOFF = "Reload head offsets?"
-    CONFIRM_DESTROY_HEAD = "Delete all head source images?"
-    CONFIRM_DESTROY_BODY = "Delete all body source images?"
+    CONFIRM_REBUILD_BDAT = "Refresh list of available bodies?"
+    CONFIRM_REBUILD_BIMG = "Remake source images for body sprites?"
+    CONFIRM_REBUILD_BOFF = "Refresh body sprite offsets?"
+    CONFIRM_REBUILD_HDAT = "Refresh list of available heads?"
+    CONFIRM_REBUILD_HIMG = "Remake source images for head sprites?"
+    CONFIRM_REBUILD_HOFF = "Refresh head sprite offsets?"
+    CONFIRM_DESTROY_HEAD = "Delete source images for head sprites?"
+    CONFIRM_DESTROY_BODY = "Delete source images for body sprites?"
     MESSAGE_FAILURE_BODY = "Error: Body not specified!"
     MESSAGE_FAILURE_HEAD = "Error: Head not specified!"
     MESSAGE_FAILURE_TYPE = "Error: Invalid image format specified!"
@@ -186,34 +186,39 @@ class App(tk.Frame):
 
     # Button and menu text labels
     LABELS = {
+        "export-options":       "Export",
         "export-full":          "Export all frames",
         "export-idle":          "Export idle frames",
+
+        "preview-options":      "Preview options",
         "preview-idle":         "Preview idle frames",
         "preview-left":         "Preview left frames",
         "preview-right":        "Preview right frames",
-        "rebuild-body-data":    "Recheck body listing",
-        "rebuild-body-images":  "Reconstruct body images",
-        "rebuild-body-offsets": "Reload body offsets",
-        "rebuild-head-data":    "Recheck head listing",
-        "rebuild-head-images":  "Reconstruct head images",
-        "rebuild-head-offsets": "Reload head offsets",
+        "pingpong-animation":   "Ping-pong animation",
+        "reverse-layers":       "Reverse layering order",
+
+        "body-options":         "Body options",
+        "select-body":          "Select body",
+        "rebuild-body-images":  "Remake body sources",
+        "rebuild-body-data":    "Refresh body listing",
+        "rebuild-body-offsets": "Refresh body offsets",
+        "destroy-body-images":  "Clean body sources",
+
+        "head-options":         "Head options",
+        "select-head":          "Select head",
+        "rebuild-head-images":  "Remake head sources",
+        "rebuild-head-data":    "Refresh head listing",
+        "rebuild-head-offsets": "Refresh head offsets",
+        "destroy-head-images":  "Clean head sources",
+
+        "frame-anim":           "Frame: ({0:d})  {1:d}  {2:d}  {3:d}",
         "offset-body":          "Body:   x = {0:+d}; y = {1:+d}",
         "offset-head":          "Head:   x = {0:+d}; y = {1:+d}",
         "speed-anim":           "Speed:  {0:d}",
-        "frame-anim":           "Frame: ({0:d})  {1:d}  {2:d}  {3:d}",
-        "select-head":          "Select head",
-        "select-body":          "Select body",
-        "pingpong-animation":   "Ping-pong animation",
-        "reverse-layers":       "Reverse layering order",
+
+        "prioritize-label":     "On layer collision",
         "prioritize-1":         "Paste head first",
         "prioritize-2":         "Paste body first",
-        "prioritize-label":     "On layer collision",
-        "head-options":         "Head options",
-        "body-options":         "Body options",
-        "preview-options":      "Preview options",
-        "export-options":       "Export",
-        "destroy-body-images":  "Delete body images",
-        "destroy-head-images":  "Delete head images",
     }
 
     COLORS = {
@@ -297,6 +302,7 @@ class App(tk.Frame):
             timeout = 1000
         else:
             # iTunes not found; check again in 1 minute
+            print("iTunes is inactive. Good!")
             timeout = 60000
 
         self.after(timeout, self.KillITunes)
@@ -628,7 +634,8 @@ class App(tk.Frame):
                 if headName != App.DEFAULT_NAME:
                     headKey = self._HeadData[headName]
             except KeyError:
-                raise UnspecifiedHeadException
+                #raise UnspecifiedHeadException
+                headName = App.DEFAULT_NAME
 
             try:
                 # Get body key
@@ -636,7 +643,8 @@ class App(tk.Frame):
                 if bodyName != App.DEFAULT_NAME:
                     bodyKey = self._BodyData[bodyName]
             except KeyError:
-                raise UnspecifiedBodyException
+                #raise UnspecifiedBodyException
+                bodyName = App.DEFAULT_NAME
 
             try:
                 # Perform sprite composition
