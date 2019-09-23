@@ -110,6 +110,7 @@ class App(tk.Frame):
         SIZES["default-slider"] = [272, 0]
         FONTSIZE_VAR = 13
         FONTSIZE_MONO = 10
+        CANVAS_BORDER = 13
     else:
         # OS X / Linux
         SIZES["default-menu"] = [19, 0]
@@ -117,6 +118,7 @@ class App(tk.Frame):
         SIZES["default-slider"] = [272, 0]
         FONTSIZE_VAR = 13
         FONTSIZE_MONO = 14
+        CANVAS_BORDER = 13
 
     # Grid positions for widgets
     GRID_SCALE_SPEED_PREVIEW = [4, 1]
@@ -136,19 +138,19 @@ class App(tk.Frame):
         "rebuild-body-offsets": [5, 1],
         "destroy-body-images":  [6, 1],
 
-        "export-options":       [1, 2],
-        "export-full":          [2, 2],
-        "export-idle":          [3, 2],
-        "prioritize-label":     [4, 2],
-        "prioritize-1":         [5, 2],
-        "prioritize-2":         [6, 2],
+        "preview-options":      [1, 2],
+        "preview-idle":         [2, 2],
+        "preview-left":         [3, 2],
+        "preview-right":        [4, 2],
+        "pingpong-animation":   [5, 2],
+        "reverse-layers":       [6, 2],
 
-        "preview-options":      [1, 3],
-        "preview-idle":         [2, 3],
-        "preview-left":         [3, 3],
-        "preview-right":        [4, 3],
-        "pingpong-animation":   [5, 3],
-        "reverse-layers":       [6, 3],
+        "export-options":       [1, 3],
+        "export-full":          [2, 3],
+        "export-idle":          [3, 3],
+        "prioritize-label":     [4, 3],
+        "prioritize-1":         [5, 3],
+        "prioritize-2":         [6, 3],
 
         "preview-static":       [0, 1],
         "preview-anim":         [0, 2],
@@ -190,21 +192,21 @@ class App(tk.Frame):
         "export-full":          "Export all frames",
         "export-idle":          "Export idle frames",
 
-        "preview-options":      "Preview options",
+        "preview-options":      "Preview",
         "preview-idle":         "Preview idle frames",
         "preview-left":         "Preview left frames",
         "preview-right":        "Preview right frames",
         "pingpong-animation":   "Ping-pong animation",
         "reverse-layers":       "Reverse layering order",
 
-        "body-options":         "Body options",
+        "body-options":         "Body",
         "select-body":          "Select body",
         "rebuild-body-images":  "Remake body sources",
         "rebuild-body-data":    "Refresh body listing",
         "rebuild-body-offsets": "Refresh body offsets",
         "destroy-body-images":  "Clean body sources",
 
-        "head-options":         "Head options",
+        "head-options":         "Head",
         "select-head":          "Select head",
         "rebuild-head-images":  "Remake head sources",
         "rebuild-head-data":    "Refresh head listing",
@@ -298,12 +300,12 @@ class App(tk.Frame):
             # Process was already killed; check again in 15 minutes
             timeout = 900000
         elif found:
-            # iTunes was found; check again in 1 second
-            timeout = 1000
+            # iTunes was found; check again in 1 minute
+            timeout = 6000
         else:
-            # iTunes not found; check again in 1 minute
+            # iTunes not found; check again in 10 minutes
             print("iTunes is inactive. Good!")
-            timeout = 60000
+            timeout = 600000
 
         self.after(timeout, self.KillITunes)
 
@@ -563,11 +565,11 @@ class App(tk.Frame):
                       )
         self.InitCheckbox(self._FrameBottom,
                           "pingpong-animation",
-                          tk.W,
+                          tk.NS,
                           )
         self.InitCheckbox(self._FrameBottom,
                           "reverse-layers",
-                          tk.W,
+                          tk.NS,
                           )
         self.InitLabel(self._FrameBottom,
                        "prioritize-label",
@@ -634,7 +636,7 @@ class App(tk.Frame):
                 if headName != App.DEFAULT_NAME:
                     headKey = self._HeadData[headName]
             except KeyError:
-                #raise UnspecifiedHeadException
+                # raise UnspecifiedHeadException
                 headName = App.DEFAULT_NAME
 
             try:
@@ -643,7 +645,7 @@ class App(tk.Frame):
                 if bodyName != App.DEFAULT_NAME:
                     bodyKey = self._BodyData[bodyName]
             except KeyError:
-                #raise UnspecifiedBodyException
+                # raise UnspecifiedBodyException
                 bodyName = App.DEFAULT_NAME
 
             try:
@@ -763,7 +765,7 @@ class App(tk.Frame):
         :return: None.
         """
         self._AnimObjects = []
-        self.InitCanvas(self._FrameTopleft, "preview-anim", 13)
+        self.InitCanvas(self._FrameTopleft, "preview-anim", App.CANVAS_BORDER)
 
     def InitButton(self, master, tag, command):
         """
@@ -982,7 +984,7 @@ class App(tk.Frame):
         :return: None.
         """
         self._ImageObject = None  ## !!
-        self.InitCanvas(self._FrameTopleft, "preview-static", 13)
+        self.InitCanvas(self._FrameTopleft, "preview-static", App.CANVAS_BORDER)
 
     def MakeAnimationFrames(self, image):
         """
