@@ -60,7 +60,7 @@ def SortedSet(*lists, reverse=False):
     return outList
 
 
-def PasteLayers(dest, head, body, layers, headfirst=True):
+def PasteLayers(dest, head, body, layers, *, headfirst=True, reverse=False):
     """
     Pastes head and body subregions in proper layering order.
     (In-place).
@@ -69,10 +69,15 @@ def PasteLayers(dest, head, body, layers, headfirst=True):
     :param head:      Head compositing data.
     :param body:      Body compositing data.
     :param layers:    List of layers to process.
-    :param headfirst: Whether to paste head first.
+    :param headfirst: Whether to paste head first. (Default True).
+    :param reverse:   Whether to invert layers. (Default False).
 
     :return: None.
     """
+    # Experimental!!
+    if reverse:
+        layers = layers[::-1]
+
     for layer in layers:
         if headfirst:
             try:
@@ -350,7 +355,13 @@ def Process(head_path,
     }
 
 
-def CompositeIdle(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
+def CompositeIdle(head,
+                  body,
+                  offset=(0, 0),
+                  is_alpha=True,
+                  headfirst=True,
+                  reverse=False,
+                  ):
     """
     Composites spritesheet (idle frames only).
 
@@ -359,6 +370,7 @@ def CompositeIdle(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
     :param offset:    Manual X-Y offset onto master sheet. (Default (0, 0)).
     :param is_alpha:  Whether to make black pixels transparent. (Default True).
     :param headfirst: Whether to paste heads before bodies. (Default True).
+    :param reverse:   Whether to invert layering order. (Default False).
 
     :return: Composited image.
     """
@@ -412,7 +424,9 @@ def CompositeIdle(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
                         newData["body"]["idle"],
                         reverse=headOffsets.get(
                             body, {}).get("reverse", False)),
-                    headfirst)
+                    headfirst=headfirst,
+                    reverse=reverse,
+                    )
 
         # Paste onto master spritesheet
         Paste(outImage, newImage, (0, y * STATE_REGION[1]))
@@ -432,7 +446,13 @@ def CompositeIdle(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
     return outImage
 
 
-def CompositeFull(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
+def CompositeFull(head,
+                  body,
+                  offset=(0, 0),
+                  is_alpha=True,
+                  headfirst=True,
+                  reverse=False,
+                  ):
     """
     Composites spritesheet.
 
@@ -441,6 +461,7 @@ def CompositeFull(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
     :param offset:    Manual X-Y offset onto master sheet. (Default (0,0)).
     :param is_alpha:  Whether to make black pixels transparent. (Default True).
     :param headfirst: Whether to paste heads before bodies. (Default True).
+    :param reverse:   Whether to invert layering order. (Default False).
 
     :return: Composited image.
     """
@@ -494,7 +515,9 @@ def CompositeFull(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
                         newData["body"]["idle"],
                         reverse=headOffsets.get(
                             body, {}).get("reverse", False)),
-                    headfirst)
+                    headfirst=headfirst,
+                    reverse=reverse,
+                    )
 
         # Composite left-moving frames
         PasteLayers(newImage,
@@ -502,7 +525,9 @@ def CompositeFull(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
                     newData["body"]["left"],
                     SortedSet(newData["head"]["left"],
                               newData["body"]["left"]),
-                    headfirst)
+                    headfirst=headfirst,
+                    reverse=reverse,
+                    )
 
         # Composite right-moving frames
         PasteLayers(newImage,
@@ -510,7 +535,9 @@ def CompositeFull(head, body, offset=(0, 0), is_alpha=True, headfirst=True):
                     newData["body"]["right"],
                     SortedSet(newData["head"]["right"],
                               newData["body"]["right"]),
-                    headfirst)
+                    headfirst=headfirst,
+                    reverse=reverse,
+                    )
 
         # Paste onto master spritesheet
         Paste(outImage, newImage, (0, y * COLOR_REGION[1]))
