@@ -104,41 +104,48 @@ class App(tk.Frame):
         SIZES["default-menu"] = [26, 0]
         SIZES["default-button"] = [27, 0]
         SIZES["default-slider"] = [272, 0]
+        FONTSIZE_VAR = 13
         FONTSIZE_MONO = 10
     else:
         # OS X / Linux
         SIZES["default-menu"] = [19, 0]
         SIZES["default-button"] = [22, 0]
-        SIZES["default-slider"] = [280, 0]
+        SIZES["default-slider"] = [272, 0]
+        FONTSIZE_VAR = 13
         FONTSIZE_MONO = 14
 
     # Grid positions for widgets
     GRID_SCALE_SPEED_PREVIEW = [4, 1]
 
     GRID = {
-        "export-full":          [6, 2],
-        "export-idle":          [5, 2],
-        "preview-idle":         [2, 2],
-        "preview-left":         [3, 2],
-        "preview-right":        [4, 2],
-        "rebuild-body-data":    [3, 1],
-        "rebuild-body-images":  [2, 1],
-        "rebuild-body-offsets": [4, 1],
-        "rebuild-head-data":    [3, 0],
-        "rebuild-head-images":  [2, 0],
-        "rebuild-head-offsets": [4, 0],
+        "export-full":          [2, 2],
+        "export-idle":          [3, 2],
+        "preview-idle":         [2, 3],
+        "preview-left":         [3, 3],
+        "preview-right":        [4, 3],
+        "rebuild-body-data":    [4, 1],
+        "rebuild-body-images":  [3, 1],
+        "rebuild-body-offsets": [5, 1],
+        "rebuild-head-data":    [4, 0],
+        "rebuild-head-images":  [3, 0],
+        "rebuild-head-offsets": [5, 0],
         "offset-body":          [2, 1],
         "offset-head":          [1, 1],
         "frame-anim":           [0, 1],
         "speed-anim":           [3, 1],
-        "select-head":          [1, 0],
-        "select-body":          [1, 1],
+        "select-head":          [2, 0],
+        "select-body":          [2, 1],
         "preview-static":       [0, 1],
         "preview-anim":         [0, 2],
-        "pingpong-animation":   [2, 3],
-        "reverse-layers":       [3, 3],
-        "prioritize-1":         [4, 3],
-        "prioritize-2":         [5, 3],
+        "pingpong-animation":   [5, 3],
+        "reverse-layers":       [6, 3],
+        "prioritize-label":     [4, 2],
+        "prioritize-1":         [5, 2],
+        "prioritize-2":         [6, 2],
+        "head-options":         [1, 0],
+        "body-options":         [1, 1],
+        "preview-options":      [1, 3],
+        "export-options":       [1, 2],
     }
 
     # Padding for widgets
@@ -178,16 +185,21 @@ class App(tk.Frame):
         "rebuild-head-data":    "Recheck head listing",
         "rebuild-head-images":  "Reconstruct head images",
         "rebuild-head-offsets": "Reload head offsets",
-        "offset-body":          "Body: {0:+d}, {1:+d}",
-        "offset-head":          "Head: {0:+d}, {1:+d}",
+        "offset-body":          "Body:  {0:+d}, {1:+d}",
+        "offset-head":          "Head:  {0:+d}, {1:+d}",
         "speed-anim":           "Speed: {0:d}",
         "frame-anim":           "Frame: ({0:d})  {1:d}  {2:d}  {3:d}",
         "select-head":          "Select head",
         "select-body":          "Select body",
         "pingpong-animation":   "Ping-pong animation",
         "reverse-layers":       "Reverse layering order",
-        "prioritize-1":         "Head",
-        "prioritize-2":         "Body",
+        "prioritize-1":         "Paste head first",
+        "prioritize-2":         "Paste body first",
+        "prioritize-label":     "On layer collision",
+        "head-options":         "Head options",
+        "body-options":         "Body options",
+        "preview-options":      "Preview options",
+        "export-options":       "Export",
     }
 
     COLORS = {
@@ -322,11 +334,14 @@ class App(tk.Frame):
         self._FrameTopRight = tk.Frame(self._FrameTopleft)
         self._FrameTopRight.grid(row=0, column=3)
 
-        self._FrameTop = tk.Frame(self._FrameTopRight, width=10, height=10)
+        self._FrameTop = tk.Frame(self._FrameTopRight, width=1, height=10)
         self._FrameTop.grid(row=0, column=0)
 
         self._FrameBottom = tk.Frame(self._Master)
         self._FrameBottom.grid(row=2)
+
+        self._FrameLast = tk.Frame(self._FrameBottom, height=10)
+        self._FrameLast.grid(row=7)
 
         # Boolean variables
         self._BooleanVars = {
@@ -390,10 +405,15 @@ class App(tk.Frame):
 
         # Labels
         self._Labels = {
-            "offset-head": tk.Label(),
-            "offset-body": tk.Label(),
-            "speed-anim":  tk.Label(),
-            "frame-anim":  tk.Label(),
+            "offset-head":      tk.Label(),
+            "offset-body":      tk.Label(),
+            "speed-anim":       tk.Label(),
+            "frame-anim":       tk.Label(),
+            "prioritize-label": tk.Label(),
+            "head-options":     tk.Label(),
+            "body-options":     tk.Label(),
+            "preview-options":  tk.Label(),
+            "export-options":   tk.Label(),
         }
 
         # Sliders
@@ -402,6 +422,11 @@ class App(tk.Frame):
         # Complete widget initialization
         self.InitDataHead()
         self.InitDataBody()
+        self.InitLabel(self._FrameBottom,
+                       "export-options",
+                       ("sans-serif", App.FONTSIZE_VAR, "bold"),
+                       tk.NS,
+                       )
         self.InitButton(self._FrameBottom,
                         "export-idle",
                         self.ExportIdleFrames,
@@ -433,9 +458,15 @@ class App(tk.Frame):
                        ("Courier", App.FONTSIZE_MONO),
                        tk.W, 0, 0,
                        )
+        self.InitLabel(self._FrameBottom,
+                       "preview-options",
+                       ("sans-serif", App.FONTSIZE_VAR, "bold"),
+                       tk.NS,
+                       )
         self.InitButton(self._FrameBottom,
                         "preview-idle",
-                        self.MakeIdlePreview)
+                        self.MakeIdlePreview,
+                        )
         self.InitButton(self._FrameBottom,
                         "preview-left",
                         self.MakeLeftPreview,
@@ -444,6 +475,11 @@ class App(tk.Frame):
                         "preview-right",
                         self.MakeRightPreview,
                         )
+        self.InitLabel(self._FrameBottom,
+                       "body-options",
+                       ("sans-serif", App.FONTSIZE_VAR, "bold"),
+                       tk.NS,
+                       )
         self.InitButton(self._FrameBottom,
                         "rebuild-body-data",
                         self.RebuildBodyData,
@@ -456,6 +492,11 @@ class App(tk.Frame):
                         "rebuild-body-offsets",
                         self.RebuildBodyOffsets,
                         )
+        self.InitLabel(self._FrameBottom,
+                       "head-options",
+                       ("sans-serif", App.FONTSIZE_VAR, "bold"),
+                       tk.NS,
+                       )
         self.InitButton(self._FrameBottom,
                         "rebuild-head-data",
                         self.RebuildHeadData,
@@ -484,18 +525,23 @@ class App(tk.Frame):
                           "reverse-layers",
                           tk.W,
                           )
+        self.InitLabel(self._FrameBottom,
+                       "prioritize-label",
+                       ("sans-serif", App.FONTSIZE_VAR, "bold"),
+                       tk.NS,
+                       )
         self.InitRadio(self._FrameBottom,
                        "prioritize-1",
                        self._StringVars["prioritize"],
                        "Head",
-                       tk.W,
+                       tk.NS,
                        select=True,
                        )
         self.InitRadio(self._FrameBottom,
                        "prioritize-2",
                        self._StringVars["prioritize"],
                        "Body",
-                       tk.W,
+                       tk.NS,
                        )
 
         # Kills any iTunes instance
@@ -919,7 +965,8 @@ class App(tk.Frame):
         self._CurSpeed = self._ScaleAnimSpeed.get()
         self._Canvases["preview-anim"].create_image((16, 16),
                                                     anchor=tk.NW,
-                                                    image=self._AnimObjects[0])
+                                                    image=self._AnimObjects[0],
+                                                    )
 
     def MakeAnimationPreview(self, image):
         """
