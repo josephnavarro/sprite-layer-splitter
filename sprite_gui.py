@@ -280,7 +280,7 @@ class App(tk.Frame):
                     fill="black",
                     text=text,
                     anchor=tk.NW,
-                )
+                    )
 
         canvas.create_text(
             x, y,
@@ -489,12 +489,12 @@ class App(tk.Frame):
         self.InitButton(
             self._FrameBottom,
             "export-idle",
-            self.ExportIdleFrames,
+            lambda: self.ExportFrames(idle_only=True),
         )
         self.InitButton(
             self._FrameBottom,
             "export-full",
-            self.ExportFullFrames,
+            lambda: self.ExportFrames(),
         )
         self.InitPreviewStatic()
         self.InitPreviewAnim()
@@ -739,7 +739,7 @@ class App(tk.Frame):
 
         return headKey, bodyKey, None
 
-    def ExportFrames(self, func, message, **kwargs):
+    def Export(self, func, message, **kwargs):
         """
         Composites and exports all frames to file.
 
@@ -791,35 +791,28 @@ class App(tk.Frame):
             # Filename not specified
             pass
 
-    def ExportFullFrames(self):
+    def ExportFrames(self, *, idle_only=False):
         """
         Composites and exports all frames to file.
 
-        :return: None.
-        """
-        reverse = not self._BooleanVars["reverse-layers"].get()
-        headfirst = self._StringVars["prioritize"].get() == "Head"
-        self.ExportFrames(
-            sprite_splitter.Composite,
-            App.MESSAGE_SUCCESS_FULL,
-            headfirst=headfirst,
-            reverse=reverse,
-        )
-
-    def ExportIdleFrames(self):
-        """
-        Composites and exports idle frames to file.
+        :param idle_only: Whether to export only idle frames. (Default False).
 
         :return: None.
         """
         reverse = self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
-        self.ExportFrames(
+
+        if idle_only:
+            message = App.MESSAGE_SUCCESS_IDLE
+        else:
+            message = App.MESSAGE_SUCCESS_FULL
+
+        self.Export(
             sprite_splitter.Composite,
-            App.MESSAGE_SUCCESS_IDLE,
+            message,
             headfirst=headfirst,
             reverse=reverse,
-            idle_only=True
+            idle_only=idle_only,
         )
 
     def InitPreviewAnim(self):
@@ -849,25 +842,27 @@ class App(tk.Frame):
         foreground = App.FromRGB(*App.COLORS[tag]["fg"])  # FG color
         background = App.FromRGB(*App.COLORS[tag]["bg"])  # BG color
 
-        self._Buttons[tag].destroy()
-        self._Buttons[tag] = tk.Button(
+        button = tk.Button(
             master,
             text=App.LABELS[tag],
             command=command,
         )
-        self._Buttons[tag].config(
+        button.config(
             width=width,
             foreground=foreground,
             background=background,
             activebackground=background,
             activeforeground=foreground,
         )
-        self._Buttons[tag].grid(
+        button.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
             padx=App.PAD[tag][0],
             pady=App.PAD[tag][1],
         )
+
+        self._Buttons[tag].destroy()
+        self._Buttons[tag] = button
 
     def InitCanvas(self, master, tag, border):
         """
@@ -879,21 +874,21 @@ class App(tk.Frame):
 
         :return: None.
         """
-        background = App.FromRGB(*App.COLORS[tag]["bg"])
-
-        self._Canvases[tag].destroy()
-        self._Canvases[tag] = tk.Canvas(
+        canvas = tk.Canvas(
             master,
             width=App.SIZES[tag][0],
             height=App.SIZES[tag][1],
-            background=background,
+            background=App.FromRGB(*App.COLORS[tag]["bg"]),
             relief=tk.SUNKEN,
             borderwidth=border,
         )
-        self._Canvases[tag].grid(
+        canvas.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
         )
+
+        self._Canvases[tag].destroy()
+        self._Canvases[tag] = canvas
 
     def InitCheckbox(self, master, tag, sticky, command=None):
         """
@@ -904,22 +899,24 @@ class App(tk.Frame):
         :param sticky:  Anchoring string.
         :param command: Callback function. (Default None).
 
-        :return:
+        :return: None.
         """
-        self._Checkboxes[tag].destroy()
-        self._Checkboxes[tag] = tk.Checkbutton(
+        checkbox = tk.Checkbutton(
             master,
             text=App.LABELS[tag],
             variable=self._BooleanVars[tag],
         )
-        self._Checkboxes[tag].grid(
+        checkbox.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
             sticky=sticky,
         )
 
         if command is not None:
-            self._Checkboxes[tag].config(command=command)
+            checkbox.config(command=command)
+
+        self._Checkboxes[tag].destroy()
+        self._Checkboxes[tag] = checkbox
 
     def InitDataBody(self):
         """
@@ -927,12 +924,11 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._Body["data"] = {
+        data = self._Body["data"] = {
             v.get("name", "---"): k
             for k, v in LoadBodyPaths().items()
         }
-        self._Body["list"] = [App.DEFAULT_NAME] + sorted(
-            list(self._Body["data"]))
+        self._Body["list"] = [App.DEFAULT_NAME] + sorted(list(data))
         self._Body["offsets"] = LoadBodyOffsets()
 
     def InitDataHead(self):
@@ -941,12 +937,11 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._Head["data"] = {
+        data = self._Head["data"] = {
             v.get("name", "---"): k
             for k, v in LoadHeadPaths().items()
         }
-        self._Head["list"] = [App.DEFAULT_NAME] + sorted(
-            list(self._Head["data"]))
+        self._Head["list"] = [App.DEFAULT_NAME] + sorted(list(data))
         self._Head["offsets"] = LoadHeadOffsets()
 
     def InitLabel(self, master, tag, font, sticky, *args):
