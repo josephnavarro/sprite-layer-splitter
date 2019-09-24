@@ -369,15 +369,19 @@ class App(tk.Frame):
             "state":   STATES.idle,
         }
 
-        self._BodyData = {}
-        self._BodyList = [""]
-        self._BodyOffsets = {}
-        self._CurBody = {}
+        self._Body = {
+            "data":    {},
+            "list":    [""],
+            "offsets": {},
+            "current": {},
+        }
 
-        self._HeadData = {}
-        self._HeadList = [""]
-        self._HeadOffsets = {}
-        self._CurHead = {}
+        self._Head = {
+            "data":    {},
+            "list":    [""],
+            "offsets": {},
+            "current": {},
+        }
 
         # Frames
         self._FrameTopleft = tk.Frame(self._Master)
@@ -448,12 +452,12 @@ class App(tk.Frame):
             "select-head": tk.OptionMenu(
                 self._FrameBottom,
                 self._StringVars["select-head"],
-                *self._HeadList
+                *self._Head["list"]
             ),
             "select-body": tk.OptionMenu(
                 self._FrameBottom,
                 self._StringVars["select-body"],
-                *self._BodyList
+                *self._Body["list"]
             ),
         }
 
@@ -595,12 +599,12 @@ class App(tk.Frame):
         self.InitMenu(
             self._FrameBottom,
             "select-head",
-            self._HeadList,
+            self._Head["list"],
         )
         self.InitMenu(
             self._FrameBottom,
             "select-body",
-            self._BodyList,
+            self._Body["list"],
         )
         self.InitCheckbox(
             self._FrameBottom,
@@ -684,7 +688,7 @@ class App(tk.Frame):
                 # Get head key
                 headName = self._StringVars["select-head"].get()
                 if headName != App.DEFAULT_NAME:
-                    headKey = self._HeadData[headName]
+                    headKey = self._Head["data"][headName]
             except KeyError:
                 # raise UnspecifiedHeadException
                 pass
@@ -693,7 +697,7 @@ class App(tk.Frame):
                 # Get body key
                 bodyName = self._StringVars["select-body"].get()
                 if bodyName != App.DEFAULT_NAME:
-                    bodyKey = self._BodyData[bodyName]
+                    bodyKey = self._Body["data"][bodyName]
             except KeyError:
                 # raise UnspecifiedBodyException
                 pass
@@ -923,12 +927,13 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._BodyData = {
+        self._Body["data"] = {
             v.get("name", "---"): k
             for k, v in LoadBodyPaths().items()
         }
-        self._BodyList = [App.DEFAULT_NAME] + sorted(list(self._BodyData))
-        self._BodyOffsets = LoadBodyOffsets()
+        self._Body["list"] = [App.DEFAULT_NAME] + sorted(
+            list(self._Body["data"]))
+        self._Body["offsets"] = LoadBodyOffsets()
 
     def InitDataHead(self):
         """
@@ -936,12 +941,13 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._HeadData = {
+        self._Head["data"] = {
             v.get("name", "---"): k
             for k, v in LoadHeadPaths().items()
         }
-        self._HeadList = [App.DEFAULT_NAME] + sorted(list(self._HeadData))
-        self._HeadOffsets = LoadHeadOffsets()
+        self._Head["list"] = [App.DEFAULT_NAME] + sorted(
+            list(self._Head["data"]))
+        self._Head["offsets"] = LoadHeadOffsets()
 
     def InitLabel(self, master, tag, font, sticky, *args):
         """
@@ -1142,7 +1148,7 @@ class App(tk.Frame):
         try:
             # Perform sprite composition
             self._Animation["state"] = state
-            self._HeadOffsets = LoadHeadOffsets()
+            self._Head["offsets"] = LoadHeadOffsets()
 
             head, body, image = self.DoComposite(func, **kwargs)
 
@@ -1166,15 +1172,15 @@ class App(tk.Frame):
 
                     try:
                         # Populate per-frame head offset data
-                        self._CurHead = self._HeadOffsets[body]
+                        self._Head["current"] = self._Head["offsets"][body]
                     except KeyError:
-                        self._CurHead = {}
+                        self._Head["current"] = {}
 
                     try:
                         # Populate per-frame body offset data
-                        self._CurBody = self._BodyOffsets[body]
+                        self._Body["current"] = self._Body["offsets"][body]
                     except KeyError:
-                        self._CurBody = {}
+                        self._Body["current"] = {}
 
                     self.UpdateOffsetLabels()
 
@@ -1246,7 +1252,7 @@ class App(tk.Frame):
             self.InitMenu(
                 self._FrameBottom,
                 "select-body",
-                self._BodyList,
+                self._Body["list"],
             )
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_BDAT)
@@ -1275,7 +1281,7 @@ class App(tk.Frame):
         query = App.CONFIRM_REBUILD_BOFF
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            self._BodyOffsets = LoadBodyOffsets()
+            self._Body["offsets"] = LoadBodyOffsets()
             self.UpdateOffsetLabels()
 
             if self._Animation["objects"]:
@@ -1318,7 +1324,7 @@ class App(tk.Frame):
             self.InitMenu(
                 self._FrameBottom,
                 "select-head",
-                self._HeadList,
+                self._Head["list"],
             )
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HDAT)
@@ -1347,7 +1353,7 @@ class App(tk.Frame):
         query = App.CONFIRM_REBUILD_HOFF
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            self._HeadOffsets = LoadHeadOffsets()
+            self._Head["offsets"] = LoadHeadOffsets()
             self.UpdateOffsetLabels()
 
             if self._Animation["objects"]:
@@ -1405,7 +1411,7 @@ class App(tk.Frame):
         try:
             self._Labels["offset-body"].config(
                 text=App.LABELS["offset-body"].format(
-                    *self._CurBody["offset"][state][frame]
+                    *self._Body["current"]["offset"][state][frame]
                 )
             )
 
@@ -1482,7 +1488,7 @@ class App(tk.Frame):
         try:
             self._Labels["offset-head"].config(
                 text=App.LABELS["offset-head"].format(
-                    *self._CurHead["offset"][state][frame]
+                    *self._Head["current"]["offset"][state][frame]
                 )
             )
 
