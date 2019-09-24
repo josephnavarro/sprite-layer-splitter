@@ -358,14 +358,16 @@ class App(tk.Frame):
             root.tk.call("wm", "iconphoto", root._w, image)
 
         # Initialize local non-widget data
-        self._AnimObjects = []
         self._ImageObject = None
         self._IsForwards = True
-        self._IsReversed = False
         self._HasInitAnim = False
-        self._CurFrame = 0
-        self._CurSpeed = 0
-        self._CurState = str(STATES.idle)
+
+        self._Animation = {
+            "objects": [],
+            "frame":   0,
+            "speed":   0,
+            "state":   STATES.idle,
+        }
 
         self._BodyData = {}
         self._BodyList = [""]
@@ -647,18 +649,24 @@ class App(tk.Frame):
 
         try:
             # Draw frame to canvas
+            animObjects = self._Animation["objects"]
+            animFrame = self._Animation["frame"]
+            animImage = animObjects[animFrame]
+
             self._Canvases["preview-anim"].create_image(
                 (16, 16),
                 anchor=tk.NW,
-                image=self._AnimObjects[self._CurFrame],
+                image=animImage,
             )
+
         except IndexError:
             # Current frame is invalid
             pass
 
         # Repeat if animation is active
-        if self._CurSpeed > 0:
-            self.after(1000 // self._CurSpeed, self.DoAnimate)
+        speed = self._Animation["speed"]
+        if speed > 0:
+            self.after(1000 // speed, self.DoAnimate)
 
     def DoComposite(self, func, **kwargs):
         """
@@ -816,7 +824,7 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._AnimObjects = []
+        self._Animation["objects"] = []
         self.InitCanvas(
             self._FrameTopleft,
             "preview-anim",
@@ -1081,7 +1089,7 @@ class App(tk.Frame):
         frame3 = sprite_imaging.Crop(image, [w * 2, 0], [w, h])
         frame4 = sprite_imaging.Crop(image, [w * 3, 0], [w, h])
 
-        self._AnimObjects = [
+        self._Animation["objects"] = [
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame1)),
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame2)),
             sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame3)),
@@ -1089,13 +1097,13 @@ class App(tk.Frame):
         ]
 
         # Reset animation counters
-        self._CurFrame = 0
+        self._Animation["frame"] = 0
         self._IsForwards = True
-        self._CurSpeed = self._ScaleAnimSpeed.get()
+        self._Animation["speed"] = self._ScaleAnimSpeed.get()
         self._Canvases["preview-anim"].create_image(
             (16, 16),
             anchor=tk.NW,
-            image=self._AnimObjects[0],
+            image=self._Animation["objects"][0],
         )
 
         self.UpdateOffsetLabels()
@@ -1133,7 +1141,7 @@ class App(tk.Frame):
         """
         try:
             # Perform sprite composition
-            self._CurState = state
+            self._Animation["state"] = state
             self._HeadOffsets = LoadHeadOffsets()
 
             head, body, image = self.DoComposite(func, **kwargs)
@@ -1270,12 +1278,13 @@ class App(tk.Frame):
             self._BodyOffsets = LoadBodyOffsets()
             self.UpdateOffsetLabels()
 
-            if self._AnimObjects:
-                if self._CurState == STATES.idle.str():
+            if self._Animation["objects"]:
+                state = self._Animation["state"]
+                if state == STATES.idle:
                     self.MakeIdlePreview()
-                elif self._CurState == STATES.left.str():
+                elif state == STATES.left:
                     self.MakeLeftPreview()
-                elif self._CurState == STATES.right.str():
+                elif state == STATES.right:
                     self.MakeRightPreview()
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_BOFF)
@@ -1341,12 +1350,13 @@ class App(tk.Frame):
             self._HeadOffsets = LoadHeadOffsets()
             self.UpdateOffsetLabels()
 
-            if self._AnimObjects:
-                if self._CurState == STATES.idle:
+            if self._Animation["objects"]:
+                state = self._Animation["state"]
+                if state == STATES.idle:
                     self.MakeIdlePreview()
-                elif self._CurState == STATES.left:
+                elif state == STATES.left:
                     self.MakeLeftPreview()
-                elif self._CurState == STATES.right:
+                elif state == STATES.right:
                     self.MakeRightPreview()
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HOFF)
@@ -1374,12 +1384,13 @@ class App(tk.Frame):
 
         :return: None.
         """
-        if self._AnimObjects:
-            if self._CurState == STATES.idle:
+        if self._Animation["objects"]:
+            state = self._Animation["state"]
+            if state == STATES.idle:
                 self.MakeIdlePreview()
-            elif self._CurState == STATES.left:
+            elif state == STATES.left:
                 self.MakeLeftPreview()
-            elif self._CurState == STATES.right:
+            elif state == STATES.right:
                 self.MakeRightPreview()
 
     def UpdateBodyOffsetLabel(self, state, frame):
@@ -1416,8 +1427,8 @@ class App(tk.Frame):
             isForwards = True
 
         # Increment frame
-        curFrame = self._CurFrame
-        if self._AnimObjects:
+        curFrame = self._Animation["frame"]
+        if self._Animation["objects"]:
             if isForwards:
                 # Forwards iteration
                 curFrame += 1
@@ -1439,7 +1450,7 @@ class App(tk.Frame):
 
         # Update references to current frame
         self._IsForwards = isForwards
-        self._CurFrame = curFrame
+        self._Animation["frame"] = curFrame
 
         # Update frame count label
         self.UpdateFrameCountLabel()
@@ -1453,7 +1464,7 @@ class App(tk.Frame):
         self._Labels["frame-anim"].config(
             text="Frame: " + " ".join([
                 "({})".format(x)
-                if x == self._CurFrame
+                if x == self._Animation["frame"]
                 else " {} ".format(x)
                 for x in range(4)
             ])
@@ -1486,8 +1497,8 @@ class App(tk.Frame):
 
         :return: None
         """
-        state = self._CurState
-        frame = self._CurFrame
+        state = self._Animation["state"]
+        frame = self._Animation["frame"]
         self.UpdateHeadOffsetLabel(state, frame)
         self.UpdateBodyOffsetLabel(state, frame)
 
@@ -1504,7 +1515,7 @@ class App(tk.Frame):
         self._Labels["speed-anim"].config(
             text=App.LABELS["speed-anim"].format(speed)
         )
-        self._CurSpeed = speed
+        self._Animation["speed"] = speed
 
         if speed == 0:
             self._HasInitAnim = False
