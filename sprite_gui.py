@@ -108,7 +108,7 @@ class App(tk.Frame):
         SIZES["default-menu"] = [26, 0]
         SIZES["default-button"] = [27, 0]
         SIZES["default-slider"] = [272, 0]
-        FONTSIZE_VAR = 13
+        FONTSIZE_VARW = 13
         FONTSIZE_MONO = 10
         CANVAS_BORDER = 13
     else:
@@ -116,7 +116,7 @@ class App(tk.Frame):
         SIZES["default-menu"] = [19, 0]
         SIZES["default-button"] = [22, 0]
         SIZES["default-slider"] = [272, 0]
-        FONTSIZE_VAR = 13
+        FONTSIZE_VARW = 13
         FONTSIZE_MONO = 14
         CANVAS_BORDER = 13
 
@@ -243,9 +243,20 @@ class App(tk.Frame):
         "preview-anim":         {"fg": [0, 0, 0], "bg": [0, 0, 0]},
     }
 
-    # Animation speeds
+    # Animation speed slider
     SPEED_SCALE_MIN = 0
     SPEED_SCALE_MAX = 12
+
+    @staticmethod
+    def MinutesToMilliseconds(minutes):
+        """
+        Converts minutes to milliseconds.
+
+        :param minutes: Minutes to convert.
+
+        :return: Number of milliseconds equivalent to given number of minutes.
+        """
+        return minutes * 60 * 1000
 
     @staticmethod
     def DrawText(canvas, x, y, text):
@@ -259,22 +270,25 @@ class App(tk.Frame):
 
         :return: None.
         """
-        font: str = "Courier {} bold".format(App.FONTSIZE_MONO)
+        font = "Courier {} bold".format(App.FONTSIZE_MONO)
         for m in range(-2, 3):
             for n in range(-2, 3):
-                canvas.create_text(x + m, y + n,
-                                   font=font,
-                                   fill="black",
-                                   text=text,
-                                   anchor=tk.NW,
-                                   )
+                canvas.create_text(
+                    x + m,
+                    y + n,
+                    font=font,
+                    fill="black",
+                    text=text,
+                    anchor=tk.NW,
+                )
 
-        canvas.create_text(x, y,
-                           font=font,
-                           fill="white",
-                           text=text,
-                           anchor=tk.NW,
-                           )
+        canvas.create_text(
+            x, y,
+            font=font,
+            fill="white",
+            text=text,
+            anchor=tk.NW,
+        )
 
     def KillITunes(self):
         """
@@ -290,22 +304,22 @@ class App(tk.Frame):
                 if proc.name() == "iTunes":
                     found = True
                     proc.kill()
-                    print("iTunes has been put in its place.")
             except psutil.ZombieProcess:
                 zombie = True
-                print("iTunes has already been reaped.")
                 break
 
         if zombie:
             # Process was already killed; check again in 15 minutes
-            timeout = 900000
+            print("iTunes has already been reaped.")
+            timeout = App.MinutesToMilliseconds(15)
         elif found:
             # iTunes was found; check again in 1 minute
-            timeout = 6000
+            print("iTunes has been put in its place.")
+            timeout = App.MinutesToMilliseconds(1)
         else:
             # iTunes not found; check again in 10 minutes
             print("iTunes is inactive. Good!")
-            timeout = 600000
+            timeout = App.MinutesToMilliseconds(10)
 
         self.after(timeout, self.KillITunes)
 
@@ -460,137 +474,165 @@ class App(tk.Frame):
         # Complete widget initialization
         self.InitDataHead()
         self.InitDataBody()
-        self.InitLabel(self._FrameBottom,
-                       "export-options",
-                       ("sans-serif", App.FONTSIZE_VAR, "bold"),
-                       tk.NS,
-                       )
-        self.InitButton(self._FrameBottom,
-                        "export-idle",
-                        self.ExportIdleFrames,
-                        )
-        self.InitButton(self._FrameBottom,
-                        "export-full",
-                        self.ExportFullFrames,
-                        )
+        self.InitLabel(
+            self._FrameBottom,
+            "export-options",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"),
+            tk.NS,
+        )
+        self.InitButton(
+            self._FrameBottom,
+            "export-idle",
+            self.ExportIdleFrames,
+        )
+        self.InitButton(
+            self._FrameBottom,
+            "export-full",
+            self.ExportFullFrames,
+        )
         self.InitPreviewStatic()
         self.InitPreviewAnim()
         self.InitSliderFramerate()
-        self.InitLabel(self._FrameTopRight,
-                       "speed-anim",
-                       ("Courier", App.FONTSIZE_MONO),
-                       tk.W, 0,
-                       )
-        self.InitLabel(self._FrameTopRight,
-                       "frame-anim",
-                       ("Courier", App.FONTSIZE_MONO),
-                       tk.W, 0, 1, 2, 3,
-                       )
-        self.InitLabel(self._FrameTopRight,
-                       "offset-head",
-                       ("Courier", App.FONTSIZE_MONO),
-                       tk.W, 0, 0,
-                       )
-        self.InitLabel(self._FrameTopRight,
-                       "offset-body",
-                       ("Courier", App.FONTSIZE_MONO),
-                       tk.W, 0, 0,
-                       )
-        self.InitLabel(self._FrameBottom,
-                       "preview-options",
-                       ("sans-serif", App.FONTSIZE_VAR, "bold"),
-                       tk.NS,
-                       )
-        self.InitButton(self._FrameBottom,
-                        "preview-idle",
-                        self.MakeIdlePreview,
-                        )
-        self.InitButton(self._FrameBottom,
-                        "preview-left",
-                        self.MakeLeftPreview,
-                        )
-        self.InitButton(self._FrameBottom,
-                        "preview-right",
-                        self.MakeRightPreview,
-                        )
-        self.InitLabel(self._FrameBottom,
-                       "body-options",
-                       ("sans-serif", App.FONTSIZE_VAR, "bold"),
-                       tk.NS,
-                       )
-        self.InitButton(self._FrameBottom,
-                        "rebuild-body-data",
-                        self.RebuildBodyData,
-                        )
-        self.InitButton(self._FrameBottom,
-                        "rebuild-body-images",
-                        self.RebuildBodyImages,
-                        )
-        self.InitButton(self._FrameBottom,
-                        "rebuild-body-offsets",
-                        self.RebuildBodyOffsets,
-                        )
-        self.InitButton(self._FrameBottom,
-                        "destroy-body-images",
-                        self.DestroyBodyImages,
-                        )
-        self.InitLabel(self._FrameBottom,
-                       "head-options",
-                       ("sans-serif", App.FONTSIZE_VAR, "bold"),
-                       tk.NS,
-                       )
-        self.InitButton(self._FrameBottom,
-                        "rebuild-head-data",
-                        self.RebuildHeadData,
-                        )
-        self.InitButton(self._FrameBottom,
-                        "rebuild-head-images",
-                        self.RebuildHeadImages,
-                        )
-        self.InitButton(self._FrameBottom,
-                        "rebuild-head-offsets",
-                        self.RebuildHeadOffsets,
-                        )
-        self.InitButton(self._FrameBottom,
-                        "destroy-head-images",
-                        self.DestroyHeadImages,
-                        )
-        self.InitMenu(self._FrameBottom,
-                      "select-head",
-                      self._HeadList,
-                      )
-        self.InitMenu(self._FrameBottom,
-                      "select-body",
-                      self._BodyList,
-                      )
-        self.InitCheckbox(self._FrameBottom,
-                          "pingpong-animation",
-                          tk.NS,
-                          )
-        self.InitCheckbox(self._FrameBottom,
-                          "reverse-layers",
-                          tk.NS,
-                          )
-        self.InitLabel(self._FrameBottom,
-                       "prioritize-label",
-                       ("sans-serif", App.FONTSIZE_VAR, "bold"),
-                       tk.NS,
-                       )
-        self.InitRadio(self._FrameBottom,
-                       "prioritize-1",
-                       self._StringVars["prioritize"],
-                       "Head",
-                       tk.NS,
-                       select=True,
-                       )
-        self.InitRadio(self._FrameBottom,
-                       "prioritize-2",
-                       self._StringVars["prioritize"],
-                       "Body",
-                       tk.NS,
-                       )
+        self.InitLabel(
+            self._FrameTopRight,
+            "speed-anim",
+            ("Courier", App.FONTSIZE_MONO),
+            tk.W, 0,
+        )
+        self.InitLabel(
+            self._FrameTopRight,
+            "frame-anim",
+            ("Courier", App.FONTSIZE_MONO),
+            tk.W, 0, 1, 2, 3,
+        )
+        self.InitLabel(
+            self._FrameTopRight,
+            "offset-head",
+            ("Courier", App.FONTSIZE_MONO),
+            tk.W, 0, 0,
+        )
+        self.InitLabel(
+            self._FrameTopRight,
+            "offset-body",
+            ("Courier", App.FONTSIZE_MONO),
+            tk.W, 0, 0,
+        )
+        self.InitLabel(
+            self._FrameBottom,
+            "preview-options",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"),
+            tk.NS,
+        )
+        self.InitButton(
+            self._FrameBottom,
+            "preview-idle",
+            self.MakeIdlePreview,
+        )
+        self.InitButton(
+            self._FrameBottom,
+            "preview-left",
+            self.MakeLeftPreview,
+        )
+        self.InitButton(
+            self._FrameBottom,
+            "preview-right",
+            self.MakeRightPreview,
+        )
+        self.InitLabel(
+            self._FrameBottom,
+            "body-options",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"),
+            tk.NS,
+        )
+        self.InitButton(
+            self._FrameBottom,
+            "rebuild-body-data",
+            self.RebuildBodyData,
+        )
+        self.InitButton(
+            self._FrameBottom,
+            "rebuild-body-images",
+            self.RebuildBodyImages,
+        )
+        self.InitButton(
+            self._FrameBottom,
+            "rebuild-body-offsets",
+            self.RebuildBodyOffsets,
+        )
+        self.InitButton(
+            self._FrameBottom,
+            "destroy-body-images",
+            self.DestroyBodyImages,
+        )
+        self.InitLabel(
+            self._FrameBottom,
+            "head-options",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"),
+            tk.NS,
+        )
+        self.InitButton(
+            self._FrameBottom,
+            "rebuild-head-data",
+            self.RebuildHeadData,
+        )
+        self.InitButton(
+            self._FrameBottom,
+            "rebuild-head-images",
+            self.RebuildHeadImages,
+        )
+        self.InitButton(
+            self._FrameBottom,
+            "rebuild-head-offsets",
+            self.RebuildHeadOffsets,
+        )
+        self.InitButton(
+            self._FrameBottom,
+            "destroy-head-images",
+            self.DestroyHeadImages,
+        )
+        self.InitMenu(
+            self._FrameBottom,
+            "select-head",
+            self._HeadList,
+        )
+        self.InitMenu(
+            self._FrameBottom,
+            "select-body",
+            self._BodyList,
+        )
+        self.InitCheckbox(
+            self._FrameBottom,
+            "pingpong-animation",
+            tk.NS,
+        )
+        self.InitCheckbox(
+            self._FrameBottom,
+            "reverse-layers",
+            tk.NS,
+        )
+        self.InitLabel(
+            self._FrameBottom,
+            "prioritize-label",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"),
+            tk.NS,
+        )
+        self.InitRadio(
+            self._FrameBottom,
+            "prioritize-1",
+            self._StringVars["prioritize"],
+            "Head",
+            tk.NS,
+            select=True,
+        )
+        self.InitRadio(
+            self._FrameBottom,
+            "prioritize-2",
+            self._StringVars["prioritize"],
+            "Body",
+            tk.NS,
+        )
 
-        # Kills any iTunes instance if on Mac
+        # Kill iTunes instance on Mac (if any)
         if IsOSX():
             self.KillITunes()
 
@@ -728,8 +770,10 @@ class App(tk.Frame):
 
         except InvalidFilenameException:
             # Image format not recognized
-            tk.messagebox.showinfo(App.WINDOW_TITLE,
-                                   App.MESSAGE_FAILURE_TYPE)
+            tk.messagebox.showinfo(
+                App.WINDOW_TITLE,
+                App.MESSAGE_FAILURE_TYPE,
+            )
 
         except EmptyFilenameException:
             # Filename not specified
@@ -744,7 +788,7 @@ class App(tk.Frame):
         reverse = not self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
         self.ExportFrames(
-            sprite_splitter.CompositeFull,
+            sprite_splitter.Composite,
             App.MESSAGE_SUCCESS_FULL,
             headfirst=headfirst,
             reverse=reverse,
@@ -759,10 +803,11 @@ class App(tk.Frame):
         reverse = self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
         self.ExportFrames(
-            sprite_splitter.CompositeIdle,
+            sprite_splitter.Composite,
             App.MESSAGE_SUCCESS_IDLE,
             headfirst=headfirst,
             reverse=reverse,
+            idle_only=True
         )
 
     def InitPreviewAnim(self):
@@ -772,7 +817,11 @@ class App(tk.Frame):
         :return: None.
         """
         self._AnimObjects = []
-        self.InitCanvas(self._FrameTopleft, "preview-anim", App.CANVAS_BORDER)
+        self.InitCanvas(
+            self._FrameTopleft,
+            "preview-anim",
+            App.CANVAS_BORDER,
+        )
 
     def InitButton(self, master, tag, command):
         """
@@ -931,21 +980,24 @@ class App(tk.Frame):
 
         self._StringVars[tag].set(App.LABELS[tag])
         self._Menus[tag].destroy()
-        self._Menus[tag] = tk.OptionMenu(master,
-                                         self._StringVars[tag],
-                                         *options
-                                         )
-        self._Menus[tag].config(width=width,
-                                foreground=foreground,
-                                background=background,
-                                activebackground=background,
-                                activeforeground=foreground,
-                                )
-        self._Menus[tag].grid(row=App.GRID[tag][0],
-                              column=App.GRID[tag][1],
-                              padx=App.PAD[tag][0],
-                              pady=App.PAD[tag][1],
-                              )
+        self._Menus[tag] = tk.OptionMenu(
+            master,
+            self._StringVars[tag],
+            *options
+        )
+        self._Menus[tag].config(
+            width=width,
+            foreground=foreground,
+            background=background,
+            activebackground=background,
+            activeforeground=foreground,
+        )
+        self._Menus[tag].grid(
+            row=App.GRID[tag][0],
+            column=App.GRID[tag][1],
+            padx=App.PAD[tag][0],
+            pady=App.PAD[tag][1],
+        )
 
     def InitRadio(self, master, tag, variable, value, sticky, select=False):
         """
@@ -961,15 +1013,17 @@ class App(tk.Frame):
         :return: None.
         """
         self._RadioButtons[tag].destroy()
-        self._RadioButtons[tag] = tk.Radiobutton(master,
-                                                 text=App.LABELS[tag],
-                                                 variable=variable,
-                                                 value=value,
-                                                 )
-        self._RadioButtons[tag].grid(row=App.GRID[tag][0],
-                                     column=App.GRID[tag][1],
-                                     sticky=sticky,
-                                     )
+        self._RadioButtons[tag] = tk.Radiobutton(
+            master,
+            text=App.LABELS[tag],
+            variable=variable,
+            value=value,
+        )
+        self._RadioButtons[tag].grid(
+            row=App.GRID[tag][0],
+            column=App.GRID[tag][1],
+            sticky=sticky,
+        )
 
         if select:
             self._RadioButtons[tag].select()
@@ -983,19 +1037,21 @@ class App(tk.Frame):
         :return: None.
         """
         self._ScaleAnimSpeed.destroy()
-        self._ScaleAnimSpeed = tk.Scale(self._FrameTopRight,
-                                        from_=App.SPEED_SCALE_MIN,
-                                        to=App.SPEED_SCALE_MAX,
-                                        orient=tk.HORIZONTAL,
-                                        length=App.SIZES["default-slider"][0],
-                                        showvalue=0,
-                                        command=self.UpdateSpeed,
-                                        )
-        self._ScaleAnimSpeed.grid(row=App.GRID_SCALE_SPEED_PREVIEW[0],
-                                  column=App.GRID_SCALE_SPEED_PREVIEW[1],
-                                  sticky=tk.W,
-                                  pady=4,
-                                  )
+        self._ScaleAnimSpeed = tk.Scale(
+            self._FrameTopRight,
+            from_=App.SPEED_SCALE_MIN,
+            to=App.SPEED_SCALE_MAX,
+            orient=tk.HORIZONTAL,
+            length=App.SIZES["default-slider"][0],
+            showvalue=0,
+            command=self.UpdateSpeed,
+        )
+        self._ScaleAnimSpeed.grid(
+            row=App.GRID_SCALE_SPEED_PREVIEW[0],
+            column=App.GRID_SCALE_SPEED_PREVIEW[1],
+            sticky=tk.W,
+            pady=4,
+        )
 
     def InitPreviewStatic(self):
         """
@@ -1004,7 +1060,11 @@ class App(tk.Frame):
         :return: None.
         """
         self._ImageObject = None  ## !!
-        self.InitCanvas(self._FrameTopleft, "preview-static", App.CANVAS_BORDER)
+        self.InitCanvas(
+            self._FrameTopleft,
+            "preview-static",
+            App.CANVAS_BORDER,
+        )
 
     def MakeAnimationFrames(self, image):
         """
@@ -1126,10 +1186,11 @@ class App(tk.Frame):
         reverse = self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
         self.MakePreview(
-            sprite_splitter.CompositeIdle,
+            sprite_splitter.Composite,
             "idle",
             headfirst=headfirst,
             reverse=reverse,
+            idle_only=True,
         )
 
     def MakeLeftPreview(self):
@@ -1141,7 +1202,7 @@ class App(tk.Frame):
         reverse = self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
         self.MakePreview(
-            sprite_splitter.CompositeFull,
+            sprite_splitter.Composite,
             "left",
             headfirst=headfirst,
             reverse=reverse,
@@ -1156,7 +1217,7 @@ class App(tk.Frame):
         reverse = self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
         self.MakePreview(
-            sprite_splitter.CompositeFull,
+            sprite_splitter.Composite,
             "right",
             headfirst=headfirst,
             reverse=reverse,
@@ -1174,7 +1235,11 @@ class App(tk.Frame):
         if tk.messagebox.askquestion(title, query) == "yes":
             CreateBodyJSON()
             self.InitDataBody()
-            self.InitMenu(self._FrameBottom, "select-body", self._BodyList)
+            self.InitMenu(
+                self._FrameBottom,
+                "select-body",
+                self._BodyList,
+            )
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_BDAT)
 
@@ -1241,7 +1306,11 @@ class App(tk.Frame):
         if tk.messagebox.askquestion(title, query) == "yes":
             CreateHeadJSON()
             self.InitDataHead()
-            self.InitMenu(self._FrameBottom, "select-head", self._HeadList)
+            self.InitMenu(
+                self._FrameBottom,
+                "select-head",
+                self._HeadList,
+            )
 
             tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HDAT)
 

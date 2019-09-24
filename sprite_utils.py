@@ -33,47 +33,50 @@ def FlushBodies():
     """
     Flushes entire body input directory.
 
-    :return: None.
+    :return: True on success; false otherwise.
     """
     try:
         shutil.rmtree(BODY_DIRECTORY)
         print("Removed directory '{}'!".format(BODY_DIRECTORY))
+        return True
     except FileNotFoundError:
         print("Directory '{}' already removed!".format(BODY_DIRECTORY))
-        return
+        return False
 
 
 def FlushHeads():
     """
     Flushes entire head input directory.
 
-    :return:
+    :return: True on success; false otherwise.
     """
     try:
         shutil.rmtree(HEAD_DIRECTORY)
         print("Removed directory '{}'!".format(HEAD_DIRECTORY))
+        return True
     except FileNotFoundError:
         print("Directory '{}' already removed!".format(HEAD_DIRECTORY))
-        return
+        return False
 
 
 def FlushOutputs():
     """
     Flushes entire image output directory.
 
-    :return: None.
+    :return: True on success; false otherwise.
     """
     try:
         shutil.rmtree(ROOT_OUTPUT_DIR)
         print("Removed directory '{}'!".format(ROOT_OUTPUT_DIR))
+        return True
     except FileNotFoundError:
         print("Directory '{}' already removed!".format(ROOT_OUTPUT_DIR))
-        return
+        return False
 
 
 def FixPath(path):
     """
-    Ensures existence of an output directory.
+    Ensures existence of an output directory before returning it.
 
     :param path: Relative path to directory.
 

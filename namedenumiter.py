@@ -9,7 +9,9 @@ mainly did this just so I could tell myself I implemented something like it.
 
 
 class EnumItem:
-
+    """
+    An entry within a NamedEnumIter container.
+    """
 
     def __init__(self, attr, enum):
         self._Attr = attr
@@ -176,12 +178,11 @@ class EnumItem:
 
 
 class NamedEnumIter:
-
+    """
+    A named, enumerated iterable.
+    """
 
     def __init__(self, *args, **kwargs):
-        """
-        A named, enumerated iterable.
-        """
         self._Counter = {}
         self._Strings = {}
         self._Indices = {}

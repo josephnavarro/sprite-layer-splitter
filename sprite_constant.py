@@ -9,6 +9,7 @@ Definitions of constant values.
 import os
 from namedenumiter import NamedEnumIter
 
+
 """ 
 Colors to avoid copying at all. 
 """
