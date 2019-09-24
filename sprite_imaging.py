@@ -108,6 +108,17 @@ def ToTkinter(image):
     return ImageTk.PhotoImage(image)
 
 
+def ToPILToTkinter(image):
+    """
+    Converts a numpy array to a PIL image to a Tkinter-compatible object.
+
+    :param image: Numpy image array.
+
+    :return: PhotoImage compatible with Tkinter.
+    """
+    return ToTkinter(ToPIL(image))
+
+
 def IsGrayscale(color):
     """
     Checks whether a color is monochrome.

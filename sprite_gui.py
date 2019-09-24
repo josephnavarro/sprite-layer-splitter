@@ -72,29 +72,49 @@ class App(tk.Frame):
     DEFAULT_NAME = "None"
 
     # Popup message text content
-    CONFIRM_REBUILD_BDAT = "Refresh list of available bodies?"
-    CONFIRM_REBUILD_BIMG = "Remake source images for body sprites?"
-    CONFIRM_REBUILD_BOFF = "Refresh body sprite offsets?"
-    CONFIRM_REBUILD_HDAT = "Refresh list of available heads?"
-    CONFIRM_REBUILD_HIMG = "Remake source images for head sprites?"
-    CONFIRM_REBUILD_HOFF = "Refresh head sprite offsets?"
-    CONFIRM_DESTROY_HEAD = "Delete source images for head sprites?"
-    CONFIRM_DESTROY_BODY = "Delete source images for body sprites?"
-    MESSAGE_FAILURE_BODY = "Error: Body not specified!"
-    MESSAGE_FAILURE_HEAD = "Error: Head not specified!"
-    MESSAGE_FAILURE_TYPE = "Error: Invalid image format specified!"
-    MESSAGE_INVALID_BODY = "Error: Body spritesheet '{}' does not exist!"
-    MESSAGE_INVALID_HEAD = "Error: Head spritesheet '{}' does not exist!"
-    MESSAGE_REBUILD_BIMG = "Successfully reconstructed body source images."
-    MESSAGE_REBUILD_BDAT = "Reassembled list of available bodies."
-    MESSAGE_REBUILD_BOFF = "Successfully reloaded per-frame body offsets."
-    MESSAGE_REBUILD_HIMG = "Successfully reconstructed head source images."
-    MESSAGE_REBUILD_HDAT = "Reassembled list of available heads."
-    MESSAGE_REBUILD_HOFF = "Successfully reloaded per-frame head offsets."
-    MESSAGE_DESTROY_HEAD = "Completely deleted all head sources."
-    MESSAGE_DESTROY_BODY = "Completely deleted all body sources."
-    MESSAGE_SUCCESS_FULL = "Sprite frames saved to {}!"
-    MESSAGE_SUCCESS_IDLE = "Idle frames saved to {}!"
+    MESSAGES = {
+        "confirm": {
+            "rebuild": {
+                "bdat": "Refresh list of available bodies?",
+                "bimg": "Remake source images for body sprites?",
+                "boff": "Refresh body sprite offsets?",
+                "hdat": "Refresh list of available heads?",
+                "himg": "Remake source images for head sprites?",
+                "hoff": "Refresh head sprite offsets?",
+            },
+            "destroy": {
+                "head": "Delete source images for head sprites?",
+                "body": "Delete source images for body sprites?",
+            }
+        },
+        "message": {
+            "destroy": {
+                "head": "Completely deleted all head sources.",
+                "body": "Completely deleted all body sources.",
+            },
+            "failure": {
+                "body": "Error: Body not specified!",
+                "head": "Error: Head not specified!",
+                "type": "Error: Invalid image format specified!",
+            },
+            "invalid":{
+                "body": "Error: Body spritesheet {} does not exist!",
+                "head": "Error: Head spritesheet {} does not exist!",
+            },
+            "rebuild":{
+                "bimg": "Succssfully reconstructed body source images.",
+                "bdat": "Reassembled list of available bodies.",
+                "boff": "Successfully reloaded per-frame body offsets.",
+                "himg": "Successfully reconstructed head source images.",
+                "hdat": "Reassembled list of available heads.",
+                "hoff": "Successfully reloaded per-frame head offsets.",
+            },
+            "success": {
+                "full": "Sprite frames saved to {}!",
+                "idle": "Idle frames saved to {}!",
+            }
+        }
+    }
 
     # Default widget dimensions
     SIZES = {
@@ -280,7 +300,7 @@ class App(tk.Frame):
                     fill="black",
                     text=text,
                     anchor=tk.NW,
-                    )
+                )
 
         canvas.create_text(
             x, y,
@@ -359,10 +379,10 @@ class App(tk.Frame):
 
         # Initialize local non-widget data
         self._ImageObject = None
-        self._IsForwards = True
-        self._HasInitAnim = False
 
         self._Animation = {
+            "init":    False,
+            "forward": True,
             "objects": [],
             "frame":   0,
             "speed":   0,
@@ -370,17 +390,17 @@ class App(tk.Frame):
         }
 
         self._Body = {
+            "current": {},
             "data":    {},
             "list":    [""],
             "offsets": {},
-            "current": {},
         }
 
         self._Head = {
+            "current": {},
             "data":    {},
             "list":    [""],
             "offsets": {},
-            "current": {},
         }
 
         # Frames
@@ -716,25 +736,25 @@ class App(tk.Frame):
             # Head not specified
             tk.messagebox.showinfo(
                 App.WINDOW_TITLE,
-                App.MESSAGE_FAILURE_HEAD,
+                App.MESSAGES["message"]["failure"]["head"],
             )
         except UnspecifiedBodyException:
             # Body not specified
             tk.messagebox.showinfo(
                 App.WINDOW_TITLE,
-                App.MESSAGE_FAILURE_BODY,
+                App.MESSAGES["message"]["failure"]["body"],
             )
         except InvalidHeadException as e:
             # Head spritesheet does not exist
             tk.messagebox.showinfo(
                 App.WINDOW_TITLE,
-                App.MESSAGE_INVALID_HEAD.format(e.filename),
+                App.MESSAGES["message"]["invalid"]["head"].format(e.filename),
             )
         except InvalidBodyException as e:
             # Body spritesheet does not exist
             tk.messagebox.showinfo(
                 App.WINDOW_TITLE,
-                App.MESSAGE_INVALID_BODY.format(e.filename),
+                App.MESSAGES["message"]["invalid"]["body"].format(e.filename),
             )
 
         return headKey, bodyKey, None
@@ -784,7 +804,7 @@ class App(tk.Frame):
             # Image format not recognized
             tk.messagebox.showinfo(
                 App.WINDOW_TITLE,
-                App.MESSAGE_FAILURE_TYPE,
+                App.MESSAGES["message"]["failure"]["type"],
             )
 
         except EmptyFilenameException:
@@ -803,9 +823,9 @@ class App(tk.Frame):
         headfirst = self._StringVars["prioritize"].get() == "Head"
 
         if idle_only:
-            message = App.MESSAGE_SUCCESS_IDLE
+            message = App.MESSAGES["message"]["success"]["idle"]
         else:
-            message = App.MESSAGE_SUCCESS_FULL
+            message = App.MESSAGES["message"]["success"]["full"]
 
         self.Export(
             sprite_splitter.Composite,
@@ -961,17 +981,19 @@ class App(tk.Frame):
         except IndexError:
             text = App.LABELS[tag]
 
-        self._Labels[tag].destroy()
-        self._Labels[tag] = tk.Label(
+        label = tk.Label(
             master,
             font=font,
             text=text,
         )
-        self._Labels[tag].grid(
+        label.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
             sticky=sticky,
         )
+
+        self._Labels[tag].destroy()
+        self._Labels[tag] = label
 
     def InitMenu(self, master, tag, options):
         """
@@ -988,25 +1010,28 @@ class App(tk.Frame):
         background = App.FromRGB(*App.COLORS[tag]["bg"])
 
         self._StringVars[tag].set(App.LABELS[tag])
-        self._Menus[tag].destroy()
-        self._Menus[tag] = tk.OptionMenu(
+
+        menu = tk.OptionMenu(
             master,
             self._StringVars[tag],
             *options
         )
-        self._Menus[tag].config(
+        menu.config(
             width=width,
             foreground=foreground,
             background=background,
             activebackground=background,
             activeforeground=foreground,
         )
-        self._Menus[tag].grid(
+        menu.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
             padx=App.PAD[tag][0],
             pady=App.PAD[tag][1],
         )
+
+        self._Menus[tag].destroy()
+        self._Menus[tag] = menu
 
     def InitRadio(self, master, tag, variable, value, sticky, select=False):
         """
@@ -1021,23 +1046,25 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._RadioButtons[tag].destroy()
-        self._RadioButtons[tag] = tk.Radiobutton(
+        radio = tk.Radiobutton(
             master,
             text=App.LABELS[tag],
             variable=variable,
             value=value,
         )
-        self._RadioButtons[tag].grid(
+        radio.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
             sticky=sticky,
         )
 
         if select:
-            self._RadioButtons[tag].select()
+            radio.select()
         else:
-            self._RadioButtons[tag].deselect()
+            radio.deselect()
+
+        self._RadioButtons[tag].destroy()
+        self._RadioButtons[tag] = radio
 
     def InitSliderFramerate(self):
         """
@@ -1045,8 +1072,7 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._ScaleAnimSpeed.destroy()
-        self._ScaleAnimSpeed = tk.Scale(
+        scale = tk.Scale(
             self._FrameTopRight,
             from_=App.SPEED_SCALE_MIN,
             to=App.SPEED_SCALE_MAX,
@@ -1055,12 +1081,15 @@ class App(tk.Frame):
             showvalue=0,
             command=self.UpdateSpeed,
         )
-        self._ScaleAnimSpeed.grid(
+        scale.grid(
             row=App.GRID_SCALE_SPEED_PREVIEW[0],
             column=App.GRID_SCALE_SPEED_PREVIEW[1],
             sticky=tk.W,
             pady=4,
         )
+
+        self._ScaleAnimSpeed.destroy()
+        self._ScaleAnimSpeed = scale
 
     def InitPreviewStatic(self):
         """
@@ -1085,21 +1114,15 @@ class App(tk.Frame):
         """
         # Get animation frames
         w, h = App.SIZES["preview-anim"]
-        frame1 = sprite_imaging.Crop(image, [w * 0, 0], [w, h])
-        frame2 = sprite_imaging.Crop(image, [w * 1, 0], [w, h])
-        frame3 = sprite_imaging.Crop(image, [w * 2, 0], [w, h])
-        frame4 = sprite_imaging.Crop(image, [w * 3, 0], [w, h])
-
         self._Animation["objects"] = [
-            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame1)),
-            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame2)),
-            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame3)),
-            sprite_imaging.ToTkinter(sprite_imaging.ToPIL(frame4)),
+            sprite_imaging.ToPILToTkinter(
+                sprite_imaging.Crop(image, [w * n, 0], [w, h])
+            ) for n in range(4)
         ]
 
         # Reset animation counters
         self._Animation["frame"] = 0
-        self._IsForwards = True
+        self._Animation["forward"] = True
         self._Animation["speed"] = self._ScaleAnimSpeed.get()
         self._Canvases["preview-anim"].create_image(
             (16, 16),
@@ -1120,16 +1143,16 @@ class App(tk.Frame):
         """
         self._ImageObject = sprite_imaging.ToTkinter(
             sprite_imaging.ToPIL(image))
+
         self._Canvases["preview-static"].create_image(
             (16, 16),
             anchor=tk.NW,
             image=self._ImageObject,
         )
 
-        App.DrawText(self._Canvases["preview-static"], 18 + 96 * 0, 92, "(0)")
-        App.DrawText(self._Canvases["preview-static"], 18 + 96 * 1, 92, "(1)")
-        App.DrawText(self._Canvases["preview-static"], 18 + 96 * 2, 92, "(2)")
-        App.DrawText(self._Canvases["preview-static"], 18 + 96 * 3, 92, "(3)")
+        canvas = self._Canvases["preview-static"]
+        for n in range(4):
+            App.DrawText(canvas, 18 + 96 * n, 92, "({})".format(n))
 
     def MakePreview(self, func, state, **kwargs):
         """
@@ -1146,7 +1169,6 @@ class App(tk.Frame):
             self._Head["offsets"] = LoadHeadOffsets()
 
             head, body, image = self.DoComposite(func, **kwargs)
-
             if image is not None:
                 try:
                     # Crop idle frames from source spritesheet
@@ -1155,8 +1177,10 @@ class App(tk.Frame):
                             sprite_imaging.Crop(
                                 image,
                                 App.RECTS[state][0:2],
-                                App.RECTS[state][2:4]),
-                            cv2.COLOR_BGR2RGB),
+                                App.RECTS[state][2:4],
+                            ),
+                            cv2.COLOR_BGR2RGB,
+                        ),
                         dsize=tuple(App.SIZES["preview-resize"]),
                         interpolation=cv2.INTER_NEAREST,
                     )
@@ -1184,7 +1208,10 @@ class App(tk.Frame):
 
         except InvalidFilenameException:
             # Image format not recognized
-            tk.messagebox.showinfo(App.WINDOW_TITLE, App.MESSAGE_FAILURE_TYPE)
+            tk.messagebox.showinfo(
+                App.WINDOW_TITLE,
+                App.MESSAGES["message"]["failure"]["type"],
+            )
 
     def MakeIdlePreview(self):
         """
@@ -1199,7 +1226,6 @@ class App(tk.Frame):
             "idle",
             headfirst=headfirst,
             reverse=reverse,
-            idle_only=True,
         )
 
     def MakeLeftPreview(self):
@@ -1239,7 +1265,7 @@ class App(tk.Frame):
         :return: None
         """
         title = App.WINDOW_TITLE
-        query = App.CONFIRM_REBUILD_BDAT
+        query = App.MESSAGES["confirm"]["rebuild"]["bdat"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             CreateBodyJSON()
@@ -1250,7 +1276,10 @@ class App(tk.Frame):
                 self._Body["list"],
             )
 
-            tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_BDAT)
+            tk.messagebox.showinfo(
+                title,
+                App.MESSAGES["message"]["rebuild"]["bdat"],
+            )
 
     # noinspection PyMethodMayBeStatic
     def RebuildBodyImages(self):
@@ -1260,11 +1289,14 @@ class App(tk.Frame):
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.CONFIRM_REBUILD_BIMG
+        query = App.MESSAGES["confirm"]["rebuild"]["bimg"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             PrepareBody()
-            tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_BIMG)
+            tk.messagebox.showinfo(
+                title,
+                App.MESSAGES["message"]["rebuild"]["bimg"],
+            )
 
     def RebuildBodyOffsets(self):
         """
@@ -1273,7 +1305,7 @@ class App(tk.Frame):
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.CONFIRM_REBUILD_BOFF
+        query = App.MESSAGES["confirm"]["rebuild"]["boff"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             self._Body["offsets"] = LoadBodyOffsets()
@@ -1288,7 +1320,10 @@ class App(tk.Frame):
                 elif state == STATES.right:
                     self.MakeRightPreview()
 
-            tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_BOFF)
+            tk.messagebox.showinfo(
+                title,
+                App.MESSAGES["message"]["rebuild"]["boff"],
+            )
 
     # noinspection PyMethodMayBeStatic
     def DestroyBodyImages(self):
@@ -1298,11 +1333,14 @@ class App(tk.Frame):
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.CONFIRM_DESTROY_BODY
+        query = App.MESSAGES["confirm"]["destroy"]["body"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             FlushBodies()
-            tk.messagebox.showinfo(title, App.MESSAGE_DESTROY_BODY)
+            tk.messagebox.showinfo(
+                title,
+                App.MESSAGES["message"]["destroy"]["body"],
+            )
 
     def RebuildHeadData(self):
         """
@@ -1311,7 +1349,7 @@ class App(tk.Frame):
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.CONFIRM_REBUILD_HDAT
+        query = App.MESSAGES["confirm"]["rebuild"]["hdat"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             CreateHeadJSON()
@@ -1322,7 +1360,10 @@ class App(tk.Frame):
                 self._Head["list"],
             )
 
-            tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HDAT)
+            tk.messagebox.showinfo(
+                title,
+                App.MESSAGES["message"]["rebuild"]["hdat"],
+            )
 
     # noinspection PyMethodMayBeStatic
     def RebuildHeadImages(self):
@@ -1332,11 +1373,14 @@ class App(tk.Frame):
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.CONFIRM_REBUILD_HIMG
+        query = App.MESSAGES["confirm"]["rebuild"]["himg"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             PrepareHead()
-            tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HIMG)
+            tk.messagebox.showinfo(
+                title,
+                App.MESSAGES["message"]["rebuild"]["himg"],
+            )
 
     def RebuildHeadOffsets(self):
         """
@@ -1345,7 +1389,7 @@ class App(tk.Frame):
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.CONFIRM_REBUILD_HOFF
+        query = App.MESSAGES["confirm"]["rebuild"]["hoff"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             self._Head["offsets"] = LoadHeadOffsets()
@@ -1360,7 +1404,10 @@ class App(tk.Frame):
                 elif state == STATES.right:
                     self.MakeRightPreview()
 
-            tk.messagebox.showinfo(title, App.MESSAGE_REBUILD_HOFF)
+            tk.messagebox.showinfo(
+                title,
+                App.MESSAGES["message"]["rebuild"]["hoff"],
+            )
 
     # noinspection PyMethodMayBeStatic
     def DestroyHeadImages(self):
@@ -1370,11 +1417,14 @@ class App(tk.Frame):
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.CONFIRM_DESTROY_HEAD
+        query = App.MESSAGES["confirm"]["destroy"]["head"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             FlushHeads()
-            tk.messagebox.showinfo(title, App.MESSAGE_DESTROY_HEAD)
+            tk.messagebox.showinfo(
+                title,
+                App.MESSAGES["message"]["destroy"]["head"],
+            )
 
     # noinspection PyUnusedLocal
     def ToggleLayerOrder(self, event):
@@ -1422,7 +1472,7 @@ class App(tk.Frame):
         :return: None.
         """
         # Check frame iteration type
-        isForwards = self._IsForwards
+        isForwards = self._Animation["forward"]
         isPingpong = self._BooleanVars["pingpong-animation"].get()
         if not isPingpong:
             isForwards = True
@@ -1450,7 +1500,7 @@ class App(tk.Frame):
                     isForwards = True
 
         # Update references to current frame
-        self._IsForwards = isForwards
+        self._Animation["forward"] = isForwards
         self._Animation["frame"] = curFrame
 
         # Update frame count label
@@ -1519,10 +1569,10 @@ class App(tk.Frame):
         self._Animation["speed"] = speed
 
         if speed == 0:
-            self._HasInitAnim = False
+            self._Animation["init"] = False
         else:
-            if not self._HasInitAnim:
-                self._HasInitAnim = True
+            if not self._Animation["init"]:
+                self._Animation["init"] = True
                 self.DoAnimate()
 
 
