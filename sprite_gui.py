@@ -500,148 +500,176 @@ class App(tk.Frame):
         # Complete widget initialization
         self.InitDataHead()
         self.InitDataBody()
+
         self.InitLabel(
             self._FrameBottom,
             "export-options",
             ("sans-serif", App.FONTSIZE_VARW, "bold"),
             tk.NS,
         )
+
         self.InitButton(
             self._FrameBottom,
             "export-idle",
             lambda: self.ExportFrames(idle_only=True),
         )
+
         self.InitButton(
             self._FrameBottom,
             "export-full",
             lambda: self.ExportFrames(),
         )
+
         self.InitPreviewStatic()
         self.InitPreviewAnim()
         self.InitSliderFramerate()
+
         self.InitLabel(
             self._FrameTopRight,
             "speed-anim",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0,
         )
+
         self.InitLabel(
             self._FrameTopRight,
             "frame-anim",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0, 1, 2, 3,
         )
+
         self.InitLabel(
             self._FrameTopRight,
             "offset-head",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0, 0,
         )
+
         self.InitLabel(
             self._FrameTopRight,
             "offset-body",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0, 0,
         )
+
         self.InitLabel(
             self._FrameBottom,
             "preview-options",
             ("sans-serif", App.FONTSIZE_VARW, "bold"),
             tk.NS,
         )
+
         self.InitButton(
             self._FrameBottom,
             "preview-idle",
             self.MakeIdlePreview,
         )
+
         self.InitButton(
             self._FrameBottom,
             "preview-left",
             self.MakeLeftPreview,
         )
+
         self.InitButton(
             self._FrameBottom,
             "preview-right",
             self.MakeRightPreview,
         )
+
         self.InitLabel(
             self._FrameBottom,
             "body-options",
             ("sans-serif", App.FONTSIZE_VARW, "bold"),
             tk.NS,
         )
+
         self.InitButton(
             self._FrameBottom,
             "rebuild-body-data",
             self.RebuildBodyData,
         )
+
         self.InitButton(
             self._FrameBottom,
             "rebuild-body-images",
             self.RebuildBodyImages,
         )
+
         self.InitButton(
             self._FrameBottom,
             "rebuild-body-offsets",
             self.RebuildBodyOffsets,
         )
+
         self.InitButton(
             self._FrameBottom,
             "destroy-body-images",
             self.DestroyBodyImages,
         )
+
         self.InitLabel(
             self._FrameBottom,
             "head-options",
             ("sans-serif", App.FONTSIZE_VARW, "bold"),
             tk.NS,
         )
+
         self.InitButton(
             self._FrameBottom,
             "rebuild-head-data",
             self.RebuildHeadData,
         )
+
         self.InitButton(
             self._FrameBottom,
             "rebuild-head-images",
             self.RebuildHeadImages,
         )
+
         self.InitButton(
             self._FrameBottom,
             "rebuild-head-offsets",
             self.RebuildHeadOffsets,
         )
+
         self.InitButton(
             self._FrameBottom,
             "destroy-head-images",
             self.DestroyHeadImages,
         )
+
         self.InitMenu(
             self._FrameBottom,
             "select-head",
             self._Head["list"],
         )
+
         self.InitMenu(
             self._FrameBottom,
             "select-body",
             self._Body["list"],
         )
+
         self.InitCheckbox(
             self._FrameBottom,
             "pingpong-animation",
             tk.NS,
         )
+
         self.InitCheckbox(
             self._FrameBottom,
             "reverse-layers",
             tk.NS,
         )
+
         self.InitLabel(
             self._FrameBottom,
             "prioritize-label",
             ("sans-serif", App.FONTSIZE_VARW, "bold"),
             tk.NS,
         )
+
         self.InitRadio(
             self._FrameBottom,
             "prioritize-1",
@@ -650,6 +678,7 @@ class App(tk.Frame):
             tk.NS,
             select=True,
         )
+
         self.InitRadio(
             self._FrameBottom,
             "prioritize-2",
@@ -764,7 +793,7 @@ class App(tk.Frame):
         Composites and exports all frames to file.
 
         :param func:    Frame compositing callback function.
-        :param message: Success message.
+        :param message: Success message to display.
 
         :return: None.
         """
@@ -797,8 +826,10 @@ class App(tk.Frame):
                 if path:
                     # Save image if path is valid
                     sprite_splitter.SaveImage(image, path)
-                    message = message.format(os.path.basename(path))
-                    tk.messagebox.showinfo(App.WINDOW_TITLE, message)
+                    tk.messagebox.showinfo(
+                        App.WINDOW_TITLE,
+                        message.format(os.path.basename(path)),
+                    )
 
         except InvalidFilenameException:
             # Image format not recognized
@@ -867,6 +898,7 @@ class App(tk.Frame):
             text=App.LABELS[tag],
             command=command,
         )
+
         button.config(
             width=width,
             foreground=foreground,
@@ -874,6 +906,7 @@ class App(tk.Frame):
             activebackground=background,
             activeforeground=foreground,
         )
+
         button.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
@@ -902,6 +935,7 @@ class App(tk.Frame):
             relief=tk.SUNKEN,
             borderwidth=border,
         )
+
         canvas.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
@@ -926,6 +960,7 @@ class App(tk.Frame):
             text=App.LABELS[tag],
             variable=self._BooleanVars[tag],
         )
+
         checkbox.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
@@ -948,6 +983,7 @@ class App(tk.Frame):
             v.get("name", "---"): k
             for k, v in LoadBodyPaths().items()
         }
+
         self._Body["list"] = [App.DEFAULT_NAME] + sorted(list(data))
         self._Body["offsets"] = LoadBodyOffsets()
 
@@ -961,6 +997,7 @@ class App(tk.Frame):
             v.get("name", "---"): k
             for k, v in LoadHeadPaths().items()
         }
+
         self._Head["list"] = [App.DEFAULT_NAME] + sorted(list(data))
         self._Head["offsets"] = LoadHeadOffsets()
 

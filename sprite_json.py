@@ -10,6 +10,7 @@ import json
 import glob
 from sprite_utils import *
 
+
 TEMPLATE_JSON_BASE = "{{{}}}"
 TEMPLATE_JSON_HEAD = "\"{name}\": {{" \
                      "\"path\": [\"images\", \"head\", \"{name}.png\"]," \
@@ -20,20 +21,32 @@ TEMPLATE_JSON_BODY = "\"{name}\": {{" \
                      "\"name\": \"{full}\"" \
                      "}},"
 
-IMPATH_DIRECTORY = os.path.join(ROOT_INPUT_DIR, "paths")
-OFFSET_DIRECTORY = os.path.join(ROOT_INPUT_DIR, "offsets")
-SOURCE_DIRECTORY = os.path.join(ROOT_INPUT_DIR, "sources")
+PATHS = {
+    "impath": os.path.join(ROOT_INPUT_DIR, "paths"),
+    "offset": os.path.join(ROOT_INPUT_DIR, "offsets"),
+    "source": {
+        "root": os.path.join(ROOT_INPUT_DIR, "sources"),
+        "head": os.path.join(ROOT_INPUT_DIR, "sources", "head"),
+        "body": os.path.join(ROOT_INPUT_DIR, "sources", "body"),
+    },
+}
 
-JSON_IMPATH_HEAD = os.path.join(IMPATH_DIRECTORY, "head.json")
-JSON_IMPATH_BODY = os.path.join(IMPATH_DIRECTORY, "body.json")
-JSON_OFFSET_HEAD = os.path.join(OFFSET_DIRECTORY, "head_offsets.json")
-JSON_OFFSET_BODY = os.path.join(OFFSET_DIRECTORY, "body_offsets.json")
-JSON_SOURCE_COLR = os.path.join(SOURCE_DIRECTORY, ".color.json")
-JSON_SOURCE_CROP = os.path.join(SOURCE_DIRECTORY, ".crop.json")
-JSON_CREATE_BODY = os.path.join(SOURCE_DIRECTORY, ".body.json")
-JSON_CREATE_HEAD = os.path.join(SOURCE_DIRECTORY, ".head.json")
-PATH_SOURCE_HEAD = os.path.join(SOURCE_DIRECTORY, "head")
-PATH_SOURCE_BODY = os.path.join(SOURCE_DIRECTORY, "body")
+JSONS = {
+    "offset":  {
+        "head": os.path.join(PATHS["offset"], "head_offsets.json"),
+        "body": os.path.join(PATHS["offset"], "body_offsets.json"),
+    },
+    "paths":   {
+        "head": os.path.join(PATHS["impath"], "head.json"),
+        "body": os.path.join(PATHS["impath"], "body.json"),
+    },
+    "sources": {
+        "color": os.path.join(PATHS["source"]["root"], ".color.json"),
+        "crop":  os.path.join(PATHS["source"]["root"], ".crop.json"),
+        "body":  os.path.join(PATHS["source"]["root"], ".body.json"),
+        "head":  os.path.join(PATHS["source"]["root"], ".head.json"),
+    },
+}
 
 JSON_KEY_DEFAULT = "?.default"
 
@@ -65,7 +78,7 @@ def CreateHeadJSON():
 
     contents = contents.rstrip(",")
     contents = TEMPLATE_JSON_BASE.format(contents)
-    with open(JSON_IMPATH_HEAD, "w") as f:
+    with open(JSONS["paths"]["head"], "w") as f:
         f.write(contents)
 
 
@@ -96,7 +109,7 @@ def CreateBodyJSON():
 
     contents = contents.rstrip(",")
     contents = TEMPLATE_JSON_BASE.format(contents)
-    with open(JSON_IMPATH_BODY, "w") as f:
+    with open(JSONS["paths"]["body"], "w") as f:
         f.write(contents)
 
 
@@ -106,7 +119,7 @@ def LoadHeadPaths():
 
     :return: Dictionary containing character head filepaths.
     """
-    with open(JSON_IMPATH_HEAD, "r") as f:
+    with open(JSONS["paths"]["head"], "r") as f:
         data = json.load(f)
     return data
 
@@ -117,7 +130,7 @@ def LoadBodyPaths():
 
     :return: Dictionary containing character body filepaths.
     """
-    with open(JSON_IMPATH_BODY, "r") as f:
+    with open(JSONS["paths"]["body"], "r") as f:
         data = json.load(f)
     return data
 
@@ -128,7 +141,7 @@ def LoadBodyOffsets():
 
     :return: Dictionary containing all characters' body offsets.
     """
-    with open(JSON_OFFSET_BODY, "r") as f:
+    with open(JSONS["offset"]["body"], "r") as f:
         data = json.load(f)
     return data
 
@@ -139,7 +152,7 @@ def LoadHeadOffsets():
 
     :return: Dictionary containing all characters' head offsets.
     """
-    with open(JSON_OFFSET_HEAD, "r") as f:
+    with open(JSONS["offset"]["head"], "r") as f:
         data = json.load(f)
     return data
 
@@ -150,7 +163,7 @@ def LoadCreateBody():
 
     :return: Dictionary containing cropping rules for body spritesheets.
     """
-    with open(JSON_CREATE_BODY, "r") as f:
+    with open(JSONS["sources"]["body"], "r") as f:
         data = json.load(f)
     return data
 
@@ -161,7 +174,7 @@ def LoadCreateHead():
 
     :return: Dictionary containing cropping rules for head spritesheets.
     """
-    with open(JSON_CREATE_HEAD, "r") as f:
+    with open(JSONS["sources"]["head"], "r") as f:
         data = json.load(f)
     return data
 
@@ -172,7 +185,7 @@ def LoadSourceColoring():
 
     :return: Dictionary containing color region order.
     """
-    with open(JSON_SOURCE_COLR, "r") as f:
+    with open(JSONS["sources"]["color"], "r") as f:
         data = json.load(f)
     return data
 
@@ -183,7 +196,7 @@ def LoadSourceCropping():
 
     :return: Dictionary containing standard cropping regions.
     """
-    with open(JSON_SOURCE_CROP, "r") as f:
+    with open(JSONS["sources"]["crop"], "r") as f:
         data = json.load(f)
     return data
 
