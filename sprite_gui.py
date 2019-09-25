@@ -97,11 +97,11 @@ class App(tk.Frame):
                 "head": "Error: Head not specified!",
                 "type": "Error: Invalid image format specified!",
             },
-            "invalid":{
+            "invalid": {
                 "body": "Error: Body spritesheet {} does not exist!",
                 "head": "Error: Head spritesheet {} does not exist!",
             },
-            "rebuild":{
+            "rebuild": {
                 "bimg": "Succssfully reconstructed body source images.",
                 "bdat": "Reassembled list of available bodies.",
                 "boff": "Successfully reloaded per-frame body offsets.",
@@ -259,8 +259,8 @@ class App(tk.Frame):
         "destroy-head-images":  {"fg": [0, 0, 0], "bg": [200, 224, 255]},
         "select-head":          {"fg": [0, 0, 0], "bg": [200, 224, 255]},
         "select-body":          {"fg": [0, 0, 0], "bg": [255, 200, 200]},
-        "preview-static":       {"fg": [0, 0, 0], "bg": [0, 0, 0]},
-        "preview-anim":         {"fg": [0, 0, 0], "bg": [0, 0, 0]},
+        "preview-static":       {"fg": [0, 0, 0], "bg": [128, 128, 128]},
+        "preview-anim":         {"fg": [0, 0, 0], "bg": [128, 128, 128]},
     }
 
     # Animation speed slider
@@ -1261,6 +1261,7 @@ class App(tk.Frame):
         self.MakePreview(
             sprite_splitter.Composite,
             "idle",
+            color=App.COLORS["preview-static"]["bg"],
             headfirst=headfirst,
             reverse=reverse,
         )
@@ -1276,6 +1277,7 @@ class App(tk.Frame):
         self.MakePreview(
             sprite_splitter.Composite,
             "left",
+            color=App.COLORS["preview-static"]["bg"],
             headfirst=headfirst,
             reverse=reverse,
         )
@@ -1291,6 +1293,7 @@ class App(tk.Frame):
         self.MakePreview(
             sprite_splitter.Composite,
             "right",
+            color=App.COLORS["preview-static"]["bg"],
             headfirst=headfirst,
             reverse=reverse,
         )

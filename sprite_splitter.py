@@ -382,7 +382,11 @@ def Process(head_path, body_path, head_offset, body_offset, head_data,
     }
 
 
-def Composite(head, body, offset=(0, 0), *,
+def Composite(head,
+              body,
+              offset=(0, 0),
+              *,
+              color=(0, 0, 0, 0),
               is_alpha=True,
               headfirst=True,
               reverse=False,
@@ -397,6 +401,7 @@ def Composite(head, body, offset=(0, 0), *,
     :param is_alpha:  Whether to make black pixels transparent. (Default True).
     :param headfirst: Whether to paste heads before bodies. (Default True).
     :param reverse:   Whether to invert layering order. (Default False).
+    :param idle_only: Whether to only composite idle frames. (Default False).
 
     :return: Composited image.
     """
@@ -429,8 +434,7 @@ def Composite(head, body, offset=(0, 0), *,
         w, h = COLOR_REGION[0], STATE_REGION[1] * (len(COLORS) + 1)
     else:
         w, h = COLOR_REGION[0], COLOR_REGION[1] * (len(COLORS) + 1)
-
-    outImage = MakeBlank(w, h)
+    outImage = MakeBlank(w, h, color=color)
 
     # Process each color
     for y, color in enumerate(COLORS):
@@ -454,27 +458,29 @@ def Composite(head, body, offset=(0, 0), *,
             SortedSet(
                 newData["head"]["idle"],
                 newData["body"]["idle"],
-                reverse=headOffsets.get(
-                    body, {}).get("reverse", False)),
+                reverse=headOffsets.get(body, {}).get("reverse", False),
+            ),
             headfirst=headfirst,
             reverse=reverse,
         )
 
-        # Composite left-moving frames
         if idle_only:
-            # Paste onto master spritesheet
+            # Paste idle frames onto master spritesheet
             Paste(
                 outImage,
                 newImage,
                 (0, y * STATE_REGION[1]),
             )
         else:
+            # Composite left-moving frames
             PasteLayers(
                 newImage,
                 newData["head"]["left"],
                 newData["body"]["left"],
-                SortedSet(newData["head"]["left"],
-                          newData["body"]["left"]),
+                SortedSet(
+                    newData["head"]["left"],
+                    newData["body"]["left"],
+                ),
                 headfirst=headfirst,
                 reverse=reverse,
             )
@@ -484,8 +490,10 @@ def Composite(head, body, offset=(0, 0), *,
                 newImage,
                 newData["head"]["right"],
                 newData["body"]["right"],
-                SortedSet(newData["head"]["right"],
-                          newData["body"]["right"]),
+                SortedSet(
+                    newData["head"]["right"],
+                    newData["body"]["right"],
+                ),
                 headfirst=headfirst,
                 reverse=reverse,
             )
@@ -500,10 +508,7 @@ def Composite(head, body, offset=(0, 0), *,
         # (Optional) Make grayscale based on purple sprite
         if color == "purple":
             newGray = cv2.cvtColor(
-                cv2.cvtColor(
-                    newImage,
-                    cv2.COLOR_BGR2GRAY,
-                ),
+                cv2.cvtColor(newImage, cv2.COLOR_BGR2GRAY),
                 cv2.COLOR_GRAY2BGR,
             )
 
@@ -515,17 +520,9 @@ def Composite(head, body, offset=(0, 0), *,
                 )
 
             if idle_only:
-                Paste(
-                    outImage,
-                    newGray,
-                    (0, (y + 1) * STATE_REGION[1]),
-                )
+                Paste(outImage, newGray, (0, (y + 1) * STATE_REGION[1]))
             else:
-                Paste(
-                    outImage,
-                    newGray,
-                    (0, (y + 1) * COLOR_REGION[1]),
-                )
+                Paste(outImage, newGray, (0, (y + 1) * COLOR_REGION[1]))
 
     # Save image to file
     return outImage

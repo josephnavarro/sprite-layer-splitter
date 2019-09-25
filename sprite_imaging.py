@@ -131,17 +131,26 @@ def IsGrayscale(color):
     return r == g == b
 
 
-def MakeBlank(w, h, channels=4):
+def MakeBlank(w, h, channels=4, *, color=(0, 0, 0, 0)):
     """
     Makes a blank image of the given size.
 
     :param w:        Width of output image.
     :param h:        Height of output image.
     :param channels: Number of color channels. (Default 4).
+    :param color:    RGBA color. (Default black).
 
     :return: Blank CV2-ready image.
     """
-    return np.zeros((h, w, channels), np.uint8)
+    image = np.zeros((h, w, channels), np.uint8)
+    if len(color) == 4:
+        fill = color[2], color[1], color[0], color[3]
+    elif len(color) == 3:
+        fill = color[2], color[1], color[0], 0
+    else:
+        fill = 0, 0, 0, 0
+    image[:, :] = fill
+    return image
 
 
 def MakeMask(image, thresh, maxval=255):
