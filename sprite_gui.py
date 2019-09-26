@@ -836,14 +836,17 @@ class App(tk.Frame):
 
         :return: None
         """
-        if self._Animation["playing"]:
+        isPlaying = self._Animation["playing"]
+        speed = self._Animation["speed"]
+
+        if isPlaying:
             self.UpdateCurrentFrame()
+
         self.UpdateOffsetLabels()
         self.UpdateAnimationImage()
 
         # Repeat if animation is active
-        speed = self._Animation["speed"]
-        if speed > 0:
+        if speed > 0 and isPlaying:
             self.after(1000 // speed, self.DoAnimate)
 
     def DoComposite(self, func, **kwargs):
@@ -1644,6 +1647,7 @@ class App(tk.Frame):
         self._Animation["playing"] = True
         self._Buttons["pause-button"].config(relief=tk.RAISED)
         self._Buttons["play-button"].config(relief=tk.SUNKEN)
+        self.DoAnimate()
 
     def TurnPlaybackOff(self):
         """
