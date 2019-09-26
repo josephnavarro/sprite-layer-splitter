@@ -1644,10 +1644,11 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._Animation["playing"] = True
-        self._Buttons["pause-button"].config(relief=tk.RAISED)
-        self._Buttons["play-button"].config(relief=tk.SUNKEN)
-        self.DoAnimate()
+        if self._Animation["objects"]:
+            self._Animation["playing"] = True
+            self._Buttons["pause-button"].config(relief=tk.RAISED)
+            self._Buttons["play-button"].config(relief=tk.SUNKEN)
+            self.DoAnimate()
 
     def TurnPlaybackOff(self):
         """
@@ -1655,9 +1656,10 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._Animation["playing"] = False
-        self._Buttons["pause-button"].config(relief=tk.SUNKEN)
-        self._Buttons["play-button"].config(relief=tk.RAISED)
+        if self._Animation["objects"]:
+            self._Animation["playing"] = False
+            self._Buttons["pause-button"].config(relief=tk.SUNKEN)
+            self._Buttons["play-button"].config(relief=tk.RAISED)
 
     def FrameForward(self):
         """
@@ -1667,16 +1669,18 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._Animation["playing"] = False
-        self._Buttons["pause-button"].config(relief=tk.SUNKEN)
-        self._Buttons["play-button"].config(relief=tk.RAISED)
+        if self._Animation["objects"]:
+            self._Animation["playing"] = False
+            self._Buttons["pause-button"].config(relief=tk.SUNKEN)
+            self._Buttons["play-button"].config(relief=tk.RAISED)
 
-        self._Animation["frame"] += 1
-        if self._Animation["frame"] >= 4:
-            self._Animation["frame"] = 0
+            self._Animation["frame"] += 1
+            if self._Animation["frame"] >= 4:
+                self._Animation["frame"] = 0
 
-        self.UpdateFrameCountLabel()
-        self.UpdateAnimationImage()
+            self.UpdateOffsetLabels()
+            self.UpdateFrameCountLabel()
+            self.UpdateAnimationImage()
 
     def FrameBackward(self):
         """
@@ -1686,15 +1690,18 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._Animation["playing"] = False
-        self._Buttons["pause-button"].config(relief=tk.SUNKEN)
-        self._Buttons["play-button"].config(relief=tk.RAISED)
+        if self._Animation["objects"]:
+            self._Animation["playing"] = False
+            self._Buttons["pause-button"].config(relief=tk.SUNKEN)
+            self._Buttons["play-button"].config(relief=tk.RAISED)
 
-        self._Animation["frame"] -= 1
-        if self._Animation["frame"] < 0:
-            self._Animation["frame"] = 3
-        self.UpdateFrameCountLabel()
-        self.UpdateAnimationImage()
+            self._Animation["frame"] -= 1
+            if self._Animation["frame"] < 0:
+                self._Animation["frame"] = 3
+
+            self.UpdateOffsetLabels()
+            self.UpdateFrameCountLabel()
+            self.UpdateAnimationImage()
 
     def UpdateBodyOffsetLabel(self, state, frame):
         """
