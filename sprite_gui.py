@@ -118,20 +118,23 @@ class App(tk.Frame):
 
     # Default widget dimensions
     SIZES = {
-        "preview-anim":   [96, 96],
-        "preview-resize": [384, 96],
-        "preview-static": [384, 96],
-        "play-button":    [32, 32],
-        "pause-button":   [32, 32],
+        "preview-anim":      [96, 96],
+        "preview-resize":    [384, 96],
+        "preview-static":    [384, 96],
+        "play-button":       [32, 32],
+        "pause-button":      [32, 32],
+        "skip-right-button": [32, 32],
+        "skip-left-button":  [32, 32],
     }
 
     if IsWindows():
         # Windows
-        SIZES["default-button"] = [27, 0]
-        SIZES["default-menu"] = [26, 0]
-        SIZES["default-slider"] = [272, 0]
+        SIZES["default-button"] = [36, 0]
+        SIZES["default-menu"] = [37, 0]
+        SIZES["default-slider"] = [256, 0]
         FONTSIZE_VARW = 13
         FONTSIZE_MONO = 10
+        FONTSIZE_SMALL = 9
         CANVAS_BORDER = 13
     else:
         # OS X / Linux
@@ -140,37 +143,40 @@ class App(tk.Frame):
         SIZES["default-slider"] = [248, 0]
         FONTSIZE_VARW = 13
         FONTSIZE_MONO = 14
+        FONTSIZE_SMALL = 9
         CANVAS_BORDER = 13
 
     GRID = {
-        "head-options":         [6, 0],
-        "select-head":          [7, 0],
-        "rebuild-head-images":  [8, 0],
-        "rebuild-head-data":    [9, 0],
-        "rebuild-head-offsets": [10, 0],
-        "destroy-head-images":  [11, 0],
+        "preview-frames-label": [1, 1],
+        "preview-anim-label":   [1, 2],
 
-        "body-options":         [12, 0],
-        "select-body":          [13, 0],
-        "rebuild-body-images":  [14, 0],
-        "rebuild-body-data":    [15, 0],
-        "rebuild-body-offsets": [16, 0],
-        "destroy-body-images":  [17, 0],
+        "head-options":         [7, 0],
+        "select-head":          [8, 0],
+        "rebuild-head-images":  [9, 0],
+        "rebuild-head-data":    [10, 0],
+        "rebuild-head-offsets": [11, 0],
+        "destroy-head-images":  [12, 0],
 
-        "preview-options":      [6, 1],
-        "preview-idle":         [7, 1],
-        "preview-left":         [8, 1],
-        "preview-right":        [9, 1],
-        "pingpong-animation":   [10, 1],
-        "reverse-layers":       [11, 1],
+        "body-options":         [13, 0],
+        "select-body":          [14, 0],
+        "rebuild-body-images":  [15, 0],
+        "rebuild-body-data":    [16, 0],
+        "rebuild-body-offsets": [17, 0],
+        "destroy-body-images":  [18, 0],
 
-        "export-options":       [12, 1],
-        "export-full":          [13, 1],
-        "export-idle":          [14, 1],
-        "prioritize-label":     [15, 1],
-        "prioritize-1":         [16, 1],
-        "prioritize-2":         [17, 1],
+        "preview-options":      [7, 1],
+        "preview-idle":         [8, 1],
+        "preview-left":         [9, 1],
+        "preview-right":        [10, 1],
+        "pingpong-animation":   [11, 1],
+        "reverse-layers":       [12, 1],
 
+        "export-options":       [13, 1],
+        "export-full":          [14, 1],
+        "export-idle":          [15, 1],
+        "prioritize-label":     [16, 1],
+        "prioritize-1":         [17, 1],
+        "prioritize-2":         [18, 1],
         "preview-static":       [0, 1],
         "preview-anim":         [0, 2],
         "speed-slider":         [1, 0],
@@ -181,10 +187,14 @@ class App(tk.Frame):
 
         "play-button":          [0, 1],
         "pause-button":         [0, 2],
+        "skip-right-button":    [0, 4],
+        "skip-left-button":     [0, 3],
     }
 
     # Padding for widgets
     PAD = {
+        "preview-frames-label": [0, 0],
+        "preview-anim-label":   [0, 0],
         "export-full":          [4, 4],
         "export-idle":          [4, 4],
         "export-options":       [4, 4],
@@ -196,6 +206,8 @@ class App(tk.Frame):
         "body-options":         [4, 4],
         "head-options":         [4, 4],
         "prioritize-label":     [4, 4],
+        "prioritize-1":         [0, 0],
+        "prioritize-2":         [0, 0],
         "preview-idle":         [4, 4],
         "preview-left":         [4, 4],
         "preview-right":        [4, 4],
@@ -209,10 +221,12 @@ class App(tk.Frame):
         "select-head":          [4, 4],
         "destroy-body-images":  [4, 4],
         "destroy-head-images":  [4, 4],
-        "pingpong-animation":   [12, 4],
-        "reverse-layers":       [12, 4],
+        "pingpong-animation":   [4, 0],
+        "reverse-layers":       [4, 0],
         "play-button":          [0, 0],
         "pause-button":         [0, 0],
+        "skip-right-button":    [0, 0],
+        "skip-left-button":     [0, 0],
     }
 
     # Preview composition dimensions
@@ -224,25 +238,28 @@ class App(tk.Frame):
 
     # Button and menu text labels
     LABELS = {
-        "export-options":       "Export",
+        "preview-frames-label": "Static frame preview",
+        "preview-anim-label":   "Animated preview",
+
+        "export-options":       "Export options",
         "export-full":          "Export all frames",
         "export-idle":          "Export idle frames",
 
-        "preview-options":      "Preview",
+        "preview-options":      "Preview options",
         "preview-idle":         "Preview idle frames",
         "preview-left":         "Preview left frames",
         "preview-right":        "Preview right frames",
         "pingpong-animation":   "Ping-pong animation",
         "reverse-layers":       "Reverse layering order",
 
-        "body-options":         "Body",
+        "body-options":         "Body options",
         "select-body":          "Select body",
         "rebuild-body-images":  "Remake body sources",
         "rebuild-body-data":    "Refresh body listing",
         "rebuild-body-offsets": "Refresh body offsets",
         "destroy-body-images":  "Clean body sources",
 
-        "head-options":         "Head",
+        "head-options":         "Head options",
         "select-head":          "Select head",
         "rebuild-head-images":  "Remake head sources",
         "rebuild-head-data":    "Refresh head listing",
@@ -260,11 +277,15 @@ class App(tk.Frame):
 
         "play-button":          "",
         "pause-button":         "",
+        "skip-right-button":    "",
+        "skip-left-button":     "",
     }
 
     IMAGES = {
-        "play-button":  os.path.join("misc", "play.png"),
-        "pause-button": os.path.join("misc", "pause.png"),
+        "play-button":       os.path.join("misc", "play.png"),
+        "pause-button":      os.path.join("misc", "pause.png"),
+        "skip-right-button": os.path.join("misc", "forward.png"),
+        "skip-left-button":  os.path.join("misc", "backward.png"),
     }
 
     COLORS = {
@@ -273,21 +294,22 @@ class App(tk.Frame):
         "preview-idle":         {"fg": [0, 0, 0], "bg": [200, 255, 212]},
         "preview-left":         {"fg": [0, 0, 0], "bg": [200, 255, 212]},
         "preview-right":        {"fg": [0, 0, 0], "bg": [200, 255, 212]},
-        "rebuild-body-data":    {"fg": [0, 0, 0], "bg": [255, 200, 200]},
-        "rebuild-body-images":  {"fg": [0, 0, 0], "bg": [255, 200, 200]},
-        "rebuild-body-offsets": {"fg": [0, 0, 0], "bg": [255, 200, 200]},
-        "destroy-body-images":  {"fg": [0, 0, 0], "bg": [255, 200, 200]},
-        "rebuild-head-data":    {"fg": [0, 0, 0], "bg": [200, 224, 255]},
-        "rebuild-head-images":  {"fg": [0, 0, 0], "bg": [200, 224, 255]},
-        "rebuild-head-offsets": {"fg": [0, 0, 0], "bg": [200, 224, 255]},
-        "destroy-head-images":  {"fg": [0, 0, 0], "bg": [200, 224, 255]},
+        "rebuild-body-data":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "rebuild-body-images":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "rebuild-body-offsets": {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "destroy-body-images":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "rebuild-head-data":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "rebuild-head-images":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "rebuild-head-offsets": {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "destroy-head-images":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "select-head":          {"fg": [0, 0, 0], "bg": [200, 224, 255]},
         "select-body":          {"fg": [0, 0, 0], "bg": [255, 200, 200]},
         "preview-static":       {"fg": [0, 0, 0], "bg": [128, 128, 128]},
         "preview-anim":         {"fg": [0, 0, 0], "bg": [128, 128, 128]},
-
-        "play-button":          {"fg": [0, 0, 0], "bg": [128, 128, 128]},
-        "pause-button":         {"fg": [0, 0, 0], "bg": [128, 128, 128]},
+        "play-button":          {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "pause-button":         {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "skip-right-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "skip-left-button":     {"fg": [0, 0, 0], "bg": [222, 222, 222]},
     }
 
     # Animation speed slider
@@ -432,27 +454,38 @@ class App(tk.Frame):
             "offsets": {},
         }
 
-        # Frames
+        # Widget-containing frames
         self._FrameTopleft = tk.Frame(self._Master)
-        self._FrameTopleft.grid(row=0, column=0)
+        self._FrameTopleft.grid(row=1, column=0)
 
         self._FrameTopRight = tk.Frame(self._FrameTopleft)
         self._FrameTopRight.grid(row=0, column=3)
 
-        self._FrameTop = tk.Frame(self._FrameTopRight, width=1, height=10)
-        self._FrameTop.grid(row=0, column=0)
+        self._FrameGroupTop = tk.Frame(self._FrameTopRight, width=1, height=10)
+        self._FrameGroupTop.grid(row=0, column=0)
 
-        self._FrameBottom = tk.Frame(self._Master)
-        self._FrameBottom.grid(row=2)
+        self._FrameGroupBot = tk.Frame(self._Master)
+        self._FrameGroupBot.grid(row=2)
 
-        self._FrameBottomRight = tk.Frame(self._FrameBottom)
-        self._FrameBottomRight.grid(column=1, row=1)
+        self._FrameBotRight = tk.Frame(self._FrameGroupBot)
+        self._FrameBotRight.grid(column=1, row=1)
 
-        self._FramePadBottom = tk.Frame(self._FrameBottom, height=10)
+        # Padding frames
+
+        self._FramePadBorder = tk.Frame(self._FrameGroupBot, height=10)
+        self._FramePadBorder.grid(row=6)
+
+        self._FramePadBottom = tk.Frame(self._FrameGroupBot, height=10)
         self._FramePadBottom.grid(row=24)
 
-        self._FramePadTop = tk.Frame(self._FrameTopleft, height=10)
-        self._FramePadTop.grid(row=1)
+        self._FramePadTopleft = tk.Frame(self._FrameTopleft, height=10)
+        self._FramePadTopleft.grid(row=1)
+
+        self._FramePadTopleft = tk.Frame(self._FrameTopleft, height=10)
+        self._FramePadTopleft.grid(row=2)
+
+        self._FramePadTop = tk.Frame(self._Master, height=10)
+        self._FramePadTop.grid(row=0)
 
         # Boolean variables
         self._BooleanVars = {
@@ -484,6 +517,8 @@ class App(tk.Frame):
             "destroy-head-images":  tk.Button(),
             "play-button":          tk.Button(),
             "pause-button":         tk.Button(),
+            "skip-right-button":    tk.Button(),
+            "skip-left-button":     tk.Button(),
         }
 
         # Canvases
@@ -507,12 +542,12 @@ class App(tk.Frame):
         # Menus
         self._Menus = {
             "select-head": tk.OptionMenu(
-                self._FrameBottom,
+                self._FrameGroupBot,
                 self._StringVars["select-head"],
                 *self._Head["list"]
             ),
             "select-body": tk.OptionMenu(
-                self._FrameBottom,
+                self._FrameGroupBot,
                 self._StringVars["select-body"],
                 *self._Body["list"]
             ),
@@ -520,15 +555,17 @@ class App(tk.Frame):
 
         # Labels
         self._Labels = {
-            "offset-head":      tk.Label(),
-            "offset-body":      tk.Label(),
-            "speed-anim":       tk.Label(),
-            "frame-anim":       tk.Label(),
-            "prioritize-label": tk.Label(),
-            "head-options":     tk.Label(),
-            "body-options":     tk.Label(),
-            "preview-options":  tk.Label(),
-            "export-options":   tk.Label(),
+            "preview-frames-label": tk.Label(),
+            "preview-anim-label":   tk.Label(),
+            "offset-head":          tk.Label(),
+            "offset-body":          tk.Label(),
+            "speed-anim":           tk.Label(),
+            "frame-anim":           tk.Label(),
+            "prioritize-label":     tk.Label(),
+            "head-options":         tk.Label(),
+            "body-options":         tk.Label(),
+            "preview-options":      tk.Label(),
+            "export-options":       tk.Label(),
         }
 
         # Sliders
@@ -539,20 +576,20 @@ class App(tk.Frame):
         self.InitDataBody()
 
         self.InitLabel(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "export-options",
             ("sans-serif", App.FONTSIZE_VARW, "bold"),
             tk.NS,
         )
 
         self.InitButton(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "export-idle",
             lambda: self.ExportFrames(idle_only=True),
         )
 
         self.InitButton(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "export-full",
             lambda: self.ExportFrames(),
         )
@@ -562,178 +599,205 @@ class App(tk.Frame):
         self.InitSliderFramerate()
 
         self.InitLabel(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "speed-anim",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0,
         )
 
         self.InitLabel(
-            self._FrameBottom,
+            self._FrameTopleft,
+            "preview-frames-label",
+            ("arial", App.FONTSIZE_SMALL),
+            tk.W
+        )
+
+        self.InitLabel(
+            self._FrameTopleft,
+            "preview-anim-label",
+            ("arial", App.FONTSIZE_SMALL),
+            tk.W
+        )
+
+        self.InitLabel(
+            self._FrameGroupBot,
             "frame-anim",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0, 1, 2, 3,
         )
 
         self.InitLabel(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "offset-head",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0, 0,
         )
 
         self.InitLabel(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "offset-body",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0, 0,
         )
 
         self.InitLabel(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "preview-options",
             ("sans-serif", App.FONTSIZE_VARW, "bold"),
             tk.NS,
         )
 
         self.InitButton(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "preview-idle",
             self.MakeIdlePreview,
         )
 
         self.InitButton(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "preview-left",
             self.MakeLeftPreview,
         )
 
         self.InitButton(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "preview-right",
             self.MakeRightPreview,
         )
 
         self.InitLabel(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "body-options",
             ("sans-serif", App.FONTSIZE_VARW, "bold"),
             tk.NS,
         )
 
         self.InitButton(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "rebuild-body-data",
             self.RebuildBodyData,
         )
 
         self.InitButton(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "rebuild-body-images",
             self.RebuildBodyImages,
         )
 
         self.InitButton(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "rebuild-body-offsets",
             self.RebuildBodyOffsets,
         )
 
         self.InitButton(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "destroy-body-images",
             self.DestroyBodyImages,
         )
 
         self.InitLabel(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "head-options",
             ("sans-serif", App.FONTSIZE_VARW, "bold"),
             tk.NS,
         )
 
         self.InitButton(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "rebuild-head-data",
             self.RebuildHeadData,
         )
 
         self.InitButton(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "rebuild-head-images",
             self.RebuildHeadImages,
         )
 
         self.InitButton(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "rebuild-head-offsets",
             self.RebuildHeadOffsets,
         )
 
         self.InitButton(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "destroy-head-images",
             self.DestroyHeadImages,
         )
 
         self.InitButton(
-            self._FrameBottomRight,
+            self._FrameBotRight,
             "play-button",
             self.TurnPlaybackOn,
         )
 
         self.InitButton(
-            self._FrameBottomRight,
+            self._FrameBotRight,
             "pause-button",
             self.TurnPlaybackOff,
+            relief=tk.SUNKEN,
+        )
+
+        self.InitButton(
+            self._FrameBotRight,
+            "skip-right-button",
+            self.FrameForward,
+        )
+
+        self.InitButton(
+            self._FrameBotRight,
+            "skip-left-button",
+            self.FrameBackward,
         )
 
         self.InitMenu(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "select-head",
             self._Head["list"],
         )
 
         self.InitMenu(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "select-body",
             self._Body["list"],
         )
 
         self.InitCheckbox(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "pingpong-animation",
             tk.W,
         )
 
         self.InitCheckbox(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "reverse-layers",
             tk.W,
         )
 
         self.InitLabel(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "prioritize-label",
             ("sans-serif", App.FONTSIZE_VARW, "bold"),
             tk.NS,
         )
 
         self.InitRadio(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "prioritize-1",
             self._StringVars["prioritize"],
             "Head",
-            tk.NS,
+            tk.W,
             select=True,
         )
 
         self.InitRadio(
-            self._FrameBottom,
+            self._FrameGroupBot,
             "prioritize-2",
             self._StringVars["prioritize"],
             "Body",
-            tk.NS,
+            tk.W,
         )
 
         # Kill iTunes instance on Mac (if any)
@@ -929,13 +993,14 @@ class App(tk.Frame):
             App.CANVAS_BORDER,
         )
 
-    def InitButton(self, master, tag, command):
+    def InitButton(self, master, tag, command, relief=tk.RAISED):
         """
         Locally initializes a button.
 
         :param master:  Tkinter root frame for button.
         :param tag:     Tag of button to initialize.
         :param command: Callback function for button.
+        :param relief:  Initial button relief. (Default tk.RAISED).
 
         :return: None.
         """
@@ -948,7 +1013,7 @@ class App(tk.Frame):
         # Image object
         path = App.IMAGES.get(tag, "")
         if path:
-            image = sprite_imaging.OpenTkinter(path)
+            image = sprite_imaging.OpenTkinter(path, width, height)
         else:
             image = None
 
@@ -968,6 +1033,7 @@ class App(tk.Frame):
             activebackground=background,
             activeforeground=foreground,
             image=image,
+            relief=relief,
         )
 
         button.grid(
@@ -1156,10 +1222,13 @@ class App(tk.Frame):
             variable=variable,
             value=value,
         )
+
         radio.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
             sticky=sticky,
+            padx=App.PAD[tag][0],
+            pady=App.PAD[tag][1],
         )
 
         if select:
@@ -1177,7 +1246,7 @@ class App(tk.Frame):
         :return: None.
         """
         scale = tk.Scale(
-            self._FrameBottom,
+            self._FrameGroupBot,
             from_=App.SPEED_SCALE_MIN,
             to=App.SPEED_SCALE_MAX,
             orient=tk.HORIZONTAL,
@@ -1382,7 +1451,7 @@ class App(tk.Frame):
             CreateBodyJSON()
             self.InitDataBody()
             self.InitMenu(
-                self._FrameBottom,
+                self._FrameGroupBot,
                 "select-body",
                 self._Body["list"],
             )
@@ -1466,7 +1535,7 @@ class App(tk.Frame):
             CreateHeadJSON()
             self.InitDataHead()
             self.InitMenu(
-                self._FrameBottom,
+                self._FrameGroupBot,
                 "select-head",
                 self._Head["list"],
             )
@@ -1572,8 +1641,38 @@ class App(tk.Frame):
         :return: None.
         """
         self._Animation["playing"] = False
-        self._Buttons["pause-button"].config(relief=tk.RAISED)
-        self._Buttons["play-button"].config(relief=tk.SUNKEN)
+        self._Buttons["pause-button"].config(relief=tk.SUNKEN)
+        self._Buttons["play-button"].config(relief=tk.RAISED)
+
+    def FrameForward(self):
+        """
+        Turns animation playing off.
+
+        :return: None.
+        """
+        self._Animation["playing"] = False
+        self._Buttons["pause-button"].config(relief=tk.SUNKEN)
+        self._Buttons["play-button"].config(relief=tk.RAISED)
+
+        self._Animation["frame"] += 1
+        if self._Animation["frame"] >= 4:
+            self._Animation["frame"] = 0
+        self.UpdateFrameCountLabel()
+
+    def FrameBackward(self):
+        """
+        Turns animation playing off.
+
+        :return: None.
+        """
+        self._Animation["playing"] = False
+        self._Buttons["pause-button"].config(relief=tk.SUNKEN)
+        self._Buttons["play-button"].config(relief=tk.RAISED)
+
+        self._Animation["frame"] -= 1
+        if self._Animation["frame"] < 0:
+            self._Animation["frame"] = 3
+        self.UpdateFrameCountLabel()
 
     def UpdateBodyOffsetLabel(self, state, frame):
         """

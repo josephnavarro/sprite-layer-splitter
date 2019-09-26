@@ -108,16 +108,18 @@ def ToTkinter(image):
     return ImageTk.PhotoImage(image)
 
 
-def OpenTkinter(path):
+def OpenTkinter(path, w, h):
     """
     Docstring goes here.
 
-    :param path:
+    :param path: Path to image file.
+    :param w:    Width of image.
+    :param h:    Height of image.
 
-    :return:
+    :return: Tkinter PhotoImage instance.
     """
     image = Image.open(path)
-    return ImageTk.PhotoImage(image.resize((16, 16), Image.ANTIALIAS))
+    return ImageTk.PhotoImage(image.resize((w, h), Image.ANTIALIAS))
 
 
 def ToPILToTkinter(image):
