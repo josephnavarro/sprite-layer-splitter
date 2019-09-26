@@ -407,7 +407,7 @@ def Composite(head,
     """
     # Load head compositing data from JSON
     headOffsets = LoadHeadOffsets()
-    headPaths = LoadHeadPaths()
+    headPaths = LoadPaths("head")
     if not head:
         headPath = ""
     else:
@@ -417,7 +417,7 @@ def Composite(head,
 
     # Load body compositing data from JSON
     bodyOffsets = LoadBodyOffsets()
-    bodyPaths = LoadBodyPaths()
+    bodyPaths = LoadPaths("body")
     if not body:
         bodyPath = ""
     else:

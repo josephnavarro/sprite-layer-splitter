@@ -76,12 +76,18 @@ class App(tk.Frame):
     MESSAGES = {
         "confirm": {
             "rebuild": {
-                "bdat": "Refresh list of available bodies?",
-                "bimg": "Remake source images for body sprites?",
-                "boff": "Refresh body sprite offsets?",
-                "hdat": "Refresh list of available heads?",
-                "himg": "Remake source images for head sprites?",
-                "hoff": "Refresh head sprite offsets?",
+                "data": {
+                    "body": "Refresh list of available bodies?",
+                    "head": "Refresh list of available heads?",
+                },
+                "image": {
+                    "body": "Remake source images for body sprites?",
+                    "head": "Remake source images for head sprites?",
+                },
+                "offset": {
+                    "body": "Refresh body sprite offsets?",
+                    "head": "Refresh head sprite offsets?",
+                },
             },
             "destroy": {
                 "head": "Delete source images for head sprites?",
@@ -103,12 +109,18 @@ class App(tk.Frame):
                 "head": "Error: Head spritesheet {} does not exist!",
             },
             "rebuild": {
-                "bimg": "Succssfully reconstructed body source images.",
-                "bdat": "Reassembled list of available bodies.",
-                "boff": "Successfully reloaded per-frame body offsets.",
-                "himg": "Successfully reconstructed head source images.",
-                "hdat": "Reassembled list of available heads.",
-                "hoff": "Successfully reloaded per-frame head offsets.",
+                "image": {
+                    "body": "Succssfully reconstructed body source images.",
+                    "head": "Successfully reconstructed head source images.",
+                },
+                "data": {
+                    "body": "Reassembled list of available bodies.",
+                    "head": "Reassembled list of available heads.",
+                },
+                "offset": {
+                    "body": "Successfully reloaded per-frame body offsets.",
+                    "head": "Successfully reloaded per-frame head offsets.",
+                },
             },
             "success": {
                 "full": "Sprite frames saved to {}!",
@@ -448,8 +460,6 @@ class App(tk.Frame):
             self.KillITunes()
 
         # Initialize local non-widget data
-        self._ImageObject = None
-
         self._Animation = {
             "image":   None,
             "init":    False,
@@ -462,18 +472,19 @@ class App(tk.Frame):
 
         }
 
-        self._Body = {
-            "current": {},
-            "data":    {},
-            "list":    [""],
-            "offsets": {},
-        }
-
-        self._Head = {
-            "current": {},
-            "data":    {},
-            "list":    [""],
-            "offsets": {},
+        self._Data = {
+            "body": {
+                "current": {},
+                "data":    {},
+                "list":    [""],
+                "offset": {},
+            },
+            "head": {
+                "current": {},
+                "data":    {},
+                "list":    [""],
+                "offset": {},
+            },
         }
 
         # Widget-containing frames
@@ -569,12 +580,12 @@ class App(tk.Frame):
             "select-head": tk.OptionMenu(
                 self._FrameGroupBot,
                 self._StringVars["select-head"],
-                *self._Head["list"]
+                *self._Data["head"]["list"]
             ),
             "select-body": tk.OptionMenu(
                 self._FrameGroupBot,
                 self._StringVars["select-body"],
-                *self._Body["list"]
+                *self._Data["body"]["list"]
             ),
         }
 
@@ -597,8 +608,8 @@ class App(tk.Frame):
         self._ScaleAnimSpeed = tk.Scale()
 
         # Complete widget initialization
-        self.InitDataHead()
-        self.InitDataBody()
+        self.InitData("head")
+        self.InitData("body")
         self.InitAllButtons()
         self.InitAllCanvases()
         self.InitAllCheckboxes()
@@ -783,7 +794,7 @@ class App(tk.Frame):
         """
         body = self._StringVars["select-body"].get()
         if body != App.DEFAULT_NAME:
-            return self._Body.get("data", {}).get(body, "")
+            return self._Data["body"].get("data", {}).get(body, "")
         else:
             return ""
 
@@ -795,7 +806,7 @@ class App(tk.Frame):
         """
         head = self._StringVars["select-head"].get()
         if head != App.DEFAULT_NAME:
-            return self._Head.get("data", {}).get(head, "")
+            return self._Data["head"].get("data", {}).get(head, "")
         else:
             return ""
 
@@ -1074,14 +1085,14 @@ class App(tk.Frame):
         self.InitMenu(
             self._FrameGroupBot,
             "select-head",
-            self._Head["list"],
+            self._Data["head"]["list"],
         )
 
         # Initialize "select body" dropdown menu
         self.InitMenu(
             self._FrameGroupBot,
             "select-body",
-            self._Body["list"],
+            self._Data["body"]["list"],
         )
 
     def InitAllRadioButtons(self):
@@ -1169,6 +1180,7 @@ class App(tk.Frame):
 
         :return: None.
         """
+        # Create canvas
         canvas = tk.Canvas(
             master,
             width=App.SIZES[tag][0],
@@ -1178,6 +1190,7 @@ class App(tk.Frame):
             borderwidth=border,
         )
 
+        # Position canvas
         canvas.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
@@ -1185,6 +1198,7 @@ class App(tk.Frame):
             pady=App.PAD[tag][1],
         )
 
+        # Replace local canvas
         self._Canvases[tag].destroy()
         self._Canvases[tag] = canvas
 
@@ -1199,53 +1213,44 @@ class App(tk.Frame):
 
         :return: None.
         """
+        # Create checkbox
         checkbox = tk.Checkbutton(
             master,
             text=App.LABELS[tag],
             variable=self._BooleanVars[tag],
         )
 
+        # Position checkbox
         checkbox.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
-            sticky=sticky,
             padx=App.PAD[tag][0],
             pady=App.PAD[tag][1],
+            sticky=sticky,
         )
 
         if command is not None:
             checkbox.config(command=command)
 
+        # Replace local checkbox
         self._Checkboxes[tag].destroy()
         self._Checkboxes[tag] = checkbox
 
-    def InitDataBody(self):
+    def InitData(self, key):
         """
-        Completes initialization of body data (from file).
+        Completes initialization of data from file.
+
+        :param key: Either of "head" or "body".
 
         :return: None.
         """
-        data = self._Body["data"] = {
+        data = self._Data[key]["data"] = {
             v.get("name", "---"): k
-            for k, v in LoadBodyPaths().items()
+            for k, v in LoadPaths(key).items()
         }
 
-        self._Body["list"] = [App.DEFAULT_NAME] + sorted(list(data))
-        self._Body["offsets"] = LoadBodyOffsets()
-
-    def InitDataHead(self):
-        """
-        Completes initialization of head data (from file).
-
-        :return: None.
-        """
-        data = self._Head["data"] = {
-            v.get("name", "---"): k
-            for k, v in LoadHeadPaths().items()
-        }
-
-        self._Head["list"] = [App.DEFAULT_NAME] + sorted(list(data))
-        self._Head["offsets"] = LoadHeadOffsets()
+        self._Data[key]["list"] = [App.DEFAULT_NAME] + sorted(list(data))
+        self._Data[key]["offset"] = LoadBodyOffsets()
 
     def InitLabel(self, master, tag, font, sticky, *args):
         """
@@ -1452,7 +1457,7 @@ class App(tk.Frame):
         try:
             # Perform sprite composition
             self._Animation["state"] = state
-            self._Head["offsets"] = LoadHeadOffsets()
+            self._Data["head"]["offset"] = LoadHeadOffsets()
 
             head, body, image = self.DoComposite(func, **kwargs)
             if image is not None:
@@ -1477,15 +1482,15 @@ class App(tk.Frame):
 
                     try:
                         # Populate per-frame head offset data
-                        self._Head["current"] = self._Head["offsets"][body]
+                        self._Data["head"]["current"] = self._Data["head"]["offset"][body]
                     except KeyError:
-                        self._Head["current"] = {}
+                        self._Data["head"]["current"] = {}
 
                     try:
                         # Populate per-frame body offset data
-                        self._Body["current"] = self._Body["offsets"][body]
+                        self._Data["body"]["current"] = self._Data["body"]["offset"][body]
                     except KeyError:
-                        self._Body["current"] = {}
+                        self._Data["body"]["current"] = {}
 
                     self.UpdateOffsetLabels()
 
@@ -1560,20 +1565,20 @@ class App(tk.Frame):
         :return: None
         """
         title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["bdat"]
+        query = App.MESSAGES["confirm"]["rebuild"]["data"]["body"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             CreateBodyJSON()
-            self.InitDataBody()
+            self.InitData("body")
             self.InitMenu(
                 self._FrameGroupBot,
                 "select-body",
-                self._Body["list"],
+                self._Data["body"]["list"],
             )
 
             tk.messagebox.showinfo(
                 title,
-                App.MESSAGES["message"]["rebuild"]["bdat"],
+                App.MESSAGES["message"]["rebuild"]["data"]["body"],
             )
 
     # noinspection PyMethodMayBeStatic
@@ -1584,13 +1589,13 @@ class App(tk.Frame):
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["bimg"]
+        query = App.MESSAGES["confirm"]["rebuild"]["image"]["body"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             PrepareBody()
             tk.messagebox.showinfo(
                 title,
-                App.MESSAGES["message"]["rebuild"]["bimg"],
+                App.MESSAGES["message"]["rebuild"]["image"]["body"],
             )
 
     def RebuildBodyOffsets(self):
@@ -1600,16 +1605,16 @@ class App(tk.Frame):
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["boff"]
+        query = App.MESSAGES["confirm"]["rebuild"]["offset"]["body"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            self._Body["offsets"] = LoadBodyOffsets()
+            self._Data["body"]["offset"] = LoadBodyOffsets()
             self.UpdateOffsetLabels()
             self.DoMakePreview()
 
             tk.messagebox.showinfo(
                 title,
-                App.MESSAGES["message"]["rebuild"]["boff"],
+                App.MESSAGES["message"]["rebuild"]["offset"]["body"],
             )
 
     def RebuildHeadData(self):
@@ -1619,20 +1624,20 @@ class App(tk.Frame):
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["hdat"]
+        query = App.MESSAGES["confirm"]["rebuild"]["data"]["head"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             CreateHeadJSON()
-            self.InitDataHead()
+            self.InitData("head")
             self.InitMenu(
                 self._FrameGroupBot,
                 "select-head",
-                self._Head["list"],
+                self._Data["head"]["list"],
             )
 
             tk.messagebox.showinfo(
                 title,
-                App.MESSAGES["message"]["rebuild"]["hdat"],
+                App.MESSAGES["message"]["rebuild"]["head"]["data"],
             )
 
     # noinspection PyMethodMayBeStatic
@@ -1643,13 +1648,13 @@ class App(tk.Frame):
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["himg"]
+        query = App.MESSAGES["confirm"]["rebuild"]["image"]["head"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             PrepareHead()
             tk.messagebox.showinfo(
                 title,
-                App.MESSAGES["message"]["rebuild"]["himg"],
+                App.MESSAGES["message"]["rebuild"]["image"]["head"],
             )
 
     def RebuildHeadOffsets(self):
@@ -1659,16 +1664,16 @@ class App(tk.Frame):
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["hoff"]
+        query = App.MESSAGES["confirm"]["rebuild"]["offset"]["head"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            self._Head["offsets"] = LoadHeadOffsets()
+            self._Data["head"]["offset"] = LoadHeadOffsets()
             self.UpdateOffsetLabels()
             self.DoMakePreview()
 
             tk.messagebox.showinfo(
                 title,
-                App.MESSAGES["message"]["rebuild"]["hoff"],
+                App.MESSAGES["message"]["rebuild"]["offset"]["head"],
             )
 
     # noinspection PyMethodMayBeStatic
@@ -1693,8 +1698,8 @@ class App(tk.Frame):
 
         :return:
         """
-        self._StringVars["select-body"].set(random.choice(self._Body["list"]))
-        self._StringVars["select-head"].set(random.choice(self._Head["list"]))
+        self._StringVars["select-body"].set(random.choice(self._Data["body"]["list"]))
+        self._StringVars["select-head"].set(random.choice(self._Data["head"]["list"]))
         self.DoMakePreview()
 
     def TurnPlaybackOn(self):
@@ -1776,7 +1781,7 @@ class App(tk.Frame):
         try:
             self._Labels["offset-body"].config(
                 text=App.LABELS["offset-body"].format(
-                    *self._Body["current"]["offset"][state][frame]
+                    *self._Data["body"]["current"]["offset"][state][frame]
                 )
             )
 
@@ -1853,7 +1858,7 @@ class App(tk.Frame):
         try:
             self._Labels["offset-head"].config(
                 text=App.LABELS["offset-head"].format(
-                    *self._Head["current"]["offset"][state][frame]
+                    *self._Data["head"]["current"]["offset"][state][frame]
                 )
             )
 

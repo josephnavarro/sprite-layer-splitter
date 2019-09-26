@@ -112,8 +112,20 @@ def CreateBodyJSON():
     with open(JSONS["paths"]["body"], "w") as f:
         f.write(contents)
 
+def LoadPaths(key):
+    """
+    Loads and returns relative filepaths to spritesheets.
 
-def LoadHeadPaths():
+    :param key: Either of "head" or "body".
+
+    :return: Dictionary containing spritesheet filepaths.
+    """
+    with open(JSONS["paths"][key], "r") as f:
+        data = json.load(f)
+    return data
+
+
+def _LoadHeadPaths():
     """
     Loads and returns relative filepaths to character head spritesheets.
 
@@ -124,7 +136,7 @@ def LoadHeadPaths():
     return data
 
 
-def LoadBodyPaths():
+def _LoadBodyPaths():
     """
     Loads and returns relative filepaths to character body spritesheets.
 
