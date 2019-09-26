@@ -619,6 +619,7 @@ class App(tk.Frame):
         self.InitPreviewAnim()
         self.InitSliderFramerate()
 
+        # Initialize "animation speed" label
         self.InitLabel(
             self._FrameBotLeft,
             "speed-anim",
@@ -626,6 +627,7 @@ class App(tk.Frame):
             tk.W, 0,
         )
 
+        # Initialize "static frames preview" label
         self.InitLabel(
             self._FrameGroupTop,
             "preview-frames-label",
@@ -633,6 +635,7 @@ class App(tk.Frame):
             tk.W
         )
 
+        # Initialize "animated preview" label
         self.InitLabel(
             self._FrameGroupTop,
             "preview-anim-label",
@@ -640,6 +643,7 @@ class App(tk.Frame):
             tk.W
         )
 
+        # Initialize "current animation frame" label
         self.InitLabel(
             self._FrameBotLeft,
             "frame-anim",
@@ -686,6 +690,7 @@ class App(tk.Frame):
             self.MakeRightPreview,
         )
 
+        # Initialize "body options" label
         self.InitLabel(
             self._FrameGroupBot,
             "body-options",
@@ -693,30 +698,35 @@ class App(tk.Frame):
             tk.NS,
         )
 
+        # Initialize "rebuild body data" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-body-data",
             self.RebuildBodyData,
         )
 
+        # Initialize "rebuild body images" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-body-images",
             self.RebuildBodyImages,
         )
 
+        # Initialize "rebuild body offsets" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-body-offsets",
             self.RebuildBodyOffsets,
         )
 
+        # Initialize "destroy body images" button
         self.InitButton(
             self._FrameGroupBot,
             "destroy-body-images",
             self.DestroyBodyImages,
         )
 
+        # Initialize "head options" label
         self.InitLabel(
             self._FrameGroupBot,
             "head-options",
@@ -724,36 +734,42 @@ class App(tk.Frame):
             tk.NS,
         )
 
+        # Initialize "rebuild head data" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-head-data",
             self.RebuildHeadData,
         )
 
+        # Initialize "rebuild head images" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-head-images",
             self.RebuildHeadImages,
         )
 
+        # Initialize "rebuild head offsets" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-head-offsets",
             self.RebuildHeadOffsets,
         )
 
+        # Initialize "destroy head images" button
         self.InitButton(
             self._FrameGroupBot,
             "destroy-head-images",
             self.DestroyHeadImages,
         )
 
+        # Initialize "play animation" button
         self.InitButton(
             self._FrameBotRight,
             "play-button",
             self.TurnPlaybackOn,
         )
 
+        # Initialize "pause animation" button
         self.InitButton(
             self._FrameBotRight,
             "pause-button",
@@ -761,24 +777,28 @@ class App(tk.Frame):
             relief=tk.SUNKEN,
         )
 
+        # Initialize "skip frame right" button
         self.InitButton(
             self._FrameBotRight,
             "skip-right-button",
             self.FrameForward,
         )
 
+        # Initialize "skip frame left" button
         self.InitButton(
             self._FrameBotRight,
             "skip-left-button",
             self.FrameBackward,
         )
 
+        # Initialize "shuffle" button
         self.InitButton(
             self._FrameBotRight,
             "shuffle-button",
             self.ShuffleAll,
         )
 
+        # Initialize "select head" dropdown menu
         self.InitMenu(
             self._FrameGroupBot,
             "select-head",
@@ -875,31 +895,17 @@ class App(tk.Frame):
 
         :return: Tuple of head key, body key, and numpy image.
         """
-        headKey = ""
-        bodyKey = ""
+        head = ""
+        body = ""
+        im = None
 
         try:
-            try:
-                # Get head key
-                headName = self._StringVars["select-head"].get()
-                if headName != App.DEFAULT_NAME:
-                    headKey = self._Head["data"][headName]
-            except KeyError:
-                # raise UnspecifiedHeadException
-                pass
-
-            try:
-                # Get body key
-                bodyName = self._StringVars["select-body"].get()
-                if bodyName != App.DEFAULT_NAME:
-                    bodyKey = self._Body["data"][bodyName]
-            except KeyError:
-                # raise UnspecifiedBodyException
-                pass
+            head = self.GetHeadKey()
+            body = self.GetBodyKey()
 
             try:
                 # Perform sprite composition
-                return headKey, bodyKey, func(headKey, bodyKey, **kwargs)
+                im = func(head, body, **kwargs)
             except sprite_splitter.NonexistentHeadException as e:
                 raise InvalidHeadException(e.filename)
             except sprite_splitter.NonexistentBodyException as e:
@@ -907,18 +913,6 @@ class App(tk.Frame):
             except cv2.error:
                 raise InvalidFilenameException
 
-        except UnspecifiedHeadException:
-            # Head not specified
-            tk.messagebox.showinfo(
-                App.WINDOW_TITLE,
-                App.MESSAGES["message"]["failure"]["head"],
-            )
-        except UnspecifiedBodyException:
-            # Body not specified
-            tk.messagebox.showinfo(
-                App.WINDOW_TITLE,
-                App.MESSAGES["message"]["failure"]["body"],
-            )
         except InvalidHeadException as e:
             # Head spritesheet does not exist
             tk.messagebox.showinfo(
@@ -932,7 +926,7 @@ class App(tk.Frame):
                 App.MESSAGES["message"]["invalid"]["body"].format(e.filename),
             )
 
-        return headKey, bodyKey, None
+        return head, body, im
 
     def DoMakePreview(self):
         """
@@ -940,13 +934,14 @@ class App(tk.Frame):
 
         :return: None.
         """
-        state = self._Animation["state"]
-        if state == STATES.idle:
-            self.MakeIdlePreview()
-        elif state == STATES.left:
-            self.MakeLeftPreview()
-        elif state == STATES.right:
-            self.MakeRightPreview()
+        self.TurnPlaybackOff()
+        self.MakePreview(
+            sprite_splitter.Composite,
+            str(self._Animation["state"]),
+            color=App.COLORS["preview-static"]["bg"],
+            headfirst=(self._StringVars["prioritize"].get() == "Head"),
+            reverse=self._BooleanVars["reverse-layers"].get(),
+        )
 
     def Export(self, func, message, **kwargs):
         """
@@ -1025,6 +1020,28 @@ class App(tk.Frame):
             reverse=reverse,
             idle_only=idle_only,
         )
+
+    def GetHeadKey(self):
+        """
+
+        :return:
+        """
+        headName = self._StringVars["select-head"].get()
+        if headName != App.DEFAULT_NAME:
+            return self._Head.get("data", {}).get(headName, "")
+        else:
+            return ""
+
+    def GetBodyKey(self):
+        """
+
+        :return:
+        """
+        bodyName = self._StringVars["select-body"].get()
+        if bodyName != App.DEFAULT_NAME:
+            return self._Body.get("data", {}).get(bodyName, "")
+        else:
+            return ""
 
     def InitPreviewAnim(self):
         """
@@ -1200,6 +1217,7 @@ class App(tk.Frame):
             font=font,
             text=text,
         )
+
         label.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
@@ -1232,6 +1250,7 @@ class App(tk.Frame):
             self._StringVars[tag],
             *options
         )
+
         menu.config(
             width=width,
             foreground=foreground,
@@ -1239,6 +1258,7 @@ class App(tk.Frame):
             activebackground=background,
             activeforeground=foreground,
         )
+
         menu.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
@@ -1347,12 +1367,15 @@ class App(tk.Frame):
         self._Animation["frame"] = 0
         self._Animation["forward"] = True
         self._Animation["speed"] = self._ScaleAnimSpeed.get()
+
+        # Create preview image
         self._Canvases["preview-anim"].create_image(
             (16, 16),
             anchor=tk.NW,
             image=self._Animation["objects"][0],
         )
 
+        # Update labels
         self.UpdateOffsetLabels()
         self.UpdateFrameCountLabel()
 
@@ -1442,6 +1465,8 @@ class App(tk.Frame):
 
         :return: None
         """
+        self.TurnPlaybackOff()
+
         reverse = self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
         self.MakePreview(
@@ -1458,6 +1483,8 @@ class App(tk.Frame):
 
         :return: None
         """
+        self.TurnPlaybackOff()
+
         reverse = self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
         self.MakePreview(
@@ -1474,6 +1501,8 @@ class App(tk.Frame):
 
         :return: None
         """
+        self.TurnPlaybackOff()
+
         reverse = self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
         self.MakePreview(
@@ -1628,30 +1657,13 @@ class App(tk.Frame):
         self._StringVars["select-head"].set(random.choice(self._Head["list"]))
         self.DoMakePreview()
 
-    # noinspection PyUnusedLocal
-    def ToggleLayerOrder(self, event):
-        """
-        Callback function. Toggles sprite compositing layer order.
-
-        :param event: Tkinter event.
-
-        :return: None.
-        """
-        if self._Animation["objects"]:
-            state = self._Animation["state"]
-            if state == STATES.idle:
-                self.MakeIdlePreview()
-            elif state == STATES.left:
-                self.MakeLeftPreview()
-            elif state == STATES.right:
-                self.MakeRightPreview()
-
     def TurnPlaybackOn(self):
         """
         Turns animation playing on.
 
         :return: None.
         """
+        self.DoMakePreview()
         if self._Animation["objects"]:
             self._Animation["playing"] = True
             self._Buttons["pause-button"].config(relief=tk.RAISED)
