@@ -125,6 +125,7 @@ class App(tk.Frame):
         "pause-button":      [32, 32],
         "skip-right-button": [32, 32],
         "skip-left-button":  [32, 32],
+        "shuffle-button":    [32, 32],
     }
 
     if IsWindows():
@@ -187,46 +188,59 @@ class App(tk.Frame):
 
         "play-button":          [0, 1],
         "pause-button":         [0, 2],
-        "skip-right-button":    [0, 4],
         "skip-left-button":     [0, 3],
+        "skip-right-button":    [0, 4],
+        "shuffle-button":       [0, 5],
     }
 
     # Padding for widgets
     PAD = {
         "preview-frames-label": [0, 0],
         "preview-anim-label":   [0, 0],
+
         "export-full":          [4, 4],
         "export-idle":          [4, 4],
         "export-options":       [4, 4],
+
         "speed-anim":           [12, 0],
         "frame-anim":           [12, 0],
+
         "offset-head":          [12, 0],
         "offset-body":          [12, 0],
+
         "preview-options":      [4, 4],
         "body-options":         [4, 4],
         "head-options":         [4, 4],
+
         "prioritize-label":     [4, 4],
         "prioritize-1":         [0, 0],
         "prioritize-2":         [0, 0],
+
         "preview-idle":         [4, 4],
         "preview-left":         [4, 4],
         "preview-right":        [4, 4],
+
         "rebuild-body-data":    [4, 4],
         "rebuild-head-data":    [4, 4],
         "rebuild-body-images":  [4, 4],
         "rebuild-head-images":  [4, 4],
         "rebuild-body-offsets": [4, 4],
         "rebuild-head-offsets": [4, 4],
+
         "select-body":          [4, 4],
         "select-head":          [4, 4],
+
         "destroy-body-images":  [4, 4],
         "destroy-head-images":  [4, 4],
+
         "pingpong-animation":   [4, 0],
         "reverse-layers":       [4, 0],
+
         "play-button":          [0, 0],
         "pause-button":         [0, 0],
-        "skip-right-button":    [0, 0],
         "skip-left-button":     [0, 0],
+        "skip-right-button":    [0, 0],
+        "shuffle-button":       [0, 0],
     }
 
     # Preview composition dimensions
@@ -279,6 +293,7 @@ class App(tk.Frame):
         "pause-button":         "",
         "skip-right-button":    "",
         "skip-left-button":     "",
+        "shuffle-button":       "",
     }
 
     IMAGES = {
@@ -286,6 +301,7 @@ class App(tk.Frame):
         "pause-button":      os.path.join("misc", "pause.png"),
         "skip-right-button": os.path.join("misc", "forward.png"),
         "skip-left-button":  os.path.join("misc", "backward.png"),
+        "shuffle-button":    os.path.join("misc", "shuffle.png"),
     }
 
     COLORS = {
@@ -310,6 +326,7 @@ class App(tk.Frame):
         "pause-button":         {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "skip-right-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "skip-left-button":     {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "shuffle-button":       {"fg": [0, 0, 0], "bg": [222, 222, 222]},
     }
 
     # Animation speed slider
@@ -455,22 +472,24 @@ class App(tk.Frame):
         }
 
         # Widget-containing frames
-        self._FrameTopleft = tk.Frame(self._Master)
-        self._FrameTopleft.grid(row=1, column=0)
-
-        self._FrameTopRight = tk.Frame(self._FrameTopleft)
-        self._FrameTopRight.grid(row=0, column=3)
-
-        self._FrameGroupTop = tk.Frame(self._FrameTopRight, width=1, height=10)
-        self._FrameGroupTop.grid(row=0, column=0)
+        self._FrameGroupTop = tk.Frame(self._Master)
+        self._FrameGroupTop.grid(row=1, column=0)
 
         self._FrameGroupBot = tk.Frame(self._Master)
-        self._FrameGroupBot.grid(row=2)
+        self._FrameGroupBot.grid(row=2, column=0)
+
+        self._FrameTopRight = tk.Frame(self._FrameGroupTop)
+        self._FrameTopRight.grid(row=0, column=3)
+
+        self._FrameBotLeft = tk.Frame(self._FrameGroupBot)
+        self._FrameBotLeft.grid(column=0, row=1)
 
         self._FrameBotRight = tk.Frame(self._FrameGroupBot)
         self._FrameBotRight.grid(column=1, row=1)
 
         # Padding frames
+        self._FramePadMidTop = tk.Frame(self._FrameTopRight, width=1, height=10)
+        self._FramePadMidTop.grid(row=0, column=0)
 
         self._FramePadBorder = tk.Frame(self._FrameGroupBot, height=10)
         self._FramePadBorder.grid(row=6)
@@ -478,10 +497,10 @@ class App(tk.Frame):
         self._FramePadBottom = tk.Frame(self._FrameGroupBot, height=10)
         self._FramePadBottom.grid(row=24)
 
-        self._FramePadTopleft = tk.Frame(self._FrameTopleft, height=10)
+        self._FramePadTopleft = tk.Frame(self._FrameGroupTop, height=10)
         self._FramePadTopleft.grid(row=1)
 
-        self._FramePadTopleft = tk.Frame(self._FrameTopleft, height=10)
+        self._FramePadTopleft = tk.Frame(self._FrameGroupTop, height=10)
         self._FramePadTopleft.grid(row=2)
 
         self._FramePadTop = tk.Frame(self._Master, height=10)
@@ -519,6 +538,7 @@ class App(tk.Frame):
             "pause-button":         tk.Button(),
             "skip-right-button":    tk.Button(),
             "skip-left-button":     tk.Button(),
+            "shuffle-button":       tk.Button(),
         }
 
         # Canvases
@@ -599,42 +619,42 @@ class App(tk.Frame):
         self.InitSliderFramerate()
 
         self.InitLabel(
-            self._FrameGroupBot,
+            self._FrameBotLeft,
             "speed-anim",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0,
         )
 
         self.InitLabel(
-            self._FrameTopleft,
+            self._FrameGroupTop,
             "preview-frames-label",
             ("arial", App.FONTSIZE_SMALL),
             tk.W
         )
 
         self.InitLabel(
-            self._FrameTopleft,
+            self._FrameGroupTop,
             "preview-anim-label",
             ("arial", App.FONTSIZE_SMALL),
             tk.W
         )
 
         self.InitLabel(
-            self._FrameGroupBot,
+            self._FrameBotLeft,
             "frame-anim",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0, 1, 2, 3,
         )
 
         self.InitLabel(
-            self._FrameGroupBot,
+            self._FrameBotLeft,
             "offset-head",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0, 0,
         )
 
         self.InitLabel(
-            self._FrameGroupBot,
+            self._FrameBotLeft,
             "offset-body",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0, 0,
@@ -750,6 +770,12 @@ class App(tk.Frame):
             self._FrameBotRight,
             "skip-left-button",
             self.FrameBackward,
+        )
+
+        self.InitButton(
+            self._FrameBotRight,
+            "shuffle-button",
+            None,
         )
 
         self.InitMenu(
@@ -973,7 +999,7 @@ class App(tk.Frame):
         """
         self._Animation["objects"] = []
         self.InitCanvas(
-            self._FrameTopleft,
+            self._FrameGroupTop,
             "preview-anim",
             App.CANVAS_BORDER,
         )
@@ -1231,7 +1257,7 @@ class App(tk.Frame):
         :return: None.
         """
         scale = tk.Scale(
-            self._FrameGroupBot,
+            self._FrameBotLeft,
             from_=App.SPEED_SCALE_MIN,
             to=App.SPEED_SCALE_MAX,
             orient=tk.HORIZONTAL,
@@ -1261,7 +1287,7 @@ class App(tk.Frame):
         """
         self._ImageObject = None  ## !!
         self.InitCanvas(
-            self._FrameTopleft,
+            self._FrameGroupTop,
             "preview-static",
             App.CANVAS_BORDER,
         )
@@ -1631,7 +1657,9 @@ class App(tk.Frame):
 
     def FrameForward(self):
         """
-        Turns animation playing off.
+        Skips one frame to the right.
+
+        Wraps around to the first frame if at the last one.
 
         :return: None.
         """
@@ -1648,7 +1676,9 @@ class App(tk.Frame):
 
     def FrameBackward(self):
         """
-        Turns animation playing off.
+        Skips one frame to the left.
+
+        Wraps around to the last frame if at the first one.
 
         :return: None.
         """
@@ -1760,8 +1790,12 @@ class App(tk.Frame):
                 text=App.LABELS["offset-head"].format(0, 0)
             )
 
-
     def UpdateAnimationImage(self):
+        """
+        Updates currently-previewed animation frame.
+
+        :return: None.
+        """
         try:
             # Draw frame to canvas
             animObjects = self._Animation["objects"]
