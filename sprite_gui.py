@@ -1703,12 +1703,13 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self.DoMakePreview()
-        if self._Animation["objects"]:
-            self._Animation["playing"] = True
-            self._Buttons["pause-button"].config(relief=tk.RAISED)
-            self._Buttons["play-button"].config(relief=tk.SUNKEN)
-            self.DoAnimate()
+        if not self._Animation["playing"]:
+            self.DoMakePreview()
+            if self._Animation["objects"]:
+                self._Animation["playing"] = True
+                self._Buttons["pause-button"].config(relief=tk.RAISED)
+                self._Buttons["play-button"].config(relief=tk.SUNKEN)
+                self.DoAnimate()
 
     def TurnPlaybackOff(self):
         """
