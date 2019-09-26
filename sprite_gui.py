@@ -813,22 +813,7 @@ class App(tk.Frame):
         if self._Animation["playing"]:
             self.UpdateCurrentFrame()
         self.UpdateOffsetLabels()
-
-        try:
-            # Draw frame to canvas
-            animObjects = self._Animation["objects"]
-            animFrame = self._Animation["frame"]
-            animImage = animObjects[animFrame]
-
-            self._Canvases["preview-anim"].create_image(
-                (16, 16),
-                anchor=tk.NW,
-                image=animImage,
-            )
-
-        except IndexError:
-            # Current frame is invalid
-            pass
+        self.UpdateAnimationImage()
 
         # Repeat if animation is active
         speed = self._Animation["speed"]
@@ -1657,7 +1642,9 @@ class App(tk.Frame):
         self._Animation["frame"] += 1
         if self._Animation["frame"] >= 4:
             self._Animation["frame"] = 0
+
         self.UpdateFrameCountLabel()
+        self.UpdateAnimationImage()
 
     def FrameBackward(self):
         """
@@ -1673,6 +1660,7 @@ class App(tk.Frame):
         if self._Animation["frame"] < 0:
             self._Animation["frame"] = 3
         self.UpdateFrameCountLabel()
+        self.UpdateAnimationImage()
 
     def UpdateBodyOffsetLabel(self, state, frame):
         """
@@ -1771,6 +1759,24 @@ class App(tk.Frame):
             self._Labels["offset-head"].config(
                 text=App.LABELS["offset-head"].format(0, 0)
             )
+
+
+    def UpdateAnimationImage(self):
+        try:
+            # Draw frame to canvas
+            animObjects = self._Animation["objects"]
+            animFrame = self._Animation["frame"]
+            animImage = animObjects[animFrame]
+
+            self._Canvases["preview-anim"].create_image(
+                (16, 16),
+                anchor=tk.NW,
+                image=animImage,
+            )
+
+        except IndexError:
+            # Current frame is invalid
+            pass
 
     def UpdateOffsetLabels(self):
         """
