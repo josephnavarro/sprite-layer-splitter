@@ -198,6 +198,8 @@ class App(tk.Frame):
     PAD = {
         "preview-frames-label": [0, 0],
         "preview-anim-label":   [0, 0],
+        "preview-static":       [0, 0],
+        "preview-anim":         [0, 0],
 
         "export-full":          [4, 4],
         "export-idle":          [4, 4],
@@ -438,16 +440,18 @@ class App(tk.Frame):
         self._Master.resizable(False, False)
         self.winfo_toplevel().title(App.WINDOW_TITLE)
 
-        # Set icon for Mac OS X
+        # Set icon for Mac OS X (and kill iTunes)
         if IsOSX():
             image = tk.Image("photo", file="misc/icon.png")
             # noinspection PyProtectedMember
             root.tk.call("wm", "iconphoto", root._w, image)
+            self.KillITunes()
 
         # Initialize local non-widget data
         self._ImageObject = None
 
         self._Animation = {
+            "image":   None,
             "init":    False,
             "forward": True,
             "playing": False,
@@ -595,145 +599,212 @@ class App(tk.Frame):
         # Complete widget initialization
         self.InitDataHead()
         self.InitDataBody()
+        self.InitAllButtons()
+        self.InitAllCanvases()
+        self.InitAllCheckboxes()
+        self.InitAllLabels()
+        self.InitAllMenus()
+        self.InitAllRadioButtons()
 
-        self.InitLabel(
-            self._FrameGroupBot,
-            "export-options",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"),
-            tk.NS,
-        )
-
-        self.InitButton(
-            self._FrameGroupBot,
-            "export-idle",
-            lambda: self.ExportFrames(idle_only=True),
-        )
-
-        self.InitButton(
-            self._FrameGroupBot,
-            "export-full",
-            lambda: self.ExportFrames(),
-        )
-
-        self.InitPreviewStatic()
-        self.InitPreviewAnim()
         self.InitSliderFramerate()
 
-        # Initialize "animation speed" label
-        self.InitLabel(
-            self._FrameBotLeft,
-            "speed-anim",
-            ("Courier", App.FONTSIZE_MONO),
-            tk.W, 0,
+    # noinspection PyMethodMayBeStatic
+    def DestroyBodyImages(self):
+        """
+        Callback function. Destroys intermediate head spritesheets.
+
+        :return: None.
+        """
+        title = App.WINDOW_TITLE
+        query = App.MESSAGES["confirm"]["destroy"]["body"]
+        message = App.MESSAGES["message"]["destroy"]["body"]
+
+        if tk.messagebox.askquestion(title, query) == "yes":
+            FlushBodies()
+            tk.messagebox.showinfo(title, message)
+
+    def DoAnimate(self):
+        """
+        Local animation callback function.
+
+        :return: None
+        """
+        isPlaying = self._Animation["playing"]
+        if isPlaying:
+            self.UpdateCurrentFrame()
+
+        # Update labels and displayed frame
+        self.UpdateOffsetLabels()
+        self.UpdateAnimationImage()
+
+        # Repeat if animation is active
+        speed = self._Animation["speed"]
+        if speed > 0 and isPlaying:
+            self.after(1000 // speed, self.DoAnimate)
+
+    def DoComposite(self, func, **kwargs):
+        """
+        Performs a general-purpose image composition routine.
+
+        :param func: Compositing function (CompositeIdle or CompositeFull)
+
+        :return: Tuple of head key, body key, and numpy image.
+        """
+        head = ""
+        body = ""
+        im = None
+
+        try:
+            # Perform sprite composition
+            head = self.GetHeadKey()
+            body = self.GetBodyKey()
+            im = func(head, body, **kwargs)
+
+        except sprite_splitter.NonexistentHeadException as e:
+            # Head spritesheet does not exist
+            tk.messagebox.showinfo(
+                App.WINDOW_TITLE,
+                App.MESSAGES["message"]["invalid"]["head"].format(e.filename),
+            )
+
+        except sprite_splitter.NonexistentBodyException as e:
+            # Body spritesheet does not exist
+            tk.messagebox.showinfo(
+                App.WINDOW_TITLE,
+                App.MESSAGES["message"]["invalid"]["body"].format(e.filename),
+            )
+
+        except cv2.error:
+            # CV2 image processing error
+            raise InvalidFilenameException
+
+        return head, body, im
+
+    def DoExport(self, func, message, **kwargs):
+        """
+        Composites and exports animation frames to file.
+
+        :param func:    Frame compositing callback function.
+        :param message: Success message to display.
+
+        :return: None.
+        """
+        try:
+            # Perform sprite composition
+            head, body, im = self.DoComposite(func, **kwargs)
+
+            if im is not None:
+                if not head and not body:
+                    head = "blank"
+                    body = "sheet"
+                elif not head:
+                    head = "body"
+                elif not body:
+                    body = "head"
+
+                # Prompt user for destination filename
+                FixPath(ROOT_OUTPUT_DIR)
+                path = filedialog.asksaveasfilename(
+                    initialfile="{}_{}.png".format(head, body),
+                    initialdir=ROOT_OUTPUT_DIR,
+                    title="Save As",
+                    filetypes=FILETYPES,
+                )
+
+                # Save image if path is valid
+                if path:
+                    sprite_splitter.SaveImage(im, path)
+                    tk.messagebox.showinfo(
+                        App.WINDOW_TITLE,
+                        message.format(os.path.basename(path)),
+                    )
+
+        except InvalidFilenameException:
+            # Image format not recognized
+            tk.messagebox.showinfo(
+                App.WINDOW_TITLE,
+                App.MESSAGES["message"]["failure"]["type"],
+            )
+
+        except EmptyFilenameException:
+            # Filename not specified
+            pass
+
+    def DoMakePreview(self):
+        """
+        Creates an animated preview.
+
+        :return: None.
+        """
+        self.TurnPlaybackOff()
+
+        state = str(self._Animation["state"])
+        color = App.COLORS["preview-static"]["bg"]
+        headfirst = self._StringVars["prioritize"].get() == "Head"
+        reverse = self._BooleanVars["reverse-layers"].get()
+
+        self.MakePreview(
+            sprite_splitter.Composite,
+            state,
+            color=color,
+            headfirst=headfirst,
+            reverse=reverse,
         )
 
-        # Initialize "static frames preview" label
-        self.InitLabel(
-            self._FrameGroupTop,
-            "preview-frames-label",
-            ("arial", App.FONTSIZE_SMALL),
-            tk.W
+    def ExportFrames(self, *, idle_only=False):
+        """
+        Composites and exports all frames to file.
+
+        :param idle_only: Whether to export only idle frames. (Default False).
+
+        :return: None.
+        """
+        reverse = self._BooleanVars["reverse-layers"].get()
+        headfirst = self._StringVars["prioritize"].get() == "Head"
+
+        if idle_only:
+            message = App.MESSAGES["message"]["success"]["idle"]
+        else:
+            message = App.MESSAGES["message"]["success"]["full"]
+
+        self.DoExport(
+            sprite_splitter.Composite,
+            message,
+            headfirst=headfirst,
+            reverse=reverse,
+            idle_only=idle_only,
         )
 
-        # Initialize "animated preview" label
-        self.InitLabel(
-            self._FrameGroupTop,
-            "preview-anim-label",
-            ("arial", App.FONTSIZE_SMALL),
-            tk.W
-        )
+    def GetBodyKey(self):
+        """
+        Gets a dict key associated with a named body.
 
-        # Initialize "current animation frame" label
-        self.InitLabel(
-            self._FrameBotLeft,
-            "frame-anim",
-            ("Courier", App.FONTSIZE_MONO),
-            tk.W, 0, 1, 2, 3,
-        )
+        :return: Body's dictionary key.
+        """
+        body = self._StringVars["select-body"].get()
+        if body != App.DEFAULT_NAME:
+            return self._Body.get("data", {}).get(body, "")
+        else:
+            return ""
 
-        self.InitLabel(
-            self._FrameBotLeft,
-            "offset-head",
-            ("Courier", App.FONTSIZE_MONO),
-            tk.W, 0, 0,
-        )
+    def GetHeadKey(self):
+        """
+        Gets a dict key associated with a named head.
 
-        self.InitLabel(
-            self._FrameBotLeft,
-            "offset-body",
-            ("Courier", App.FONTSIZE_MONO),
-            tk.W, 0, 0,
-        )
+        :return: Head's dictionary key.
+        """
+        head = self._StringVars["select-head"].get()
+        if head != App.DEFAULT_NAME:
+            return self._Head.get("data", {}).get(head, "")
+        else:
+            return ""
 
-        self.InitLabel(
-            self._FrameGroupBot,
-            "preview-options",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"),
-            tk.NS,
-        )
+    def InitAllButtons(self):
+        """
+        Initializes all required buttons.
 
-        self.InitButton(
-            self._FrameGroupBot,
-            "preview-idle",
-            self.MakeIdlePreview,
-        )
-
-        self.InitButton(
-            self._FrameGroupBot,
-            "preview-left",
-            self.MakeLeftPreview,
-        )
-
-        self.InitButton(
-            self._FrameGroupBot,
-            "preview-right",
-            self.MakeRightPreview,
-        )
-
-        # Initialize "body options" label
-        self.InitLabel(
-            self._FrameGroupBot,
-            "body-options",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"),
-            tk.NS,
-        )
-
-        # Initialize "rebuild body data" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "rebuild-body-data",
-            self.RebuildBodyData,
-        )
-
-        # Initialize "rebuild body images" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "rebuild-body-images",
-            self.RebuildBodyImages,
-        )
-
-        # Initialize "rebuild body offsets" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "rebuild-body-offsets",
-            self.RebuildBodyOffsets,
-        )
-
-        # Initialize "destroy body images" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "destroy-body-images",
-            self.DestroyBodyImages,
-        )
-
-        # Initialize "head options" label
-        self.InitLabel(
-            self._FrameGroupBot,
-            "head-options",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"),
-            tk.NS,
-        )
-
+        :return: None.
+        """
         # Initialize "rebuild head data" button
         self.InitButton(
             self._FrameGroupBot,
@@ -798,31 +869,194 @@ class App(tk.Frame):
             self.ShuffleAll,
         )
 
-        # Initialize "select head" dropdown menu
-        self.InitMenu(
+        # Initialize "rebuild body offsets" button
+        self.InitButton(
             self._FrameGroupBot,
-            "select-head",
-            self._Head["list"],
+            "rebuild-body-offsets",
+            self.RebuildBodyOffsets,
         )
 
-        self.InitMenu(
+        # Initialize "destroy body images" button
+        self.InitButton(
             self._FrameGroupBot,
-            "select-body",
-            self._Body["list"],
+            "destroy-body-images",
+            self.DestroyBodyImages,
         )
 
+        # Initialize "rebuild body data" button
+        self.InitButton(
+            self._FrameGroupBot,
+            "rebuild-body-data",
+            self.RebuildBodyData,
+        )
+
+        # Initialize "rebuild body images" button
+        self.InitButton(
+            self._FrameGroupBot,
+            "rebuild-body-images",
+            self.RebuildBodyImages,
+        )
+
+        # Initialize "make idle preview" button
+        self.InitButton(
+            self._FrameGroupBot,
+            "preview-idle",
+            self.MakeIdlePreview,
+        )
+
+        # Initialize "make left preview" button
+        self.InitButton(
+            self._FrameGroupBot,
+            "preview-left",
+            self.MakeLeftPreview,
+        )
+
+        # Initialize "make right preview" button
+        self.InitButton(
+            self._FrameGroupBot,
+            "preview-right",
+            self.MakeRightPreview,
+        )
+
+        # Initialize "export idle frames" button
+        self.InitButton(
+            self._FrameGroupBot,
+            "export-idle",
+            lambda: self.ExportFrames(idle_only=True),
+        )
+
+        # Initialize "export all frames" button
+        self.InitButton(
+            self._FrameGroupBot,
+            "export-full",
+            lambda: self.ExportFrames(),
+        )
+
+    def InitAllCanvases(self):
+        """
+        Initializes all required canvases.
+
+        :return: None.
+        """
+        self.InitCanvas(
+            self._FrameGroupTop,
+            "preview-static",
+            App.CANVAS_BORDER,
+        )
+
+        self.InitCanvas(
+            self._FrameGroupTop,
+            "preview-anim",
+            App.CANVAS_BORDER,
+        )
+
+    def InitAllCheckboxes(self):
+        """
+        Initializes all required checkboxes.
+
+        :return: None.
+        """
+        # Initialize "pingpong animation" checkbox
         self.InitCheckbox(
             self._FrameGroupBot,
             "pingpong-animation",
             tk.W,
         )
 
+        # Initialize "reverse layers" checkbox
         self.InitCheckbox(
             self._FrameGroupBot,
             "reverse-layers",
             tk.W,
         )
 
+    def InitAllLabels(self):
+        """
+        Initializes all required labels.
+
+        :return: None.
+        """
+        # Initialize "export options" label
+        self.InitLabel(
+            self._FrameGroupBot,
+            "export-options",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"),
+            tk.NS,
+        )
+
+        # Initialize "animation speed" label
+        self.InitLabel(
+            self._FrameBotLeft,
+            "speed-anim",
+            ("Courier", App.FONTSIZE_MONO),
+            tk.W, 0,
+        )
+
+        # Initialize "static frames preview" label
+        self.InitLabel(
+            self._FrameGroupTop,
+            "preview-frames-label",
+            ("arial", App.FONTSIZE_SMALL),
+            tk.W
+        )
+
+        # Initialize "animated preview" label
+        self.InitLabel(
+            self._FrameGroupTop,
+            "preview-anim-label",
+            ("arial", App.FONTSIZE_SMALL),
+            tk.W
+        )
+
+        # Initialize "current animation frame" label
+        self.InitLabel(
+            self._FrameBotLeft,
+            "frame-anim",
+            ("Courier", App.FONTSIZE_MONO),
+            tk.W, 0, 1, 2, 3,
+        )
+
+        # Initialize "head offset" label
+        self.InitLabel(
+            self._FrameBotLeft,
+            "offset-head",
+            ("Courier", App.FONTSIZE_MONO),
+            tk.W, 0, 0,
+        )
+
+        # Initialize "body offset" label
+        self.InitLabel(
+            self._FrameBotLeft,
+            "offset-body",
+            ("Courier", App.FONTSIZE_MONO),
+            tk.W, 0, 0,
+        )
+
+        # Initialize "preview options" label
+        self.InitLabel(
+            self._FrameGroupBot,
+            "preview-options",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"),
+            tk.NS,
+        )
+
+        # Initialize "body options" label
+        self.InitLabel(
+            self._FrameGroupBot,
+            "body-options",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"),
+            tk.NS,
+        )
+
+        # Initialize "head options" label
+        self.InitLabel(
+            self._FrameGroupBot,
+            "head-options",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"),
+            tk.NS,
+        )
+
+        # Initialize "prioritize" label
         self.InitLabel(
             self._FrameGroupBot,
             "prioritize-label",
@@ -830,6 +1064,33 @@ class App(tk.Frame):
             tk.NS,
         )
 
+    def InitAllMenus(self):
+        """
+        Initializes all required menus.
+
+        :return: None.
+        """
+        # Initialize "select head" dropdown menu
+        self.InitMenu(
+            self._FrameGroupBot,
+            "select-head",
+            self._Head["list"],
+        )
+
+        # Initialize "select body" dropdown menu
+        self.InitMenu(
+            self._FrameGroupBot,
+            "select-body",
+            self._Body["list"],
+        )
+
+    def InitAllRadioButtons(self):
+        """
+        Initializes all required radio buttons.
+
+        :return: None.
+        """
+        # Initialize "prioritize head" radio button
         self.InitRadio(
             self._FrameGroupBot,
             "prioritize-1",
@@ -839,6 +1100,7 @@ class App(tk.Frame):
             select=True,
         )
 
+        # Initialize "prioritize body" radio button
         self.InitRadio(
             self._FrameGroupBot,
             "prioritize-2",
@@ -847,218 +1109,9 @@ class App(tk.Frame):
             tk.W,
         )
 
-        # Kill iTunes instance on Mac (if any)
-        if IsOSX():
-            self.KillITunes()
-
-    # noinspection PyMethodMayBeStatic
-    def DestroyBodyImages(self):
-        """
-        Callback function. Destroys intermediate head spritesheets.
-
-        :return: None.
-        """
-        title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["destroy"]["body"]
-
-        if tk.messagebox.askquestion(title, query) == "yes":
-            FlushBodies()
-            tk.messagebox.showinfo(
-                title,
-                App.MESSAGES["message"]["destroy"]["body"],
-            )
-
-    def DoAnimate(self):
-        """
-        Local animation callback function.
-
-        :return: None
-        """
-        isPlaying = self._Animation["playing"]
-        speed = self._Animation["speed"]
-
-        if isPlaying:
-            self.UpdateCurrentFrame()
-
-        self.UpdateOffsetLabels()
-        self.UpdateAnimationImage()
-
-        # Repeat if animation is active
-        if speed > 0 and isPlaying:
-            self.after(1000 // speed, self.DoAnimate)
-
-    def DoComposite(self, func, **kwargs):
-        """
-        Performs a general-purpose image composition routine.
-
-        :param func: Compositing function (CompositeIdle or CompositeFull)
-
-        :return: Tuple of head key, body key, and numpy image.
-        """
-        head = ""
-        body = ""
-        im = None
-
-        try:
-            head = self.GetHeadKey()
-            body = self.GetBodyKey()
-
-            try:
-                # Perform sprite composition
-                im = func(head, body, **kwargs)
-            except sprite_splitter.NonexistentHeadException as e:
-                raise InvalidHeadException(e.filename)
-            except sprite_splitter.NonexistentBodyException as e:
-                raise InvalidBodyException(e.filename)
-            except cv2.error:
-                raise InvalidFilenameException
-
-        except InvalidHeadException as e:
-            # Head spritesheet does not exist
-            tk.messagebox.showinfo(
-                App.WINDOW_TITLE,
-                App.MESSAGES["message"]["invalid"]["head"].format(e.filename),
-            )
-        except InvalidBodyException as e:
-            # Body spritesheet does not exist
-            tk.messagebox.showinfo(
-                App.WINDOW_TITLE,
-                App.MESSAGES["message"]["invalid"]["body"].format(e.filename),
-            )
-
-        return head, body, im
-
-    def DoMakePreview(self):
-        """
-        Creates an animated preview.
-
-        :return: None.
-        """
-        self.TurnPlaybackOff()
-        self.MakePreview(
-            sprite_splitter.Composite,
-            str(self._Animation["state"]),
-            color=App.COLORS["preview-static"]["bg"],
-            headfirst=(self._StringVars["prioritize"].get() == "Head"),
-            reverse=self._BooleanVars["reverse-layers"].get(),
-        )
-
-    def Export(self, func, message, **kwargs):
-        """
-        Composites and exports all frames to file.
-
-        :param func:    Frame compositing callback function.
-        :param message: Success message to display.
-
-        :return: None.
-        """
-        try:
-            # Perform sprite composition
-            head, body, image = self.DoComposite(func, **kwargs)
-
-            if image is not None:
-                # Prompt user for destination filename
-                FixPath(ROOT_OUTPUT_DIR)
-
-                if not head and not body:
-                    head = "blank"
-                    body = "sheet"
-                elif not head:
-                    head = "body"
-                elif not body:
-                    body = "head"
-
-                initialfile = "{}_{}.png".format(head, body)
-                initialdir = ROOT_OUTPUT_DIR
-                title = "Save As"
-                filetypes = FILETYPES
-                path = filedialog.asksaveasfilename(
-                    initialfile=initialfile,
-                    initialdir=initialdir,
-                    title=title,
-                    filetypes=filetypes,
-                )
-                if path:
-                    # Save image if path is valid
-                    sprite_splitter.SaveImage(image, path)
-                    tk.messagebox.showinfo(
-                        App.WINDOW_TITLE,
-                        message.format(os.path.basename(path)),
-                    )
-
-        except InvalidFilenameException:
-            # Image format not recognized
-            tk.messagebox.showinfo(
-                App.WINDOW_TITLE,
-                App.MESSAGES["message"]["failure"]["type"],
-            )
-
-        except EmptyFilenameException:
-            # Filename not specified
-            pass
-
-    def ExportFrames(self, *, idle_only=False):
-        """
-        Composites and exports all frames to file.
-
-        :param idle_only: Whether to export only idle frames. (Default False).
-
-        :return: None.
-        """
-        reverse = self._BooleanVars["reverse-layers"].get()
-        headfirst = self._StringVars["prioritize"].get() == "Head"
-
-        if idle_only:
-            message = App.MESSAGES["message"]["success"]["idle"]
-        else:
-            message = App.MESSAGES["message"]["success"]["full"]
-
-        self.Export(
-            sprite_splitter.Composite,
-            message,
-            headfirst=headfirst,
-            reverse=reverse,
-            idle_only=idle_only,
-        )
-
-    def GetHeadKey(self):
-        """
-
-        :return:
-        """
-        headName = self._StringVars["select-head"].get()
-        if headName != App.DEFAULT_NAME:
-            return self._Head.get("data", {}).get(headName, "")
-        else:
-            return ""
-
-    def GetBodyKey(self):
-        """
-
-        :return:
-        """
-        bodyName = self._StringVars["select-body"].get()
-        if bodyName != App.DEFAULT_NAME:
-            return self._Body.get("data", {}).get(bodyName, "")
-        else:
-            return ""
-
-    def InitPreviewAnim(self):
-        """
-        Initializes animated image preview canvas.
-
-        :return: None.
-        """
-        self._Animation["objects"] = []
-        self.InitCanvas(
-            self._FrameGroupTop,
-            "preview-anim",
-            App.CANVAS_BORDER,
-        )
-
     def InitButton(self, master, tag, command, relief=tk.RAISED):
         """
-        Locally initializes a button.
+        Initializes a local button.
 
         :param master:  Tkinter root frame for button.
         :param tag:     Tag of button to initialize.
@@ -1067,38 +1120,34 @@ class App(tk.Frame):
 
         :return: None.
         """
-        size = App.SIZES.get(tag, App.SIZES["default-button"])
-        width = size[0]  # Button width
-        height = size[1]  # Button height
-        foreground = App.FromRGB(*App.COLORS[tag]["fg"])  # FG color
-        background = App.FromRGB(*App.COLORS[tag]["bg"])  # BG color
+        w, h = App.SIZES.get(tag, App.SIZES["default-button"])
+        fg = App.FromRGB(*App.COLORS[tag]["fg"])  # FG color
+        bg = App.FromRGB(*App.COLORS[tag]["bg"])  # BG color
 
         # Image object
         path = App.IMAGES.get(tag, "")
         if path:
-            image = sprite_imaging.OpenTkinter(path, width, height)
+            image = sprite_imaging.OpenTkinter(path, w, h)
         else:
             image = None
 
-        button = tk.Button(
-            master,
-            text=App.LABELS[tag],
-            command=command,
-        )
+        # Create button
+        button = tk.Button(master, text=App.LABELS[tag], command=command)
 
+        # Configure button
         button.image = image
-
         button.config(
-            width=width,
-            height=height,
-            foreground=foreground,
-            background=background,
-            activebackground=background,
-            activeforeground=foreground,
+            width=w,
+            height=h,
+            foreground=fg,
+            background=bg,
+            activebackground=bg,
+            activeforeground=fg,
             image=image,
             relief=relief,
         )
 
+        # Position button
         button.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
@@ -1106,6 +1155,7 @@ class App(tk.Frame):
             pady=App.PAD[tag][1],
         )
 
+        # Replace local button
         self._Buttons[tag].destroy()
         self._Buttons[tag] = button
 
@@ -1131,6 +1181,8 @@ class App(tk.Frame):
         canvas.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
+            padx=App.PAD[tag][0],
+            pady=App.PAD[tag][1],
         )
 
         self._Canvases[tag].destroy()
@@ -1334,19 +1386,6 @@ class App(tk.Frame):
         self._ScaleAnimSpeed.destroy()
         self._ScaleAnimSpeed = scale
 
-    def InitPreviewStatic(self):
-        """
-        Initializes static image preview canvas.
-
-        :return: None.
-        """
-        self._ImageObject = None  ## !!
-        self.InitCanvas(
-            self._FrameGroupTop,
-            "preview-static",
-            App.CANVAS_BORDER,
-        )
-
     def MakeAnimationFrames(self, image):
         """
         Populates local animation buffer.
@@ -1387,15 +1426,16 @@ class App(tk.Frame):
 
         :return: None.
         """
-        self._ImageObject = sprite_imaging.ToTkinter(
-            sprite_imaging.ToPIL(image))
-
+        # Paste image onto canvas
+        image = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
+        self._Animation["image"] = image
         self._Canvases["preview-static"].create_image(
             (16, 16),
             anchor=tk.NW,
-            image=self._ImageObject,
+            image=image,
         )
 
+        # Draw frame labels on canvas
         canvas = self._Canvases["preview-static"]
         for n in range(4):
             App.DrawText(canvas, 18 + 96 * n, 92, "({})".format(n))
