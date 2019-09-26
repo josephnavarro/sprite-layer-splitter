@@ -7,6 +7,7 @@ Graphical user interface layer.
 
 """
 import psutil
+import random
 import cv2
 import tkinter as tk
 from tkinter import messagebox
@@ -775,7 +776,7 @@ class App(tk.Frame):
         self.InitButton(
             self._FrameBotRight,
             "shuffle-button",
-            None,
+            self.ShuffleAll,
         )
 
         self.InitMenu(
@@ -829,6 +830,23 @@ class App(tk.Frame):
         # Kill iTunes instance on Mac (if any)
         if IsOSX():
             self.KillITunes()
+
+    # noinspection PyMethodMayBeStatic
+    def DestroyBodyImages(self):
+        """
+        Callback function. Destroys intermediate head spritesheets.
+
+        :return: None.
+        """
+        title = App.WINDOW_TITLE
+        query = App.MESSAGES["confirm"]["destroy"]["body"]
+
+        if tk.messagebox.askquestion(title, query) == "yes":
+            FlushBodies()
+            tk.messagebox.showinfo(
+                title,
+                App.MESSAGES["message"]["destroy"]["body"],
+            )
 
     def DoAnimate(self):
         """
@@ -915,6 +933,20 @@ class App(tk.Frame):
             )
 
         return headKey, bodyKey, None
+
+    def DoMakePreview(self):
+        """
+        Creates an animated preview.
+
+        :return: None.
+        """
+        state = self._Animation["state"]
+        if state == STATES.idle:
+            self.MakeIdlePreview()
+        elif state == STATES.left:
+            self.MakeLeftPreview()
+        elif state == STATES.right:
+            self.MakeRightPreview()
 
     def Export(self, func, message, **kwargs):
         """
@@ -1504,36 +1536,11 @@ class App(tk.Frame):
         if tk.messagebox.askquestion(title, query) == "yes":
             self._Body["offsets"] = LoadBodyOffsets()
             self.UpdateOffsetLabels()
-
-            if self._Animation["objects"]:
-                state = self._Animation["state"]
-                if state == STATES.idle:
-                    self.MakeIdlePreview()
-                elif state == STATES.left:
-                    self.MakeLeftPreview()
-                elif state == STATES.right:
-                    self.MakeRightPreview()
+            self.DoMakePreview()
 
             tk.messagebox.showinfo(
                 title,
                 App.MESSAGES["message"]["rebuild"]["boff"],
-            )
-
-    # noinspection PyMethodMayBeStatic
-    def DestroyBodyImages(self):
-        """
-        Callback function. Destroys intermediate head spritesheets.
-
-        :return: None.
-        """
-        title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["destroy"]["body"]
-
-        if tk.messagebox.askquestion(title, query) == "yes":
-            FlushBodies()
-            tk.messagebox.showinfo(
-                title,
-                App.MESSAGES["message"]["destroy"]["body"],
             )
 
     def RebuildHeadData(self):
@@ -1588,15 +1595,7 @@ class App(tk.Frame):
         if tk.messagebox.askquestion(title, query) == "yes":
             self._Head["offsets"] = LoadHeadOffsets()
             self.UpdateOffsetLabels()
-
-            if self._Animation["objects"]:
-                state = self._Animation["state"]
-                if state == STATES.idle:
-                    self.MakeIdlePreview()
-                elif state == STATES.left:
-                    self.MakeLeftPreview()
-                elif state == STATES.right:
-                    self.MakeRightPreview()
+            self.DoMakePreview()
 
             tk.messagebox.showinfo(
                 title,
@@ -1619,6 +1618,15 @@ class App(tk.Frame):
                 title,
                 App.MESSAGES["message"]["destroy"]["head"],
             )
+
+    def ShuffleAll(self):
+        """
+
+        :return:
+        """
+        self._StringVars["select-body"].set(random.choice(self._Body["list"]))
+        self._StringVars["select-head"].set(random.choice(self._Head["list"]))
+        self.DoMakePreview()
 
     # noinspection PyUnusedLocal
     def ToggleLayerOrder(self, event):
