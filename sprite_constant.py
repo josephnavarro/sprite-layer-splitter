@@ -18,25 +18,21 @@ IGNORED_COLORS = [
     0xFF,  # White
 ]
 
-"""
-Root input directory.
-"""
-ROOT_INPUT_DIR = os.path.join("inputs", "")
+DIRECTORIES = {
+    "input": {
+        "root": os.path.join("inputs", ""),
+        "body": os.path.join("inputs", "images", "body"),
+        "head": os.path.join("inputs", "images", "head"),
+    },
+    "output": {
+        "root": os.path.join("outputs", ""),
+    }
+}
 
 """ 
 Root spritesheet output directory. 
 """
 ROOT_OUTPUT_DIR = os.path.join("outputs", "")
-
-"""
-Head spritesheet directory.
-"""
-HEAD_DIRECTORY = os.path.join(ROOT_INPUT_DIR, "images", "head")
-
-"""
-Body spritesheet directory.
-"""
-BODY_DIRECTORY = os.path.join(ROOT_INPUT_DIR, "images", "body")
 
 """ 
 Recognized file types.

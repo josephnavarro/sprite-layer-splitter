@@ -76,11 +76,11 @@ class App(tk.Frame):
     MESSAGES = {
         "confirm": {
             "rebuild": {
-                "data": {
+                "data":   {
                     "body": "Refresh list of available bodies?",
                     "head": "Refresh list of available heads?",
                 },
-                "image": {
+                "image":  {
                     "body": "Remake source images for body sprites?",
                     "head": "Remake source images for head sprites?",
                 },
@@ -109,11 +109,11 @@ class App(tk.Frame):
                 "head": "Error: Head spritesheet {} does not exist!",
             },
             "rebuild": {
-                "image": {
+                "image":  {
                     "body": "Succssfully reconstructed body source images.",
                     "head": "Successfully reconstructed head source images.",
                 },
-                "data": {
+                "data":   {
                     "body": "Reassembled list of available bodies.",
                     "head": "Reassembled list of available heads.",
                 },
@@ -165,14 +165,14 @@ class App(tk.Frame):
         "preview-anim-label":   [1, 2],
 
         "head-options":         [7, 0],
-        "select-head":          [8, 0],
+        "head":                 [8, 0],
         "rebuild-head-images":  [9, 0],
         "rebuild-head-data":    [10, 0],
         "rebuild-head-offsets": [11, 0],
         "destroy-head-images":  [12, 0],
 
         "body-options":         [13, 0],
-        "select-body":          [14, 0],
+        "body":                 [14, 0],
         "rebuild-body-images":  [15, 0],
         "rebuild-body-data":    [16, 0],
         "rebuild-body-offsets": [17, 0],
@@ -242,8 +242,8 @@ class App(tk.Frame):
         "rebuild-body-offsets": [4, 4],
         "rebuild-head-offsets": [4, 4],
 
-        "select-body":          [4, 4],
-        "select-head":          [4, 4],
+        "body":                 [4, 4],
+        "head":                 [4, 4],
 
         "destroy-body-images":  [4, 4],
         "destroy-head-images":  [4, 4],
@@ -282,14 +282,14 @@ class App(tk.Frame):
         "reverse-layers":       "Reverse layering order",
 
         "body-options":         "Body options",
-        "select-body":          "Select body",
+        "body":                 "Select body",
         "rebuild-body-images":  "Remake body sources",
         "rebuild-body-data":    "Refresh body listing",
         "rebuild-body-offsets": "Refresh body offsets",
         "destroy-body-images":  "Clean body sources",
 
         "head-options":         "Head options",
-        "select-head":          "Select head",
+        "head":                 "Select head",
         "rebuild-head-images":  "Remake head sources",
         "rebuild-head-data":    "Refresh head listing",
         "rebuild-head-offsets": "Refresh head offsets",
@@ -333,8 +333,8 @@ class App(tk.Frame):
         "rebuild-head-images":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "rebuild-head-offsets": {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "destroy-head-images":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "select-head":          {"fg": [0, 0, 0], "bg": [200, 224, 255]},
-        "select-body":          {"fg": [0, 0, 0], "bg": [255, 200, 200]},
+        "head":                 {"fg": [0, 0, 0], "bg": [200, 224, 255]},
+        "body":                 {"fg": [0, 0, 0], "bg": [255, 200, 200]},
         "preview-static":       {"fg": [0, 0, 0], "bg": [128, 128, 128]},
         "preview-anim":         {"fg": [0, 0, 0], "bg": [128, 128, 128]},
         "play-button":          {"fg": [0, 0, 0], "bg": [222, 222, 222]},
@@ -477,13 +477,13 @@ class App(tk.Frame):
                 "current": {},
                 "data":    {},
                 "list":    [""],
-                "offset": {},
+                "offset":  {},
             },
             "head": {
                 "current": {},
                 "data":    {},
                 "list":    [""],
-                "offset": {},
+                "offset":  {},
             },
         }
 
@@ -530,9 +530,9 @@ class App(tk.Frame):
 
         # String variables
         self._StringVars = {
-            "select-head": tk.StringVar(self._Master),
-            "select-body": tk.StringVar(self._Master),
-            "prioritize":  tk.StringVar(self._Master),
+            "head":       tk.StringVar(self._Master),
+            "body":       tk.StringVar(self._Master),
+            "prioritize": tk.StringVar(self._Master),
         }
 
         # Buttons
@@ -577,14 +577,14 @@ class App(tk.Frame):
 
         # Menus
         self._Menus = {
-            "select-head": tk.OptionMenu(
+            "head": tk.OptionMenu(
                 self._FrameGroupBot,
-                self._StringVars["select-head"],
+                self._StringVars["head"],
                 *self._Data["head"]["list"]
             ),
-            "select-body": tk.OptionMenu(
+            "body": tk.OptionMenu(
                 self._FrameGroupBot,
-                self._StringVars["select-body"],
+                self._StringVars["body"],
                 *self._Data["body"]["list"]
             ),
         }
@@ -631,7 +631,7 @@ class App(tk.Frame):
         message = App.MESSAGES["message"]["destroy"]["body"]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            FlushBodies()
+            FlushInputs("body")
             tk.messagebox.showinfo(title, message)
 
     def DoAnimate(self):
@@ -667,8 +667,8 @@ class App(tk.Frame):
 
         try:
             # Perform sprite composition
-            head = self.GetHeadKey()
-            body = self.GetBodyKey()
+            head = self.GetKey("head")
+            body = self.GetKey("body")
             im = func(head, body, **kwargs)
 
         except sprite_splitter.NonexistentHeadException as e:
@@ -786,27 +786,17 @@ class App(tk.Frame):
             idle_only=idle_only,
         )
 
-    def GetBodyKey(self):
+    def GetKey(self, key):
         """
-        Gets a dict key associated with a named body.
+        Gets a dict key associated with a named body or head.
 
-        :return: Body's dictionary key.
-        """
-        body = self._StringVars["select-body"].get()
-        if body != App.DEFAULT_NAME:
-            return self._Data["body"].get("data", {}).get(body, "")
-        else:
-            return ""
+        :param key: Either of "body" or "head".
 
-    def GetHeadKey(self):
+        :return: Name's associated dictionary key.
         """
-        Gets a dict key associated with a named head.
-
-        :return: Head's dictionary key.
-        """
-        head = self._StringVars["select-head"].get()
-        if head != App.DEFAULT_NAME:
-            return self._Data["head"].get("data", {}).get(head, "")
+        name = self._StringVars[key].get()
+        if name != App.DEFAULT_NAME:
+            return self._Data[key].get("data", {}).get(name, "")
         else:
             return ""
 
@@ -820,28 +810,28 @@ class App(tk.Frame):
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-head-data",
-            self.RebuildHeadData,
+            lambda: self.RebuildData("head"),
         )
 
         # Initialize "rebuild head images" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-head-images",
-            self.RebuildHeadImages,
+            lambda: self.RebuildImages("head"),
         )
 
         # Initialize "rebuild head offsets" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-head-offsets",
-            self.RebuildHeadOffsets,
+            lambda: self.RebuildOffsets("head"),
         )
 
         # Initialize "destroy head images" button
         self.InitButton(
             self._FrameGroupBot,
             "destroy-head-images",
-            self.DestroyHeadImages,
+            lambda: self.DestroyImages("head"),
         )
 
         # Initialize "play animation" button
@@ -884,28 +874,28 @@ class App(tk.Frame):
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-body-offsets",
-            self.RebuildBodyOffsets,
+            lambda: self.RebuildOffsets("body"),
         )
 
         # Initialize "destroy body images" button
         self.InitButton(
             self._FrameGroupBot,
             "destroy-body-images",
-            self.DestroyBodyImages,
+            lambda: self.DestroyImages("body"),
         )
 
         # Initialize "rebuild body data" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-body-data",
-            self.RebuildBodyData,
+            lambda: self.RebuildData("body"),
         )
 
         # Initialize "rebuild body images" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-body-images",
-            self.RebuildBodyImages,
+            lambda: self.RebuildImages("body"),
         )
 
         # Initialize "make idle preview" button
@@ -1084,14 +1074,14 @@ class App(tk.Frame):
         # Initialize "select head" dropdown menu
         self.InitMenu(
             self._FrameGroupBot,
-            "select-head",
+            "head",
             self._Data["head"]["list"],
         )
 
         # Initialize "select body" dropdown menu
         self.InitMenu(
             self._FrameGroupBot,
-            "select-body",
+            "body",
             self._Data["body"]["list"],
         )
 
@@ -1250,7 +1240,7 @@ class App(tk.Frame):
         }
 
         self._Data[key]["list"] = [App.DEFAULT_NAME] + sorted(list(data))
-        self._Data[key]["offset"] = LoadBodyOffsets()
+        self._Data[key]["offset"] = LoadOffsets(key)
 
     def InitLabel(self, master, tag, font, sticky, *args):
         """
@@ -1457,7 +1447,7 @@ class App(tk.Frame):
         try:
             # Perform sprite composition
             self._Animation["state"] = state
-            self._Data["head"]["offset"] = LoadHeadOffsets()
+            self._Data["head"]["offset"] = LoadOffsets("head")
 
             head, body, image = self.DoComposite(func, **kwargs)
             if image is not None:
@@ -1482,13 +1472,15 @@ class App(tk.Frame):
 
                     try:
                         # Populate per-frame head offset data
-                        self._Data["head"]["current"] = self._Data["head"]["offset"][body]
+                        self._Data["head"]["current"] = \
+                        self._Data["head"]["offset"][body]
                     except KeyError:
                         self._Data["head"]["current"] = {}
 
                     try:
                         # Populate per-frame body offset data
-                        self._Data["body"]["current"] = self._Data["body"]["offset"][body]
+                        self._Data["body"]["current"] = \
+                        self._Data["body"]["offset"][body]
                     except KeyError:
                         self._Data["body"]["current"] = {}
 
@@ -1558,139 +1550,83 @@ class App(tk.Frame):
             reverse=reverse,
         )
 
-    def RebuildBodyData(self):
+    def RebuildData(self, key):
         """
-        Rebuilds JSON database for body spritesheet filepaths.
+        Callback function. Rebuilds a given JSON database.
 
-        :return: None
+        :param key: Either of "head" or "body".
+
+        :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["data"]["body"]
+        query = App.MESSAGES["confirm"]["rebuild"]["data"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            CreateBodyJSON()
-            self.InitData("body")
-            self.InitMenu(
-                self._FrameGroupBot,
-                "select-body",
-                self._Data["body"]["list"],
-            )
-
+            CreateInputJSON(key)
+            self.InitData(key)
+            self.InitMenu(self._FrameGroupBot, key, self._Data[key]["list"])
             tk.messagebox.showinfo(
                 title,
-                App.MESSAGES["message"]["rebuild"]["data"]["body"],
+                App.MESSAGES["message"]["rebuild"][key]["data"],
             )
 
     # noinspection PyMethodMayBeStatic
-    def RebuildBodyImages(self):
+    def RebuildImages(self, key):
         """
         Callback function. Rebuilds intermediate body spritesheets.
 
+        :param key: Either of "head" or "body".
+
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["image"]["body"]
+        query = App.MESSAGES["confirm"]["rebuild"]["image"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            PrepareBody()
+            Prepare(key)
             tk.messagebox.showinfo(
                 title,
-                App.MESSAGES["message"]["rebuild"]["image"]["body"],
+                App.MESSAGES["message"]["rebuild"]["image"][key],
             )
 
-    def RebuildBodyOffsets(self):
+    def RebuildOffsets(self, key):
         """
-        Callback function. Rebuilds body offset database.
+        Callback function. Rebuilds offset database.
+
+        :param key: Either of "head" or "body".
 
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["offset"]["body"]
+        query = App.MESSAGES["confirm"]["rebuild"]["offset"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            self._Data["body"]["offset"] = LoadBodyOffsets()
+            self._Data[key]["offset"] = LoadOffsets(key)
             self.UpdateOffsetLabels()
             self.DoMakePreview()
 
             tk.messagebox.showinfo(
                 title,
-                App.MESSAGES["message"]["rebuild"]["offset"]["body"],
-            )
-
-    def RebuildHeadData(self):
-        """
-        Callback function. Rebuilds head JSON database.
-
-        :return: None.
-        """
-        title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["data"]["head"]
-
-        if tk.messagebox.askquestion(title, query) == "yes":
-            CreateHeadJSON()
-            self.InitData("head")
-            self.InitMenu(
-                self._FrameGroupBot,
-                "select-head",
-                self._Data["head"]["list"],
-            )
-
-            tk.messagebox.showinfo(
-                title,
-                App.MESSAGES["message"]["rebuild"]["head"]["data"],
+                App.MESSAGES["message"]["rebuild"]["offset"][key],
             )
 
     # noinspection PyMethodMayBeStatic
-    def RebuildHeadImages(self):
+    def DestroyImages(self, key):
         """
-        Callback function. Rebuilds intermediate head spritesheets.
+        Callback function. Destroys intermediate spritesheets.
+
+        :param key: Either of "head" or "body".
 
         :return: None.
         """
         title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["image"]["head"]
+        query = App.MESSAGES["confirm"]["destroy"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            PrepareHead()
+            FlushInputs(key)
             tk.messagebox.showinfo(
                 title,
-                App.MESSAGES["message"]["rebuild"]["image"]["head"],
-            )
-
-    def RebuildHeadOffsets(self):
-        """
-        Callback function. Rebuilds head offset database.
-
-        :return: None.
-        """
-        title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["offset"]["head"]
-
-        if tk.messagebox.askquestion(title, query) == "yes":
-            self._Data["head"]["offset"] = LoadHeadOffsets()
-            self.UpdateOffsetLabels()
-            self.DoMakePreview()
-
-            tk.messagebox.showinfo(
-                title,
-                App.MESSAGES["message"]["rebuild"]["offset"]["head"],
-            )
-
-    # noinspection PyMethodMayBeStatic
-    def DestroyHeadImages(self):
-        """
-        Callback function. Destroys intermediate head spritesheets.
-
-        :return: None.
-        """
-        title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["destroy"]["head"]
-
-        if tk.messagebox.askquestion(title, query) == "yes":
-            FlushHeads()
-            tk.messagebox.showinfo(
-                title,
-                App.MESSAGES["message"]["destroy"]["head"],
+                App.MESSAGES["message"]["destroy"][key],
             )
 
     def ShuffleAll(self):
@@ -1698,8 +1634,8 @@ class App(tk.Frame):
 
         :return:
         """
-        self._StringVars["select-body"].set(random.choice(self._Data["body"]["list"]))
-        self._StringVars["select-head"].set(random.choice(self._Data["head"]["list"]))
+        self._StringVars["body"].set(random.choice(self._Data["body"]["list"]))
+        self._StringVars["head"].set(random.choice(self._Data["head"]["list"]))
         self.DoMakePreview()
 
     def TurnPlaybackOn(self):

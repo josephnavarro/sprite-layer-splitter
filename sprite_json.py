@@ -11,23 +11,25 @@ import glob
 from sprite_utils import *
 
 
-TEMPLATE_JSON_BASE = "{{{}}}"
-TEMPLATE_JSON_HEAD = "\"{name}\": {{" \
-                     "\"path\": [\"images\", \"head\", \"{name}.png\"]," \
-                     "\"name\": \"{full}\"" \
-                     "}},"
-TEMPLATE_JSON_BODY = "\"{name}\": {{" \
-                     "\"path\": [\"images\", \"body\", \"{name}.png\"]," \
-                     "\"name\": \"{full}\"" \
-                     "}},"
+JSON_TEMPLATES = {
+    "base": "{{{}}}",
+    "head": "\"{name}\": {{"
+            "\"path\": [\"images\", \"head\", \"{name}.png\"],"
+            "\"name\": \"{full}\""
+            "}},",
+    "body": "\"{name}\": {{"
+            "\"path\": [\"images\", \"body\", \"{name}.png\"],"
+            "\"name\": \"{full}\""
+            "}},",
+}
 
 PATHS = {
-    "impath": os.path.join(ROOT_INPUT_DIR, "paths"),
-    "offset": os.path.join(ROOT_INPUT_DIR, "offsets"),
+    "impath": os.path.join(DIRECTORIES["input"]["root"], "paths"),
+    "offset": os.path.join(DIRECTORIES["input"]["root"], "offsets"),
     "source": {
-        "root": os.path.join(ROOT_INPUT_DIR, "sources"),
-        "head": os.path.join(ROOT_INPUT_DIR, "sources", "head"),
-        "body": os.path.join(ROOT_INPUT_DIR, "sources", "body"),
+        "root": os.path.join(DIRECTORIES["input"]["root"], "sources"),
+        "head": os.path.join(DIRECTORIES["input"]["root"], "sources", "head"),
+        "body": os.path.join(DIRECTORIES["input"]["root"], "sources", "body"),
     },
 }
 
@@ -51,7 +53,7 @@ JSONS = {
 JSON_KEY_DEFAULT = "?.default"
 
 
-def CreateHeadJSON():
+def CreateInputJSON(key):
     """
     Automatically generates a character head JSON file.
 
@@ -59,7 +61,7 @@ def CreateHeadJSON():
 
     :return: None.
     """
-    path = os.path.join(HEAD_DIRECTORY, "*.png")
+    path = os.path.join(DIRECTORIES["input"][key], "*.png")
 
     contents = ""
     for fn in sorted(glob.glob(path)):
@@ -74,43 +76,27 @@ def CreateHeadJSON():
             )
         ) for x in n.split("-")
         ])
-        contents += TEMPLATE_JSON_HEAD.format(name=n, full=p)
+        contents += JSON_TEMPLATES[key].format(name=n, full=p)
 
     contents = contents.rstrip(",")
-    contents = TEMPLATE_JSON_BASE.format(contents)
-    with open(JSONS["paths"]["head"], "w") as f:
+    contents = JSON_TEMPLATES["base"].format(contents)
+
+    with open(JSONS["paths"][key], "w") as f:
         f.write(contents)
 
 
-def CreateBodyJSON():
+def LoadOffsets(key):
     """
-    Automatically generates a JSON file containing paths to body spritesheets.
+    Loads and returns per-frame (x,y) offsets.
 
-    JSON contents will reflect contents of "inputs/body/".
+    :param key: Either of "head" or "body".
 
-    :return: None.
+    :return: Dictionary containing all (x,y) offsets.
     """
-    path = os.path.join(BODY_DIRECTORY, "*.png")
+    with open(JSONS["offset"][key], "r") as f:
+        data = json.load(f)
+    return data
 
-    contents = ""
-    for fn in sorted(glob.glob(path)):
-        n = os.path.splitext(os.path.basename(fn))[0]
-        p = " ".join([(
-            "({})".format(x.capitalize())
-            if len(x) == 1
-            else (
-                x
-                if len(x) == 2
-                else x.capitalize()
-            )
-        ) for x in n.split("-")
-        ])
-        contents += TEMPLATE_JSON_BODY.format(name=n, full=p)
-
-    contents = contents.rstrip(",")
-    contents = TEMPLATE_JSON_BASE.format(contents)
-    with open(JSONS["paths"]["body"], "w") as f:
-        f.write(contents)
 
 def LoadPaths(key):
     """
@@ -125,68 +111,15 @@ def LoadPaths(key):
     return data
 
 
-def _LoadHeadPaths():
+def LoadCreate(key):
     """
-    Loads and returns relative filepaths to character head spritesheets.
+    Loads and returns cropping regions on raw spritesheets.
 
-    :return: Dictionary containing character head filepaths.
-    """
-    with open(JSONS["paths"]["head"], "r") as f:
-        data = json.load(f)
-    return data
-
-
-def _LoadBodyPaths():
-    """
-    Loads and returns relative filepaths to character body spritesheets.
-
-    :return: Dictionary containing character body filepaths.
-    """
-    with open(JSONS["paths"]["body"], "r") as f:
-        data = json.load(f)
-    return data
-
-
-def LoadBodyOffsets():
-    """
-    Loads and returns per-frame character body offsets.
-
-    :return: Dictionary containing all characters' body offsets.
-    """
-    with open(JSONS["offset"]["body"], "r") as f:
-        data = json.load(f)
-    return data
-
-
-def LoadHeadOffsets():
-    """
-    Loads and returns per-frame character head offsets.
-
-    :return: Dictionary containing all characters' head offsets.
-    """
-    with open(JSONS["offset"]["head"], "r") as f:
-        data = json.load(f)
-    return data
-
-
-def LoadCreateBody():
-    """
-    Loads and returns cropping regions on raw body spritesheets.
+    :param key: Either of "head" or "body".
 
     :return: Dictionary containing cropping rules for body spritesheets.
     """
-    with open(JSONS["sources"]["body"], "r") as f:
-        data = json.load(f)
-    return data
-
-
-def LoadCreateHead():
-    """
-    Loads and returns cropping regions on raw head spritesheets.
-
-    :return: Dictionary containing cropping rules for head spritesheets.
-    """
-    with open(JSONS["sources"]["head"], "r") as f:
+    with open(JSONS["sources"][key], "r") as f:
         data = json.load(f)
     return data
 
@@ -214,5 +147,5 @@ def LoadSourceCropping():
 
 
 if __name__ == "__main__":
-    CreateHeadJSON()
-    CreateBodyJSON()
+    CreateInputJSON("head")
+    CreateInputJSON("body")

@@ -406,22 +406,28 @@ def Composite(head,
     :return: Composited image.
     """
     # Load head compositing data from JSON
-    headOffsets = LoadHeadOffsets()
+    headOffsets = LoadOffsets("head")
     headPaths = LoadPaths("head")
     if not head:
         headPath = ""
     else:
-        headPath = os.path.join(ROOT_INPUT_DIR, *headPaths[head]["path"])
+        headPath = os.path.join(
+            DIRECTORIES["input"]["root"],
+            *headPaths[head]["path"]
+        )
         if not os.path.isfile(headPath):
             raise NonexistentHeadException(headPath)
 
     # Load body compositing data from JSON
-    bodyOffsets = LoadBodyOffsets()
+    bodyOffsets = LoadOffsets("body")
     bodyPaths = LoadPaths("body")
     if not body:
         bodyPath = ""
     else:
-        bodyPath = os.path.join(ROOT_INPUT_DIR, *bodyPaths[body]["path"])
+        bodyPath = os.path.join(
+            DIRECTORIES["input"]["root"],
+            *bodyPaths[body]["path"]
+        )
         if not os.path.isfile(bodyPath):
             raise NonexistentBodyException(bodyPath)
 

@@ -43,52 +43,34 @@ def MakeImage(w, h):
     return Image.new(MODE, (w, h), (0, 0, 0, 255))
 
 
-def PrepareBody():
+def Prepare(key):
     """
-    Creates intermediate body spritesheets.
+    Creates intermediate spritesheets.
+
+    :param key: Either of "head" or "body".
 
     :return: None.
     """
-    print("Now generating intermediate body spritesheets...")
+    print("Now generating intermediate {} spritesheets...".format(key))
 
-    bodyData = LoadCreateBody()
-    files = glob.glob(os.path.join(PATHS["source"]["body"], "*.png"))
+    data = LoadCreate(key)
+    files = glob.glob(os.path.join(PATHS["source"][key], "*.png"))
     files.sort()
 
     for filename in files:
         print("Generating intermediate for {}...".format(filename))
 
-        root = FixPath(BODY_DIRECTORY)
+        root = FixPath(DIRECTORIES["input"][key])
         path = os.path.join(root, os.path.split(filename)[-1])
 
-        image = ProcessBody(filename, bodyData)
-        image.save(path)
+        if key == "head":
+            image = ProcessHead(filename, data)
+            image.save(path)
+        elif key == "body":
+            image = ProcessBody(filename, data)
+            image.save(path)
 
-    print("Intermediate body spritesheets complete!")
-
-
-def PrepareHead():
-    """
-    Creates intermediate head spritesheets.
-
-    :return: None.
-    """
-    print("Now generating intermediate head spritesheets...")
-
-    headData = LoadCreateHead()
-    files = glob.glob(os.path.join(PATHS["source"]["head"], "*.png"))
-    files.sort()
-
-    for filename in files:
-        print("Generating intermediate for {}...".format(filename))
-
-        root = FixPath(HEAD_DIRECTORY)
-        path = os.path.join(root, os.path.split(filename)[-1])
-
-        image = ProcessHead(filename, headData)
-        image.save(path)
-
-    print("Intermediate head spritesheets complete!")
+    print("Intermediate {} spritesheets complete!".format(key))
 
 
 def ProcessBody(filename, data):
@@ -178,5 +160,5 @@ def ProcessHead(filename, data):
 
 
 if __name__ == "__main__":
-    PrepareBody()
-    PrepareHead()
+    Prepare("body")
+    Prepare("head")

@@ -29,33 +29,21 @@ def IsOSX():
     return sys.platform == "darwin"
 
 
-def FlushBodies():
+def FlushInputs(key):
     """
-    Flushes entire body input directory.
+    Flushes an input directory.
+
+    :param key: Either of "head" or "body".
 
     :return: True on success; false otherwise.
     """
+    path = DIRECTORIES["input"][key]
     try:
-        shutil.rmtree(BODY_DIRECTORY)
-        print("Removed directory '{}'!".format(BODY_DIRECTORY))
+        shutil.rmtree(path)
+        print("Removed directory '{}'!".format(path))
         return True
     except FileNotFoundError:
-        print("Directory '{}' already removed!".format(BODY_DIRECTORY))
-        return False
-
-
-def FlushHeads():
-    """
-    Flushes entire head input directory.
-
-    :return: True on success; false otherwise.
-    """
-    try:
-        shutil.rmtree(HEAD_DIRECTORY)
-        print("Removed directory '{}'!".format(HEAD_DIRECTORY))
-        return True
-    except FileNotFoundError:
-        print("Directory '{}' already removed!".format(HEAD_DIRECTORY))
+        print("Directory '{}' already removed!".format(path))
         return False
 
 
