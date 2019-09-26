@@ -108,6 +108,18 @@ def ToTkinter(image):
     return ImageTk.PhotoImage(image)
 
 
+def OpenTkinter(path):
+    """
+    Docstring goes here.
+
+    :param path:
+
+    :return:
+    """
+    image = Image.open(path)
+    return ImageTk.PhotoImage(image.resize((16, 16), Image.ANTIALIAS))
+
+
 def ToPILToTkinter(image):
     """
     Converts a numpy array to a PIL image to a Tkinter-compatible object.

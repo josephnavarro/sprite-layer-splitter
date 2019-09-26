@@ -118,72 +118,84 @@ class App(tk.Frame):
 
     # Default widget dimensions
     SIZES = {
-        "preview-static": [384, 96],
         "preview-anim":   [96, 96],
         "preview-resize": [384, 96],
+        "preview-static": [384, 96],
+        "play-button":    [32, 32],
+        "pause-button":   [32, 32],
     }
 
     if IsWindows():
         # Windows
-        SIZES["default-menu"] = [26, 0]
         SIZES["default-button"] = [27, 0]
+        SIZES["default-menu"] = [26, 0]
         SIZES["default-slider"] = [272, 0]
         FONTSIZE_VARW = 13
         FONTSIZE_MONO = 10
         CANVAS_BORDER = 13
     else:
         # OS X / Linux
-        SIZES["default-menu"] = [19, 0]
-        SIZES["default-button"] = [22, 0]
-        SIZES["default-slider"] = [272, 0]
+        SIZES["default-button"] = [28, 0]
+        SIZES["default-menu"] = [25, 0]
+        SIZES["default-slider"] = [248, 0]
         FONTSIZE_VARW = 13
         FONTSIZE_MONO = 14
         CANVAS_BORDER = 13
 
-    # Grid positions for widgets
-    GRID_SCALE_SPEED_PREVIEW = [4, 1]
-
     GRID = {
-        "head-options":         [1, 0],
-        "select-head":          [2, 0],
-        "rebuild-head-images":  [3, 0],
-        "rebuild-head-data":    [4, 0],
-        "rebuild-head-offsets": [5, 0],
-        "destroy-head-images":  [6, 0],
+        "head-options":         [6, 0],
+        "select-head":          [7, 0],
+        "rebuild-head-images":  [8, 0],
+        "rebuild-head-data":    [9, 0],
+        "rebuild-head-offsets": [10, 0],
+        "destroy-head-images":  [11, 0],
 
-        "body-options":         [1, 1],
-        "select-body":          [2, 1],
-        "rebuild-body-images":  [3, 1],
-        "rebuild-body-data":    [4, 1],
-        "rebuild-body-offsets": [5, 1],
-        "destroy-body-images":  [6, 1],
+        "body-options":         [12, 0],
+        "select-body":          [13, 0],
+        "rebuild-body-images":  [14, 0],
+        "rebuild-body-data":    [15, 0],
+        "rebuild-body-offsets": [16, 0],
+        "destroy-body-images":  [17, 0],
 
-        "preview-options":      [1, 2],
-        "preview-idle":         [2, 2],
-        "preview-left":         [3, 2],
-        "preview-right":        [4, 2],
-        "pingpong-animation":   [5, 2],
-        "reverse-layers":       [6, 2],
+        "preview-options":      [6, 1],
+        "preview-idle":         [7, 1],
+        "preview-left":         [8, 1],
+        "preview-right":        [9, 1],
+        "pingpong-animation":   [10, 1],
+        "reverse-layers":       [11, 1],
 
-        "export-options":       [1, 3],
-        "export-full":          [2, 3],
-        "export-idle":          [3, 3],
-        "prioritize-label":     [4, 3],
-        "prioritize-1":         [5, 3],
-        "prioritize-2":         [6, 3],
+        "export-options":       [12, 1],
+        "export-full":          [13, 1],
+        "export-idle":          [14, 1],
+        "prioritize-label":     [15, 1],
+        "prioritize-1":         [16, 1],
+        "prioritize-2":         [17, 1],
 
         "preview-static":       [0, 1],
         "preview-anim":         [0, 2],
-        "frame-anim":           [0, 1],
-        "offset-head":          [1, 1],
-        "offset-body":          [2, 1],
-        "speed-anim":           [3, 1],
+        "speed-slider":         [1, 0],
+        "speed-anim":           [2, 0],
+        "frame-anim":           [3, 0],
+        "offset-head":          [4, 0],
+        "offset-body":          [5, 0],
+
+        "play-button":          [0, 1],
+        "pause-button":         [0, 2],
     }
 
     # Padding for widgets
     PAD = {
         "export-full":          [4, 4],
         "export-idle":          [4, 4],
+        "export-options":       [4, 4],
+        "speed-anim":           [12, 0],
+        "frame-anim":           [12, 0],
+        "offset-head":          [12, 0],
+        "offset-body":          [12, 0],
+        "preview-options":      [4, 4],
+        "body-options":         [4, 4],
+        "head-options":         [4, 4],
+        "prioritize-label":     [4, 4],
         "preview-idle":         [4, 4],
         "preview-left":         [4, 4],
         "preview-right":        [4, 4],
@@ -197,6 +209,10 @@ class App(tk.Frame):
         "select-head":          [4, 4],
         "destroy-body-images":  [4, 4],
         "destroy-head-images":  [4, 4],
+        "pingpong-animation":   [12, 4],
+        "reverse-layers":       [12, 4],
+        "play-button":          [0, 0],
+        "pause-button":         [0, 0],
     }
 
     # Preview composition dimensions
@@ -233,14 +249,22 @@ class App(tk.Frame):
         "rebuild-head-offsets": "Refresh head offsets",
         "destroy-head-images":  "Clean head sources",
 
-        "frame-anim":           "Frame: ({0:d})  {1:d}   {2:d}   {3:d}",
-        "offset-body":          "Body:   x = {0:+d}; y = {1:+d}",
-        "offset-head":          "Head:   x = {0:+d}; y = {1:+d}",
-        "speed-anim":           "Speed:  {0:d}",
+        "frame-anim":           "Frame := ({0:d})  {1:d}   {2:d}   {3:d}",
+        "offset-body":          "Body  :=  x: {0:+d} / y: {1:+d}",
+        "offset-head":          "Head  :=  x: {0:+d} / y: {1:+d}",
+        "speed-anim":           "Speed :=  {0:d}",
 
         "prioritize-label":     "On layer collision",
         "prioritize-1":         "Paste head first",
         "prioritize-2":         "Paste body first",
+
+        "play-button":          "",
+        "pause-button":         "",
+    }
+
+    IMAGES = {
+        "play-button":  os.path.join("misc", "play.png"),
+        "pause-button": os.path.join("misc", "pause.png"),
     }
 
     COLORS = {
@@ -261,6 +285,9 @@ class App(tk.Frame):
         "select-body":          {"fg": [0, 0, 0], "bg": [255, 200, 200]},
         "preview-static":       {"fg": [0, 0, 0], "bg": [128, 128, 128]},
         "preview-anim":         {"fg": [0, 0, 0], "bg": [128, 128, 128]},
+
+        "play-button":          {"fg": [0, 0, 0], "bg": [128, 128, 128]},
+        "pause-button":         {"fg": [0, 0, 0], "bg": [128, 128, 128]},
     }
 
     # Animation speed slider
@@ -383,10 +410,12 @@ class App(tk.Frame):
         self._Animation = {
             "init":    False,
             "forward": True,
+            "playing": False,
             "objects": [],
             "frame":   0,
-            "speed":   0,
+            "speed":   6,
             "state":   STATES.idle,
+
         }
 
         self._Body = {
@@ -416,8 +445,14 @@ class App(tk.Frame):
         self._FrameBottom = tk.Frame(self._Master)
         self._FrameBottom.grid(row=2)
 
-        self._FrameLast = tk.Frame(self._FrameBottom, height=10)
-        self._FrameLast.grid(row=7)
+        self._FrameBottomRight = tk.Frame(self._FrameBottom)
+        self._FrameBottomRight.grid(column=1, row=1)
+
+        self._FramePadBottom = tk.Frame(self._FrameBottom, height=10)
+        self._FramePadBottom.grid(row=24)
+
+        self._FramePadTop = tk.Frame(self._FrameTopleft, height=10)
+        self._FramePadTop.grid(row=1)
 
         # Boolean variables
         self._BooleanVars = {
@@ -447,6 +482,8 @@ class App(tk.Frame):
             "rebuild-head-images":  tk.Button(),
             "rebuild-head-offsets": tk.Button(),
             "destroy-head-images":  tk.Button(),
+            "play-button":          tk.Button(),
+            "pause-button":         tk.Button(),
         }
 
         # Canvases
@@ -525,28 +562,28 @@ class App(tk.Frame):
         self.InitSliderFramerate()
 
         self.InitLabel(
-            self._FrameTopRight,
+            self._FrameBottom,
             "speed-anim",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0,
         )
 
         self.InitLabel(
-            self._FrameTopRight,
+            self._FrameBottom,
             "frame-anim",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0, 1, 2, 3,
         )
 
         self.InitLabel(
-            self._FrameTopRight,
+            self._FrameBottom,
             "offset-head",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0, 0,
         )
 
         self.InitLabel(
-            self._FrameTopRight,
+            self._FrameBottom,
             "offset-body",
             ("Courier", App.FONTSIZE_MONO),
             tk.W, 0, 0,
@@ -639,6 +676,18 @@ class App(tk.Frame):
             self.DestroyHeadImages,
         )
 
+        self.InitButton(
+            self._FrameBottomRight,
+            "play-button",
+            self.TurnPlaybackOn,
+        )
+
+        self.InitButton(
+            self._FrameBottomRight,
+            "pause-button",
+            self.TurnPlaybackOff,
+        )
+
         self.InitMenu(
             self._FrameBottom,
             "select-head",
@@ -654,13 +703,13 @@ class App(tk.Frame):
         self.InitCheckbox(
             self._FrameBottom,
             "pingpong-animation",
-            tk.NS,
+            tk.W,
         )
 
         self.InitCheckbox(
             self._FrameBottom,
             "reverse-layers",
-            tk.NS,
+            tk.W,
         )
 
         self.InitLabel(
@@ -697,7 +746,8 @@ class App(tk.Frame):
 
         :return: None
         """
-        self.UpdateCurrentFrame()
+        if self._Animation["playing"]:
+            self.UpdateCurrentFrame()
         self.UpdateOffsetLabels()
 
         try:
@@ -889,9 +939,18 @@ class App(tk.Frame):
 
         :return: None.
         """
-        width = App.SIZES["default-button"][0]  # Button width
+        size = App.SIZES.get(tag, App.SIZES["default-button"])
+        width = size[0]  # Button width
+        height = size[1]  # Button height
         foreground = App.FromRGB(*App.COLORS[tag]["fg"])  # FG color
         background = App.FromRGB(*App.COLORS[tag]["bg"])  # BG color
+
+        # Image object
+        path = App.IMAGES.get(tag, "")
+        if path:
+            image = sprite_imaging.OpenTkinter(path)
+        else:
+            image = None
 
         button = tk.Button(
             master,
@@ -899,12 +958,16 @@ class App(tk.Frame):
             command=command,
         )
 
+        button.image = image
+
         button.config(
             width=width,
+            height=height,
             foreground=foreground,
             background=background,
             activebackground=background,
             activeforeground=foreground,
+            image=image,
         )
 
         button.grid(
@@ -965,6 +1028,8 @@ class App(tk.Frame):
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
             sticky=sticky,
+            padx=App.PAD[tag][0],
+            pady=App.PAD[tag][1],
         )
 
         if command is not None:
@@ -1027,6 +1092,8 @@ class App(tk.Frame):
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
             sticky=sticky,
+            padx=App.PAD[tag][0],
+            pady=App.PAD[tag][1],
         )
 
         self._Labels[tag].destroy()
@@ -1110,7 +1177,7 @@ class App(tk.Frame):
         :return: None.
         """
         scale = tk.Scale(
-            self._FrameTopRight,
+            self._FrameBottom,
             from_=App.SPEED_SCALE_MIN,
             to=App.SPEED_SCALE_MAX,
             orient=tk.HORIZONTAL,
@@ -1118,10 +1185,14 @@ class App(tk.Frame):
             showvalue=0,
             command=self.UpdateSpeed,
         )
+
+        scale.set(self._Animation["speed"])
+
         scale.grid(
-            row=App.GRID_SCALE_SPEED_PREVIEW[0],
-            column=App.GRID_SCALE_SPEED_PREVIEW[1],
+            row=App.GRID["speed-slider"][0],
+            column=App.GRID["speed-slider"][1],
             sticky=tk.W,
+            padx=16,
             pady=4,
         )
 
@@ -1484,6 +1555,26 @@ class App(tk.Frame):
             elif state == STATES.right:
                 self.MakeRightPreview()
 
+    def TurnPlaybackOn(self):
+        """
+        Turns animation playing on.
+
+        :return: None.
+        """
+        self._Animation["playing"] = True
+        self._Buttons["pause-button"].config(relief=tk.RAISED)
+        self._Buttons["play-button"].config(relief=tk.SUNKEN)
+
+    def TurnPlaybackOff(self):
+        """
+        Turns animation playing off.
+
+        :return: None.
+        """
+        self._Animation["playing"] = False
+        self._Buttons["pause-button"].config(relief=tk.RAISED)
+        self._Buttons["play-button"].config(relief=tk.SUNKEN)
+
     def UpdateBodyOffsetLabel(self, state, frame):
         """
         Updates label for current (x,y) body offset.
@@ -1553,7 +1644,7 @@ class App(tk.Frame):
         :return: None.
         """
         self._Labels["frame-anim"].config(
-            text="Frame: " + " ".join([
+            text="Frame := " + " ".join([
                 "({})".format(x)
                 if x == self._Animation["frame"]
                 else " {} ".format(x)
