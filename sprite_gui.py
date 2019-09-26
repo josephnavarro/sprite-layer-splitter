@@ -853,14 +853,14 @@ class App(tk.Frame):
         self.InitButton(
             self._FrameBotRight,
             "skip-right-button",
-            self.FrameForward,
+            lambda: self.FrameSkip(1),
         )
 
         # Initialize "skip frame left" button
         self.InitButton(
             self._FrameBotRight,
             "skip-left-button",
-            self.FrameBackward,
+            lambda: self.FrameSkip(-1),
         )
 
         # Initialize "shuffle" button
@@ -1242,6 +1242,7 @@ class App(tk.Frame):
         self._Data[key]["list"] = [App.DEFAULT_NAME] + sorted(list(data))
         self._Data[key]["offset"] = LoadOffsets(key)
 
+
     def InitLabel(self, master, tag, font, sticky, *args):
         """
         Initializes a label.
@@ -1473,14 +1474,14 @@ class App(tk.Frame):
                     try:
                         # Populate per-frame head offset data
                         self._Data["head"]["current"] = \
-                        self._Data["head"]["offset"][body]
+                            self._Data["head"]["offset"][body]
                     except KeyError:
                         self._Data["head"]["current"] = {}
 
                     try:
                         # Populate per-frame body offset data
                         self._Data["body"]["current"] = \
-                        self._Data["body"]["offset"][body]
+                            self._Data["body"]["offset"][body]
                     except KeyError:
                         self._Data["body"]["current"] = {}
 
@@ -1567,7 +1568,7 @@ class App(tk.Frame):
             self.InitMenu(self._FrameGroupBot, key, self._Data[key]["list"])
             tk.messagebox.showinfo(
                 title,
-                App.MESSAGES["message"]["rebuild"][key]["data"],
+                App.MESSAGES["message"]["rebuild"]["data"][key],
             )
 
     # noinspection PyMethodMayBeStatic
@@ -1663,11 +1664,12 @@ class App(tk.Frame):
             self._Buttons["pause-button"].config(relief=tk.SUNKEN)
             self._Buttons["play-button"].config(relief=tk.RAISED)
 
-    def FrameForward(self):
+    def FrameSkip(self, skip):
         """
-        Skips one frame to the right.
+        Skips any number of frames forward or backward.
+        Implements wrapping at bounds.
 
-        Wraps around to the first frame if at the last one.
+        :param skip: Number (and direction) of frames to skip.
 
         :return: None.
         """
@@ -1676,55 +1678,15 @@ class App(tk.Frame):
             self._Buttons["pause-button"].config(relief=tk.SUNKEN)
             self._Buttons["play-button"].config(relief=tk.RAISED)
 
-            self._Animation["frame"] += 1
-            if self._Animation["frame"] >= 4:
+            self._Animation["frame"] += skip
+            if self._Animation["frame"] < 0:
+                self._Animation["frame"] = 3
+            elif self._Animation["frame"] >= 4:
                 self._Animation["frame"] = 0
 
             self.UpdateOffsetLabels()
             self.UpdateFrameCountLabel()
             self.UpdateAnimationImage()
-
-    def FrameBackward(self):
-        """
-        Skips one frame to the left.
-
-        Wraps around to the last frame if at the first one.
-
-        :return: None.
-        """
-        if self._Animation["objects"]:
-            self._Animation["playing"] = False
-            self._Buttons["pause-button"].config(relief=tk.SUNKEN)
-            self._Buttons["play-button"].config(relief=tk.RAISED)
-
-            self._Animation["frame"] -= 1
-            if self._Animation["frame"] < 0:
-                self._Animation["frame"] = 3
-
-            self.UpdateOffsetLabels()
-            self.UpdateFrameCountLabel()
-            self.UpdateAnimationImage()
-
-    def UpdateBodyOffsetLabel(self, state, frame):
-        """
-        Updates label for current (x,y) body offset.
-
-        :param state: Current sprite state.
-        :param frame: Current frame of animation.
-
-        :return: None.
-        """
-        try:
-            self._Labels["offset-body"].config(
-                text=App.LABELS["offset-body"].format(
-                    *self._Data["body"]["current"]["offset"][state][frame]
-                )
-            )
-
-        except (KeyError, IndexError):
-            self._Labels["offset-body"].config(
-                text=App.LABELS["offset-body"].format(0, 0)
-            )
 
     def UpdateCurrentFrame(self):
         """
@@ -1782,26 +1744,25 @@ class App(tk.Frame):
             ])
         )
 
-    def UpdateHeadOffsetLabel(self, state, frame):
+    def UpdateOffsetLabel(self, key, state, frame):
         """
         Updates label for current (x,y) head offset.
 
+        :param key:   Either of "head" or "body".
         :param state: Current sprite state.
         :param frame: Current frame of animation.
 
         :return: None.
         """
+        label = "offset-{}".format(key)
         try:
-            self._Labels["offset-head"].config(
-                text=App.LABELS["offset-head"].format(
-                    *self._Data["head"]["current"]["offset"][state][frame]
+            self._Labels[label].config(
+                text=App.LABELS[label].format(
+                    *self._Data[key]["current"]["offset"][state][frame]
                 )
             )
-
-        except (KeyError, IndexError):
-            self._Labels["offset-head"].config(
-                text=App.LABELS["offset-head"].format(0, 0)
-            )
+        except (KeyError, IndexError) as e:
+            self._Labels[label].config(text=App.LABELS[label].format(0, 0))
 
     def UpdateAnimationImage(self):
         """
@@ -1833,8 +1794,8 @@ class App(tk.Frame):
         """
         state = self._Animation["state"]
         frame = self._Animation["frame"]
-        self.UpdateHeadOffsetLabel(state, frame)
-        self.UpdateBodyOffsetLabel(state, frame)
+        self.UpdateOffsetLabel("head", state, frame)
+        self.UpdateOffsetLabel("body", state, frame)
 
     def UpdateSpeed(self, speed):
         """
