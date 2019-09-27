@@ -156,7 +156,7 @@ class App(tk.Frame):
         # Windows
         SIZES["default-button"] = [36, 0]
         SIZES["default-menu"] = [37, 0]
-        SIZES["default-slider"] = [256, 0]
+        SIZES["default-slider"] = [120, 0]
 
         FONTSIZE_VAR_W = 13
         FONTSIZE_MONOS = 10
@@ -167,7 +167,7 @@ class App(tk.Frame):
         # OS X / Linux
         SIZES["default-button"] = [28, 0]
         SIZES["default-menu"] = [25, 0]
-        SIZES["default-slider"] = [248, 0]
+        SIZES["default-slider"] = [120, 0]
 
         FONTSIZE_VAR_W = 13
         FONTSIZE_MONOS = 14
@@ -601,6 +601,12 @@ class App(tk.Frame):
         self._FrameBotLeftBot = tk.Frame(self._FrameBotLeft)
         self._FrameBotLeftBot.grid(column=0, row=7)
 
+        self._FrameBotRightLeft = tk.Frame(self._FrameBotRight)
+        self._FrameBotRightLeft.grid(column=0, row=0)
+
+        self._FrameBotRightRight = tk.Frame(self._FrameBotRight)
+        self._FrameBotRightRight.grid(column=1, row=0)
+
         # Padding frames
         self._FramePadMidTop = tk.Frame(self._FrameTopRight, width=1, height=10)
         self._FramePadMidTop.grid(row=0, column=0)
@@ -884,13 +890,14 @@ class App(tk.Frame):
         """
         self.TurnPlaybackOff()
 
+        callback = sprite_splitter.Composite
         state = state or str(self._Animation["state"])
         color = App.COLORS["preview-static"]["bg"]
         headfirst = self._StringVars["prioritize"].get() == "Head"
         reverse = self._BooleanVars["reverse-layers"].get()
 
         self.MakePreview(
-            sprite_splitter.Composite,
+            callback,
             state,
             color=color,
             headfirst=headfirst,
@@ -1097,14 +1104,14 @@ class App(tk.Frame):
 
         # Initialize "play animation" button
         self.InitButton(
-            self._FrameBotRight,
+            self._FrameBotRightRight,
             "play-button",
             self.TurnPlaybackOn,
         )
 
         # Initialize "pause animation" button
         self.InitButton(
-            self._FrameBotRight,
+            self._FrameBotRightRight,
             "pause-button",
             self.TurnPlaybackOff,
             relief=tk.SUNKEN,
@@ -1112,42 +1119,42 @@ class App(tk.Frame):
 
         # Initialize "skip frame right" button
         self.InitButton(
-            self._FrameBotRight,
+            self._FrameBotRightRight,
             "skip-right-button",
             lambda: self.FrameSkip(1),
         )
 
         # Initialize "skip frame left" button
         self.InitButton(
-            self._FrameBotRight,
+            self._FrameBotRightRight,
             "skip-left-button",
             lambda: self.FrameSkip(-1),
         )
 
         # Initialize "shuffle" button
         self.InitButton(
-            self._FrameBotRight,
+            self._FrameBotRightRight,
             "shuffle-button",
             lambda: (self.ShuffleAll() + self.JumpFrame(0)),
         )
 
         # Initialize "shuffle" button
         self.InitButton(
-            self._FrameBotRight,
+            self._FrameBotRightRight,
             "shuffle-body-button",
             lambda: (self.ShuffleBody() + self.JumpFrame(0)),
         )
 
         # Initialize "shuffle" button
         self.InitButton(
-            self._FrameBotRight,
+            self._FrameBotRightRight,
             "shuffle-head-button",
             lambda: (self.ShuffleHead() + self.JumpFrame(0)),
         )
 
         # Initialize "reload" button
         self.InitButton(
-            self._FrameBotRight,
+            self._FrameBotRightRight,
             "reload-button",
             lambda: (self.DoRemakeOffset("head") +
                      self.DoRemakeOffset("body") +
@@ -1156,7 +1163,7 @@ class App(tk.Frame):
 
         # Initialize "idle preview" button
         self.InitButton(
-            self._FrameBotRight,
+            self._FrameBotRightRight,
             "preview-idle-button",
             lambda: (self.DoMakePreview(state="idle") +
                      self.DoPressButton("preview-idle-button") +
@@ -1168,7 +1175,7 @@ class App(tk.Frame):
 
         # Initialize "left preview" button
         self.InitButton(
-            self._FrameBotRight,
+            self._FrameBotRightRight,
             "preview-left-button",
             lambda: (self.DoMakePreview(state="left") +
                      self.DoPressButton("preview-left-button") +
@@ -1179,7 +1186,7 @@ class App(tk.Frame):
 
         # Initialize "right preview" button
         self.InitButton(
-            self._FrameBotRight,
+            self._FrameBotRightRight,
             "preview-right-button",
             lambda: (self.DoMakePreview(state="right") +
                      self.DoPressButton("preview-right-button") +
@@ -1190,14 +1197,14 @@ class App(tk.Frame):
 
         # Initialize "ping-pong" button
         self.InitButton(
-            self._FrameBotRight,
+            self._FrameBotRightRight,
             "ping-pong-button",
             lambda: print("Baz"),
         )
 
         # Initialize "reverse layers" button
         self.InitButton(
-            self._FrameBotRight,
+            self._FrameBotRightRight,
             "layers-button",
             lambda: print("Baz"),
         )
@@ -1727,10 +1734,10 @@ class App(tk.Frame):
         :return: None.
         """
         scale = tk.Scale(
-            self._FrameBotLeft,
-            from_=App.SPEED_SCALE_MIN,
-            to=App.SPEED_SCALE_MAX,
-            orient=tk.HORIZONTAL,
+            self._FrameBotRightLeft,
+            from_=App.SPEED_SCALE_MAX,
+            to=App.SPEED_SCALE_MIN,
+            orient=tk.VERTICAL,
             length=App.SIZES["default-slider"][0],
             showvalue=0,
             command=self.UpdateSpeed,
