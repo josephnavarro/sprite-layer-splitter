@@ -1927,13 +1927,6 @@ class App(tk.Frame):
         self._Labels["speed-anim"].config(text=text)
         self._Animation["speed"] = speed
 
-        if speed == 0:
-            self._Animation["init"] = False
-        else:
-            if not self._Animation["init"]:
-                self._Animation["init"] = True
-                self.DoAnimate()
-
         return 0
 
 
