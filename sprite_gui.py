@@ -1032,14 +1032,16 @@ class App(tk.Frame):
         self.InitButton(
             self._FrameBotRight,
             "shuffle-button",
-            self.ShuffleAll,
+            lambda: (self.ShuffleAll() + self.JumpFrame(0)),
         )
 
         # Initialize "reload" button
         self.InitButton(
             self._FrameBotRight,
             "reload-button",
-            lambda: (self.DoRemakeOffset("head") + self.DoRemakeOffset("body")),
+            lambda: (self.DoRemakeOffset("head") +
+                     self.DoRemakeOffset("body") +
+                     self.JumpFrame(0)),
         )
 
         # Initialize "rebuild body offsets" button
@@ -1074,21 +1076,21 @@ class App(tk.Frame):
         self.InitButton(
             self._FrameGroupBot,
             "preview-idle",
-            lambda: self.DoMakePreview(state="idle"),
+            lambda: (self.DoMakePreview(state="idle") + self.JumpFrame(0)),
         )
 
         # Initialize "make left preview" button
         self.InitButton(
             self._FrameGroupBot,
             "preview-left",
-            lambda: self.DoMakePreview(state="left"),
+            lambda: (self.DoMakePreview(state="left") + self.JumpFrame(0)),
         )
 
         # Initialize "make right preview" button
         self.InitButton(
             self._FrameGroupBot,
             "preview-right",
-            lambda: self.DoMakePreview(state="right"),
+            lambda: (self.DoMakePreview(state="right") + self.JumpFrame(0)),
         )
 
         # Initialize "export idle frames" button
