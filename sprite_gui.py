@@ -132,17 +132,22 @@ class App(tk.Frame):
     # Default widget dimensions
     SIZES = {
         # Preview canvases
-        "preview-anim":      [96, 96],
-        "preview-resize":    [384, 96],
-        "preview-static":    [384, 96],
+        "preview-anim":         [96, 96],
+        "preview-resize":       [384, 96],
+        "preview-static":       [384, 96],
 
         # Icon-based buttons
-        "play-button":       [32, 32],
-        "pause-button":      [32, 32],
-        "skip-right-button": [32, 32],
-        "skip-left-button":  [32, 32],
-        "shuffle-button":    [32, 32],
-        "reload-button":     [32, 32],
+        "play-button":          [32, 32],
+        "pause-button":         [32, 32],
+        "skip-right-button":    [32, 32],
+        "skip-left-button":     [32, 32],
+        "shuffle-button":       [32, 32],
+        "reload-button":        [32, 32],
+        "preview-idle-button":  [32, 32],
+        "preview-left-button":  [32, 32],
+        "preview-right-button": [32, 32],
+        "ping-pong-button":     [32, 32],
+        "layers-button":        [32, 32],
     }
 
     if IsWindows():
@@ -151,10 +156,10 @@ class App(tk.Frame):
         SIZES["default-menu"] = [37, 0]
         SIZES["default-slider"] = [256, 0]
 
-        FONTSIZE_VARW = 13
-        FONTSIZE_MONO = 10
+        FONTSIZE_VAR_W = 13
+        FONTSIZE_MONOS = 10
         FONTSIZE_SMALL = 9
-        CANVAS_BORDER = 13
+        CANVAS_BORDERS = 13
 
     else:
         # OS X / Linux
@@ -162,10 +167,10 @@ class App(tk.Frame):
         SIZES["default-menu"] = [25, 0]
         SIZES["default-slider"] = [248, 0]
 
-        FONTSIZE_VARW = 13
-        FONTSIZE_MONO = 14
+        FONTSIZE_VAR_W = 13
+        FONTSIZE_MONOS = 14
         FONTSIZE_SMALL = 9
-        CANVAS_BORDER = 13
+        CANVAS_BORDERS = 13
 
     GRID = {
         # Preview canvases
@@ -223,6 +228,11 @@ class App(tk.Frame):
         "skip-left-button":     [0, 4],
         "skip-right-button":    [0, 5],
         "shuffle-button":       [0, 6],
+        "preview-idle-button":  [1, 1],
+        "preview-left-button":  [1, 2],
+        "preview-right-button": [1, 3],
+        "ping-pong-button":     [1, 4],
+        "layers-button":        [1, 5],
     }
 
     # Padding for widgets
@@ -286,6 +296,11 @@ class App(tk.Frame):
         "skip-right-button":    [0, 0],
         "shuffle-button":       [0, 0],
         "reload-button":        [0, 0],
+        "preview-idle-button":  [0, 0],
+        "preview-left-button":  [0, 0],
+        "preview-right-button": [0, 0],
+        "ping-pong-button":     [0, 0],
+        "layers-button":        [0, 0],
     }
 
     # Preview composition dimensions
@@ -352,17 +367,29 @@ class App(tk.Frame):
         "skip-left-button":     "",
         "shuffle-button":       "",
         "reload-button":        "",
+        "preview-idle-button":  "",
+        "preview-left-button":  "",
+        "preview-right-button": "",
+        "ping-pong-button":     "",
+        "layers-button":        "",
     }
 
+    # Button icon images
     IMAGES = {
-        "play-button":       os.path.join("misc", "play.png"),
-        "pause-button":      os.path.join("misc", "pause.png"),
-        "skip-right-button": os.path.join("misc", "forward.png"),
-        "skip-left-button":  os.path.join("misc", "backward.png"),
-        "shuffle-button":    os.path.join("misc", "shuffle.png"),
-        "reload-button":     os.path.join("misc", "reload.png"),
+        "play-button":          os.path.join("misc", "play.png"),
+        "pause-button":         os.path.join("misc", "pause.png"),
+        "skip-right-button":    os.path.join("misc", "forward.png"),
+        "skip-left-button":     os.path.join("misc", "backward.png"),
+        "shuffle-button":       os.path.join("misc", "shuffle.png"),
+        "reload-button":        os.path.join("misc", "reload.png"),
+        "preview-idle-button":  os.path.join("misc", "idle.png"),
+        "preview-left-button":  os.path.join("misc", "left.png"),
+        "preview-right-button": os.path.join("misc", "right.png"),
+        "ping-pong-button":     os.path.join("misc", "ping-pong.png"),
+        "layers-button":        os.path.join("misc", "layers.png"),
     }
 
+    # Widget colors (RGB, foreground + background)
     COLORS = {
         "export-full":          {"fg": [0, 0, 0], "bg": [244, 212, 248]},
         "export-idle":          {"fg": [0, 0, 0], "bg": [244, 212, 248]},
@@ -382,12 +409,19 @@ class App(tk.Frame):
         "state":                {"fg": [0, 0, 0], "bg": [200, 255, 212]},
         "preview-static":       {"fg": [0, 0, 0], "bg": [128, 128, 128]},
         "preview-anim":         {"fg": [0, 0, 0], "bg": [128, 128, 128]},
+
+        # Icon-based buttons
         "play-button":          {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "pause-button":         {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "skip-right-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "skip-left-button":     {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "shuffle-button":       {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "reload-button":        {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "preview-idle-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "preview-left-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "preview-right-button": {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "ping-pong-button":     {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "layers-button":        {"fg": [0, 0, 0], "bg": [222, 222, 222]},
     }
 
     # Animation speed slider
@@ -417,7 +451,7 @@ class App(tk.Frame):
 
         :return: None.
         """
-        font = "Courier {} bold".format(App.FONTSIZE_MONO)
+        font = "Courier {} bold".format(App.FONTSIZE_MONOS)
         for m in range(-2, 3):
             for n in range(-2, 3):
                 canvas.create_text(
@@ -520,6 +554,7 @@ class App(tk.Frame):
 
         }
 
+        # Initialize per-frame body and head data
         self._Data = {
             "body": {
                 "current": {},
@@ -590,25 +625,39 @@ class App(tk.Frame):
 
         # Buttons
         self._Buttons = {
+            # Export buttons
             "export-idle":          tk.Button(),
             "export-full":          tk.Button(),
+
+            # Previewing buttons
             "preview-idle":         tk.Button(),
             "preview-left":         tk.Button(),
             "preview-right":        tk.Button(),
+
+            # Body-related buttons
             "rebuild-body-data":    tk.Button(),
             "rebuild-body-images":  tk.Button(),
             "rebuild-body-offsets": tk.Button(),
             "destroy-body-images":  tk.Button(),
+
+            # Head-related buttons
             "rebuild-head-data":    tk.Button(),
             "rebuild-head-images":  tk.Button(),
             "rebuild-head-offsets": tk.Button(),
             "destroy-head-images":  tk.Button(),
+
+            # Icon-based buttons
             "play-button":          tk.Button(),
             "pause-button":         tk.Button(),
             "skip-right-button":    tk.Button(),
             "skip-left-button":     tk.Button(),
             "shuffle-button":       tk.Button(),
             "reload-button":        tk.Button(),
+            "preview-idle-button":  tk.Button(),
+            "preview-left-button":  tk.Button(),
+            "preview-right-button": tk.Button(),
+            "ping-pong-button":     tk.Button(),
+            "layers-button":        tk.Button(),
         }
 
         # Canvases
@@ -672,6 +721,7 @@ class App(tk.Frame):
         # Complete widget initialization
         self.InitData("head")
         self.InitData("body")
+
         self.InitAllButtons()
         self.InitAllCanvases()
         self.InitAllCheckboxes()
@@ -714,11 +764,13 @@ class App(tk.Frame):
 
             speed = self._Animation["speed"]
             if speed > 0:
-                self._AfterJob = self.after(1000 // speed, self.DoAnimate)
+                delay = 1000 // speed
+                self._AfterJob = self.after(delay, self.DoAnimate)
 
         self.UpdateOffsetLabels()
         self.UpdateAnimationImage()
         self.SelectAnimRadioButton()
+
         return 0
 
     def DoComposite(self, func, **kwargs):
@@ -839,13 +891,13 @@ class App(tk.Frame):
 
         :return: 0 on success; -1 on failure.
         """
-        self._Animation["playing"] = False
         if self._AfterJob is not None:
             self.after_cancel(self._AfterJob)
 
         if self._Animation["objects"]:
-            self._Buttons["pause-button"].config(relief=tk.SUNKEN)
-            self._Buttons["play-button"].config(relief=tk.RAISED)
+            self._Animation["playing"] = False
+            self.DoPressButton("pause-button")
+            self.DoUnpressButton("play-button")
 
         return 0
 
@@ -855,13 +907,27 @@ class App(tk.Frame):
 
         :return: 0 on success; -1 on failure.
         """
-        self._Animation["playing"] = True
         if self._Animation["objects"]:
-            self._Buttons["play-button"].config(relief=tk.SUNKEN)
-            self._Buttons["pause-button"].config(relief=tk.RAISED)
+            self._Animation["playing"] = True
+            self.DoPressButton("play-button")
+            self.DoUnpressButton("pause-button")
             self.DoAnimate(False)
 
         return 0
+
+    def DoPressButton(self, key):
+        """
+        Visibly presses a button.
+
+        :param key: Key of button to press.
+
+        :return: 0 on success; -1 on failure.
+        """
+        try:
+            self._Buttons[key].config(relief=tk.SUNKEN)
+            return 0
+        except KeyError:
+            return -1
 
     def DoRemakeOffset(self, key):
         """
@@ -896,6 +962,20 @@ class App(tk.Frame):
 
         return 0
 
+    def DoUnpressButton(self, key):
+        """
+        Visibly unpresses a button.
+
+        :param key: Key of button to unpress.
+
+        :return: 0 on success; -1 on failure.
+        """
+        try:
+            self._Buttons[key].config(relief=tk.RAISED)
+            return 0
+        except KeyError:
+            return -1
+
     def DrawFrameLabels(self):
         """
         Draw frame labels to animation preview canvas.
@@ -916,16 +996,18 @@ class App(tk.Frame):
 
         :return: 0 on success, -1 on failure.
         """
-        reverse = self._BooleanVars["reverse-layers"].get()
-        headfirst = self._StringVars["prioritize"].get() == "Head"
 
         if idle_only:
             message = App.MESSAGES["message"]["success"]["idle"]
         else:
             message = App.MESSAGES["message"]["success"]["full"]
 
+        callback = sprite_splitter.Composite
+        reverse = self._BooleanVars["reverse-layers"].get()
+        headfirst = self._StringVars["prioritize"].get() == "Head"
+
         self.DoExport(
-            sprite_splitter.Composite,
+            callback,
             message,
             headfirst=headfirst,
             reverse=reverse,
@@ -1044,6 +1126,54 @@ class App(tk.Frame):
                      self.JumpFrame(0)),
         )
 
+        # Initialize "idle preview" button
+        self.InitButton(
+            self._FrameBotRight,
+            "preview-idle-button",
+            lambda: (self.DoMakePreview(state="idle") +
+                     self.DoPressButton("preview-idle-button") +
+                     self.DoUnpressButton("preview-left-button") +
+                     self.DoUnpressButton("preview-right-button") +
+                     self.JumpFrame(0)),
+            relief=tk.SUNKEN,
+        )
+
+        # Initialize "left preview" button
+        self.InitButton(
+            self._FrameBotRight,
+            "preview-left-button",
+            lambda: (self.DoMakePreview(state="left") +
+                     self.DoPressButton("preview-left-button") +
+                     self.DoUnpressButton("preview-idle-button") +
+                     self.DoUnpressButton("preview-right-button") +
+                     self.JumpFrame(0)),
+        )
+
+        # Initialize "right preview" button
+        self.InitButton(
+            self._FrameBotRight,
+            "preview-right-button",
+            lambda: (self.DoMakePreview(state="right") +
+                     self.DoPressButton("preview-right-button") +
+                     self.DoUnpressButton("preview-left-button") +
+                     self.DoUnpressButton("preview-idle-button") +
+                     self.JumpFrame(0)),
+        )
+
+        # Initialize "ping-pong" button
+        self.InitButton(
+            self._FrameBotRight,
+            "ping-pong-button",
+            lambda: print("Baz"),
+        )
+
+        # Initialize "reverse layers" button
+        self.InitButton(
+            self._FrameBotRight,
+            "layers-button",
+            lambda: print("Baz"),
+        )
+
         # Initialize "rebuild body offsets" button
         self.InitButton(
             self._FrameGroupBot,
@@ -1076,21 +1206,33 @@ class App(tk.Frame):
         self.InitButton(
             self._FrameGroupBot,
             "preview-idle",
-            lambda: (self.DoMakePreview(state="idle") + self.JumpFrame(0)),
+            lambda: (self.DoMakePreview(state="idle") +
+                     self.DoPressButton("preview-idle-button") +
+                     self.DoUnpressButton("preview-left-button") +
+                     self.DoUnpressButton("preview-right-button") +
+                     self.JumpFrame(0)),
         )
 
         # Initialize "make left preview" button
         self.InitButton(
             self._FrameGroupBot,
             "preview-left",
-            lambda: (self.DoMakePreview(state="left") + self.JumpFrame(0)),
+            lambda: (self.DoMakePreview(state="left") +
+                     self.DoPressButton("preview-left-button") +
+                     self.DoUnpressButton("preview-idle-button") +
+                     self.DoUnpressButton("preview-right-button") +
+                     self.JumpFrame(0)),
         )
 
         # Initialize "make right preview" button
         self.InitButton(
             self._FrameGroupBot,
             "preview-right",
-            lambda: (self.DoMakePreview(state="right") + self.JumpFrame(0)),
+            lambda: (self.DoMakePreview(state="right") +
+                     self.DoPressButton("preview-right-button") +
+                     self.DoUnpressButton("preview-left-button") +
+                     self.DoUnpressButton("preview-idle-button") +
+                     self.JumpFrame(0)),
         )
 
         # Initialize "export idle frames" button
@@ -1119,14 +1261,14 @@ class App(tk.Frame):
         self.InitCanvas(
             self._FrameGroupTop,
             "preview-static",
-            App.CANVAS_BORDER,
+            App.CANVAS_BORDERS,
         )
 
         # Initialize "animated preview" canvas
         self.InitCanvas(
             self._FrameGroupTop,
             "preview-anim",
-            App.CANVAS_BORDER,
+            App.CANVAS_BORDERS,
         )
 
         return 0
@@ -1151,6 +1293,16 @@ class App(tk.Frame):
 
         return 0
 
+    def InitAllData(self):
+        """
+        Initializes all required data.
+
+        :return: 0 on success; -1 on failure.
+        """
+        self.InitData("head")
+        self.InitData("body")
+        return 0
+
     def InitAllLabels(self):
         """
         Initializes all required labels.
@@ -1160,13 +1312,13 @@ class App(tk.Frame):
         # Initialize "export options" label
         self.InitLabel(
             self._FrameGroupBot, "export-options",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"), tk.NS,
+            ("sans-serif", App.FONTSIZE_VAR_W, "bold"), tk.NS,
         )
 
         # Initialize "animation speed" label
         self.InitLabel(
             self._FrameBotLeft, "speed-anim",
-            ("Courier", App.FONTSIZE_MONO), tk.W, 0,
+            ("Courier", App.FONTSIZE_MONOS), tk.W, 0,
         )
 
         # Initialize "static frames preview" label
@@ -1184,39 +1336,39 @@ class App(tk.Frame):
         # Initialize "head offset" label
         self.InitLabel(
             self._FrameBotLeft, "offset-head",
-            ("Courier", App.FONTSIZE_MONO), tk.W,
+            ("Courier", App.FONTSIZE_MONOS), tk.W,
             0, 0,
         )
 
         # Initialize "body offset" label
         self.InitLabel(
             self._FrameBotLeft, "offset-body",
-            ("Courier", App.FONTSIZE_MONO), tk.W,
+            ("Courier", App.FONTSIZE_MONOS), tk.W,
             0, 0,
         )
 
         # Initialize "preview options" label
         self.InitLabel(
             self._FrameGroupBot, "preview-options",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"), tk.NS,
+            ("sans-serif", App.FONTSIZE_VAR_W, "bold"), tk.NS,
         )
 
         # Initialize "body options" label
         self.InitLabel(
             self._FrameGroupBot, "body-options",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"), tk.NS,
+            ("sans-serif", App.FONTSIZE_VAR_W, "bold"), tk.NS,
         )
 
         # Initialize "head options" label
         self.InitLabel(
             self._FrameGroupBot, "head-options",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"), tk.NS,
+            ("sans-serif", App.FONTSIZE_VAR_W, "bold"), tk.NS,
         )
 
         # Initialize "prioritize" label
         self.InitLabel(
             self._FrameGroupBot, "prioritize-label",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"), tk.NS,
+            ("sans-serif", App.FONTSIZE_VAR_W, "bold"), tk.NS,
         )
 
         return 0
@@ -1580,8 +1732,8 @@ class App(tk.Frame):
         self._Animation["playing"] = False
         self._Animation["frame"] = frame
 
-        self._Buttons["pause-button"].config(relief=tk.SUNKEN)
-        self._Buttons["play-button"].config(relief=tk.RAISED)
+        self.DoPressButton("pause-button")
+        self.DoUnpressButton("play-button")
 
         self.UpdateAnimationImage()
         self.UpdateOffsetLabels()
