@@ -142,6 +142,8 @@ class App(tk.Frame):
         "skip-right-button":    [32, 32],
         "skip-left-button":     [32, 32],
         "shuffle-button":       [32, 32],
+        "shuffle-body-button":  [32, 32],
+        "shuffle-head-button":  [32, 32],
         "reload-button":        [32, 32],
         "preview-idle-button":  [32, 32],
         "preview-left-button":  [32, 32],
@@ -227,12 +229,14 @@ class App(tk.Frame):
         "pause-button":         [0, 3],
         "skip-left-button":     [0, 4],
         "skip-right-button":    [0, 5],
-        "shuffle-button":       [0, 6],
         "preview-idle-button":  [1, 1],
         "preview-left-button":  [1, 2],
         "preview-right-button": [1, 3],
         "ping-pong-button":     [1, 4],
         "layers-button":        [1, 5],
+        "shuffle-button":       [2, 1],
+        "shuffle-body-button":  [2, 2],
+        "shuffle-head-button":  [2, 3],
     }
 
     # Padding for widgets
@@ -295,6 +299,8 @@ class App(tk.Frame):
         "skip-left-button":     [0, 0],
         "skip-right-button":    [0, 0],
         "shuffle-button":       [0, 0],
+        "shuffle-body-button":  [0, 0],
+        "shuffle-head-button":  [0, 0],
         "reload-button":        [0, 0],
         "preview-idle-button":  [0, 0],
         "preview-left-button":  [0, 0],
@@ -366,6 +372,8 @@ class App(tk.Frame):
         "skip-right-button":    "",
         "skip-left-button":     "",
         "shuffle-button":       "",
+        "shuffle-body-button":  "",
+        "shuffle-head-button":  "",
         "reload-button":        "",
         "preview-idle-button":  "",
         "preview-left-button":  "",
@@ -381,6 +389,8 @@ class App(tk.Frame):
         "skip-right-button":    os.path.join("misc", "forward.png"),
         "skip-left-button":     os.path.join("misc", "backward.png"),
         "shuffle-button":       os.path.join("misc", "shuffle.png"),
+        "shuffle-body-button":  os.path.join("misc", "shuffle-body.png"),
+        "shuffle-head-button":  os.path.join("misc", "shuffle-head.png"),
         "reload-button":        os.path.join("misc", "reload.png"),
         "preview-idle-button":  os.path.join("misc", "idle.png"),
         "preview-left-button":  os.path.join("misc", "left.png"),
@@ -416,6 +426,8 @@ class App(tk.Frame):
         "skip-right-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "skip-left-button":     {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "shuffle-button":       {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "shuffle-body-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "shuffle-head-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "reload-button":        {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "preview-idle-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "preview-left-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
@@ -652,6 +664,8 @@ class App(tk.Frame):
             "skip-right-button":    tk.Button(),
             "skip-left-button":     tk.Button(),
             "shuffle-button":       tk.Button(),
+            "shuffle-head-button":  tk.Button(),
+            "shuffle-body-button":  tk.Button(),
             "reload-button":        tk.Button(),
             "preview-idle-button":  tk.Button(),
             "preview-left-button":  tk.Button(),
@@ -1115,6 +1129,20 @@ class App(tk.Frame):
             self._FrameBotRight,
             "shuffle-button",
             lambda: (self.ShuffleAll() + self.JumpFrame(0)),
+        )
+
+        # Initialize "shuffle" button
+        self.InitButton(
+            self._FrameBotRight,
+            "shuffle-body-button",
+            lambda: (self.ShuffleBody() + self.JumpFrame(0)),
+        )
+
+        # Initialize "shuffle" button
+        self.InitButton(
+            self._FrameBotRight,
+            "shuffle-head-button",
+            lambda: (self.ShuffleHead() + self.JumpFrame(0)),
         )
 
         # Initialize "reload" button
@@ -1936,6 +1964,28 @@ class App(tk.Frame):
         :return: 0 on success; -1 on failure.
         """
         self._StringVars["body"].set(random.choice(self._Data["body"]["list"]))
+        self._StringVars["head"].set(random.choice(self._Data["head"]["list"]))
+        self.DoMakePreview()
+
+        return 0
+
+    def ShuffleBody(self):
+        """
+        Shuffles bodies.
+
+        :return: 0 on success; -1 on failure.
+        """
+        self._StringVars["body"].set(random.choice(self._Data["body"]["list"]))
+        self.DoMakePreview()
+
+        return 0
+
+    def ShuffleHead(self):
+        """
+        Shuffles heads.
+
+        :return: 0 on success; -1 on failure.
+        """
         self._StringVars["head"].set(random.choice(self._Data["head"]["list"]))
         self.DoMakePreview()
 
