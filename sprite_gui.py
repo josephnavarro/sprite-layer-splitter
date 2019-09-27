@@ -498,6 +498,8 @@ class App(tk.Frame):
         self._Master.resizable(False, False)
         self.winfo_toplevel().title(App.WINDOW_TITLE)
 
+        self._AfterJob = None
+
         # Set icon for Mac OS X (and kill iTunes)
         if IsOSX():
             image = tk.Image("photo", file="misc/icon.png")
@@ -712,7 +714,7 @@ class App(tk.Frame):
 
             speed = self._Animation["speed"]
             if speed > 0:
-                self.after(1000 // speed, self.DoAnimate)
+                self._AfterJob = self.after(1000 // speed, self.DoAnimate)
 
         self.UpdateOffsetLabels()
         self.UpdateAnimationImage()
@@ -837,10 +839,14 @@ class App(tk.Frame):
 
         :return: 0 on success; -1 on failure.
         """
+        self._Animation["playing"] = False
+        if self._AfterJob is not None:
+            self.after_cancel(self._AfterJob)
+
         if self._Animation["objects"]:
-            self._Animation["playing"] = False
             self._Buttons["pause-button"].config(relief=tk.SUNKEN)
             self._Buttons["play-button"].config(relief=tk.RAISED)
+
         return 0
 
     def DoPlay(self):
@@ -849,8 +855,8 @@ class App(tk.Frame):
 
         :return: 0 on success; -1 on failure.
         """
+        self._Animation["playing"] = True
         if self._Animation["objects"]:
-            self._Animation["playing"] = True
             self._Buttons["play-button"].config(relief=tk.SUNKEN)
             self._Buttons["pause-button"].config(relief=tk.RAISED)
             self.DoAnimate(False)
