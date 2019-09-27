@@ -131,14 +131,18 @@ class App(tk.Frame):
 
     # Default widget dimensions
     SIZES = {
+        # Preview canvases
         "preview-anim":      [96, 96],
         "preview-resize":    [384, 96],
         "preview-static":    [384, 96],
+
+        # Icon-based buttons
         "play-button":       [32, 32],
         "pause-button":      [32, 32],
         "skip-right-button": [32, 32],
         "skip-left-button":  [32, 32],
         "shuffle-button":    [32, 32],
+        "reload-button":     [32, 32],
     }
 
     if IsWindows():
@@ -161,16 +165,19 @@ class App(tk.Frame):
         CANVAS_BORDER = 13
 
     GRID = {
+        # Preview canvases
+        "preview-static":       [0, 1],
+        "preview-anim":         [0, 2],
         "preview-frames-label": [1, 1],
         "preview-anim-label":   [1, 2],
 
+        # Left column
         "head-options":         [7, 0],
         "head":                 [8, 0],
         "rebuild-head-images":  [9, 0],
         "rebuild-head-data":    [10, 0],
         "rebuild-head-offsets": [11, 0],
         "destroy-head-images":  [12, 0],
-
         "body-options":         [13, 0],
         "body":                 [14, 0],
         "rebuild-body-images":  [15, 0],
@@ -178,84 +185,101 @@ class App(tk.Frame):
         "rebuild-body-offsets": [17, 0],
         "destroy-body-images":  [18, 0],
 
+        # Right column
         "preview-options":      [7, 1],
+        "state":                [7, 1],
         "preview-idle":         [8, 1],
         "preview-left":         [9, 1],
         "preview-right":        [10, 1],
         "pingpong-animation":   [11, 1],
         "reverse-layers":       [12, 1],
-
         "export-options":       [13, 1],
         "export-full":          [14, 1],
         "export-idle":          [15, 1],
         "prioritize-label":     [16, 1],
         "prioritize-1":         [17, 1],
         "prioritize-2":         [18, 1],
-        "preview-static":       [0, 1],
-        "preview-anim":         [0, 2],
+
+        # Frame data readout
         "speed-slider":         [1, 0],
         "speed-anim":           [2, 0],
-        "frame-anim":           [3, 0],
         "offset-head":          [4, 0],
         "offset-body":          [5, 0],
+        "frame-0":              [6, 0],
+        "frame-1":              [6, 1],
+        "frame-2":              [6, 2],
+        "frame-3":              [6, 3],
 
-        "play-button":          [0, 1],
-        "pause-button":         [0, 2],
-        "skip-left-button":     [0, 3],
-        "skip-right-button":    [0, 4],
-        "shuffle-button":       [0, 5],
+        # Icon-based buttons
+        "reload-button":        [0, 1],
+        "play-button":          [0, 2],
+        "pause-button":         [0, 3],
+        "skip-left-button":     [0, 4],
+        "skip-right-button":    [0, 5],
+        "shuffle-button":       [0, 6],
     }
 
     # Padding for widgets
     PAD = {
+        # Preview canvases
         "preview-frames-label": [0, 0],
         "preview-anim-label":   [0, 0],
         "preview-static":       [0, 0],
         "preview-anim":         [0, 0],
 
+        # Export options
         "export-full":          [4, 4],
         "export-idle":          [4, 4],
         "export-options":       [4, 4],
 
+        # Frame data readout
         "speed-anim":           [12, 0],
-        "frame-anim":           [12, 0],
-
         "offset-head":          [12, 0],
         "offset-body":          [12, 0],
+        "frame-0":              [0, 0],
+        "frame-1":              [0, 0],
+        "frame-2":              [0, 0],
+        "frame-3":              [0, 0],
 
+        # Preview options
         "preview-options":      [4, 4],
         "body-options":         [4, 4],
         "head-options":         [4, 4],
 
+        # Layer collision resolution
         "prioritize-label":     [4, 4],
         "prioritize-1":         [0, 0],
         "prioritize-2":         [0, 0],
 
+        # Preview options
+        "state":                [4, 4],
         "preview-idle":         [4, 4],
         "preview-left":         [4, 4],
         "preview-right":        [4, 4],
-
-        "rebuild-body-data":    [4, 4],
-        "rebuild-head-data":    [4, 4],
-        "rebuild-body-images":  [4, 4],
-        "rebuild-head-images":  [4, 4],
-        "rebuild-body-offsets": [4, 4],
-        "rebuild-head-offsets": [4, 4],
-
-        "body":                 [4, 4],
-        "head":                 [4, 4],
-
-        "destroy-body-images":  [4, 4],
-        "destroy-head-images":  [4, 4],
-
         "pingpong-animation":   [4, 0],
         "reverse-layers":       [4, 0],
 
+        # Head options
+        "head":                 [4, 4],
+        "rebuild-head-data":    [4, 4],
+        "rebuild-head-images":  [4, 4],
+        "rebuild-head-offsets": [4, 4],
+        "destroy-head-images":  [4, 4],
+
+        # Body options
+        "body":                 [4, 4],
+        "rebuild-body-data":    [4, 4],
+        "rebuild-body-images":  [4, 4],
+        "rebuild-body-offsets": [4, 4],
+        "destroy-body-images":  [4, 4],
+
+        # Icon-based buttons
         "play-button":          [0, 0],
         "pause-button":         [0, 0],
         "skip-left-button":     [0, 0],
         "skip-right-button":    [0, 0],
         "shuffle-button":       [0, 0],
+        "reload-button":        [0, 0],
     }
 
     # Preview composition dimensions
@@ -267,20 +291,25 @@ class App(tk.Frame):
 
     # Button and menu text labels
     LABELS = {
+        # Canvas captions
         "preview-frames-label": "Static frame preview",
         "preview-anim-label":   "Animated preview",
 
+        # Export options
         "export-options":       "Export options",
         "export-full":          "Export all frames",
         "export-idle":          "Export idle frames",
 
+        # Preview options
         "preview-options":      "Preview options",
+        "state":                "Select state",
         "preview-idle":         "Preview idle frames",
         "preview-left":         "Preview left frames",
         "preview-right":        "Preview right frames",
         "pingpong-animation":   "Ping-pong animation",
         "reverse-layers":       "Reverse layering order",
 
+        # Body options
         "body-options":         "Body options",
         "body":                 "Select body",
         "rebuild-body-images":  "Remake body sources",
@@ -288,6 +317,7 @@ class App(tk.Frame):
         "rebuild-body-offsets": "Refresh body offsets",
         "destroy-body-images":  "Clean body sources",
 
+        # Head options
         "head-options":         "Head options",
         "head":                 "Select head",
         "rebuild-head-images":  "Remake head sources",
@@ -295,20 +325,27 @@ class App(tk.Frame):
         "rebuild-head-offsets": "Refresh head offsets",
         "destroy-head-images":  "Clean head sources",
 
-        "frame-anim":           "Frame := ({0:d})  {1:d}   {2:d}   {3:d}",
+        # Frame data readout
         "offset-body":          "Body  :=  x: {0:+d} / y: {1:+d}",
         "offset-head":          "Head  :=  x: {0:+d} / y: {1:+d}",
         "speed-anim":           "Speed :=  {0:d}",
+        "frame-0":              "0",
+        "frame-1":              "1",
+        "frame-2":              "2",
+        "frame-3":              "3",
 
+        # Layer collision resolution
         "prioritize-label":     "On layer collision",
         "prioritize-1":         "Paste head first",
         "prioritize-2":         "Paste body first",
 
+        # Icon-based buttons
         "play-button":          "",
         "pause-button":         "",
         "skip-right-button":    "",
         "skip-left-button":     "",
         "shuffle-button":       "",
+        "reload-button":        "",
     }
 
     IMAGES = {
@@ -317,6 +354,7 @@ class App(tk.Frame):
         "skip-right-button": os.path.join("misc", "forward.png"),
         "skip-left-button":  os.path.join("misc", "backward.png"),
         "shuffle-button":    os.path.join("misc", "shuffle.png"),
+        "reload-button":     os.path.join("misc", "reload.png"),
     }
 
     COLORS = {
@@ -335,6 +373,7 @@ class App(tk.Frame):
         "destroy-head-images":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "head":                 {"fg": [0, 0, 0], "bg": [200, 224, 255]},
         "body":                 {"fg": [0, 0, 0], "bg": [255, 200, 200]},
+        "state":                {"fg": [0, 0, 0], "bg": [200, 255, 212]},
         "preview-static":       {"fg": [0, 0, 0], "bg": [128, 128, 128]},
         "preview-anim":         {"fg": [0, 0, 0], "bg": [128, 128, 128]},
         "play-button":          {"fg": [0, 0, 0], "bg": [222, 222, 222]},
@@ -342,6 +381,7 @@ class App(tk.Frame):
         "skip-right-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "skip-left-button":     {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "shuffle-button":       {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "reload-button":        {"fg": [0, 0, 0], "bg": [222, 222, 222]},
     }
 
     # Animation speed slider
@@ -503,6 +543,9 @@ class App(tk.Frame):
         self._FrameBotRight = tk.Frame(self._FrameGroupBot)
         self._FrameBotRight.grid(column=1, row=1)
 
+        self._FrameBotLeftBot = tk.Frame(self._FrameBotLeft)
+        self._FrameBotLeftBot.grid(column=0, row=7)
+
         # Padding frames
         self._FramePadMidTop = tk.Frame(self._FrameTopRight, width=1, height=10)
         self._FramePadMidTop.grid(row=0, column=0)
@@ -532,6 +575,8 @@ class App(tk.Frame):
         self._StringVars = {
             "head":       tk.StringVar(self._Master),
             "body":       tk.StringVar(self._Master),
+            "state":      tk.StringVar(self._Master),
+            "frame":      tk.StringVar(self._Master),
             "prioritize": tk.StringVar(self._Master),
         }
 
@@ -555,6 +600,7 @@ class App(tk.Frame):
             "skip-right-button":    tk.Button(),
             "skip-left-button":     tk.Button(),
             "shuffle-button":       tk.Button(),
+            "reload-button":        tk.Button(),
         }
 
         # Canvases
@@ -573,20 +619,29 @@ class App(tk.Frame):
         self._RadioButtons = {
             "prioritize-1": tk.Radiobutton(),
             "prioritize-2": tk.Radiobutton(),
+            "frame-0":      tk.Radiobutton(),
+            "frame-1":      tk.Radiobutton(),
+            "frame-2":      tk.Radiobutton(),
+            "frame-3":      tk.Radiobutton(),
         }
 
         # Menus
         self._Menus = {
-            "head": tk.OptionMenu(
+            "head":  tk.OptionMenu(
                 self._FrameGroupBot,
                 self._StringVars["head"],
                 *self._Data["head"]["list"]
             ),
-            "body": tk.OptionMenu(
+            "body":  tk.OptionMenu(
                 self._FrameGroupBot,
                 self._StringVars["body"],
                 *self._Data["body"]["list"]
             ),
+            "state": tk.OptionMenu(
+                self._FrameGroupBot,
+                self._StringVars["state"],
+                *STATES
+            )
         }
 
         # Labels
@@ -596,7 +651,6 @@ class App(tk.Frame):
             "offset-head":          tk.Label(),
             "offset-body":          tk.Label(),
             "speed-anim":           tk.Label(),
-            "frame-anim":           tk.Label(),
             "prioritize-label":     tk.Label(),
             "head-options":         tk.Label(),
             "body-options":         tk.Label(),
@@ -620,25 +674,29 @@ class App(tk.Frame):
         self.InitSliderFramerate()
 
     # noinspection PyMethodMayBeStatic
-    def DestroyBodyImages(self):
+    def DestroyImages(self, key):
         """
-        Callback function. Destroys intermediate head spritesheets.
+        Callback function. Destroys intermediate spritesheets.
 
-        :return: None.
+        :param key: Either of "head" or "body".
+
+        :return: 0 on success; -1 on failure.
         """
         title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["destroy"]["body"]
-        message = App.MESSAGES["message"]["destroy"]["body"]
+        query = App.MESSAGES["confirm"]["destroy"][key]
+        alert = App.MESSAGES["message"]["destroy"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            FlushInputs("body")
-            tk.messagebox.showinfo(title, message)
+            FlushInputs(key)
+            tk.messagebox.showinfo(title, alert)
+
+        return 0
 
     def DoAnimate(self):
         """
         Local animation callback function.
 
-        :return: None
+        :return: 0 on success; -1 on failure.
         """
         isPlaying = self._Animation["playing"]
         if isPlaying:
@@ -652,6 +710,8 @@ class App(tk.Frame):
         speed = self._Animation["speed"]
         if speed > 0 and isPlaying:
             self.after(1000 // speed, self.DoAnimate)
+
+        return 0
 
     def DoComposite(self, func, **kwargs):
         """
@@ -673,17 +733,15 @@ class App(tk.Frame):
 
         except sprite_splitter.NonexistentHeadException as e:
             # Head spritesheet does not exist
-            tk.messagebox.showinfo(
-                App.WINDOW_TITLE,
-                App.MESSAGES["message"]["invalid"]["head"].format(e.filename),
-            )
+            title = App.WINDOW_TITLE
+            alert = App.MESSAGES["message"]["invalid"]["head"]  # type: str
+            tk.messagebox.showinfo(title, alert.format(e.filename))
 
         except sprite_splitter.NonexistentBodyException as e:
             # Body spritesheet does not exist
-            tk.messagebox.showinfo(
-                App.WINDOW_TITLE,
-                App.MESSAGES["message"]["invalid"]["body"].format(e.filename),
-            )
+            title = App.WINDOW_TITLE
+            alert = App.MESSAGES["message"]["invalid"]["body"]  # type: str
+            tk.messagebox.showinfo(title, alert.format(e.filename))
 
         except cv2.error:
             # CV2 image processing error
@@ -698,7 +756,7 @@ class App(tk.Frame):
         :param func:    Frame compositing callback function.
         :param message: Success message to display.
 
-        :return: None.
+        :return: 0 on success; -1 on failure.
         """
         try:
             # Perform sprite composition
@@ -725,31 +783,34 @@ class App(tk.Frame):
                 # Save image if path is valid
                 if path:
                     sprite_splitter.SaveImage(im, path)
-                    tk.messagebox.showinfo(
-                        App.WINDOW_TITLE,
-                        message.format(os.path.basename(path)),
-                    )
+                    title = App.WINDOW_TITLE
+                    alert = message.format(os.path.basename(path))
+                    tk.messagebox.showinfo(title, alert)
+
+            return 0
 
         except InvalidFilenameException:
             # Image format not recognized
-            tk.messagebox.showinfo(
-                App.WINDOW_TITLE,
-                App.MESSAGES["message"]["failure"]["type"],
-            )
+            title = App.WINDOW_TITLE
+            alert = App.MESSAGES["message"]["failure"]["type"]
+            tk.messagebox.showinfo(title, alert)
+            return -1
 
         except EmptyFilenameException:
             # Filename not specified
-            pass
+            return -1
 
-    def DoMakePreview(self):
+    def DoMakePreview(self, state=""):
         """
         Creates an animated preview.
 
-        :return: None.
+        :param state: State to preview. (Default empty).
+
+        :return: 0 on success; -1 on failure.
         """
         self.TurnPlaybackOff()
 
-        state = str(self._Animation["state"])
+        state = state or str(self._Animation["state"])
         color = App.COLORS["preview-static"]["bg"]
         headfirst = self._StringVars["prioritize"].get() == "Head"
         reverse = self._BooleanVars["reverse-layers"].get()
@@ -762,13 +823,41 @@ class App(tk.Frame):
             reverse=reverse,
         )
 
+        return 0
+
+    def DoRemakeOffset(self, key):
+        """
+        Rebuilds per-frame offsets.
+
+        :param key: Either of "head" or "body".
+
+        :return: 0 on success, -1 on failure.
+        """
+        self._Data[key]["offset"] = LoadOffsets(key)
+        self.UpdateOffsetLabels()
+        self.DoMakePreview()
+
+        return 0
+
+    def DrawFrameLabels(self):
+        """
+        Draw frame labels to animation preview canvas.
+
+        :return: 0 on success; -1 on failure.
+        """
+        canvas = self._Canvases["preview-static"]
+        for n in range(4):
+            App.DrawText(canvas, 18 + 96 * n, 92, "({})".format(n))
+
+        return 0
+
     def ExportFrames(self, *, idle_only=False):
         """
         Composites and exports all frames to file.
 
         :param idle_only: Whether to export only idle frames. (Default False).
 
-        :return: None.
+        :return: 0 on success, -1 on failure.
         """
         reverse = self._BooleanVars["reverse-layers"].get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
@@ -785,6 +874,42 @@ class App(tk.Frame):
             reverse=reverse,
             idle_only=idle_only,
         )
+
+        return 0
+
+    def FrameSkip(self, skip):
+        """
+        Skips any number of frames forward or backward.
+        Implements wrapping at bounds.
+
+        :param skip: Number (and direction) of frames to skip.
+
+        :return: 0 on success; -1 on failure.
+        """
+        if self._Animation["objects"]:
+            self._Animation["playing"] = False
+            self._Buttons["pause-button"].config(relief=tk.SUNKEN)
+            self._Buttons["play-button"].config(relief=tk.RAISED)
+
+            frame = self._Animation["frame"]
+            frame += skip
+            if frame < 0:
+                frame = 3
+            elif frame >= 4:
+                frame = 0
+            self._Animation["frame"] = frame
+
+            for n in range(4):
+                key = "frame-{}".format(n)
+                if n == frame:
+                    self._RadioButtons[key].select()
+                else:
+                    self._RadioButtons[key].deselect()
+
+            self.UpdateOffsetLabels()
+            self.UpdateAnimationImage()
+
+        return 0
 
     def GetKey(self, key):
         """
@@ -804,7 +929,7 @@ class App(tk.Frame):
         """
         Initializes all required buttons.
 
-        :return: None.
+        :return: 0 on success; -1 on failure.
         """
         # Initialize "rebuild head data" button
         self.InitButton(
@@ -870,6 +995,13 @@ class App(tk.Frame):
             self.ShuffleAll,
         )
 
+        # Initialize "reload" button
+        self.InitButton(
+            self._FrameBotRight,
+            "reload-button",
+            lambda: (self.DoRemakeOffset("head") + self.DoRemakeOffset("body")),
+        )
+
         # Initialize "rebuild body offsets" button
         self.InitButton(
             self._FrameGroupBot,
@@ -902,21 +1034,21 @@ class App(tk.Frame):
         self.InitButton(
             self._FrameGroupBot,
             "preview-idle",
-            self.MakeIdlePreview,
+            lambda: self.DoMakePreview("idle"),
         )
 
         # Initialize "make left preview" button
         self.InitButton(
             self._FrameGroupBot,
             "preview-left",
-            self.MakeLeftPreview,
+            lambda: self.DoMakePreview("left"),
         )
 
         # Initialize "make right preview" button
         self.InitButton(
             self._FrameGroupBot,
             "preview-right",
-            self.MakeRightPreview,
+            lambda: self.DoMakePreview("right"),
         )
 
         # Initialize "export idle frames" button
@@ -933,157 +1065,139 @@ class App(tk.Frame):
             lambda: self.ExportFrames(),
         )
 
+        return 0
+
     def InitAllCanvases(self):
         """
         Initializes all required canvases.
 
-        :return: None.
+        :return: 0 on success; -1 on failure.
         """
+        # Initialize "static preview" canvas
         self.InitCanvas(
             self._FrameGroupTop,
             "preview-static",
             App.CANVAS_BORDER,
         )
 
+        # Initialize "animated preview" canvas
         self.InitCanvas(
             self._FrameGroupTop,
             "preview-anim",
             App.CANVAS_BORDER,
         )
 
+        return 0
+
     def InitAllCheckboxes(self):
         """
         Initializes all required checkboxes.
 
-        :return: None.
+        :return: 0 on success; -1 on failure.
         """
         # Initialize "pingpong animation" checkbox
         self.InitCheckbox(
             self._FrameGroupBot,
-            "pingpong-animation",
-            tk.W,
+            "pingpong-animation", tk.W,
         )
 
         # Initialize "reverse layers" checkbox
         self.InitCheckbox(
             self._FrameGroupBot,
-            "reverse-layers",
-            tk.W,
+            "reverse-layers", tk.W,
         )
+
+        return 0
 
     def InitAllLabels(self):
         """
         Initializes all required labels.
 
-        :return: None.
+        :return: 0 on success; -1 on failure.
         """
         # Initialize "export options" label
         self.InitLabel(
-            self._FrameGroupBot,
-            "export-options",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"),
-            tk.NS,
+            self._FrameGroupBot, "export-options",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"), tk.NS,
         )
 
         # Initialize "animation speed" label
         self.InitLabel(
-            self._FrameBotLeft,
-            "speed-anim",
-            ("Courier", App.FONTSIZE_MONO),
-            tk.W, 0,
+            self._FrameBotLeft, "speed-anim",
+            ("Courier", App.FONTSIZE_MONO), tk.W, 0,
         )
 
         # Initialize "static frames preview" label
         self.InitLabel(
-            self._FrameGroupTop,
-            "preview-frames-label",
-            ("arial", App.FONTSIZE_SMALL),
-            tk.W
+            self._FrameGroupTop, "preview-frames-label",
+            ("arial", App.FONTSIZE_SMALL), tk.W,
         )
 
         # Initialize "animated preview" label
         self.InitLabel(
-            self._FrameGroupTop,
-            "preview-anim-label",
-            ("arial", App.FONTSIZE_SMALL),
-            tk.W
-        )
-
-        # Initialize "current animation frame" label
-        self.InitLabel(
-            self._FrameBotLeft,
-            "frame-anim",
-            ("Courier", App.FONTSIZE_MONO),
-            tk.W, 0, 1, 2, 3,
+            self._FrameGroupTop, "preview-anim-label",
+            ("arial", App.FONTSIZE_SMALL), tk.W,
         )
 
         # Initialize "head offset" label
         self.InitLabel(
-            self._FrameBotLeft,
-            "offset-head",
-            ("Courier", App.FONTSIZE_MONO),
-            tk.W, 0, 0,
+            self._FrameBotLeft, "offset-head",
+            ("Courier", App.FONTSIZE_MONO), tk.W,
+            0, 0,
         )
 
         # Initialize "body offset" label
         self.InitLabel(
-            self._FrameBotLeft,
-            "offset-body",
-            ("Courier", App.FONTSIZE_MONO),
-            tk.W, 0, 0,
+            self._FrameBotLeft, "offset-body",
+            ("Courier", App.FONTSIZE_MONO), tk.W,
+            0, 0,
         )
 
         # Initialize "preview options" label
         self.InitLabel(
-            self._FrameGroupBot,
-            "preview-options",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"),
-            tk.NS,
+            self._FrameGroupBot, "preview-options",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"), tk.NS,
         )
 
         # Initialize "body options" label
         self.InitLabel(
-            self._FrameGroupBot,
-            "body-options",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"),
-            tk.NS,
+            self._FrameGroupBot, "body-options",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"), tk.NS,
         )
 
         # Initialize "head options" label
         self.InitLabel(
-            self._FrameGroupBot,
-            "head-options",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"),
-            tk.NS,
+            self._FrameGroupBot, "head-options",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"), tk.NS,
         )
 
         # Initialize "prioritize" label
         self.InitLabel(
-            self._FrameGroupBot,
-            "prioritize-label",
-            ("sans-serif", App.FONTSIZE_VARW, "bold"),
-            tk.NS,
+            self._FrameGroupBot, "prioritize-label",
+            ("sans-serif", App.FONTSIZE_VARW, "bold"), tk.NS,
         )
+
+        return 0
 
     def InitAllMenus(self):
         """
         Initializes all required menus.
 
-        :return: None.
+        :return: 0 on success; -1 on failure.
         """
         # Initialize "select head" dropdown menu
         self.InitMenu(
-            self._FrameGroupBot,
-            "head",
+            self._FrameGroupBot, "head",
             self._Data["head"]["list"],
         )
 
         # Initialize "select body" dropdown menu
         self.InitMenu(
-            self._FrameGroupBot,
-            "body",
+            self._FrameGroupBot, "body",
             self._Data["body"]["list"],
         )
+
+        return 0
 
     def InitAllRadioButtons(self):
         """
@@ -1093,21 +1207,49 @@ class App(tk.Frame):
         """
         # Initialize "prioritize head" radio button
         self.InitRadio(
-            self._FrameGroupBot,
-            "prioritize-1",
-            self._StringVars["prioritize"],
-            "Head",
-            tk.W,
+            self._FrameGroupBot, "prioritize-1",
+            self._StringVars["prioritize"], "Head", tk.W,
             select=True,
         )
 
         # Initialize "prioritize body" radio button
         self.InitRadio(
-            self._FrameGroupBot,
-            "prioritize-2",
-            self._StringVars["prioritize"],
-            "Body",
-            tk.W,
+            self._FrameGroupBot, "prioritize-2",
+            self._StringVars["prioritize"], "Body", tk.W,
+        )
+
+        def foo(x):
+            self._Animation["playing"] = False
+            self._Animation["frame"] = int(x)
+            self.UpdateAnimationImage()
+
+        # Initialize "frame #1" radio button
+        self.InitRadio(
+            self._FrameBotLeftBot, "frame-0",
+            self._StringVars["frame"], "0", tk.W,
+            select=True,
+            command=lambda: foo(0)
+        )
+
+        # Initialize "frame #2" radio button
+        self.InitRadio(
+            self._FrameBotLeftBot, "frame-1",
+            self._StringVars["frame"], "1", tk.W,
+            command=lambda: foo(1),
+        )
+
+        # Initialize "frame #3" radio button
+        self.InitRadio(
+            self._FrameBotLeftBot, "frame-2",
+            self._StringVars["frame"], "2", tk.W,
+            command=lambda: foo(2)
+        )
+
+        # Initialize "frame #4" radio button
+        self.InitRadio(
+            self._FrameBotLeftBot, "frame-3",
+            self._StringVars["frame"], "3", tk.W,
+            command=lambda: foo(3)
         )
 
     def InitButton(self, master, tag, command, relief=tk.RAISED):
@@ -1133,7 +1275,11 @@ class App(tk.Frame):
             image = None
 
         # Create button
-        button = tk.Button(master, text=App.LABELS[tag], command=command)
+        button = tk.Button(
+            master,
+            text=App.LABELS[tag],
+            command=command,
+        )
 
         # Configure button
         button.image = image
@@ -1242,7 +1388,6 @@ class App(tk.Frame):
         self._Data[key]["list"] = [App.DEFAULT_NAME] + sorted(list(data))
         self._Data[key]["offset"] = LoadOffsets(key)
 
-
     def InitLabel(self, master, tag, font, sticky, *args):
         """
         Initializes a label.
@@ -1260,12 +1405,7 @@ class App(tk.Frame):
         except IndexError:
             text = App.LABELS[tag]
 
-        label = tk.Label(
-            master,
-            font=font,
-            text=text,
-        )
-
+        label = tk.Label(master, font=font, text=text)
         label.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
@@ -1293,12 +1433,7 @@ class App(tk.Frame):
 
         self._StringVars[tag].set(App.LABELS[tag])
 
-        menu = tk.OptionMenu(
-            master,
-            self._StringVars[tag],
-            *options
-        )
-
+        menu = tk.OptionMenu(master, self._StringVars[tag], *options)
         menu.config(
             width=width,
             foreground=foreground,
@@ -1317,7 +1452,16 @@ class App(tk.Frame):
         self._Menus[tag].destroy()
         self._Menus[tag] = menu
 
-    def InitRadio(self, master, tag, variable, value, sticky, select=False):
+    def InitRadio(self,
+                  master,
+                  tag,
+                  variable,
+                  value,
+                  sticky,
+                  *,
+                  select=False,
+                  command=None,
+                  ):
         """
         Initializes a radio button.
 
@@ -1327,16 +1471,20 @@ class App(tk.Frame):
         :param value:
         :param sticky:
         :param select:
+        :param command:
 
         :return: None.
         """
+        # Create radio button
         radio = tk.Radiobutton(
             master,
             text=App.LABELS[tag],
             variable=variable,
             value=value,
+            command=command,
         )
 
+        # Position radio button
         radio.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
@@ -1345,11 +1493,13 @@ class App(tk.Frame):
             pady=App.PAD[tag][1],
         )
 
+        # (Optional) Select button
         if select:
             radio.select()
         else:
             radio.deselect()
 
+        # Replace local button
         self._RadioButtons[tag].destroy()
         self._RadioButtons[tag] = radio
 
@@ -1412,7 +1562,6 @@ class App(tk.Frame):
 
         # Update labels
         self.UpdateOffsetLabels()
-        self.UpdateFrameCountLabel()
 
     def MakeAnimationPreview(self, image):
         """
@@ -1431,10 +1580,7 @@ class App(tk.Frame):
             image=image,
         )
 
-        # Draw frame labels on canvas
-        canvas = self._Canvases["preview-static"]
-        for n in range(4):
-            App.DrawText(canvas, 18 + 96 * n, 92, "({})".format(n))
+        self.DrawFrameLabels()
 
     def MakePreview(self, func, state, **kwargs):
         """
@@ -1497,79 +1643,25 @@ class App(tk.Frame):
                 App.MESSAGES["message"]["failure"]["type"],
             )
 
-    def MakeIdlePreview(self):
-        """
-        Generates a preview image for current sprite's "idle" frames.
-
-        :return: None
-        """
-        self.TurnPlaybackOff()
-
-        reverse = self._BooleanVars["reverse-layers"].get()
-        headfirst = self._StringVars["prioritize"].get() == "Head"
-        self.MakePreview(
-            sprite_splitter.Composite,
-            "idle",
-            color=App.COLORS["preview-static"]["bg"],
-            headfirst=headfirst,
-            reverse=reverse,
-        )
-
-    def MakeLeftPreview(self):
-        """
-        Generates a preview image for current sprite's "left" frames.
-
-        :return: None
-        """
-        self.TurnPlaybackOff()
-
-        reverse = self._BooleanVars["reverse-layers"].get()
-        headfirst = self._StringVars["prioritize"].get() == "Head"
-        self.MakePreview(
-            sprite_splitter.Composite,
-            "left",
-            color=App.COLORS["preview-static"]["bg"],
-            headfirst=headfirst,
-            reverse=reverse,
-        )
-
-    def MakeRightPreview(self):
-        """
-        Generates a preview image for current sprite's "right" frames.
-
-        :return: None
-        """
-        self.TurnPlaybackOff()
-
-        reverse = self._BooleanVars["reverse-layers"].get()
-        headfirst = self._StringVars["prioritize"].get() == "Head"
-        self.MakePreview(
-            sprite_splitter.Composite,
-            "right",
-            color=App.COLORS["preview-static"]["bg"],
-            headfirst=headfirst,
-            reverse=reverse,
-        )
-
     def RebuildData(self, key):
         """
         Callback function. Rebuilds a given JSON database.
 
         :param key: Either of "head" or "body".
 
-        :return: None.
+        :return: 0 on success; -1 on failure.
         """
         title = App.WINDOW_TITLE
         query = App.MESSAGES["confirm"]["rebuild"]["data"][key]
+        alert = App.MESSAGES["message"]["rebuild"]["data"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             CreateInputJSON(key)
             self.InitData(key)
             self.InitMenu(self._FrameGroupBot, key, self._Data[key]["list"])
-            tk.messagebox.showinfo(
-                title,
-                App.MESSAGES["message"]["rebuild"]["data"][key],
-            )
+            tk.messagebox.showinfo(title, alert)
+
+        return 0
 
     # noinspection PyMethodMayBeStatic
     def RebuildImages(self, key):
@@ -1578,17 +1670,17 @@ class App(tk.Frame):
 
         :param key: Either of "head" or "body".
 
-        :return: None.
+        :return: 0 on success; -1 on failure.
         """
         title = App.WINDOW_TITLE
         query = App.MESSAGES["confirm"]["rebuild"]["image"][key]
+        alert = App.MESSAGES["message"]["rebuild"]["image"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             Prepare(key)
-            tk.messagebox.showinfo(
-                title,
-                App.MESSAGES["message"]["rebuild"]["image"][key],
-            )
+            tk.messagebox.showinfo(title, alert)
+
+        return 0
 
     def RebuildOffsets(self, key):
         """
@@ -1596,97 +1688,59 @@ class App(tk.Frame):
 
         :param key: Either of "head" or "body".
 
-        :return: None.
+        :return: 0 on success; -1 on failure.
         """
         title = App.WINDOW_TITLE
         query = App.MESSAGES["confirm"]["rebuild"]["offset"][key]
+        alert = App.MESSAGES["message"]["rebuild"]["offset"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            self._Data[key]["offset"] = LoadOffsets(key)
-            self.UpdateOffsetLabels()
-            self.DoMakePreview()
+            self.DoRemakeOffset(key)
+            tk.messagebox.showinfo(title, alert)
 
-            tk.messagebox.showinfo(
-                title,
-                App.MESSAGES["message"]["rebuild"]["offset"][key],
-            )
-
-    # noinspection PyMethodMayBeStatic
-    def DestroyImages(self, key):
-        """
-        Callback function. Destroys intermediate spritesheets.
-
-        :param key: Either of "head" or "body".
-
-        :return: None.
-        """
-        title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["destroy"][key]
-
-        if tk.messagebox.askquestion(title, query) == "yes":
-            FlushInputs(key)
-            tk.messagebox.showinfo(
-                title,
-                App.MESSAGES["message"]["destroy"][key],
-            )
+        return 0
 
     def ShuffleAll(self):
         """
+        Shuffles bodies and heads.
 
-        :return:
+        :return: 0 on success; -1 on failure.
         """
         self._StringVars["body"].set(random.choice(self._Data["body"]["list"]))
         self._StringVars["head"].set(random.choice(self._Data["head"]["list"]))
         self.DoMakePreview()
 
+        return 0
+
     def TurnPlaybackOn(self):
         """
-        Turns animation playing on.
+        Turns animation playback on.
 
-        :return: None.
+        :return: 0 on success; -1 on failure.
         """
         if not self._Animation["playing"]:
             self.DoMakePreview()
+
             if self._Animation["objects"]:
                 self._Animation["playing"] = True
                 self._Buttons["pause-button"].config(relief=tk.RAISED)
                 self._Buttons["play-button"].config(relief=tk.SUNKEN)
                 self.DoAnimate()
 
+        return 0
+
     def TurnPlaybackOff(self):
         """
         Turns animation playing off.
 
-        :return: None.
+        :return: 0 on success; -1 on failure.
         """
         if self._Animation["objects"]:
             self._Animation["playing"] = False
             self._Buttons["pause-button"].config(relief=tk.SUNKEN)
             self._Buttons["play-button"].config(relief=tk.RAISED)
 
-    def FrameSkip(self, skip):
-        """
-        Skips any number of frames forward or backward.
-        Implements wrapping at bounds.
-
-        :param skip: Number (and direction) of frames to skip.
-
-        :return: None.
-        """
-        if self._Animation["objects"]:
-            self._Animation["playing"] = False
-            self._Buttons["pause-button"].config(relief=tk.SUNKEN)
-            self._Buttons["play-button"].config(relief=tk.RAISED)
-
-            self._Animation["frame"] += skip
-            if self._Animation["frame"] < 0:
-                self._Animation["frame"] = 3
-            elif self._Animation["frame"] >= 4:
-                self._Animation["frame"] = 0
-
-            self.UpdateOffsetLabels()
-            self.UpdateFrameCountLabel()
-            self.UpdateAnimationImage()
+        return 0
 
     def UpdateCurrentFrame(self):
         """
@@ -1726,23 +1780,12 @@ class App(tk.Frame):
         self._Animation["forward"] = isForwards
         self._Animation["frame"] = curFrame
 
-        # Update frame count label
-        self.UpdateFrameCountLabel()
-
-    def UpdateFrameCountLabel(self):
-        """
-        Updates label for currently-iterated frame.
-
-        :return: None.
-        """
-        self._Labels["frame-anim"].config(
-            text="Frame := " + " ".join([
-                "({})".format(x)
-                if x == self._Animation["frame"]
-                else " {} ".format(x)
-                for x in range(4)
-            ])
-        )
+        for n in range(4):
+            key = "frame-{}".format(n)
+            if n == curFrame:
+                self._RadioButtons[key].select()
+            else:
+                self._RadioButtons[key].deselect()
 
     def UpdateOffsetLabel(self, key, state, frame):
         """
@@ -1756,12 +1799,9 @@ class App(tk.Frame):
         """
         label = "offset-{}".format(key)
         try:
-            self._Labels[label].config(
-                text=App.LABELS[label].format(
-                    *self._Data[key]["current"]["offset"][state][frame]
-                )
-            )
-        except (KeyError, IndexError) as e:
+            xy = self._Data[key]["current"]["offset"][state][frame]
+            self._Labels[label].config(text=App.LABELS[label].format(*xy))
+        except (KeyError, IndexError):
             self._Labels[label].config(text=App.LABELS[label].format(0, 0))
 
     def UpdateAnimationImage(self):
@@ -1803,13 +1843,12 @@ class App(tk.Frame):
 
         :param speed: New framerate.
 
-        :return: None.
+        :return: 0 on success; -1 on failure.
         """
         speed = int(speed)
+        text = App.LABELS["speed-anim"].format(speed)
 
-        self._Labels["speed-anim"].config(
-            text=App.LABELS["speed-anim"].format(speed)
-        )
+        self._Labels["speed-anim"].config(text=text)
         self._Animation["speed"] = speed
 
         if speed == 0:
@@ -1818,6 +1857,8 @@ class App(tk.Frame):
             if not self._Animation["init"]:
                 self._Animation["init"] = True
                 self.DoAnimate()
+
+        return 0
 
 
 def GUIMain():
