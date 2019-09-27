@@ -169,7 +169,7 @@ class App(tk.Frame):
 
         FONTSIZE_VAR_W = 13
         FONTSIZE_MONOS = 14
-        FONTSIZE_SMALL = 9
+        FONTSIZE_SMALL = 13
         CANVAS_BORDERS = 13
 
     GRID = {
