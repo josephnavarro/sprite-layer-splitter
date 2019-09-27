@@ -150,15 +150,18 @@ class App(tk.Frame):
         SIZES["default-button"] = [36, 0]
         SIZES["default-menu"] = [37, 0]
         SIZES["default-slider"] = [256, 0]
+
         FONTSIZE_VARW = 13
         FONTSIZE_MONO = 10
         FONTSIZE_SMALL = 9
         CANVAS_BORDER = 13
+
     else:
         # OS X / Linux
         SIZES["default-button"] = [28, 0]
         SIZES["default-menu"] = [25, 0]
         SIZES["default-slider"] = [248, 0]
+
         FONTSIZE_VARW = 13
         FONTSIZE_MONO = 14
         FONTSIZE_SMALL = 9
@@ -178,6 +181,7 @@ class App(tk.Frame):
         "rebuild-head-data":    [10, 0],
         "rebuild-head-offsets": [11, 0],
         "destroy-head-images":  [12, 0],
+
         "body-options":         [13, 0],
         "body":                 [14, 0],
         "rebuild-body-images":  [15, 0],
@@ -193,6 +197,7 @@ class App(tk.Frame):
         "preview-right":        [10, 1],
         "pingpong-animation":   [11, 1],
         "reverse-layers":       [12, 1],
+
         "export-options":       [13, 1],
         "export-full":          [14, 1],
         "export-idle":          [15, 1],
@@ -205,6 +210,7 @@ class App(tk.Frame):
         "speed-anim":           [2, 0],
         "offset-head":          [4, 0],
         "offset-body":          [5, 0],
+
         "frame-0":              [6, 0],
         "frame-1":              [6, 1],
         "frame-2":              [6, 2],
@@ -692,25 +698,25 @@ class App(tk.Frame):
 
         return 0
 
-    def DoAnimate(self):
+    def DoAnimate(self, update=True):
         """
         Local animation callback function.
 
         :return: 0 on success; -1 on failure.
         """
-        isPlaying = self._Animation["playing"]
-        if isPlaying:
-            self.UpdateCurrentFrame()
+        if self._Animation["playing"]:
+            if update:
+                self.UpdateCurrentFrame(1)
+            else:
+                self.UpdateCurrentFrame(0)
 
-        # Update labels and displayed frame
+            speed = self._Animation["speed"]
+            if speed > 0:
+                self.after(1000 // speed, self.DoAnimate)
+
         self.UpdateOffsetLabels()
         self.UpdateAnimationImage()
-
-        # Repeat if animation is active
-        speed = self._Animation["speed"]
-        if speed > 0 and isPlaying:
-            self.after(1000 // speed, self.DoAnimate)
-
+        self.SelectAnimRadioButton()
         return 0
 
     def DoComposite(self, func, **kwargs):
@@ -800,7 +806,7 @@ class App(tk.Frame):
             # Filename not specified
             return -1
 
-    def DoMakePreview(self, state=""):
+    def DoMakePreview(self, *, state=""):
         """
         Creates an animated preview.
 
@@ -825,6 +831,32 @@ class App(tk.Frame):
 
         return 0
 
+    def DoPause(self):
+        """
+        Presses "pause" button, effectively.
+
+        :return: 0 on success; -1 on failure.
+        """
+        if self._Animation["objects"]:
+            self._Animation["playing"] = False
+            self._Buttons["pause-button"].config(relief=tk.SUNKEN)
+            self._Buttons["play-button"].config(relief=tk.RAISED)
+        return 0
+
+    def DoPlay(self):
+        """
+        Presses "play" button, effectively.
+
+        :return: 0 on success; -1 on failure.
+        """
+        if self._Animation["objects"]:
+            self._Animation["playing"] = True
+            self._Buttons["play-button"].config(relief=tk.SUNKEN)
+            self._Buttons["pause-button"].config(relief=tk.RAISED)
+            self.DoAnimate(False)
+
+        return 0
+
     def DoRemakeOffset(self, key):
         """
         Rebuilds per-frame offsets.
@@ -836,6 +868,25 @@ class App(tk.Frame):
         self._Data[key]["offset"] = LoadOffsets(key)
         self.UpdateOffsetLabels()
         self.DoMakePreview()
+
+        return 0
+
+    def DoSkipFrame(self, skip):
+        """
+        Skips a specific number of animation frames.
+
+        :param skip: Number (and direction) of frames to skip.
+
+        :return: 0 on success; -1 on failure.
+        """
+        frame = self._Animation["frame"] + skip
+        if frame < 0:
+            frame = 3
+        elif frame >= 4:
+            frame = 0
+
+        self._Animation["frame"] = frame
+        self.SelectAnimRadioButton()
 
         return 0
 
@@ -887,25 +938,8 @@ class App(tk.Frame):
         :return: 0 on success; -1 on failure.
         """
         if self._Animation["objects"]:
-            self._Animation["playing"] = False
-            self._Buttons["pause-button"].config(relief=tk.SUNKEN)
-            self._Buttons["play-button"].config(relief=tk.RAISED)
-
-            frame = self._Animation["frame"]
-            frame += skip
-            if frame < 0:
-                frame = 3
-            elif frame >= 4:
-                frame = 0
-            self._Animation["frame"] = frame
-
-            for n in range(4):
-                key = "frame-{}".format(n)
-                if n == frame:
-                    self._RadioButtons[key].select()
-                else:
-                    self._RadioButtons[key].deselect()
-
+            self.DoPause()
+            self.DoSkipFrame(skip)
             self.UpdateOffsetLabels()
             self.UpdateAnimationImage()
 
@@ -1034,21 +1068,21 @@ class App(tk.Frame):
         self.InitButton(
             self._FrameGroupBot,
             "preview-idle",
-            lambda: self.DoMakePreview("idle"),
+            lambda: self.DoMakePreview(state="idle"),
         )
 
         # Initialize "make left preview" button
         self.InitButton(
             self._FrameGroupBot,
             "preview-left",
-            lambda: self.DoMakePreview("left"),
+            lambda: self.DoMakePreview(state="left"),
         )
 
         # Initialize "make right preview" button
         self.InitButton(
             self._FrameGroupBot,
             "preview-right",
-            lambda: self.DoMakePreview("right"),
+            lambda: self.DoMakePreview(state="right"),
         )
 
         # Initialize "export idle frames" button
@@ -1218,38 +1252,33 @@ class App(tk.Frame):
             self._StringVars["prioritize"], "Body", tk.W,
         )
 
-        def foo(x):
-            self._Animation["playing"] = False
-            self._Animation["frame"] = int(x)
-            self.UpdateAnimationImage()
-
         # Initialize "frame #1" radio button
         self.InitRadio(
             self._FrameBotLeftBot, "frame-0",
             self._StringVars["frame"], "0", tk.W,
             select=True,
-            command=lambda: foo(0)
+            command=lambda: self.JumpFrame(0)
         )
 
         # Initialize "frame #2" radio button
         self.InitRadio(
             self._FrameBotLeftBot, "frame-1",
             self._StringVars["frame"], "1", tk.W,
-            command=lambda: foo(1),
+            command=lambda: self.JumpFrame(1),
         )
 
         # Initialize "frame #3" radio button
         self.InitRadio(
             self._FrameBotLeftBot, "frame-2",
             self._StringVars["frame"], "2", tk.W,
-            command=lambda: foo(2)
+            command=lambda: self.JumpFrame(2)
         )
 
         # Initialize "frame #4" radio button
         self.InitRadio(
             self._FrameBotLeftBot, "frame-3",
             self._StringVars["frame"], "3", tk.W,
-            command=lambda: foo(3)
+            command=lambda: self.JumpFrame(3)
         )
 
     def InitButton(self, master, tag, command, relief=tk.RAISED):
@@ -1532,11 +1561,32 @@ class App(tk.Frame):
         self._ScaleAnimSpeed.destroy()
         self._ScaleAnimSpeed = scale
 
-    def MakeAnimationFrames(self, image):
+    def JumpFrame(self, frame):
+        """
+        Jumps to a specific animation frame.
+
+        :param frame: Frame to jump to.
+
+        :return: 0 on success; -1 on failure.
+        """
+        self._Animation["playing"] = False
+        self._Animation["frame"] = frame
+
+        self._Buttons["pause-button"].config(relief=tk.SUNKEN)
+        self._Buttons["play-button"].config(relief=tk.RAISED)
+
+        self.UpdateAnimationImage()
+        self.UpdateOffsetLabels()
+        self.SelectAnimRadioButton()
+
+        return 0
+
+    def MakeAnimationFrames(self, image, reset):
         """
         Populates local animation buffer.
 
         :param image: Spritesheet to crop frames from.
+        :param reset: Whether to reset animation counters.
 
         :return: None
         """
@@ -1549,8 +1599,9 @@ class App(tk.Frame):
         ]
 
         # Reset animation counters
-        self._Animation["frame"] = 0
-        self._Animation["forward"] = True
+        if reset:
+            self._Animation["frame"] = 0
+            self._Animation["forward"] = True
         self._Animation["speed"] = self._ScaleAnimSpeed.get()
 
         # Create preview image
@@ -1582,12 +1633,13 @@ class App(tk.Frame):
 
         self.DrawFrameLabels()
 
-    def MakePreview(self, func, state, **kwargs):
+    def MakePreview(self, func, state, reset=False, **kwargs):
         """
         Generates a static preview image.
 
         :param func:  Compositing callback function to use.
         :param state: Named state of preview to generate.
+        :param reset: Whether to reset animation frame. (Default False).
 
         :return: None.
         """
@@ -1615,7 +1667,7 @@ class App(tk.Frame):
 
                     # Set static and animated previews
                     self.MakeAnimationPreview(image)
-                    self.MakeAnimationFrames(image)
+                    self.MakeAnimationFrames(image, reset)
 
                     try:
                         # Populate per-frame head offset data
@@ -1700,6 +1752,23 @@ class App(tk.Frame):
 
         return 0
 
+    def SelectAnimRadioButton(self):
+        """
+        Selects the appropriate animation frame radio button.
+
+        :return: 0 on success; -1 on failure.
+        """
+        frame = self._Animation["frame"]
+
+        for n in range(4):
+            key = "frame-{}".format(n)
+            if n == frame:
+                self._RadioButtons[key].select()
+            else:
+                self._RadioButtons[key].deselect()
+
+        return 0
+
     def ShuffleAll(self):
         """
         Shuffles bodies and heads.
@@ -1720,12 +1789,7 @@ class App(tk.Frame):
         """
         if not self._Animation["playing"]:
             self.DoMakePreview()
-
-            if self._Animation["objects"]:
-                self._Animation["playing"] = True
-                self._Buttons["pause-button"].config(relief=tk.RAISED)
-                self._Buttons["play-button"].config(relief=tk.SUNKEN)
-                self.DoAnimate()
+            self.DoPlay()
 
         return 0
 
@@ -1735,14 +1799,10 @@ class App(tk.Frame):
 
         :return: 0 on success; -1 on failure.
         """
-        if self._Animation["objects"]:
-            self._Animation["playing"] = False
-            self._Buttons["pause-button"].config(relief=tk.SUNKEN)
-            self._Buttons["play-button"].config(relief=tk.RAISED)
-
+        self.DoPause()
         return 0
 
-    def UpdateCurrentFrame(self):
+    def UpdateCurrentFrame(self, increment):
         """
         Increments current animation frame.
 
@@ -1755,37 +1815,50 @@ class App(tk.Frame):
             isForwards = True
 
         # Increment frame
-        curFrame = self._Animation["frame"]
+        frame = self._Animation["frame"]
+
         if self._Animation["objects"]:
             if isForwards:
                 # Forwards iteration
-                curFrame += 1
-                if curFrame >= 4:
+                frame += increment
+                if frame < 0:
                     if not isPingpong:
-                        # Wrap to beginning
-                        curFrame = 0
+                        frame = 3
+                        isForwards = True
                     else:
-                        # Switch iteration direction
-                        curFrame = 2
+                        frame = 1
+                        isForwards = True
+
+                elif frame >= 4:
+                    if not isPingpong:
+                        frame = 0
+                        isForwards = True
+                    else:
+                        frame = 2
                         isForwards = False
+
             else:
                 # Backwards iteration
-                curFrame -= 1
-                if curFrame < 0:
-                    # Switch iteration direction
-                    curFrame = 1
-                    isForwards = True
+                frame -= increment
+                if frame < 0:
+                    if not isPingpong:
+                        frame = 3
+                        isForwards = True
+                    else:
+                        frame = 1
+                        isForwards = True
+
+                elif frame >= 4:
+                    if not isPingpong:
+                        frame = 0
+                        isForwards = True
+                    else:
+                        frame = 2
+                        isForwards = False
 
         # Update references to current frame
         self._Animation["forward"] = isForwards
-        self._Animation["frame"] = curFrame
-
-        for n in range(4):
-            key = "frame-{}".format(n)
-            if n == curFrame:
-                self._RadioButtons[key].select()
-            else:
-                self._RadioButtons[key].deselect()
+        self._Animation["frame"] = frame
 
     def UpdateOffsetLabel(self, key, state, frame):
         """
@@ -1830,12 +1903,15 @@ class App(tk.Frame):
         """
         Updates per-frame (x,y) head and body offset labels.
 
-        :return: None
+        :return: 0 on success; -1 on failure.
         """
         state = self._Animation["state"]
         frame = self._Animation["frame"]
+
         self.UpdateOffsetLabel("head", state, frame)
         self.UpdateOffsetLabel("body", state, frame)
+
+        return 0
 
     def UpdateSpeed(self, speed):
         """
