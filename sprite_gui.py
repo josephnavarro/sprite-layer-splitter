@@ -544,7 +544,12 @@ class App(tk.Frame):
         self._Master.resizable(False, False)
         self.winfo_toplevel().title(App.WINDOW_TITLE)
 
-        self._AfterJob = None
+        self._PendingJobs = {
+            "event-lock": None,
+            "animate":    None,
+        }
+
+        self._EventLock = False
 
         # Set icon for Mac OS X (and kill iTunes)
         if IsOSX():
@@ -739,9 +744,7 @@ class App(tk.Frame):
         self._ScaleAnimSpeed = tk.Scale()
 
         # Complete widget initialization
-        self.InitData("head")
-        self.InitData("body")
-
+        self.InitAllData()
         self.InitAllButtons()
         self.InitAllCanvases()
         self.InitAllCheckboxes()
@@ -751,6 +754,40 @@ class App(tk.Frame):
 
         self.InitSliderFramerate()
 
+    def AcquireEventLock(self):
+        """
+        Acquires the event lock.
+
+        :return: True on success; False on failure.
+        """
+        if not self._EventLock:
+            self._EventLock = True
+            return True
+        else:
+            print("locked")
+            return False
+
+    def ReleaseEventLock(self):
+        """
+        Releases the event lock.
+
+        :return: True on success; False on failure.
+        """
+        self.CancelPending("event-lock")
+        self.SetPending("event-lock", self.DoReleaseEventLock, 1000)
+        return True
+
+    def CancelPending(self, key):
+        """
+
+        :param key:
+        :return:
+        """
+        job = self._PendingJobs.get(key, None)
+        if job is not None:
+            self.after_cancel(job)
+            #self._PendingJobs[key] = None
+
     # noinspection PyMethodMayBeStatic
     def DestroyImages(self, key):
         """
@@ -758,7 +795,7 @@ class App(tk.Frame):
 
         :param key: Either of "head" or "body".
 
-        :return: 0 on success; -1 on failure.
+        :return: True on success; False on failure.
         """
         title = App.WINDOW_TITLE
         query = App.MESSAGES["confirm"]["destroy"][key]
@@ -767,14 +804,15 @@ class App(tk.Frame):
         if tk.messagebox.askquestion(title, query) == "yes":
             FlushInputs(key)
             tk.messagebox.showinfo(title, alert)
-
-        return 0
+            return True
+        else:
+            return False
 
     def DoAnimate(self, update=True):
         """
         Local animation callback function.
 
-        :return: 0 on success; -1 on failure.
+        :return: True on success; False on failure.
         """
         if self._Animation["playing"]:
             if update:
@@ -782,16 +820,13 @@ class App(tk.Frame):
             else:
                 self.UpdateCurrentFrame(0)
 
-            speed = self._Animation["speed"]
-            if speed > 0:
-                delay = 1000 // speed
-                self._AfterJob = self.after(delay, self.DoAnimate)
+            self.ScheduleAnimate()
 
         self.UpdateOffsetLabels()
         self.UpdateAnimationImage()
         self.SelectAnimRadioButton()
 
-        return 0
+        return True
 
     def DoComposite(self, func, **kwargs):
         """
@@ -829,18 +864,18 @@ class App(tk.Frame):
 
         return head, body, im
 
-    def DoExport(self, func, message, **kwargs):
+    def DoExport(self, callback, message, **kwargs):
         """
         Composites and exports animation frames to file.
 
-        :param func:    Frame compositing callback function.
-        :param message: Success message to display.
+        :param callback: Frame compositing callback function.
+        :param message:  Success message to display.
 
-        :return: 0 on success; -1 on failure.
+        :return: True on success; False on failure.
         """
         try:
             # Perform sprite composition
-            head, body, im = self.DoComposite(func, **kwargs)
+            head, body, im = self.DoComposite(callback, **kwargs)
 
             if im is not None:
                 if not head and not body:
@@ -867,18 +902,18 @@ class App(tk.Frame):
                     alert = message.format(os.path.basename(path))
                     tk.messagebox.showinfo(title, alert)
 
-            return 0
+            return True
 
         except InvalidFilenameException:
             # Image format not recognized
             title = App.WINDOW_TITLE
             alert = App.MESSAGES["message"]["failure"]["type"]
             tk.messagebox.showinfo(title, alert)
-            return -1
+            return False
 
         except EmptyFilenameException:
             # Filename not specified
-            return -1
+            return False
 
     def DoMakePreview(self, *, state=""):
         """
@@ -886,7 +921,7 @@ class App(tk.Frame):
 
         :param state: State to preview. (Default empty).
 
-        :return: 0 on success; -1 on failure.
+        :return: True on success; False on failure.
         """
         self.TurnPlaybackOff()
 
@@ -904,29 +939,28 @@ class App(tk.Frame):
             reverse=reverse,
         )
 
-        return 0
+        return True
 
     def DoPause(self):
         """
         Presses "pause" button, effectively.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
-        if self._AfterJob is not None:
-            self.after_cancel(self._AfterJob)
+        self.CancelPending("animate")
 
         if self._Animation["objects"]:
             self._Animation["playing"] = False
             self.DoPressButton("pause-button")
             self.DoUnpressButton("play-button")
 
-        return 0
+        return True
 
     def DoPlay(self):
         """
         Presses "play" button, effectively.
 
-        :return: 0 on success; -1 on failure.
+        :return: True on success; False on failure.
         """
         if self._Animation["objects"]:
             self._Animation["playing"] = True
@@ -934,7 +968,7 @@ class App(tk.Frame):
             self.DoUnpressButton("pause-button")
             self.DoAnimate(False)
 
-        return 0
+        return True
 
     def DoPressButton(self, key):
         """
@@ -942,13 +976,23 @@ class App(tk.Frame):
 
         :param key: Key of button to press.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         try:
             self._Buttons[key].config(relief=tk.SUNKEN)
-            return 0
         except KeyError:
-            return -1
+            pass
+
+        return True
+
+    def DoReleaseEventLock(self):
+        """
+        Releases local event lock.
+
+        :return: True.
+        """
+        self._EventLock = False
+        return True
 
     def DoRemakeOffset(self, key):
         """
@@ -956,13 +1000,13 @@ class App(tk.Frame):
 
         :param key: Either of "head" or "body".
 
-        :return: 0 on success, -1 on failure.
+        :return: True.
         """
         self._Data[key]["offset"] = LoadOffsets(key)
         self.UpdateOffsetLabels()
         self.DoMakePreview()
 
-        return 0
+        return True
 
     def DoSkipFrame(self, skip):
         """
@@ -970,7 +1014,7 @@ class App(tk.Frame):
 
         :param skip: Number (and direction) of frames to skip.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         frame = self._Animation["frame"] + skip
         if frame < 0:
@@ -981,7 +1025,7 @@ class App(tk.Frame):
         self._Animation["frame"] = frame
         self.SelectAnimRadioButton()
 
-        return 0
+        return True
 
     def DoUnpressButton(self, key):
         """
@@ -989,25 +1033,26 @@ class App(tk.Frame):
 
         :param key: Key of button to unpress.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         try:
             self._Buttons[key].config(relief=tk.RAISED)
-            return 0
         except KeyError:
-            return -1
+            pass
+
+        return True
 
     def DrawFrameLabels(self):
         """
         Draw frame labels to animation preview canvas.
 
-        :return: 0 on success; -1 on failure.
+        :return: True on success; False on failure.
         """
         canvas = self._Canvases["preview-static"]
         for n in range(4):
             App.DrawText(canvas, 18 + 96 * n, 92, "({})".format(n))
 
-        return 0
+        return True
 
     def ExportFrames(self, *, idle_only=False):
         """
@@ -1015,7 +1060,7 @@ class App(tk.Frame):
 
         :param idle_only: Whether to export only idle frames. (Default False).
 
-        :return: 0 on success, -1 on failure.
+        :return: True on success; False on failure.
         """
 
         if idle_only:
@@ -1035,16 +1080,17 @@ class App(tk.Frame):
             idle_only=idle_only,
         )
 
-        return 0
+        return True
 
     def FrameSkip(self, skip):
         """
         Skips any number of frames forward or backward.
+
         Implements wrapping at bounds.
 
         :param skip: Number (and direction) of frames to skip.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         if self._Animation["objects"]:
             self.DoPause()
@@ -1052,7 +1098,7 @@ class App(tk.Frame):
             self.UpdateOffsetLabels()
             self.UpdateAnimationImage()
 
-        return 0
+        return True
 
     def GetKey(self, key):
         """
@@ -1072,48 +1118,60 @@ class App(tk.Frame):
         """
         Initializes all required buttons.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         # Initialize "rebuild head data" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-head-data",
-            lambda: self.RebuildData("head"),
+            lambda: self.AcquireEventLock()
+                    and self.RebuildData("head")
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "rebuild head images" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-head-images",
-            lambda: self.RebuildImages("head"),
+            lambda: self.AcquireEventLock()
+                    and self.RebuildImages("head")
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "rebuild head offsets" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-head-offsets",
-            lambda: self.RebuildOffsets("head"),
+            lambda: self.AcquireEventLock()
+                    and self.RebuildOffsets("head")
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "destroy head images" button
         self.InitButton(
             self._FrameGroupBot,
             "destroy-head-images",
-            lambda: self.DestroyImages("head"),
+            lambda: self.AcquireEventLock()
+                    and self.DestroyImages("head")
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "play animation" button
         self.InitButton(
             self._FrameBotRightRight,
             "play-button",
-            self.TurnPlaybackOn,
+            lambda: self.AcquireEventLock()
+                    and self.TurnPlaybackOn()
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "pause animation" button
         self.InitButton(
             self._FrameBotRightRight,
             "pause-button",
-            self.TurnPlaybackOff,
+            lambda: self.AcquireEventLock()
+                    and self.TurnPlaybackOff()
+                    and self.ReleaseEventLock(),
             relief=tk.SUNKEN,
         )
 
@@ -1121,55 +1179,74 @@ class App(tk.Frame):
         self.InitButton(
             self._FrameBotRightRight,
             "skip-right-button",
-            lambda: self.FrameSkip(1),
+            lambda: self.AcquireEventLock()
+                    and self.FrameSkip(1)
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "skip frame left" button
         self.InitButton(
             self._FrameBotRightRight,
             "skip-left-button",
-            lambda: self.FrameSkip(-1),
+            lambda: self.AcquireEventLock()
+                    and self.FrameSkip(-1)
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "shuffle" button
         self.InitButton(
             self._FrameBotRightRight,
             "shuffle-button",
-            lambda: (self.ShuffleAll() + self.JumpFrame(0)),
+            lambda: self.AcquireEventLock()
+                    and self.ShuffleAll()
+                    and self.JumpFrame(0)
+                    and self.ReleaseEventLock(),
         )
 
-        # Initialize "shuffle" button
+        # Initialize "shuffle body" button
         self.InitButton(
             self._FrameBotRightRight,
             "shuffle-body-button",
-            lambda: (self.ShuffleBody() + self.JumpFrame(0)),
+            lambda: self.AcquireEventLock()
+                    and self.ShuffleBody()
+                    and self.JumpFrame(0)
+                    and self.ReleaseEventLock(),
         )
 
-        # Initialize "shuffle" button
+        # Initialize "shuffle head" button
         self.InitButton(
             self._FrameBotRightRight,
             "shuffle-head-button",
-            lambda: (self.ShuffleHead() + self.JumpFrame(0)),
+            lambda: self.AcquireEventLock()
+                    and self.ShuffleHead()
+                    and self.JumpFrame(0)
+                    and self.ReleaseEventLock(),
+
         )
 
         # Initialize "reload" button
         self.InitButton(
             self._FrameBotRightRight,
             "reload-button",
-            lambda: (self.DoRemakeOffset("head") +
-                     self.DoRemakeOffset("body") +
-                     self.JumpFrame(0)),
+            lambda: self.AcquireEventLock()
+                    and self.DoRemakeOffset("head")
+                    and self.DoRemakeOffset("body")
+                    and self.JumpFrame(0)
+                    and self.ReleaseEventLock(),
+
         )
 
         # Initialize "idle preview" button
         self.InitButton(
             self._FrameBotRightRight,
             "preview-idle-button",
-            lambda: (self.DoMakePreview(state="idle") +
-                     self.DoPressButton("preview-idle-button") +
-                     self.DoUnpressButton("preview-left-button") +
-                     self.DoUnpressButton("preview-right-button") +
-                     self.JumpFrame(0)),
+            lambda: self.AcquireEventLock()
+                    and self.DoMakePreview(state="idle")
+                    and self.DoPressButton("preview-idle-button")
+                    and self.DoUnpressButton("preview-left-button")
+                    and self.DoUnpressButton("preview-right-button")
+                    and self.JumpFrame(0)
+                    and self.ReleaseEventLock(),
             relief=tk.SUNKEN,
         )
 
@@ -1177,111 +1254,137 @@ class App(tk.Frame):
         self.InitButton(
             self._FrameBotRightRight,
             "preview-left-button",
-            lambda: (self.DoMakePreview(state="left") +
-                     self.DoPressButton("preview-left-button") +
-                     self.DoUnpressButton("preview-idle-button") +
-                     self.DoUnpressButton("preview-right-button") +
-                     self.JumpFrame(0)),
+            lambda: self.AcquireEventLock()
+                    and self.DoMakePreview(state="left")
+                    and self.DoPressButton("preview-left-button")
+                    and self.DoUnpressButton("preview-idle-button")
+                    and self.DoUnpressButton("preview-right-button")
+                    and self.JumpFrame(0)
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "right preview" button
         self.InitButton(
             self._FrameBotRightRight,
             "preview-right-button",
-            lambda: (self.DoMakePreview(state="right") +
-                     self.DoPressButton("preview-right-button") +
-                     self.DoUnpressButton("preview-left-button") +
-                     self.DoUnpressButton("preview-idle-button") +
-                     self.JumpFrame(0)),
+            lambda: self.AcquireEventLock()
+                    and self.DoMakePreview(state="right")
+                    and self.DoPressButton("preview-right-button")
+                    and self.DoUnpressButton("preview-left-button")
+                    and self.DoUnpressButton("preview-idle-button")
+                    and self.JumpFrame(0)
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "ping-pong" button
         self.InitButton(
             self._FrameBotRightRight,
             "ping-pong-button",
-            lambda: print("Baz"),
+            lambda: self.AcquireEventLock()
+                    and print("Baz")
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "reverse layers" button
         self.InitButton(
             self._FrameBotRightRight,
             "layers-button",
-            lambda: print("Baz"),
+            lambda: self.AcquireEventLock()
+                    and print("Baz")
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "rebuild body offsets" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-body-offsets",
-            lambda: self.RebuildOffsets("body"),
+            lambda: self.AcquireEventLock()
+                    and self.RebuildOffsets("body")
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "destroy body images" button
         self.InitButton(
             self._FrameGroupBot,
             "destroy-body-images",
-            lambda: self.DestroyImages("body"),
+            lambda: self.AcquireEventLock()
+                    and self.DestroyImages("body")
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "rebuild body data" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-body-data",
-            lambda: self.RebuildData("body"),
+            lambda: self.AcquireEventLock()
+                    and self.RebuildData("body")
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "rebuild body images" button
         self.InitButton(
             self._FrameGroupBot,
             "rebuild-body-images",
-            lambda: self.RebuildImages("body"),
+            lambda: self.AcquireEventLock()
+                    and self.RebuildImages("body")
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "make idle preview" button
         self.InitButton(
             self._FrameGroupBot,
             "preview-idle",
-            lambda: (self.DoMakePreview(state="idle") +
-                     self.DoPressButton("preview-idle-button") +
-                     self.DoUnpressButton("preview-left-button") +
-                     self.DoUnpressButton("preview-right-button") +
-                     self.JumpFrame(0)),
+            lambda: self.AcquireEventLock()
+                    and self.DoMakePreview(state="idle")
+                    and self.DoPressButton("preview-idle-button")
+                    and self.DoUnpressButton("preview-left-button")
+                    and self.DoUnpressButton("preview-right-button")
+                    and self.JumpFrame(0)
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "make left preview" button
         self.InitButton(
             self._FrameGroupBot,
             "preview-left",
-            lambda: (self.DoMakePreview(state="left") +
-                     self.DoPressButton("preview-left-button") +
-                     self.DoUnpressButton("preview-idle-button") +
-                     self.DoUnpressButton("preview-right-button") +
-                     self.JumpFrame(0)),
+            lambda: self.AcquireEventLock()
+                    and self.DoMakePreview(state="left")
+                    and self.DoPressButton("preview-left-button")
+                    and self.DoUnpressButton("preview-idle-button")
+                    and self.DoUnpressButton("preview-right-button")
+                    and self.JumpFrame(0)
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "make right preview" button
         self.InitButton(
             self._FrameGroupBot,
             "preview-right",
-            lambda: (self.DoMakePreview(state="right") +
-                     self.DoPressButton("preview-right-button") +
-                     self.DoUnpressButton("preview-left-button") +
-                     self.DoUnpressButton("preview-idle-button") +
-                     self.JumpFrame(0)),
+            lambda: self.AcquireEventLock()
+                    and self.DoMakePreview(state="right")
+                    and self.DoPressButton("preview-right-button")
+                    and self.DoUnpressButton("preview-left-button")
+                    and self.DoUnpressButton("preview-idle-button")
+                    and self.JumpFrame(0)
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "export idle frames" button
         self.InitButton(
             self._FrameGroupBot,
             "export-idle",
-            lambda: self.ExportFrames(idle_only=True),
+            lambda: self.AcquireEventLock()
+                    and self.ExportFrames(idle_only=True)
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "export all frames" button
         self.InitButton(
             self._FrameGroupBot,
             "export-full",
-            lambda: self.ExportFrames(),
+            lambda: self.AcquireEventLock()
+                    and self.ExportFrames()
+                    and self.ReleaseEventLock(),
         )
 
         return 0
@@ -1290,7 +1393,7 @@ class App(tk.Frame):
         """
         Initializes all required canvases.
 
-        :return: 0 on success; -1 on failure.
+        :return: True on success; False on failure.
         """
         # Initialize "static preview" canvas
         self.InitCanvas(
@@ -1306,13 +1409,13 @@ class App(tk.Frame):
             App.CANVAS_BORDERS,
         )
 
-        return 0
+        return True
 
     def InitAllCheckboxes(self):
         """
         Initializes all required checkboxes.
 
-        :return: 0 on success; -1 on failure.
+        :return: True on success; False on failure.
         """
         # Initialize "pingpong animation" checkbox
         self.InitCheckbox(
@@ -1326,93 +1429,111 @@ class App(tk.Frame):
             "reverse-layers", tk.W,
         )
 
-        return 0
+        return True
 
     def InitAllData(self):
         """
         Initializes all required data.
 
-        :return: 0 on success; -1 on failure.
+        :return: True on success; False on failure.
         """
         self.InitData("head")
         self.InitData("body")
-        return 0
+        return True
 
     def InitAllLabels(self):
         """
         Initializes all required labels.
 
-        :return: 0 on success; -1 on failure.
+        :return: True on success; False on failure.
         """
         # Initialize "export options" label
         self.InitLabel(
-            self._FrameGroupBot, "export-options",
-            ("sans-serif", App.FONTSIZE_VAR_W, "bold"), tk.NS,
+            self._FrameGroupBot,
+            "export-options",
+            ("sans-serif", App.FONTSIZE_VAR_W, "bold"),
+            tk.NS,
         )
 
         # Initialize "animation speed" label
         self.InitLabel(
-            self._FrameBotLeft, "speed-anim",
-            ("Courier", App.FONTSIZE_MONOS), tk.W, 0,
+            self._FrameBotLeft,
+            "speed-anim",
+            ("Courier", App.FONTSIZE_MONOS),
+            tk.W, 0,
         )
 
         # Initialize "static frames preview" label
         self.InitLabel(
-            self._FrameGroupTop, "preview-frames-label",
-            ("arial", App.FONTSIZE_SMALL), tk.W,
+            self._FrameGroupTop,
+            "preview-frames-label",
+            ("arial", App.FONTSIZE_SMALL),
+            tk.W,
         )
 
         # Initialize "animated preview" label
         self.InitLabel(
-            self._FrameGroupTop, "preview-anim-label",
-            ("arial", App.FONTSIZE_SMALL), tk.W,
+            self._FrameGroupTop,
+            "preview-anim-label",
+            ("arial", App.FONTSIZE_SMALL),
+            tk.W,
         )
 
         # Initialize "head offset" label
         self.InitLabel(
-            self._FrameBotLeft, "offset-head",
-            ("Courier", App.FONTSIZE_MONOS), tk.W,
-            0, 0,
+            self._FrameBotLeft,
+            "offset-head",
+            ("Courier", App.FONTSIZE_MONOS),
+            tk.W, 0, 0,
         )
 
         # Initialize "body offset" label
         self.InitLabel(
-            self._FrameBotLeft, "offset-body",
-            ("Courier", App.FONTSIZE_MONOS), tk.W,
-            0, 0,
+            self._FrameBotLeft,
+            "offset-body",
+            ("Courier", App.FONTSIZE_MONOS),
+            tk.W, 0, 0,
         )
 
         # Initialize "preview options" label
         self.InitLabel(
-            self._FrameGroupBot, "preview-options",
-            ("sans-serif", App.FONTSIZE_VAR_W, "bold"), tk.NS,
+            self._FrameGroupBot,
+            "preview-options",
+            ("sans-serif", App.FONTSIZE_VAR_W, "bold"),
+            tk.NS,
         )
 
         # Initialize "body options" label
         self.InitLabel(
-            self._FrameGroupBot, "body-options",
-            ("sans-serif", App.FONTSIZE_VAR_W, "bold"), tk.NS,
+            self._FrameGroupBot,
+            "body-options",
+            ("sans-serif", App.FONTSIZE_VAR_W, "bold"),
+            tk.NS,
         )
 
         # Initialize "head options" label
         self.InitLabel(
-            self._FrameGroupBot, "head-options",
-            ("sans-serif", App.FONTSIZE_VAR_W, "bold"), tk.NS,
+            self._FrameGroupBot,
+            "head-options",
+            ("sans-serif", App.FONTSIZE_VAR_W, "bold"),
+            tk.NS,
         )
 
         # Initialize "prioritize" label
         self.InitLabel(
-            self._FrameGroupBot, "prioritize-label",
-            ("sans-serif", App.FONTSIZE_VAR_W, "bold"), tk.NS,
+            self._FrameGroupBot,
+            "prioritize-label",
+            ("sans-serif", App.FONTSIZE_VAR_W, "bold"),
+            tk.NS,
         )
 
-        return 0
+        return True
 
     def InitAllMenus(self):
         """
         Initializes all required menus.
 
-        :return: 0 on success; -1 on failure.
+        :return: True on success; False on failure.
         """
         # Initialize "select head" dropdown menu
         self.InitMenu(
@@ -1426,25 +1547,31 @@ class App(tk.Frame):
             self._Data["body"]["list"],
         )
 
-        return 0
+        return True
 
     def InitAllRadioButtons(self):
         """
         Initializes all required radio buttons.
 
-        :return: None.
+        :return: True.
         """
         # Initialize "prioritize head" radio button
         self.InitRadio(
-            self._FrameGroupBot, "prioritize-1",
-            self._StringVars["prioritize"], "Head", tk.W,
+            self._FrameGroupBot,
+            "prioritize-1",
+            self._StringVars["prioritize"],
+            "Head",
+            tk.W,
             select=True,
         )
 
         # Initialize "prioritize body" radio button
         self.InitRadio(
-            self._FrameGroupBot, "prioritize-2",
-            self._StringVars["prioritize"], "Body", tk.W,
+            self._FrameGroupBot,
+            "prioritize-2",
+            self._StringVars["prioritize"],
+            "Body",
+            tk.W,
         )
 
         # Initialize "frame #1" radio button
@@ -1452,29 +1579,39 @@ class App(tk.Frame):
             self._FrameBotLeftBot, "frame-0",
             self._StringVars["frame"], "0", tk.W,
             select=True,
-            command=lambda: self.JumpFrame(0)
+            command=lambda: self.AcquireEventLock()
+                            and self.JumpFrame(0)
+                            and self.ReleaseEventLock(),
         )
 
         # Initialize "frame #2" radio button
         self.InitRadio(
             self._FrameBotLeftBot, "frame-1",
             self._StringVars["frame"], "1", tk.W,
-            command=lambda: self.JumpFrame(1),
+            command=lambda: self.AcquireEventLock()
+                            and self.JumpFrame(1)
+                            and self.ReleaseEventLock(),
         )
 
         # Initialize "frame #3" radio button
         self.InitRadio(
             self._FrameBotLeftBot, "frame-2",
             self._StringVars["frame"], "2", tk.W,
-            command=lambda: self.JumpFrame(2)
+            command=lambda: self.AcquireEventLock()
+                            and self.JumpFrame(2)
+                            and self.ReleaseEventLock(),
         )
 
         # Initialize "frame #4" radio button
         self.InitRadio(
             self._FrameBotLeftBot, "frame-3",
             self._StringVars["frame"], "3", tk.W,
-            command=lambda: self.JumpFrame(3)
+            command=lambda: self.AcquireEventLock()
+                            and self.JumpFrame(3)
+                            and self.ReleaseEventLock(),
         )
+
+        return True
 
     def InitButton(self, master, tag, command, relief=tk.RAISED):
         """
@@ -1530,6 +1667,8 @@ class App(tk.Frame):
         self._Buttons[tag].destroy()
         self._Buttons[tag] = button
 
+        return True
+
     def InitCanvas(self, master, tag, border):
         """
         Locally initializes a canvas.
@@ -1538,7 +1677,7 @@ class App(tk.Frame):
         :param tag:    Name of canvas to initialize.
         :param border: Border size for canvas.
 
-        :return: None.
+        :return: True.
         """
         # Create canvas
         canvas = tk.Canvas(
@@ -1562,6 +1701,8 @@ class App(tk.Frame):
         self._Canvases[tag].destroy()
         self._Canvases[tag] = canvas
 
+        return True
+
     def InitCheckbox(self, master, tag, sticky, command=None):
         """
         Initializes a checkbox.
@@ -1571,7 +1712,7 @@ class App(tk.Frame):
         :param sticky:  Anchoring string.
         :param command: Callback function. (Default None).
 
-        :return: None.
+        :return: True.
         """
         # Create checkbox
         checkbox = tk.Checkbutton(
@@ -1596,13 +1737,15 @@ class App(tk.Frame):
         self._Checkboxes[tag].destroy()
         self._Checkboxes[tag] = checkbox
 
+        return True
+
     def InitData(self, key):
         """
         Completes initialization of data from file.
 
         :param key: Either of "head" or "body".
 
-        :return: None.
+        :return: True.
         """
         data = self._Data[key]["data"] = {
             v.get("name", "---"): k
@@ -1611,6 +1754,8 @@ class App(tk.Frame):
 
         self._Data[key]["list"] = [App.DEFAULT_NAME] + sorted(list(data))
         self._Data[key]["offset"] = LoadOffsets(key)
+
+        return True
 
     def InitLabel(self, master, tag, font, sticky, *args):
         """
@@ -1622,7 +1767,7 @@ class App(tk.Frame):
         :param sticky: Anchoring string.
         :param args:   Zero or more formatting arguments for string.
 
-        :return: None.
+        :return: True.
         """
         try:
             text = App.LABELS[tag].format(*args)
@@ -1641,6 +1786,8 @@ class App(tk.Frame):
         self._Labels[tag].destroy()
         self._Labels[tag] = label
 
+        return True
+
     def InitMenu(self, master, tag, options):
         """
         Initializes a menu.
@@ -1649,7 +1796,7 @@ class App(tk.Frame):
         :param tag:     Tag of menu to initialize.
         :param options: Options to populate menu with.
 
-        :return: None.
+        :return: True.
         """
         width = App.SIZES["default-menu"][0]
         foreground = App.FromRGB(*App.COLORS[tag]["fg"])
@@ -1676,6 +1823,8 @@ class App(tk.Frame):
         self._Menus[tag].destroy()
         self._Menus[tag] = menu
 
+        return True
+
     def InitRadio(self,
                   master,
                   tag,
@@ -1697,7 +1846,7 @@ class App(tk.Frame):
         :param select:
         :param command:
 
-        :return: None.
+        :return: True.
         """
         # Create radio button
         radio = tk.Radiobutton(
@@ -1727,11 +1876,13 @@ class App(tk.Frame):
         self._RadioButtons[tag].destroy()
         self._RadioButtons[tag] = radio
 
+        return True
+
     def InitSliderFramerate(self):
         """
         Completes initialization of framerate slider.
 
-        :return: None.
+        :return: True.
         """
         scale = tk.Scale(
             self._FrameBotRightLeft,
@@ -1756,13 +1907,15 @@ class App(tk.Frame):
         self._ScaleAnimSpeed.destroy()
         self._ScaleAnimSpeed = scale
 
+        return True
+
     def JumpFrame(self, frame):
         """
         Jumps to a specific animation frame.
 
         :param frame: Frame to jump to.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         self._Animation["playing"] = False
         self._Animation["frame"] = frame
@@ -1774,7 +1927,7 @@ class App(tk.Frame):
         self.UpdateOffsetLabels()
         self.SelectAnimRadioButton()
 
-        return 0
+        return True
 
     def MakeAnimationFrames(self, image, reset):
         """
@@ -1783,7 +1936,7 @@ class App(tk.Frame):
         :param image: Spritesheet to crop frames from.
         :param reset: Whether to reset animation counters.
 
-        :return: None
+        :return: True
         """
         # Get animation frames
         w, h = App.SIZES["preview-anim"]
@@ -1809,13 +1962,15 @@ class App(tk.Frame):
         # Update labels
         self.UpdateOffsetLabels()
 
+        return True
+
     def MakeAnimationPreview(self, image):
         """
         Displays static preview frames.
 
         :param image: Image to display.
 
-        :return: None.
+        :return: True.
         """
         # Paste image onto canvas
         image = sprite_imaging.ToTkinter(sprite_imaging.ToPIL(image))
@@ -1828,6 +1983,8 @@ class App(tk.Frame):
 
         self.DrawFrameLabels()
 
+        return True
+
     def MakePreview(self, func, state, reset=False, **kwargs):
         """
         Generates a static preview image.
@@ -1836,7 +1993,7 @@ class App(tk.Frame):
         :param state: Named state of preview to generate.
         :param reset: Whether to reset animation frame. (Default False).
 
-        :return: None.
+        :return: True.
         """
         try:
             # Perform sprite composition
@@ -1890,13 +2047,15 @@ class App(tk.Frame):
                 App.MESSAGES["message"]["failure"]["type"],
             )
 
+        return True
+
     def RebuildData(self, key):
         """
         Callback function. Rebuilds a given JSON database.
 
         :param key: Either of "head" or "body".
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         title = App.WINDOW_TITLE
         query = App.MESSAGES["confirm"]["rebuild"]["data"][key]
@@ -1908,7 +2067,7 @@ class App(tk.Frame):
             self.InitMenu(self._FrameGroupBot, key, self._Data[key]["list"])
             tk.messagebox.showinfo(title, alert)
 
-        return 0
+        return True
 
     # noinspection PyMethodMayBeStatic
     def RebuildImages(self, key):
@@ -1917,7 +2076,7 @@ class App(tk.Frame):
 
         :param key: Either of "head" or "body".
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         title = App.WINDOW_TITLE
         query = App.MESSAGES["confirm"]["rebuild"]["image"][key]
@@ -1927,7 +2086,7 @@ class App(tk.Frame):
             Prepare(key)
             tk.messagebox.showinfo(title, alert)
 
-        return 0
+        return True
 
     def RebuildOffsets(self, key):
         """
@@ -1935,7 +2094,7 @@ class App(tk.Frame):
 
         :param key: Either of "head" or "body".
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         title = App.WINDOW_TITLE
         query = App.MESSAGES["confirm"]["rebuild"]["offset"][key]
@@ -1945,13 +2104,25 @@ class App(tk.Frame):
             self.DoRemakeOffset(key)
             tk.messagebox.showinfo(title, alert)
 
-        return 0
+        return True
+
+    def ScheduleAnimate(self):
+        """
+        Schedules an animation callback routine.
+
+        :return: True.
+        """
+        speed = self._Animation["speed"]
+        if speed > 0:
+            self.SetPending("animate", self.DoAnimate, 1000 // speed)
+
+        return True
 
     def SelectAnimRadioButton(self):
         """
         Selects the appropriate animation frame radio button.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         frame = self._Animation["frame"]
 
@@ -1962,68 +2133,82 @@ class App(tk.Frame):
             else:
                 self._RadioButtons[key].deselect()
 
-        return 0
+        return True
+
+    def SetPending(self, key, callback, delay):
+        """
+
+        :param key:
+        :param callback:
+        :param delay:
+
+        :return: True
+        """
+        self._PendingJobs[key] = self.after(delay, callback)
+        return True
 
     def ShuffleAll(self):
         """
         Shuffles bodies and heads.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         self._StringVars["body"].set(random.choice(self._Data["body"]["list"]))
         self._StringVars["head"].set(random.choice(self._Data["head"]["list"]))
         self.DoMakePreview()
 
-        return 0
+        return True
 
     def ShuffleBody(self):
         """
         Shuffles bodies.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         self._StringVars["body"].set(random.choice(self._Data["body"]["list"]))
         self.DoMakePreview()
 
-        return 0
+        print("body")
+
+        return True
 
     def ShuffleHead(self):
         """
         Shuffles heads.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         self._StringVars["head"].set(random.choice(self._Data["head"]["list"]))
         self.DoMakePreview()
 
-        return 0
+        return True
 
     def TurnPlaybackOn(self):
         """
         Turns animation playback on.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         if not self._Animation["playing"]:
             self.DoMakePreview()
             self.DoPlay()
 
-        return 0
+        return True
 
     def TurnPlaybackOff(self):
         """
         Turns animation playing off.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         self.DoPause()
-        return 0
+        return True
 
     def UpdateCurrentFrame(self, increment):
         """
         Increments current animation frame.
 
-        :return: None.
+        :return: True.
         """
         # Check frame iteration type
         isForwards = self._Animation["forward"]
@@ -2077,6 +2262,8 @@ class App(tk.Frame):
         self._Animation["forward"] = isForwards
         self._Animation["frame"] = frame
 
+        return True
+
     def UpdateOffsetLabel(self, key, state, frame):
         """
         Updates label for current (x,y) head offset.
@@ -2085,7 +2272,7 @@ class App(tk.Frame):
         :param state: Current sprite state.
         :param frame: Current frame of animation.
 
-        :return: None.
+        :return: True.
         """
         label = "offset-{}".format(key)
         try:
@@ -2094,11 +2281,13 @@ class App(tk.Frame):
         except (KeyError, IndexError):
             self._Labels[label].config(text=App.LABELS[label].format(0, 0))
 
+        return True
+
     def UpdateAnimationImage(self):
         """
         Updates currently-previewed animation frame.
 
-        :return: None.
+        :return: True.
         """
         try:
             # Draw frame to canvas
@@ -2116,11 +2305,13 @@ class App(tk.Frame):
             # Current frame is invalid
             pass
 
+        return True
+
     def UpdateOffsetLabels(self):
         """
         Updates per-frame (x,y) head and body offset labels.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         state = self._Animation["state"]
         frame = self._Animation["frame"]
@@ -2128,7 +2319,7 @@ class App(tk.Frame):
         self.UpdateOffsetLabel("head", state, frame)
         self.UpdateOffsetLabel("body", state, frame)
 
-        return 0
+        return True
 
     def UpdateSpeed(self, speed):
         """
@@ -2136,7 +2327,7 @@ class App(tk.Frame):
 
         :param speed: New framerate.
 
-        :return: 0 on success; -1 on failure.
+        :return: True.
         """
         speed = int(speed)
         text = App.LABELS["speed-anim"].format(speed)
@@ -2144,7 +2335,11 @@ class App(tk.Frame):
         self._Labels["speed-anim"].config(text=text)
         self._Animation["speed"] = speed
 
-        return 0
+        # Play animation
+        self.CancelPending("animate")
+        self.ScheduleAnimate()
+
+        return True
 
 
 def GUIMain():
