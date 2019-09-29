@@ -167,7 +167,7 @@ class App(tk.Frame):
         # OS X / Linux
         SIZES["default-button"] = [28, 0]
         SIZES["default-menu"] = [25, 0]
-        SIZES["default-slider"] = [120, 0]
+        SIZES["default-slider"] = [200, 0]
 
         FONTSIZE_VAR_W = 13
         FONTSIZE_MONOS = 14
