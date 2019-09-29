@@ -156,7 +156,7 @@ class App(tk.Frame):
         # Windows
         SIZES["default-button"] = [36, 0]
         SIZES["default-menu"] = [37, 0]
-        SIZES["default-slider"] = [120, 0]
+        SIZES["default-slider"] = [200, 0]
 
         FONTSIZE_VAR_W = 13
         FONTSIZE_MONOS = 10
@@ -182,42 +182,21 @@ class App(tk.Frame):
         "preview-anim-label":   [1, 2],
 
         # Left column
-        "head-options":         [7, 0],
-        "head":                 [8, 0],
-        "rebuild-head-images":  [9, 0],
-        "rebuild-head-data":    [10, 0],
-        "rebuild-head-offsets": [11, 0],
-        "destroy-head-images":  [12, 0],
-
-        "body-options":         [13, 0],
-        "body":                 [14, 0],
-        "rebuild-body-images":  [15, 0],
-        "rebuild-body-data":    [16, 0],
-        "rebuild-body-offsets": [17, 0],
-        "destroy-body-images":  [18, 0],
+        "head":                 [0, 0],
+        "body":                 [1, 0],
 
         # Right column
-        "preview-options":      [7, 1],
-        "state":                [7, 1],
-        "preview-idle":         [8, 1],
-        "preview-left":         [9, 1],
-        "preview-right":        [10, 1],
         "pingpong-animation":   [11, 1],
         "reverse-layers":       [12, 1],
-
-        "export-options":       [13, 1],
-        "export-full":          [14, 1],
-        "export-idle":          [15, 1],
         "prioritize-label":     [16, 1],
         "prioritize-1":         [17, 1],
         "prioritize-2":         [18, 1],
 
         # Frame data readout
-        "speed-slider":         [1, 0],
-        "speed-anim":           [2, 0],
+        "speed-slider":         [2, 0],
+        "speed-anim":           [3, 0],
         "offset-head":          [4, 0],
         "offset-body":          [5, 0],
-
         "frame-0":              [6, 0],
         "frame-1":              [6, 1],
         "frame-2":              [6, 2],
@@ -247,11 +226,6 @@ class App(tk.Frame):
         "preview-static":       [0, 0],
         "preview-anim":         [0, 0],
 
-        # Export options
-        "export-full":          [4, 4],
-        "export-idle":          [4, 4],
-        "export-options":       [4, 4],
-
         # Frame data readout
         "speed-anim":           [12, 0],
         "offset-head":          [12, 0],
@@ -261,37 +235,16 @@ class App(tk.Frame):
         "frame-2":              [0, 0],
         "frame-3":              [0, 0],
 
-        # Preview options
-        "preview-options":      [4, 4],
-        "body-options":         [4, 4],
-        "head-options":         [4, 4],
-
         # Layer collision resolution
         "prioritize-label":     [4, 4],
         "prioritize-1":         [0, 0],
         "prioritize-2":         [0, 0],
 
         # Preview options
-        "state":                [4, 4],
-        "preview-idle":         [4, 4],
-        "preview-left":         [4, 4],
-        "preview-right":        [4, 4],
         "pingpong-animation":   [4, 0],
         "reverse-layers":       [4, 0],
-
-        # Head options
         "head":                 [4, 4],
-        "rebuild-head-data":    [4, 4],
-        "rebuild-head-images":  [4, 4],
-        "rebuild-head-offsets": [4, 4],
-        "destroy-head-images":  [4, 4],
-
-        # Body options
         "body":                 [4, 4],
-        "rebuild-body-data":    [4, 4],
-        "rebuild-body-images":  [4, 4],
-        "rebuild-body-offsets": [4, 4],
-        "destroy-body-images":  [4, 4],
 
         # Icon-based buttons
         "play-button":          [0, 0],
@@ -323,21 +276,14 @@ class App(tk.Frame):
         "preview-anim-label":   "Animated preview",
 
         # Export options
-        "export-options":       "Export options",
         "export-full":          "Export all frames",
         "export-idle":          "Export idle frames",
 
         # Preview options
-        "preview-options":      "Preview options",
-        "state":                "Select state",
-        "preview-idle":         "Preview idle frames",
-        "preview-left":         "Preview left frames",
-        "preview-right":        "Preview right frames",
         "pingpong-animation":   "Ping-pong animation",
         "reverse-layers":       "Reverse layering order",
 
         # Body options
-        "body-options":         "Body options",
         "body":                 "Select body",
         "rebuild-body-images":  "Remake body sources",
         "rebuild-body-data":    "Refresh body listing",
@@ -345,7 +291,6 @@ class App(tk.Frame):
         "destroy-body-images":  "Clean body sources",
 
         # Head options
-        "head-options":         "Head options",
         "head":                 "Select head",
         "rebuild-head-images":  "Remake head sources",
         "rebuild-head-data":    "Refresh head listing",
@@ -401,22 +346,8 @@ class App(tk.Frame):
 
     # Widget colors (RGB, foreground + background)
     COLORS = {
-        "export-full":          {"fg": [0, 0, 0], "bg": [244, 212, 248]},
-        "export-idle":          {"fg": [0, 0, 0], "bg": [244, 212, 248]},
-        "preview-idle":         {"fg": [0, 0, 0], "bg": [200, 255, 212]},
-        "preview-left":         {"fg": [0, 0, 0], "bg": [200, 255, 212]},
-        "preview-right":        {"fg": [0, 0, 0], "bg": [200, 255, 212]},
-        "rebuild-body-data":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "rebuild-body-images":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "rebuild-body-offsets": {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "destroy-body-images":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "rebuild-head-data":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "rebuild-head-images":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "rebuild-head-offsets": {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "destroy-head-images":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "head":                 {"fg": [0, 0, 0], "bg": [200, 224, 255]},
         "body":                 {"fg": [0, 0, 0], "bg": [255, 200, 200]},
-        "state":                {"fg": [0, 0, 0], "bg": [200, 255, 212]},
         "preview-static":       {"fg": [0, 0, 0], "bg": [128, 128, 128]},
         "preview-anim":         {"fg": [0, 0, 0], "bg": [128, 128, 128]},
 
@@ -514,7 +445,7 @@ class App(tk.Frame):
             print("iTunes is inactive. Good!")
             timeout = App.MinutesToMilliseconds(10)
 
-        self.after(timeout, self.KillITunes)
+        self.SetPending("kill-itnes", self.KillITunes, timeout)
 
     @staticmethod
     def FromRGB(r, g, b):
@@ -544,9 +475,11 @@ class App(tk.Frame):
         self._Master.resizable(False, False)
         self.winfo_toplevel().title(App.WINDOW_TITLE)
 
+        # Repeat callback jobs
         self._PendingJobs = {
-            "event-lock": None,
-            "animate":    None,
+            "event-lock":  None,
+            "animate":     None,
+            "kill-itunes": None,
         }
 
         self._EventLock = False
@@ -587,45 +520,129 @@ class App(tk.Frame):
             },
         }
 
+        # Main menu instance
+        self._Menu = tk.Menu(self._Master)
+
+        # "Head" menu
+        self._HeadMenu = tk.Menu(self._Menu, tearoff=0)
+        self._HeadMenu.add_command(
+            label=App.LABELS["rebuild-head-data"],
+            command=lambda: self.AcquireEventLock()
+                            and self.RebuildData("head")
+                            and self.ReleaseEventLock(),
+        )
+        self._HeadMenu.add_command(
+            label=App.LABELS["rebuild-head-images"],
+            command=lambda: self.AcquireEventLock()
+                            and self.RebuildImages("head")
+                            and self.ReleaseEventLock(),
+        )
+        self._HeadMenu.add_command(
+            label=App.LABELS["rebuild-head-offsets"],
+            command=lambda: self.AcquireEventLock()
+                            and self.RebuildOffsets("head")
+                            and self.ReleaseEventLock(),
+        )
+        self._HeadMenu.add_command(
+            label=App.LABELS["destroy-head-images"],
+            command=lambda: self.AcquireEventLock()
+                            and self.DestroyImages("head")
+                            and self.ReleaseEventLock(),
+        )
+
+        # "Body" menu
+        self._BodyMenu = tk.Menu(self._Menu, tearoff=0)
+        self._BodyMenu.add_command(
+            label=App.LABELS["rebuild-body-data"],
+            command=lambda: self.AcquireEventLock()
+                            and self.RebuildData("body")
+                            and self.ReleaseEventLock(),
+        )
+        self._BodyMenu.add_command(
+            label=App.LABELS["rebuild-body-images"],
+            command=lambda: self.AcquireEventLock()
+                            and self.RebuildImages("body")
+                            and self.ReleaseEventLock(),
+        )
+        self._BodyMenu.add_command(
+            label=App.LABELS["rebuild-body-offsets"],
+            command=lambda: self.AcquireEventLock()
+                            and self.RebuildOffsets("body")
+                            and self.ReleaseEventLock(),
+        )
+        self._BodyMenu.add_command(
+            label=App.LABELS["destroy-body-images"],
+            command=lambda: self.AcquireEventLock()
+                            and self.DestroyImages("body")
+                            and self.ReleaseEventLock(),
+        )
+
+        # "Export" menu
+        self._ExportMenu = tk.Menu(self._Menu, tearoff=0)
+        self._ExportMenu.add_command(
+            label=App.LABELS["export-idle"],
+            command=lambda: self.AcquireEventLock()
+                            and self.ExportFrames(idle_only=True)
+                            and self.ReleaseEventLock(),
+        )
+        self._ExportMenu.add_command(
+            label=App.LABELS["export-full"],
+            command=lambda: self.AcquireEventLock()
+                            and self.ExportFrames()
+                            and self.ReleaseEventLock(),
+        )
+
+        self._Menu.add_cascade(label="Export", menu=self._ExportMenu)
+        self._Menu.add_cascade(label="Head", menu=self._HeadMenu)
+        self._Menu.add_cascade(label="Body", menu=self._BodyMenu)
+
+        self._Master.config(menu=self._Menu)
+
         # Widget-containing frames
-        self._FrameGroupTop = tk.Frame(self._Master)
-        self._FrameGroupTop.grid(row=1, column=0)
+        self._FrameA_Y1X0 = tk.Frame(self._Master)
+        self._FrameA_Y1X0.grid(row=1, column=0)
 
-        self._FrameGroupBot = tk.Frame(self._Master)
-        self._FrameGroupBot.grid(row=2, column=0)
+        self._FrameA_Y2X0 = tk.Frame(self._Master)
+        self._FrameA_Y2X0.grid(row=2, column=0)
 
-        self._FrameTopRight = tk.Frame(self._FrameGroupTop)
-        self._FrameTopRight.grid(row=0, column=3)
+        self._FrameB_Y0X3 = tk.Frame(self._FrameA_Y1X0)
+        self._FrameB_Y0X3.grid(row=0, column=3)
 
-        self._FrameBotLeft = tk.Frame(self._FrameGroupBot)
-        self._FrameBotLeft.grid(column=0, row=1)
+        self._FrameB_Y1X0 = tk.Frame(self._FrameA_Y2X0)
+        self._FrameB_Y1X0.grid(row=1, column=0)
 
-        self._FrameBotRight = tk.Frame(self._FrameGroupBot)
-        self._FrameBotRight.grid(column=1, row=1)
+        self._FrameB_Y1X1 = tk.Frame(self._FrameA_Y2X0)
+        self._FrameB_Y1X1.grid(row=1, column=1)
 
-        self._FrameBotLeftBot = tk.Frame(self._FrameBotLeft)
-        self._FrameBotLeftBot.grid(column=0, row=7)
+        self._FrameC_Y7X0 = tk.Frame(self._FrameB_Y1X0)
+        self._FrameC_Y7X0.grid(row=7, column=0)
 
-        self._FrameBotRightLeft = tk.Frame(self._FrameBotRight)
-        self._FrameBotRightLeft.grid(column=0, row=0)
+        self._FrameC_Y0X0 = tk.Frame(self._FrameB_Y1X1)
+        self._FrameC_Y0X0.grid(row=0, column=0)
 
-        self._FrameBotRightRight = tk.Frame(self._FrameBotRight)
-        self._FrameBotRightRight.grid(column=1, row=0)
+        self._FrameC_Y0X1 = tk.Frame(self._FrameB_Y1X1)
+        self._FrameC_Y0X1.grid(row=0, column=1)
+
+        self._FrameD_Y0X0 = tk.Frame(self._FrameC_Y0X1)
+        self._FrameD_Y0X0.grid(row=0, column=0)
+
+        self._FrameD_Y1X0 = tk.Frame(self._FrameC_Y0X1)
+        self._FrameD_Y1X0.grid(row=1, column=0)
 
         # Padding frames
-        self._FramePadMidTop = tk.Frame(self._FrameTopRight, width=1, height=10)
+        self._FramePadMidTop = tk.Frame(self._FrameB_Y0X3, width=1, height=10)
         self._FramePadMidTop.grid(row=0, column=0)
 
-        self._FramePadBorder = tk.Frame(self._FrameGroupBot, height=10)
+        self._FramePadBorder = tk.Frame(self._FrameA_Y2X0, height=10)
         self._FramePadBorder.grid(row=6)
 
-        self._FramePadBottom = tk.Frame(self._FrameGroupBot, height=10)
+        self._FramePadBottom = tk.Frame(self._FrameA_Y2X0, height=10)
         self._FramePadBottom.grid(row=24)
 
-        self._FramePadTopleft = tk.Frame(self._FrameGroupTop, height=10)
+        self._FramePadTopleft = tk.Frame(self._FrameA_Y1X0, height=10)
         self._FramePadTopleft.grid(row=1)
 
-        self._FramePadTopleft = tk.Frame(self._FrameGroupTop, height=10)
+        self._FramePadTopleft = tk.Frame(self._FrameA_Y1X0, height=10)
         self._FramePadTopleft.grid(row=2)
 
         self._FramePadTop = tk.Frame(self._Master, height=10)
@@ -710,17 +727,17 @@ class App(tk.Frame):
         # Menus
         self._Menus = {
             "head":  tk.OptionMenu(
-                self._FrameGroupBot,
+                self._FrameA_Y2X0,
                 self._StringVars["head"],
                 *self._Data["head"]["list"]
             ),
             "body":  tk.OptionMenu(
-                self._FrameGroupBot,
+                self._FrameA_Y2X0,
                 self._StringVars["body"],
                 *self._Data["body"]["list"]
             ),
             "state": tk.OptionMenu(
-                self._FrameGroupBot,
+                self._FrameA_Y2X0,
                 self._StringVars["state"],
                 *STATES
             )
@@ -747,7 +764,7 @@ class App(tk.Frame):
         self.InitAllData()
         self.InitAllButtons()
         self.InitAllCanvases()
-        self.InitAllCheckboxes()
+        #self.InitAllCheckboxes()
         self.InitAllLabels()
         self.InitAllMenus()
         self.InitAllRadioButtons()
@@ -774,19 +791,23 @@ class App(tk.Frame):
         :return: True on success; False on failure.
         """
         self.CancelPending("event-lock")
-        self.SetPending("event-lock", self.DoReleaseEventLock, 1000)
+        self.SetPending("event-lock", self.DoReleaseEventLock, 333)
+
         return True
 
     def CancelPending(self, key):
         """
+        Cancels a pending scheduled event.
 
-        :param key:
-        :return:
+        :param key: Key of event to cancel.
+
+        :return: True
         """
         job = self._PendingJobs.get(key, None)
         if job is not None:
             self.after_cancel(job)
-            #self._PendingJobs[key] = None
+
+        return True
 
     # noinspection PyMethodMayBeStatic
     def DestroyImages(self, key):
@@ -1120,45 +1141,9 @@ class App(tk.Frame):
 
         :return: True.
         """
-        # Initialize "rebuild head data" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "rebuild-head-data",
-            lambda: self.AcquireEventLock()
-                    and self.RebuildData("head")
-                    and self.ReleaseEventLock(),
-        )
-
-        # Initialize "rebuild head images" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "rebuild-head-images",
-            lambda: self.AcquireEventLock()
-                    and self.RebuildImages("head")
-                    and self.ReleaseEventLock(),
-        )
-
-        # Initialize "rebuild head offsets" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "rebuild-head-offsets",
-            lambda: self.AcquireEventLock()
-                    and self.RebuildOffsets("head")
-                    and self.ReleaseEventLock(),
-        )
-
-        # Initialize "destroy head images" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "destroy-head-images",
-            lambda: self.AcquireEventLock()
-                    and self.DestroyImages("head")
-                    and self.ReleaseEventLock(),
-        )
-
         # Initialize "play animation" button
         self.InitButton(
-            self._FrameBotRightRight,
+            self._FrameD_Y0X0,
             "play-button",
             lambda: self.AcquireEventLock()
                     and self.TurnPlaybackOn()
@@ -1167,7 +1152,7 @@ class App(tk.Frame):
 
         # Initialize "pause animation" button
         self.InitButton(
-            self._FrameBotRightRight,
+            self._FrameD_Y0X0,
             "pause-button",
             lambda: self.AcquireEventLock()
                     and self.TurnPlaybackOff()
@@ -1177,7 +1162,7 @@ class App(tk.Frame):
 
         # Initialize "skip frame right" button
         self.InitButton(
-            self._FrameBotRightRight,
+            self._FrameD_Y0X0,
             "skip-right-button",
             lambda: self.AcquireEventLock()
                     and self.FrameSkip(1)
@@ -1186,7 +1171,7 @@ class App(tk.Frame):
 
         # Initialize "skip frame left" button
         self.InitButton(
-            self._FrameBotRightRight,
+            self._FrameD_Y0X0,
             "skip-left-button",
             lambda: self.AcquireEventLock()
                     and self.FrameSkip(-1)
@@ -1195,7 +1180,7 @@ class App(tk.Frame):
 
         # Initialize "shuffle" button
         self.InitButton(
-            self._FrameBotRightRight,
+            self._FrameD_Y0X0,
             "shuffle-button",
             lambda: self.AcquireEventLock()
                     and self.ShuffleAll()
@@ -1205,7 +1190,7 @@ class App(tk.Frame):
 
         # Initialize "shuffle body" button
         self.InitButton(
-            self._FrameBotRightRight,
+            self._FrameD_Y0X0,
             "shuffle-body-button",
             lambda: self.AcquireEventLock()
                     and self.ShuffleBody()
@@ -1215,7 +1200,7 @@ class App(tk.Frame):
 
         # Initialize "shuffle head" button
         self.InitButton(
-            self._FrameBotRightRight,
+            self._FrameD_Y0X0,
             "shuffle-head-button",
             lambda: self.AcquireEventLock()
                     and self.ShuffleHead()
@@ -1226,7 +1211,7 @@ class App(tk.Frame):
 
         # Initialize "reload" button
         self.InitButton(
-            self._FrameBotRightRight,
+            self._FrameD_Y0X0,
             "reload-button",
             lambda: self.AcquireEventLock()
                     and self.DoRemakeOffset("head")
@@ -1238,7 +1223,7 @@ class App(tk.Frame):
 
         # Initialize "idle preview" button
         self.InitButton(
-            self._FrameBotRightRight,
+            self._FrameD_Y0X0,
             "preview-idle-button",
             lambda: self.AcquireEventLock()
                     and self.DoMakePreview(state="idle")
@@ -1252,7 +1237,7 @@ class App(tk.Frame):
 
         # Initialize "left preview" button
         self.InitButton(
-            self._FrameBotRightRight,
+            self._FrameD_Y0X0,
             "preview-left-button",
             lambda: self.AcquireEventLock()
                     and self.DoMakePreview(state="left")
@@ -1265,7 +1250,7 @@ class App(tk.Frame):
 
         # Initialize "right preview" button
         self.InitButton(
-            self._FrameBotRightRight,
+            self._FrameD_Y0X0,
             "preview-right-button",
             lambda: self.AcquireEventLock()
                     and self.DoMakePreview(state="right")
@@ -1278,112 +1263,19 @@ class App(tk.Frame):
 
         # Initialize "ping-pong" button
         self.InitButton(
-            self._FrameBotRightRight,
+            self._FrameD_Y0X0,
             "ping-pong-button",
             lambda: self.AcquireEventLock()
-                    and print("Baz")
+                    and self.TogglePingpong()
                     and self.ReleaseEventLock(),
         )
 
         # Initialize "reverse layers" button
         self.InitButton(
-            self._FrameBotRightRight,
+            self._FrameD_Y0X0,
             "layers-button",
             lambda: self.AcquireEventLock()
-                    and print("Baz")
-                    and self.ReleaseEventLock(),
-        )
-
-        # Initialize "rebuild body offsets" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "rebuild-body-offsets",
-            lambda: self.AcquireEventLock()
-                    and self.RebuildOffsets("body")
-                    and self.ReleaseEventLock(),
-        )
-
-        # Initialize "destroy body images" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "destroy-body-images",
-            lambda: self.AcquireEventLock()
-                    and self.DestroyImages("body")
-                    and self.ReleaseEventLock(),
-        )
-
-        # Initialize "rebuild body data" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "rebuild-body-data",
-            lambda: self.AcquireEventLock()
-                    and self.RebuildData("body")
-                    and self.ReleaseEventLock(),
-        )
-
-        # Initialize "rebuild body images" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "rebuild-body-images",
-            lambda: self.AcquireEventLock()
-                    and self.RebuildImages("body")
-                    and self.ReleaseEventLock(),
-        )
-
-        # Initialize "make idle preview" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "preview-idle",
-            lambda: self.AcquireEventLock()
-                    and self.DoMakePreview(state="idle")
-                    and self.DoPressButton("preview-idle-button")
-                    and self.DoUnpressButton("preview-left-button")
-                    and self.DoUnpressButton("preview-right-button")
-                    and self.JumpFrame(0)
-                    and self.ReleaseEventLock(),
-        )
-
-        # Initialize "make left preview" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "preview-left",
-            lambda: self.AcquireEventLock()
-                    and self.DoMakePreview(state="left")
-                    and self.DoPressButton("preview-left-button")
-                    and self.DoUnpressButton("preview-idle-button")
-                    and self.DoUnpressButton("preview-right-button")
-                    and self.JumpFrame(0)
-                    and self.ReleaseEventLock(),
-        )
-
-        # Initialize "make right preview" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "preview-right",
-            lambda: self.AcquireEventLock()
-                    and self.DoMakePreview(state="right")
-                    and self.DoPressButton("preview-right-button")
-                    and self.DoUnpressButton("preview-left-button")
-                    and self.DoUnpressButton("preview-idle-button")
-                    and self.JumpFrame(0)
-                    and self.ReleaseEventLock(),
-        )
-
-        # Initialize "export idle frames" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "export-idle",
-            lambda: self.AcquireEventLock()
-                    and self.ExportFrames(idle_only=True)
-                    and self.ReleaseEventLock(),
-        )
-
-        # Initialize "export all frames" button
-        self.InitButton(
-            self._FrameGroupBot,
-            "export-full",
-            lambda: self.AcquireEventLock()
-                    and self.ExportFrames()
+                    and self.ToggleReverseLayers()
                     and self.ReleaseEventLock(),
         )
 
@@ -1397,14 +1289,14 @@ class App(tk.Frame):
         """
         # Initialize "static preview" canvas
         self.InitCanvas(
-            self._FrameGroupTop,
+            self._FrameA_Y1X0,
             "preview-static",
             App.CANVAS_BORDERS,
         )
 
         # Initialize "animated preview" canvas
         self.InitCanvas(
-            self._FrameGroupTop,
+            self._FrameA_Y1X0,
             "preview-anim",
             App.CANVAS_BORDERS,
         )
@@ -1419,13 +1311,13 @@ class App(tk.Frame):
         """
         # Initialize "pingpong animation" checkbox
         self.InitCheckbox(
-            self._FrameGroupBot,
+            self._FrameD_Y1X0,
             "pingpong-animation", tk.W,
         )
 
         # Initialize "reverse layers" checkbox
         self.InitCheckbox(
-            self._FrameGroupBot,
+            self._FrameD_Y1X0,
             "reverse-layers", tk.W,
         )
 
@@ -1447,17 +1339,9 @@ class App(tk.Frame):
 
         :return: True on success; False on failure.
         """
-        # Initialize "export options" label
-        self.InitLabel(
-            self._FrameGroupBot,
-            "export-options",
-            ("sans-serif", App.FONTSIZE_VAR_W, "bold"),
-            tk.NS,
-        )
-
         # Initialize "animation speed" label
         self.InitLabel(
-            self._FrameBotLeft,
+            self._FrameB_Y1X0,
             "speed-anim",
             ("Courier", App.FONTSIZE_MONOS),
             tk.W, 0,
@@ -1465,23 +1349,23 @@ class App(tk.Frame):
 
         # Initialize "static frames preview" label
         self.InitLabel(
-            self._FrameGroupTop,
+            self._FrameA_Y1X0,
             "preview-frames-label",
-            ("arial", App.FONTSIZE_SMALL),
+            ("calibri", App.FONTSIZE_SMALL),
             tk.W,
         )
 
         # Initialize "animated preview" label
         self.InitLabel(
-            self._FrameGroupTop,
+            self._FrameA_Y1X0,
             "preview-anim-label",
-            ("arial", App.FONTSIZE_SMALL),
+            ("calibri", App.FONTSIZE_SMALL),
             tk.W,
         )
 
         # Initialize "head offset" label
         self.InitLabel(
-            self._FrameBotLeft,
+            self._FrameB_Y1X0,
             "offset-head",
             ("Courier", App.FONTSIZE_MONOS),
             tk.W, 0, 0,
@@ -1489,41 +1373,17 @@ class App(tk.Frame):
 
         # Initialize "body offset" label
         self.InitLabel(
-            self._FrameBotLeft,
+            self._FrameB_Y1X0,
             "offset-body",
             ("Courier", App.FONTSIZE_MONOS),
             tk.W, 0, 0,
         )
 
-        # Initialize "preview options" label
-        self.InitLabel(
-            self._FrameGroupBot,
-            "preview-options",
-            ("sans-serif", App.FONTSIZE_VAR_W, "bold"),
-            tk.NS,
-        )
-
-        # Initialize "body options" label
-        self.InitLabel(
-            self._FrameGroupBot,
-            "body-options",
-            ("sans-serif", App.FONTSIZE_VAR_W, "bold"),
-            tk.NS,
-        )
-
-        # Initialize "head options" label
-        self.InitLabel(
-            self._FrameGroupBot,
-            "head-options",
-            ("sans-serif", App.FONTSIZE_VAR_W, "bold"),
-            tk.NS,
-        )
-
         # Initialize "prioritize" label
         self.InitLabel(
-            self._FrameGroupBot,
+            self._FrameD_Y1X0,
             "prioritize-label",
-            ("sans-serif", App.FONTSIZE_VAR_W, "bold"),
+            ("calibri", App.FONTSIZE_VAR_W),
             tk.NS,
         )
 
@@ -1537,13 +1397,15 @@ class App(tk.Frame):
         """
         # Initialize "select head" dropdown menu
         self.InitMenu(
-            self._FrameGroupBot, "head",
+            self._FrameB_Y1X0,
+            "head",
             self._Data["head"]["list"],
         )
 
         # Initialize "select body" dropdown menu
         self.InitMenu(
-            self._FrameGroupBot, "body",
+            self._FrameB_Y1X0,
+            "body",
             self._Data["body"]["list"],
         )
 
@@ -1557,7 +1419,7 @@ class App(tk.Frame):
         """
         # Initialize "prioritize head" radio button
         self.InitRadio(
-            self._FrameGroupBot,
+            self._FrameD_Y1X0,
             "prioritize-1",
             self._StringVars["prioritize"],
             "Head",
@@ -1567,7 +1429,7 @@ class App(tk.Frame):
 
         # Initialize "prioritize body" radio button
         self.InitRadio(
-            self._FrameGroupBot,
+            self._FrameD_Y1X0,
             "prioritize-2",
             self._StringVars["prioritize"],
             "Body",
@@ -1576,7 +1438,7 @@ class App(tk.Frame):
 
         # Initialize "frame #1" radio button
         self.InitRadio(
-            self._FrameBotLeftBot, "frame-0",
+            self._FrameC_Y7X0, "frame-0",
             self._StringVars["frame"], "0", tk.W,
             select=True,
             command=lambda: self.AcquireEventLock()
@@ -1586,7 +1448,7 @@ class App(tk.Frame):
 
         # Initialize "frame #2" radio button
         self.InitRadio(
-            self._FrameBotLeftBot, "frame-1",
+            self._FrameC_Y7X0, "frame-1",
             self._StringVars["frame"], "1", tk.W,
             command=lambda: self.AcquireEventLock()
                             and self.JumpFrame(1)
@@ -1595,7 +1457,7 @@ class App(tk.Frame):
 
         # Initialize "frame #3" radio button
         self.InitRadio(
-            self._FrameBotLeftBot, "frame-2",
+            self._FrameC_Y7X0, "frame-2",
             self._StringVars["frame"], "2", tk.W,
             command=lambda: self.AcquireEventLock()
                             and self.JumpFrame(2)
@@ -1604,7 +1466,7 @@ class App(tk.Frame):
 
         # Initialize "frame #4" radio button
         self.InitRadio(
-            self._FrameBotLeftBot, "frame-3",
+            self._FrameC_Y7X0, "frame-3",
             self._StringVars["frame"], "3", tk.W,
             command=lambda: self.AcquireEventLock()
                             and self.JumpFrame(3)
@@ -1885,7 +1747,7 @@ class App(tk.Frame):
         :return: True.
         """
         scale = tk.Scale(
-            self._FrameBotRightLeft,
+            self._FrameC_Y0X0,
             from_=App.SPEED_SCALE_MAX,
             to=App.SPEED_SCALE_MIN,
             orient=tk.VERTICAL,
@@ -2064,7 +1926,7 @@ class App(tk.Frame):
         if tk.messagebox.askquestion(title, query) == "yes":
             CreateInputJSON(key)
             self.InitData(key)
-            self.InitMenu(self._FrameGroupBot, key, self._Data[key]["list"])
+            self.InitMenu(self._FrameA_Y2X0, key, self._Data[key]["list"])
             tk.messagebox.showinfo(title, alert)
 
         return True
@@ -2137,14 +1999,16 @@ class App(tk.Frame):
 
     def SetPending(self, key, callback, delay):
         """
+        Schedules a callback function to run after a time delay.
 
-        :param key:
-        :param callback:
-        :param delay:
+        :param key:      Key of callback to flag.
+        :param callback: Callback function to trigger.
+        :param delay:    Time delay (milliseconds).
 
         :return: True
         """
         self._PendingJobs[key] = self.after(delay, callback)
+
         return True
 
     def ShuffleAll(self):
@@ -2168,8 +2032,6 @@ class App(tk.Frame):
         self._StringVars["body"].set(random.choice(self._Data["body"]["list"]))
         self.DoMakePreview()
 
-        print("body")
-
         return True
 
     def ShuffleHead(self):
@@ -2180,6 +2042,38 @@ class App(tk.Frame):
         """
         self._StringVars["head"].set(random.choice(self._Data["head"]["list"]))
         self.DoMakePreview()
+
+        return True
+
+    def TogglePingpong(self):
+        """
+        hhh
+
+        :return: True
+        """
+        isPingpong = self._BooleanVars["pingpong-animation"]
+        if isPingpong.get():
+            self.DoUnpressButton("ping-pong-button")
+            isPingpong.set(False)
+        else:
+            self.DoPressButton("ping-pong-button")
+            isPingpong.set(True)
+
+        return True
+
+    def ToggleReverseLayers(self):
+        """
+        hhh
+
+        :return: True
+        """
+        isReverseLayers = self._BooleanVars["reverse-layers"]
+        if isReverseLayers.get():
+            self.DoUnpressButton("layers-button")
+            isReverseLayers.set(False)
+        else:
+            self.DoPressButton("layers-button")
+            isReverseLayers.set(True)
 
         return True
 
