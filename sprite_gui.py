@@ -870,13 +870,13 @@ class App(tk.Frame):
         except sprite_splitter.NonexistentHeadException as e:
             # Head spritesheet does not exist
             title = App.WINDOW_TITLE
-            alert = App.MESSAGES["message"]["invalid"]["head"]  # type: str
+            alert = App.MESSAGES["message"]["invalid"]["head"]
             tk.messagebox.showinfo(title, alert.format(e.filename))
 
         except sprite_splitter.NonexistentBodyException as e:
             # Body spritesheet does not exist
             title = App.WINDOW_TITLE
-            alert = App.MESSAGES["message"]["invalid"]["body"]  # type: str
+            alert = App.MESSAGES["message"]["invalid"]["body"]
             tk.messagebox.showinfo(title, alert.format(e.filename))
 
         except cv2.error:
@@ -1000,7 +1000,13 @@ class App(tk.Frame):
         :return: True.
         """
         try:
-            self._Buttons[key].config(relief=tk.SUNKEN)
+            button = self._Buttons[key]
+            if IsOSX():
+                button.config(
+                    highlightbackground=App.FromRGB(*App.COLORS[key]["fg"])
+                )
+            else:
+                button.config(relief=tk.SUNKEN)
         except KeyError:
             pass
 
@@ -1057,7 +1063,13 @@ class App(tk.Frame):
         :return: True.
         """
         try:
-            self._Buttons[key].config(relief=tk.RAISED)
+            button = self._Buttons[key]
+            if IsOSX():
+                button.config(
+                    highlightbackground=App.FromRGB(*App.COLORS[key]["bg"])
+                )
+            else:
+                button.config(relief=tk.RAISED)
         except KeyError:
             pass
 
@@ -1516,6 +1528,18 @@ class App(tk.Frame):
             image=image,
             relief=relief,
         )
+
+        if IsOSX():
+            if relief == tk.RAISED:
+                button.config(
+                    highlightbackground=bg,
+                    highlightcolor=fg,
+                )
+            else:
+                button.config(
+                    highlightbackground=fg,
+                    highlightcolor=fg,
+                )
 
         # Position button
         button.grid(
