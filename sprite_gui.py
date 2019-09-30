@@ -194,13 +194,14 @@ class App(tk.Frame):
 
         # Frame data readout
         "speed-slider":         [2, 0],
-        "speed-anim":           [3, 0],
+        "offset-body":          [3, 0],
         "offset-head":          [4, 0],
-        "offset-body":          [5, 0],
-        "frame-0":              [6, 0],
-        "frame-1":              [6, 1],
-        "frame-2":              [6, 2],
-        "frame-3":              [6, 3],
+        "speed-anim":           [5, 0],
+        "frame-label":          [7, 0],
+        "frame-0":              [6, 1],
+        "frame-1":              [6, 2],
+        "frame-2":              [6, 3],
+        "frame-3":              [6, 4],
 
         # Icon-based buttons
         "reload-button":        [0, 1],
@@ -229,9 +230,10 @@ class App(tk.Frame):
         "preview-anim":         [0, 0],
 
         # Frame data readout
-        "speed-anim":           [12, 0],
+        "speed-anim":           [0, 0],
         "offset-head":          [12, 0],
         "offset-body":          [12, 0],
+        "frame-label":          [0, 0],
         "frame-0":              [0, 0],
         "frame-1":              [0, 0],
         "frame-2":              [0, 0],
@@ -298,7 +300,8 @@ class App(tk.Frame):
         # Frame data readout
         "offset-body":          "Body  :=  x: {0:+d} / y: {1:+d}",
         "offset-head":          "Head  :=  x: {0:+d} / y: {1:+d}",
-        "speed-anim":           "Speed :=  {0:d}",
+        "speed-anim":           "Speed:  {0:d}",
+        "frame-label":          "Frame:",
         "frame-0":              "0",
         "frame-1":              "1",
         "frame-2":              "2",
@@ -751,16 +754,17 @@ class App(tk.Frame):
 
         # Labels
         self._Labels = {
-            "preview-frames-label": tk.Label(),
-            "preview-anim-label":   tk.Label(),
+            "body-options":         tk.Label(),
+            "export-options":       tk.Label(),
+            "frame-label":          tk.Label(),
+            "head-options":         tk.Label(),
             "offset-head":          tk.Label(),
             "offset-body":          tk.Label(),
-            "speed-anim":           tk.Label(),
-            "prioritize-label":     tk.Label(),
-            "head-options":         tk.Label(),
-            "body-options":         tk.Label(),
+            "preview-anim-label":   tk.Label(),
+            "preview-frames-label": tk.Label(),
             "preview-options":      tk.Label(),
-            "export-options":       tk.Label(),
+            "prioritize-label":     tk.Label(),
+            "speed-anim":           tk.Label(),
         }
 
         # Sliders
@@ -770,7 +774,7 @@ class App(tk.Frame):
         self.InitAllData()
         self.InitAllButtons()
         self.InitAllCanvases()
-        # self.InitAllCheckboxes()
+        self.InitAllCheckboxes()
         self.InitAllLabels()
         self.InitAllMenus()
         self.InitAllRadioButtons()
@@ -1393,8 +1397,16 @@ class App(tk.Frame):
         self.InitLabel(
             self._FrameB_Y1X0,
             "speed-anim",
-            ("Courier", App.FONTSIZE_MONOS),
+            ("calibri", App.FONTSIZE_SMALL),
             tk.W, 0,
+        )
+
+        # Initialize "current frame" label
+        self.InitLabel(
+            self._FrameB_Y1X0,
+            "frame-label",
+            ("calibri", App.FONTSIZE_SMALL),
+            tk.SW,
         )
 
         # Initialize "static frames preview" label
@@ -1488,8 +1500,11 @@ class App(tk.Frame):
 
         # Initialize "frame #1" radio button
         self.InitRadio(
-            self._FrameC_Y7X0, "frame-0",
-            self._StringVars["frame"], "0", tk.W,
+            self._FrameC_Y7X0,
+            "frame-0",
+            self._StringVars["frame"],
+            "0",
+            tk.W,
             select=True,
             command=lambda: self.AcquireEventLock()
                             and self.JumpFrame(0)
@@ -1498,8 +1513,11 @@ class App(tk.Frame):
 
         # Initialize "frame #2" radio button
         self.InitRadio(
-            self._FrameC_Y7X0, "frame-1",
-            self._StringVars["frame"], "1", tk.W,
+            self._FrameC_Y7X0,
+            "frame-1",
+            self._StringVars["frame"],
+            "1",
+            tk.W,
             command=lambda: self.AcquireEventLock()
                             and self.JumpFrame(1)
                             and self.ReleaseEventLock(),
@@ -1507,8 +1525,11 @@ class App(tk.Frame):
 
         # Initialize "frame #3" radio button
         self.InitRadio(
-            self._FrameC_Y7X0, "frame-2",
-            self._StringVars["frame"], "2", tk.W,
+            self._FrameC_Y7X0,
+            "frame-2",
+            self._StringVars["frame"],
+            "2",
+            tk.W,
             command=lambda: self.AcquireEventLock()
                             and self.JumpFrame(2)
                             and self.ReleaseEventLock(),
@@ -1516,8 +1537,11 @@ class App(tk.Frame):
 
         # Initialize "frame #4" radio button
         self.InitRadio(
-            self._FrameC_Y7X0, "frame-3",
-            self._StringVars["frame"], "3", tk.W,
+            self._FrameC_Y7X0,
+            "frame-3",
+            self._StringVars["frame"],
+            "3",
+            tk.W,
             command=lambda: self.AcquireEventLock()
                             and self.JumpFrame(3)
                             and self.ReleaseEventLock(),
