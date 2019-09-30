@@ -585,8 +585,8 @@ class App(tk.Frame):
         self._FrameC_Y7X0 = tk.Frame(self._FrameB_Y1X0)
         self._FrameC_Y7X0.grid(row=7, column=0)
 
-        self._FrameC_Y0X0 = tk.Frame(self._FrameB_Y1X1)
-        self._FrameC_Y0X0.grid(row=0, column=0)
+        self._FrameC_Y0X0b = tk.Frame(self._FrameB_Y1X1)
+        self._FrameC_Y0X0b.grid(row=0, column=0)
 
         self._FrameC_Y0X1 = tk.Frame(self._FrameB_Y1X1)
         self._FrameC_Y0X1.grid(row=0, column=1)
@@ -598,23 +598,26 @@ class App(tk.Frame):
         self._FrameD_Y1X0.grid(row=1, column=0)
 
         # Padding frames
-        self._FramePadMidTop = tk.Frame(self._FrameB_Y0X3, width=1, height=10)
-        self._FramePadMidTop.grid(row=0, column=0)
+        self._PadB_Y0X3 = tk.Frame(self._FrameB_Y0X3, width=1, height=10)
+        self._PadB_Y0X3.grid(row=0, column=0)
 
-        self._FramePadBorder = tk.Frame(self._FrameA_Y2X0, height=10)
-        self._FramePadBorder.grid(row=6)
+        self._PadA_Y2X0a = tk.Frame(self._FrameA_Y2X0, height=10)
+        self._PadA_Y2X0a.grid(row=6)
 
-        self._FramePadBottom = tk.Frame(self._FrameA_Y2X0, height=10)
-        self._FramePadBottom.grid(row=24)
+        self._PadA_Y2X0b = tk.Frame(self._FrameA_Y2X0, height=10)
+        self._PadA_Y2X0b.grid(row=24)
 
-        self._FramePadTopleft = tk.Frame(self._FrameA_Y1X0, height=10)
-        self._FramePadTopleft.grid(row=1)
+        self._PadA_Y1X0 = tk.Frame(self._FrameA_Y1X0, height=10)
+        self._PadA_Y1X0.grid(row=1)
 
-        self._FramePadTopleft = tk.Frame(self._FrameA_Y1X0, height=10)
-        self._FramePadTopleft.grid(row=2)
+        self._PadB_Y1X0 = tk.Frame(self._FrameB_Y1X0, height=16)
+        self._PadB_Y1X0.grid(row=2)
 
-        self._FramePadTop = tk.Frame(self._Master, height=10)
-        self._FramePadTop.grid(row=0)
+        self._PadD_Y1X0 = tk.Frame(self._FrameD_Y1X0, height=16)
+        self._PadD_Y1X0.grid(row=0)
+
+        self._Pad_MasterY0X0 = tk.Frame(self._Master, height=10)
+        self._Pad_MasterY0X0.grid(row=0)
 
         self._Menus = {
             "main-menu":   tk.Menu(self._Master),
@@ -766,9 +769,6 @@ class App(tk.Frame):
         self.InitAllMenus()
         self.InitAllOptionMenus()
         self.InitAllRadioButtons()
-
-        self.DoRebuildData("head")
-        self.DoRebuildData("body")
 
         self.InitSliderFramerate()
 
@@ -1524,7 +1524,7 @@ class App(tk.Frame):
         self.InitLabel(
             self._FrameD_Y1X0,
             "prioritize-label",
-            ("calibri", App.FONTSIZE_VAR_W),
+            ("calibri", App.FONTSIZE_SMALL),
             tk.NS,
         )
 
@@ -2067,7 +2067,7 @@ class App(tk.Frame):
         :return: True.
         """
         scale = tk.Scale(
-            self._FrameC_Y0X0,
+            self._FrameC_Y0X0b,
             from_=App.SPEED_SCALE_MAX,
             to=App.SPEED_SCALE_MIN,
             orient=tk.VERTICAL,
