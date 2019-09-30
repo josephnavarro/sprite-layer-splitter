@@ -195,16 +195,19 @@ class App(tk.Frame):
         # Left column
         "head":                 [0, 0],
         "body":                 [1, 0],
-        "body-x-label":         [0, 0],
-        "body-x":               [0, 1],
-        "body-y-label":         [0, 2],
-        "body-y":               [0, 3],
-        "head-x-label":         [1, 0],
-        "head-x":               [1, 1],
-        "head-y-label":         [1, 2],
-        "head-y":               [1, 3],
-        "offset-body":          [4, 0],
-        "offset-head":          [5, 0],
+
+        "offset-body":          [0, 0],
+        "body-x-label":         [0, 1],
+        "body-x":               [0, 2],
+        "body-y-label":         [0, 3],
+        "body-y":               [0, 4],
+
+        "offset-head":          [0, 0],
+        "head-x-label":         [0, 1],
+        "head-x":               [0, 2],
+        "head-y-label":         [0, 3],
+        "head-y":               [0, 4],
+
         "speed-anim":           [6, 0],
         "frame-label":          [7, 0],
         "frame-0":              [7, 1],
@@ -1401,34 +1404,34 @@ class App(tk.Frame):
         """
         # Initialize "body x-coordinate" entry
         self.InitEntry(
-            self._FrameC_Y0X0a,
+            self._FrameC_Y1X0a,
             "body-x",
             tk.W,
-            text="0",
+            text="+0",
             justify=tk.CENTER,
         )
         # Initialize "body y-coordinate" entry
         self.InitEntry(
-            self._FrameC_Y0X0a,
+            self._FrameC_Y1X0a,
             "body-y",
             tk.W,
-            text="0",
+            text="+0",
             justify=tk.CENTER,
         )
         # Initialize "head x-coordinate" entry
         self.InitEntry(
-            self._FrameC_Y1X0a,
+            self._FrameC_Y0X0a,
             "head-x",
             tk.W,
-            text="0",
+            text="+0",
             justify=tk.CENTER,
         )
         # Initialize "head y-coordinate" entry
         self.InitEntry(
-            self._FrameC_Y1X0a,
+            self._FrameC_Y0X0a,
             "head-y",
             tk.W,
-            text="0",
+            text="+0",
             justify=tk.CENTER,
         )
 
@@ -1474,7 +1477,7 @@ class App(tk.Frame):
 
         # Initialize "head offset" label
         self.InitLabel(
-            self._FrameB_Y1X0,
+            self._FrameC_Y0X0a,
             "offset-head",
             ("calibri", App.FONTSIZE_SMALL),
             tk.W, 0, 0,
@@ -1482,7 +1485,7 @@ class App(tk.Frame):
 
         # Initialize "body offset" label
         self.InitLabel(
-            self._FrameB_Y1X0,
+            self._FrameC_Y1X0a,
             "offset-body",
             ("calibri", App.FONTSIZE_SMALL),
             tk.W, 0, 0,
@@ -2487,12 +2490,12 @@ class App(tk.Frame):
         strvary = "{}-y".format(key)
         try:
             xy = self._Data[key]["current"]["offset"][state][frame]
-            self._StringVars[strvarx].set(str(xy[0]))
-            self._StringVars[strvary].set(str(xy[1]))
+            self._StringVars[strvarx].set("{0:+d}".format(xy[0]))
+            self._StringVars[strvary].set("{0:+d}".format(xy[1]))
 
         except (KeyError, IndexError):
-            self._StringVars[strvarx].set(str(0))
-            self._StringVars[strvary].set(str(0))
+            self._StringVars[strvarx].set("{0:+d}".format(0))
+            self._StringVars[strvary].set("{0:+d}".format(0))
 
         return True
 
