@@ -517,6 +517,13 @@ class App(tk.Frame):
             anchor=tk.NW,
         )
 
+    def ThreadIt(self, callback):
+        def function():
+            self.AcquireEventLock()
+            callback()
+            self.ReleaseEventLock()
+        return function
+
     def KillITunes(self):
         """
         Kills any iTunes instance. Checks periodically.
@@ -1599,33 +1606,27 @@ class App(tk.Frame):
 
         :return: True.
         """
+        threadIt = self.ThreadIt
+
         # Initialize "head" menu
         self.InitMenu(
             self._Menus["main-menu"],
             "head-menu",
             {
                 "label":   App.LABELS["rebuild-head-data"],
-                "command": lambda: self.AcquireEventLock()
-                                   and self.RebuildData("head")
-                                   and self.ReleaseEventLock(),
+                "command": threadIt(lambda: self.RebuildData("head")),
             },
             {
                 "label":   App.LABELS["rebuild-head-images"],
-                "command": lambda: self.AcquireEventLock()
-                                   and self.RebuildImages("head")
-                                   and self.ReleaseEventLock(),
+                "command": threadIt(lambda: self.RebuildImages("head")),
             },
             {
                 "label":   App.LABELS["rebuild-head-offsets"],
-                "command": lambda: self.AcquireEventLock()
-                                   and self.RebuildOffsets("head")
-                                   and self.ReleaseEventLock(),
+                "command": threadIt(lambda: self.RebuildOffsets("head")),
             },
             {
                 "label":   App.LABELS["destroy-head-images"],
-                "command": lambda: self.AcquireEventLock()
-                                   and self.DestroyImages("head")
-                                   and self.ReleaseEventLock(),
+                "command": threadIt(lambda: self.DestroyImages("head")),
             },
         )
 
@@ -1635,27 +1636,19 @@ class App(tk.Frame):
             "body-menu",
             {
                 "label":   App.LABELS["rebuild-body-data"],
-                "command": lambda: self.AcquireEventLock()
-                                   and self.RebuildData("body")
-                                   and self.ReleaseEventLock(),
+                "command": threadIt(lambda: self.RebuildData("body")),
             },
             {
                 "label":   App.LABELS["rebuild-body-images"],
-                "command": lambda: self.AcquireEventLock()
-                                   and self.RebuildImages("body")
-                                   and self.ReleaseEventLock(),
+                "command": threadIt(lambda: self.RebuildImages("body")),
             },
             {
                 "label":   App.LABELS["rebuild-body-offsets"],
-                "command": lambda: self.AcquireEventLock()
-                                   and self.RebuildOffsets("body")
-                                   and self.ReleaseEventLock(),
+                "command": threadIt(lambda: self.RebuildOffsets("body")),
             },
             {
                 "label":   App.LABELS["destroy-body-images"],
-                "command": lambda: self.AcquireEventLock()
-                                   and self.DestroyImages("body")
-                                   and self.ReleaseEventLock(),
+                "command": threadIt(lambda: self.DestroyImages("body")),
             },
         )
 
@@ -1665,15 +1658,11 @@ class App(tk.Frame):
             "export-menu",
             {
                 "label":   App.LABELS["export-idle"],
-                "command": lambda: self.AcquireEventLock()
-                                   and self.ExportFrames(idle_only=True)
-                                   and self.ReleaseEventLock(),
+                "command": threadIt(lambda: self.ExportFrames(idle_only=True)),
             },
             {
                 "label":   App.LABELS["export-full"],
-                "command": lambda: self.AcquireEventLock()
-                                   and self.ExportFrames()
-                                   and self.ReleaseEventLock(),
+                "command": threadIt(self.ExportFrames),
             },
         )
 
@@ -1734,9 +1723,7 @@ class App(tk.Frame):
             "0",
             tk.W,
             select=True,
-            command=lambda: self.AcquireEventLock()
-                            and self.JumpFrame(0)
-                            and self.ReleaseEventLock(),
+            command=self.ThreadIt(lambda: self.JumpFrame(0)),
         )
 
         # Initialize "frame #2" radio button
@@ -1746,9 +1733,7 @@ class App(tk.Frame):
             self._StringVars["frame"],
             "1",
             tk.W,
-            command=lambda: self.AcquireEventLock()
-                            and self.JumpFrame(1)
-                            and self.ReleaseEventLock(),
+            command=self.ThreadIt(lambda: self.JumpFrame(1)),
         )
 
         # Initialize "frame #3" radio button
@@ -1758,9 +1743,7 @@ class App(tk.Frame):
             self._StringVars["frame"],
             "2",
             tk.W,
-            command=lambda: self.AcquireEventLock()
-                            and self.JumpFrame(2)
-                            and self.ReleaseEventLock(),
+            command=self.ThreadIt(lambda: self.JumpFrame(2)),
         )
 
         # Initialize "frame #4" radio button
@@ -1770,9 +1753,7 @@ class App(tk.Frame):
             self._StringVars["frame"],
             "3",
             tk.W,
-            command=lambda: self.AcquireEventLock()
-                            and self.JumpFrame(3)
-                            and self.ReleaseEventLock(),
+            command=self.ThreadIt(lambda: self.JumpFrame(3)),
         )
 
         return True
