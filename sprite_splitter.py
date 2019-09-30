@@ -323,8 +323,14 @@ def ProcessHead(name, image, where, head_data, source_data, is_alpha):
     return output
 
 
-def Process(head_path, body_path, head_offset, body_offset, head_data,
-            body_data, source_data, is_alpha):
+def Process(head_path,
+            body_path,
+            head_offset,
+            body_offset,
+            head_data,
+            body_data,
+            source_data,
+            is_alpha):
     """
     Assembles sprite data for both head and body images.
 
@@ -405,7 +411,7 @@ def Composite(head,
 
     :return: Composited image.
     """
-    # Load head compositing data from JSON
+    # Load head composition data from JSON
     headOffsets = LoadOffsets("head")
     headPaths = LoadPaths("head")
     if not head:
@@ -418,7 +424,7 @@ def Composite(head,
         if not os.path.isfile(headPath):
             raise NonexistentHeadException(headPath)
 
-    # Load body compositing data from JSON
+    # Load body composition data from JSON
     bodyOffsets = LoadOffsets("body")
     bodyPaths = LoadPaths("body")
     if not body:
@@ -431,7 +437,7 @@ def Composite(head,
         if not os.path.isfile(bodyPath):
             raise NonexistentBodyException(bodyPath)
 
-    # Load compositing rules from JSON
+    # Load miscellaneous composition rules from JSON
     srcColorData = LoadSourceColoring()
     srcCropData = LoadSourceCropping()
 
@@ -456,7 +462,7 @@ def Composite(head,
             is_alpha,
         )
 
-        # Composite idle frames
+        # Compose idle frames
         PasteLayers(
             newImage,
             newData["head"]["idle"],
@@ -478,7 +484,7 @@ def Composite(head,
                 (0, y * STATE_REGION[1]),
             )
         else:
-            # Composite left-moving frames
+            # Compose left movement frames
             PasteLayers(
                 newImage,
                 newData["head"]["left"],
@@ -491,7 +497,7 @@ def Composite(head,
                 reverse=reverse,
             )
 
-            # Composite right-moving frames
+            # Compose right movement frames
             PasteLayers(
                 newImage,
                 newData["head"]["right"],
@@ -530,7 +536,7 @@ def Composite(head,
             else:
                 Paste(outImage, newGray, (0, (y + 1) * COLOR_REGION[1]))
 
-    # Save image to file
+    # Return newly composed image
     return outImage
 
 

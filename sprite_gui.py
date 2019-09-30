@@ -137,10 +137,10 @@ class App(tk.Frame):
         "preview-static":       [384, 96],
 
         # Entry widgets (characters)
-        "body-x":               [2, 1],
-        "body-y":               [2, 1],
-        "head-x":               [2, 1],
-        "head-y":               [2, 1],
+        "body-x":               [3, 1],
+        "body-y":               [3, 1],
+        "head-x":               [3, 1],
+        "head-y":               [3, 1],
 
         # Icon-based buttons (pixels)
         "play-button":          [32, 32],
@@ -2134,7 +2134,7 @@ class App(tk.Frame):
             self._Animation["forward"] = True
         self._Animation["speed"] = self._ScaleAnimSpeed.get()
 
-        # Create preview image
+        # Create animated preview
         self._Canvases["preview-anim"].create_image(
             (16, 16),
             anchor=tk.NW,
