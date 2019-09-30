@@ -144,6 +144,8 @@ class App(tk.Frame):
         "shuffle-button":       [32, 32],
         "shuffle-body-button":  [32, 32],
         "shuffle-head-button":  [32, 32],
+        "clear-body-button":    [32, 32],
+        "clear-head-button":    [32, 32],
         "reload-button":        [32, 32],
         "preview-idle-button":  [32, 32],
         "preview-left-button":  [32, 32],
@@ -169,7 +171,7 @@ class App(tk.Frame):
         SIZES["default-menu"] = [25, 0]
         SIZES["default-slider"] = [200, 0]
 
-        FONTSIZE_VAR_W = 13
+        FONTSIZE_VAR_W = 14
         FONTSIZE_MONOS = 14
         FONTSIZE_SMALL = 13
         CANVAS_BORDERS = 13
@@ -186,8 +188,6 @@ class App(tk.Frame):
         "body":                 [1, 0],
 
         # Right column
-        "pingpong-animation":   [11, 1],
-        "reverse-layers":       [12, 1],
         "prioritize-label":     [16, 1],
         "prioritize-1":         [17, 1],
         "prioritize-2":         [18, 1],
@@ -216,6 +216,8 @@ class App(tk.Frame):
         "shuffle-button":       [2, 1],
         "shuffle-body-button":  [2, 2],
         "shuffle-head-button":  [2, 3],
+        "clear-body-button":    [2, 4],
+        "clear-head-button":    [2, 5],
     }
 
     # Padding for widgets
@@ -241,8 +243,6 @@ class App(tk.Frame):
         "prioritize-2":         [0, 0],
 
         # Preview options
-        "pingpong-animation":   [4, 0],
-        "reverse-layers":       [4, 0],
         "head":                 [4, 4],
         "body":                 [4, 4],
 
@@ -254,6 +254,8 @@ class App(tk.Frame):
         "shuffle-button":       [0, 0],
         "shuffle-body-button":  [0, 0],
         "shuffle-head-button":  [0, 0],
+        "clear-body-button":    [0, 0],
+        "clear-head-button":    [0, 0],
         "reload-button":        [0, 0],
         "preview-idle-button":  [0, 0],
         "preview-left-button":  [0, 0],
@@ -278,10 +280,6 @@ class App(tk.Frame):
         # Export options
         "export-full":          "Export all frames",
         "export-idle":          "Export idle frames",
-
-        # Preview options
-        "pingpong-animation":   "Ping-pong animation",
-        "reverse-layers":       "Reverse layering order",
 
         # Body options
         "body":                 "Select body",
@@ -319,6 +317,8 @@ class App(tk.Frame):
         "shuffle-button":       "",
         "shuffle-body-button":  "",
         "shuffle-head-button":  "",
+        "clear-body-button":    "",
+        "clear-head-button":    "",
         "reload-button":        "",
         "preview-idle-button":  "",
         "preview-left-button":  "",
@@ -336,6 +336,8 @@ class App(tk.Frame):
         "shuffle-button":       os.path.join("misc", "shuffle.png"),
         "shuffle-body-button":  os.path.join("misc", "shuffle-body.png"),
         "shuffle-head-button":  os.path.join("misc", "shuffle-head.png"),
+        "clear-body-button":    os.path.join("misc", "clear-body.png"),
+        "clear-head-button":    os.path.join("misc", "clear-head.png"),
         "reload-button":        os.path.join("misc", "reload.png"),
         "preview-idle-button":  os.path.join("misc", "idle.png"),
         "preview-left-button":  os.path.join("misc", "left.png"),
@@ -357,8 +359,10 @@ class App(tk.Frame):
         "skip-right-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "skip-left-button":     {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "shuffle-button":       {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "shuffle-body-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "shuffle-head-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "shuffle-body-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "clear-body-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        "clear-head-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "reload-button":        {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "preview-idle-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
         "preview-left-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
@@ -694,6 +698,8 @@ class App(tk.Frame):
             "shuffle-button":       tk.Button(),
             "shuffle-head-button":  tk.Button(),
             "shuffle-body-button":  tk.Button(),
+            "clear-body-button":    tk.Button(),
+            "clear-head-button":    tk.Button(),
             "reload-button":        tk.Button(),
             "preview-idle-button":  tk.Button(),
             "preview-left-button":  tk.Button(),
@@ -764,7 +770,7 @@ class App(tk.Frame):
         self.InitAllData()
         self.InitAllButtons()
         self.InitAllCanvases()
-        #self.InitAllCheckboxes()
+        # self.InitAllCheckboxes()
         self.InitAllLabels()
         self.InitAllMenus()
         self.InitAllRadioButtons()
@@ -806,6 +812,28 @@ class App(tk.Frame):
         job = self._PendingJobs.get(key, None)
         if job is not None:
             self.after_cancel(job)
+
+        return True
+
+    def ClearBody(self):
+        """
+        Clears body selection.
+
+        :return: True.
+        """
+        self._StringVars["body"].set(App.DEFAULT_NAME)
+        self.DoMakePreview()
+
+        return True
+
+    def ClearHead(self):
+        """
+        Clears head selection.
+
+        :return: True.
+        """
+        self._StringVars["head"].set(App.DEFAULT_NAME)
+        self.DoMakePreview()
 
         return True
 
@@ -1218,7 +1246,26 @@ class App(tk.Frame):
                     and self.ShuffleHead()
                     and self.JumpFrame(0)
                     and self.ReleaseEventLock(),
+        )
 
+        # Initialize "clear body" button
+        self.InitButton(
+            self._FrameD_Y0X0,
+            "clear-body-button",
+            lambda: self.AcquireEventLock()
+                    and self.ClearBody()
+                    and self.JumpFrame(0)
+                    and self.ReleaseEventLock(),
+        )
+
+        # Initialize "clear head" button
+        self.InitButton(
+            self._FrameD_Y0X0,
+            "clear-head-button",
+            lambda: self.AcquireEventLock()
+                    and self.ClearHead()
+                    and self.JumpFrame(0)
+                    and self.ReleaseEventLock(),
         )
 
         # Initialize "reload" button
@@ -1321,17 +1368,8 @@ class App(tk.Frame):
 
         :return: True on success; False on failure.
         """
-        # Initialize "pingpong animation" checkbox
-        self.InitCheckbox(
-            self._FrameD_Y1X0,
-            "pingpong-animation", tk.W,
-        )
 
-        # Initialize "reverse layers" checkbox
-        self.InitCheckbox(
-            self._FrameD_Y1X0,
-            "reverse-layers", tk.W,
-        )
+        # None
 
         return True
 
@@ -1529,6 +1567,7 @@ class App(tk.Frame):
             relief=relief,
         )
 
+        # Simulate "raised" and "sunken" on OS X
         if IsOSX():
             if relief == tk.RAISED:
                 button.config(
