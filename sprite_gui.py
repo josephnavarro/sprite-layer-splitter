@@ -131,6 +131,27 @@ class App(tk.Frame):
 
     # Default widget dimensions
     SIZES = {
+        # Frames
+        "a-y1x0":               [0, 0],
+        "a-y2x0":               [0, 0],
+        "b-y0x3":               [0, 0],
+        "b-y1x0":               [0, 0],
+        "b-y1x1":               [0, 0],
+        "c-y0x0a":              [0, 0],
+        "c-y1x0a":              [0, 0],
+        "c-y7x0":               [0, 0],
+        "c-y0x0b":              [0, 0],
+        "c-y0x1":               [0, 0],
+        "d-y0x0":               [0, 0],
+        "d-y1x0":               [0, 0],
+        "pad-a-y1x0":           [0, 10],
+        "pad-a-y2x0a":          [0, 10],
+        "pad-a-y2x0b":          [0, 10],
+        "pad-b-y0x3":           [1, 10],
+        "pad-b-y1x0":           [0, 16],
+        "pad-d-y1x0":           [0, 16],
+        "pad-master-y0x0":      [0, 10],
+
         # Preview canvases (pixels)
         "preview-anim":         [96, 96],
         "preview-resize":       [384, 96],
@@ -183,6 +204,27 @@ class App(tk.Frame):
         CANVAS_BORDERS = 13
 
     GRID = {
+        # Frames
+        "a-y1x0":               [1, 0],
+        "a-y2x0":               [2, 0],
+        "b-y0x3":               [0, 3],
+        "b-y1x0":               [1, 0],
+        "b-y1x1":               [1, 1],
+        "c-y0x0a":              [4, 0],
+        "c-y1x0a":              [5, 0],
+        "c-y7x0":               [7, 0],
+        "c-y0x0b":              [0, 0],
+        "c-y0x1":               [0, 1],
+        "d-y0x0":               [0, 0],
+        "d-y1x0":               [1, 0],
+        "pad-a-y1x0":           [1, 0],
+        "pad-a-y2x0a":          [6, 0],
+        "pad-a-y2x0b":          [24, 0],
+        "pad-b-y0x3":           [0, 0],
+        "pad-b-y1x0":           [2, 0],
+        "pad-d-y1x0":           [0, 0],
+        "pad-master-y0x0":      [0, 0],
+
         # Preview canvases
         "preview-static":       [0, 1],
         "preview-anim":         [0, 2],
@@ -239,6 +281,27 @@ class App(tk.Frame):
 
     # Padding for widgets
     PAD = {
+        # Frames
+        "a-y1x0":               [0, 0],
+        "a-y2x0":               [0, 0],
+        "b-y0x3":               [0, 0],
+        "b-y1x0":               [0, 0],
+        "b-y1x1":               [0, 0],
+        "c-y0x0a":              [0, 0],
+        "c-y1x0a":              [0, 0],
+        "c-y7x0":               [0, 0],
+        "c-y0x0b":              [0, 0],
+        "c-y0x1":               [0, 0],
+        "d-y0x0":               [0, 0],
+        "d-y1x0":               [0, 0],
+        "pad-a-y1x0":           [0, 0],
+        "pad-a-y2x0a":          [0, 0],
+        "pad-a-y2x0b":          [0, 0],
+        "pad-b-y0x3":           [0, 0],
+        "pad-b-y1x0":           [0, 0],
+        "pad-d-y1x0":           [0, 0],
+        "pad-master-y0x0":      [0, 0],
+
         # Preview canvases
         "preview-frames-label": [0, 0],
         "preview-anim-label":   [0, 0],
@@ -560,65 +623,7 @@ class App(tk.Frame):
             },
         }
 
-        # Widget-containing frames
-        self._FrameA_Y1X0 = tk.Frame(self._Master)
-        self._FrameA_Y1X0.grid(row=1, column=0)
-
-        self._FrameA_Y2X0 = tk.Frame(self._Master)
-        self._FrameA_Y2X0.grid(row=2, column=0)
-
-        self._FrameB_Y0X3 = tk.Frame(self._FrameA_Y1X0)
-        self._FrameB_Y0X3.grid(row=0, column=3)
-
-        self._FrameB_Y1X0 = tk.Frame(self._FrameA_Y2X0)
-        self._FrameB_Y1X0.grid(row=1, column=0)
-
-        self._FrameB_Y1X1 = tk.Frame(self._FrameA_Y2X0)
-        self._FrameB_Y1X1.grid(row=1, column=1)
-
-        self._FrameC_Y0X0a = tk.Frame(self._FrameB_Y1X0)
-        self._FrameC_Y0X0a.grid(row=4, column=0)
-
-        self._FrameC_Y1X0a = tk.Frame(self._FrameB_Y1X0)
-        self._FrameC_Y1X0a.grid(row=5, column=0)
-
-        self._FrameC_Y7X0 = tk.Frame(self._FrameB_Y1X0)
-        self._FrameC_Y7X0.grid(row=7, column=0)
-
-        self._FrameC_Y0X0b = tk.Frame(self._FrameB_Y1X1)
-        self._FrameC_Y0X0b.grid(row=0, column=0)
-
-        self._FrameC_Y0X1 = tk.Frame(self._FrameB_Y1X1)
-        self._FrameC_Y0X1.grid(row=0, column=1)
-
-        self._FrameD_Y0X0 = tk.Frame(self._FrameC_Y0X1)
-        self._FrameD_Y0X0.grid(row=0, column=0)
-
-        self._FrameD_Y1X0 = tk.Frame(self._FrameC_Y0X1)
-        self._FrameD_Y1X0.grid(row=1, column=0)
-
-        # Padding frames
-        self._PadB_Y0X3 = tk.Frame(self._FrameB_Y0X3, width=1, height=10)
-        self._PadB_Y0X3.grid(row=0, column=0)
-
-        self._PadA_Y2X0a = tk.Frame(self._FrameA_Y2X0, height=10)
-        self._PadA_Y2X0a.grid(row=6)
-
-        self._PadA_Y2X0b = tk.Frame(self._FrameA_Y2X0, height=10)
-        self._PadA_Y2X0b.grid(row=24)
-
-        self._PadA_Y1X0 = tk.Frame(self._FrameA_Y1X0, height=10)
-        self._PadA_Y1X0.grid(row=1)
-
-        self._PadB_Y1X0 = tk.Frame(self._FrameB_Y1X0, height=16)
-        self._PadB_Y1X0.grid(row=2)
-
-        self._PadD_Y1X0 = tk.Frame(self._FrameD_Y1X0, height=16)
-        self._PadD_Y1X0.grid(row=0)
-
-        self._Pad_MasterY0X0 = tk.Frame(self._Master, height=10)
-        self._Pad_MasterY0X0.grid(row=0)
-
+        # Menu bar
         self._Menus = {
             "main-menu":   tk.Menu(self._Master),
             "head-menu":   tk.Menu(),
@@ -708,6 +713,29 @@ class App(tk.Frame):
             "body-y": tk.Entry(),
         }
 
+        # Frames
+        self._Frames = {
+            "a-y1x0":          tk.Frame(),
+            "a-y2x0":          tk.Frame(),
+            "b-y0x3":          tk.Frame(),
+            "b-y1x0":          tk.Frame(),
+            "b-y1x1":          tk.Frame(),
+            "c-y0x0a":         tk.Frame(),
+            "c-y0x0b":         tk.Frame(),
+            "c-y1x0a":         tk.Frame(),
+            "c-y7x0":          tk.Frame(),
+            "c-y0x1":          tk.Frame(),
+            "d-y0x0":          tk.Frame(),
+            "d-y1x0":          tk.Frame(),
+            "pad-a-y1x0":      tk.Frame(),
+            "pad-a-y2x0a":     tk.Frame(),
+            "pad-a-y2x0b":     tk.Frame(),
+            "pad-b-y0x3":      tk.Frame(),
+            "pad-b-y1x0":      tk.Frame(),
+            "pad-d-y1x0":      tk.Frame(),
+            "pad-master-y0x0": tk.Frame(),
+        }
+
         # Radio buttons
         self._RadioButtons = {
             "prioritize-1": tk.Radiobutton(),
@@ -721,17 +749,17 @@ class App(tk.Frame):
         # Menus
         self._OptionMenus = {
             "head":  tk.OptionMenu(
-                self._FrameA_Y2X0,
+                None,
                 self._StringVars["head"],
                 *self._Data["head"]["list"]
             ),
             "body":  tk.OptionMenu(
-                self._FrameA_Y2X0,
+                None,
                 self._StringVars["body"],
                 *self._Data["body"]["list"]
             ),
             "state": tk.OptionMenu(
-                self._FrameA_Y2X0,
+                None,
                 self._StringVars["state"],
                 *STATES
             )
@@ -760,6 +788,9 @@ class App(tk.Frame):
         self._ScaleAnimSpeed = tk.Scale()
 
         # Complete widget initialization
+        self.InitAllFrames(
+
+        )
         self.InitAllData()
         self.InitAllButtons()
         self.InitAllCanvases()
@@ -893,13 +924,13 @@ class App(tk.Frame):
         except sprite_splitter.NonexistentHeadException as e:
             # Head spritesheet does not exist
             title = App.WINDOW_TITLE
-            alert = App.MESSAGES["message"]["invalid"]["head"]
+            alert: str = App.MESSAGES["message"]["invalid"]["head"]
             tk.messagebox.showinfo(title, alert.format(e.filename))
 
         except sprite_splitter.NonexistentBodyException as e:
             # Body spritesheet does not exist
             title = App.WINDOW_TITLE
-            alert = App.MESSAGES["message"]["invalid"]["body"]
+            alert: str = App.MESSAGES["message"]["invalid"]["body"]
             tk.messagebox.showinfo(title, alert.format(e.filename))
 
         except cv2.error:
@@ -1055,7 +1086,7 @@ class App(tk.Frame):
         CreateInputJSON(key)
         self.InitData(key)
         self.InitOptionMenu(
-            self._FrameB_Y1X0,
+            self._Frames["b-y1x0"],
             key,
             self._Data[key]["list"],
         )
@@ -1196,7 +1227,7 @@ class App(tk.Frame):
         """
         # Initialize "play animation" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "play-button",
             lambda: self.AcquireEventLock()
                     and self.TurnPlaybackOn()
@@ -1205,7 +1236,7 @@ class App(tk.Frame):
 
         # Initialize "pause animation" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "pause-button",
             lambda: self.AcquireEventLock()
                     and self.TurnPlaybackOff()
@@ -1215,7 +1246,7 @@ class App(tk.Frame):
 
         # Initialize "skip frame right" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "skip-right-button",
             lambda: self.AcquireEventLock()
                     and self.FrameSkip(1)
@@ -1224,7 +1255,7 @@ class App(tk.Frame):
 
         # Initialize "skip frame left" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "skip-left-button",
             lambda: self.AcquireEventLock()
                     and self.FrameSkip(-1)
@@ -1233,7 +1264,7 @@ class App(tk.Frame):
 
         # Initialize "shuffle" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "shuffle-button",
             lambda: self.AcquireEventLock()
                     and self.ShuffleAll()
@@ -1243,7 +1274,7 @@ class App(tk.Frame):
 
         # Initialize "shuffle body" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "shuffle-body-button",
             lambda: self.AcquireEventLock()
                     and self.ShuffleBody()
@@ -1253,7 +1284,7 @@ class App(tk.Frame):
 
         # Initialize "shuffle head" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "shuffle-head-button",
             lambda: self.AcquireEventLock()
                     and self.ShuffleHead()
@@ -1263,7 +1294,7 @@ class App(tk.Frame):
 
         # Initialize "clear body" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "clear-body-button",
             lambda: self.AcquireEventLock()
                     and self.ClearBody()
@@ -1273,7 +1304,7 @@ class App(tk.Frame):
 
         # Initialize "clear head" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "clear-head-button",
             lambda: self.AcquireEventLock()
                     and self.ClearHead()
@@ -1283,7 +1314,7 @@ class App(tk.Frame):
 
         # Initialize "reload" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "reload-button",
             lambda: self.AcquireEventLock()
                     and self.DoRemakeOffset("head")
@@ -1295,7 +1326,7 @@ class App(tk.Frame):
 
         # Initialize "idle preview" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "preview-idle-button",
             lambda: self.AcquireEventLock()
                     and self.DoMakePreview(state="idle")
@@ -1309,7 +1340,7 @@ class App(tk.Frame):
 
         # Initialize "left preview" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "preview-left-button",
             lambda: self.AcquireEventLock()
                     and self.DoMakePreview(state="left")
@@ -1322,7 +1353,7 @@ class App(tk.Frame):
 
         # Initialize "right preview" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "preview-right-button",
             lambda: self.AcquireEventLock()
                     and self.DoMakePreview(state="right")
@@ -1335,7 +1366,7 @@ class App(tk.Frame):
 
         # Initialize "ping-pong" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "ping-pong-button",
             lambda: self.AcquireEventLock()
                     and self.TogglePingpong()
@@ -1344,7 +1375,7 @@ class App(tk.Frame):
 
         # Initialize "reverse layers" button
         self.InitButton(
-            self._FrameD_Y0X0,
+            self._Frames["d-y0x0"],
             "layers-button",
             lambda: self.AcquireEventLock()
                     and self.ToggleReverseLayers()
@@ -1361,14 +1392,14 @@ class App(tk.Frame):
         """
         # Initialize "static preview" canvas
         self.InitCanvas(
-            self._FrameA_Y1X0,
+            self._Frames["a-y1x0"],
             "preview-static",
             App.CANVAS_BORDERS,
         )
 
         # Initialize "animated preview" canvas
         self.InitCanvas(
-            self._FrameA_Y1X0,
+            self._Frames["a-y1x0"],
             "preview-anim",
             App.CANVAS_BORDERS,
         )
@@ -1381,8 +1412,7 @@ class App(tk.Frame):
 
         :return: True on success; False on failure.
         """
-
-        # None
+        assert self
 
         return True
 
@@ -1404,7 +1434,7 @@ class App(tk.Frame):
         """
         # Initialize "body x-coordinate" entry
         self.InitEntry(
-            self._FrameC_Y1X0a,
+            self._Frames["c-y1x0a"],
             "body-x",
             tk.W,
             text="+0",
@@ -1412,7 +1442,7 @@ class App(tk.Frame):
         )
         # Initialize "body y-coordinate" entry
         self.InitEntry(
-            self._FrameC_Y1X0a,
+            self._Frames["c-y1x0a"],
             "body-y",
             tk.W,
             text="+0",
@@ -1420,7 +1450,7 @@ class App(tk.Frame):
         )
         # Initialize "head x-coordinate" entry
         self.InitEntry(
-            self._FrameC_Y0X0a,
+            self._Frames["c-y0x0a"],
             "head-x",
             tk.W,
             text="+0",
@@ -1428,12 +1458,45 @@ class App(tk.Frame):
         )
         # Initialize "head y-coordinate" entry
         self.InitEntry(
-            self._FrameC_Y0X0a,
+            self._Frames["c-y0x0a"],
             "head-y",
             tk.W,
             text="+0",
             justify=tk.CENTER,
         )
+
+        return True
+
+    def InitAllFrames(self):
+        """
+        Initializes all required frames.
+
+        :return: True.
+        """
+        # Main frames
+        self.InitFrame(self._Master, "a-y1x0")
+        self.InitFrame(self._Master, "a-y2x0")
+
+        # Container frames
+        self.InitFrame(self._Frames["a-y1x0"], "b-y0x3")
+        self.InitFrame(self._Frames["a-y2x0"], "b-y1x0")
+        self.InitFrame(self._Frames["a-y2x0"], "b-y1x1")
+        self.InitFrame(self._Frames["b-y1x0"], "c-y0x0a")
+        self.InitFrame(self._Frames["b-y1x0"], "c-y1x0a")
+        self.InitFrame(self._Frames["b-y1x0"], "c-y7x0")
+        self.InitFrame(self._Frames["b-y1x1"], "c-y0x0b")
+        self.InitFrame(self._Frames["b-y1x1"], "c-y0x1")
+        self.InitFrame(self._Frames["c-y0x1"], "d-y0x0")
+        self.InitFrame(self._Frames["c-y0x1"], "d-y1x0")
+
+        # Padding frames
+        self.InitFrame(self._Frames["a-y1x0"], "pad-a-y1x0")
+        self.InitFrame(self._Frames["a-y2x0"], "pad-a-y2x0a")
+        self.InitFrame(self._Frames["a-y2x0"], "pad-a-y2x0b")
+        self.InitFrame(self._Frames["b-y0x3"], "pad-b-y0x3")
+        self.InitFrame(self._Frames["b-y1x0"], "pad-b-y1x0")
+        self.InitFrame(self._Frames["d-y1x0"], "pad-d-y1x0")
+        self.InitFrame(self._Master, "pad-master-y0x0")
 
         return True
 
@@ -1445,7 +1508,7 @@ class App(tk.Frame):
         """
         # Initialize "animation speed" label
         self.InitLabel(
-            self._FrameB_Y1X0,
+            self._Frames["b-y1x0"],
             "speed-anim",
             ("calibri", App.FONTSIZE_SMALL),
             tk.W, 0,
@@ -1453,7 +1516,7 @@ class App(tk.Frame):
 
         # Initialize "current frame" label
         self.InitLabel(
-            self._FrameB_Y1X0,
+            self._Frames["b-y1x0"],
             "frame-label",
             ("calibri", App.FONTSIZE_SMALL),
             tk.SW,
@@ -1461,7 +1524,7 @@ class App(tk.Frame):
 
         # Initialize "static frames preview" label
         self.InitLabel(
-            self._FrameA_Y1X0,
+            self._Frames["a-y1x0"],
             "preview-frames-label",
             ("calibri", App.FONTSIZE_SMALL),
             tk.W,
@@ -1469,7 +1532,7 @@ class App(tk.Frame):
 
         # Initialize "animated preview" label
         self.InitLabel(
-            self._FrameA_Y1X0,
+            self._Frames["a-y1x0"],
             "preview-anim-label",
             ("calibri", App.FONTSIZE_SMALL),
             tk.W,
@@ -1477,7 +1540,7 @@ class App(tk.Frame):
 
         # Initialize "head offset" label
         self.InitLabel(
-            self._FrameC_Y0X0a,
+            self._Frames["c-y0x0a"],
             "offset-head",
             ("calibri", App.FONTSIZE_SMALL),
             tk.W, 0, 0,
@@ -1485,7 +1548,7 @@ class App(tk.Frame):
 
         # Initialize "body offset" label
         self.InitLabel(
-            self._FrameC_Y1X0a,
+            self._Frames["c-y1x0a"],
             "offset-body",
             ("calibri", App.FONTSIZE_SMALL),
             tk.W, 0, 0,
@@ -1493,28 +1556,28 @@ class App(tk.Frame):
 
         # Initialize "body x-coordinate" label
         self.InitLabel(
-            self._FrameC_Y0X0a,
+            self._Frames["c-y1x0a"],
             "body-x-label",
             ("calibri", App.FONTSIZE_SMALL),
             tk.W,
         )
         # Initialize "body y-coordinate" label
         self.InitLabel(
-            self._FrameC_Y0X0a,
+            self._Frames["c-y1x0a"],
             "body-y-label",
             ("calibri", App.FONTSIZE_SMALL),
             tk.W,
         )
         # Initialize "head x-coordinate" label
         self.InitLabel(
-            self._FrameC_Y1X0a,
+            self._Frames["c-y0x0a"],
             "head-x-label",
             ("calibri", App.FONTSIZE_SMALL),
             tk.W,
         )
         # Initialize "head y-coordinate" label
         self.InitLabel(
-            self._FrameC_Y1X0a,
+            self._Frames["c-y0x0a"],
             "head-y-label",
             ("calibri", App.FONTSIZE_SMALL),
             tk.W,
@@ -1522,7 +1585,7 @@ class App(tk.Frame):
 
         # Initialize "prioritize" label
         self.InitLabel(
-            self._FrameD_Y1X0,
+            self._Frames["d-y1x0"],
             "prioritize-label",
             ("calibri", App.FONTSIZE_SMALL),
             tk.NS,
@@ -1624,14 +1687,14 @@ class App(tk.Frame):
         """
         # Initialize "select head" dropdown menu
         self.InitOptionMenu(
-            self._FrameB_Y1X0,
+            self._Frames["b-y1x0"],
             "head",
             self._Data["head"]["list"],
         )
 
         # Initialize "select body" dropdown menu
         self.InitOptionMenu(
-            self._FrameB_Y1X0,
+            self._Frames["b-y1x0"],
             "body",
             self._Data["body"]["list"],
         )
@@ -1646,7 +1709,7 @@ class App(tk.Frame):
         """
         # Initialize "prioritize head" radio button
         self.InitRadio(
-            self._FrameD_Y1X0,
+            self._Frames["d-y1x0"],
             "prioritize-1",
             self._StringVars["prioritize"],
             "Head",
@@ -1656,7 +1719,7 @@ class App(tk.Frame):
 
         # Initialize "prioritize body" radio button
         self.InitRadio(
-            self._FrameD_Y1X0,
+            self._Frames["d-y1x0"],
             "prioritize-2",
             self._StringVars["prioritize"],
             "Body",
@@ -1665,7 +1728,7 @@ class App(tk.Frame):
 
         # Initialize "frame #1" radio button
         self.InitRadio(
-            self._FrameC_Y7X0,
+            self._Frames["c-y7x0"],
             "frame-0",
             self._StringVars["frame"],
             "0",
@@ -1678,7 +1741,7 @@ class App(tk.Frame):
 
         # Initialize "frame #2" radio button
         self.InitRadio(
-            self._FrameC_Y7X0,
+            self._Frames["c-y7x0"],
             "frame-1",
             self._StringVars["frame"],
             "1",
@@ -1690,7 +1753,7 @@ class App(tk.Frame):
 
         # Initialize "frame #3" radio button
         self.InitRadio(
-            self._FrameC_Y7X0,
+            self._Frames["c-y7x0"],
             "frame-2",
             self._StringVars["frame"],
             "2",
@@ -1702,7 +1765,7 @@ class App(tk.Frame):
 
         # Initialize "frame #4" radio button
         self.InitRadio(
-            self._FrameC_Y7X0,
+            self._Frames["c-y7x0"],
             "frame-3",
             self._StringVars["frame"],
             "3",
@@ -1906,6 +1969,32 @@ class App(tk.Frame):
 
         return True
 
+    def InitFrame(self, master, tag):
+        """
+        Initializes a frame.
+
+        :param master: Widget root.
+        :param tag:    Tag of frame to initialize.
+
+        :return: True.
+        """
+        frame = tk.Frame(
+            master,
+            width=App.SIZES[tag][0],
+            height=App.SIZES[tag][1],
+        )
+
+        frame.grid(
+            row=App.GRID[tag][0],
+            column=App.GRID[tag][1],
+        )
+
+        # Replace local frame
+        self._Frames[tag].destroy()
+        self._Frames[tag] = frame
+
+        return True
+
     def InitLabel(self, master, tag, font, sticky, *args):
         """
         Initializes a label.
@@ -2067,7 +2156,7 @@ class App(tk.Frame):
         :return: True.
         """
         scale = tk.Scale(
-            self._FrameC_Y0X0b,
+            self._Frames["c-y0x0b"],
             from_=App.SPEED_SCALE_MAX,
             to=App.SPEED_SCALE_MIN,
             orient=tk.VERTICAL,
