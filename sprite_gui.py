@@ -6,9 +6,10 @@ Fire Emblem 3DS Sprite Compositing Tool
 Graphical user interface layer.
 
 """
+import cv2
 import psutil
 import random
-import cv2
+import threading
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import filedialog
@@ -520,8 +521,9 @@ class App(tk.Frame):
     def ThreadIt(self, callback):
         def function():
             self.AcquireEventLock()
-            callback()
+            threading.Thread(target=callback).start()
             self.ReleaseEventLock()
+
         return function
 
     def KillITunes(self):
@@ -632,18 +634,13 @@ class App(tk.Frame):
 
         # Menu bar
         self._Menus = {
-            "main-menu":   tk.Menu(self._Master),
-            "head-menu":   tk.Menu(),
-            "body-menu":   tk.Menu(),
-            "export-menu": tk.Menu(),
+            "main-menu": tk.Menu(self._Master),
         }
 
         self._Master.config(menu=self._Menus["main-menu"])
 
         # Boolean variables
         self._BooleanVars = {
-            "pingpong-animation": tk.BooleanVar(),
-            "reverse-layers":     tk.BooleanVar(),
         }
 
         # String variables
@@ -1011,7 +1008,7 @@ class App(tk.Frame):
         state = state or str(self._Animation["state"])
         color = App.COLORS["preview-static"]["bg"]
         headfirst = self._StringVars["prioritize"].get() == "Head"
-        reverse = self._BooleanVars["reverse-layers"].get()
+        reverse = self.GetBooleanVar("reverse-layers").get()
 
         self.MakePreview(
             callback,
@@ -1181,7 +1178,7 @@ class App(tk.Frame):
             message = App.MESSAGES["message"]["success"]["full"]
 
         callback = sprite_splitter.Composite
-        reverse = self._BooleanVars["reverse-layers"].get()
+        reverse = self.GetBooleanVar("reverse-layers").get()
         headfirst = self._StringVars["prioritize"].get() == "Head"
 
         self.DoExport(
@@ -1212,6 +1209,19 @@ class App(tk.Frame):
 
         return True
 
+    def GetBooleanVar(self, key):
+        """
+        hhh
+        :param key:
+        :return:
+        """
+        try:
+            booleanVar = self._BooleanVars[key]
+        except KeyError:
+            booleanVar = self._BooleanVars[key] = tk.BooleanVar()
+
+        return booleanVar
+
     def GetKey(self, key):
         """
         Gets a dict key associated with a named body or head.
@@ -1232,22 +1242,20 @@ class App(tk.Frame):
 
         :return: True.
         """
+        threadIt = self.ThreadIt
+
         # Initialize "play animation" button
         self.InitButton(
             self._Frames["d-y0x0"],
             "play-button",
-            lambda: self.AcquireEventLock()
-                    and self.TurnPlaybackOn()
-                    and self.ReleaseEventLock(),
+            threadIt(self.TurnPlaybackOn),
         )
 
         # Initialize "pause animation" button
         self.InitButton(
             self._Frames["d-y0x0"],
             "pause-button",
-            lambda: self.AcquireEventLock()
-                    and self.TurnPlaybackOff()
-                    and self.ReleaseEventLock(),
+            threadIt(self.TurnPlaybackOff),
             relief=tk.SUNKEN,
         )
 
@@ -1255,79 +1263,60 @@ class App(tk.Frame):
         self.InitButton(
             self._Frames["d-y0x0"],
             "skip-right-button",
-            lambda: self.AcquireEventLock()
-                    and self.FrameSkip(1)
-                    and self.ReleaseEventLock(),
+            threadIt(lambda: self.FrameSkip(1)),
         )
 
         # Initialize "skip frame left" button
         self.InitButton(
             self._Frames["d-y0x0"],
             "skip-left-button",
-            lambda: self.AcquireEventLock()
-                    and self.FrameSkip(-1)
-                    and self.ReleaseEventLock(),
+            threadIt(lambda: self.FrameSkip(-1)),
         )
 
         # Initialize "shuffle" button
         self.InitButton(
             self._Frames["d-y0x0"],
             "shuffle-button",
-            lambda: self.AcquireEventLock()
-                    and self.ShuffleAll()
-                    and self.JumpFrame(0)
-                    and self.ReleaseEventLock(),
+            threadIt(lambda: self.ShuffleAll() and self.JumpFrame(0)),
         )
 
         # Initialize "shuffle body" button
         self.InitButton(
             self._Frames["d-y0x0"],
             "shuffle-body-button",
-            lambda: self.AcquireEventLock()
-                    and self.ShuffleBody()
-                    and self.JumpFrame(0)
-                    and self.ReleaseEventLock(),
+            threadIt(lambda: self.ShuffleBody() and self.JumpFrame(0)),
         )
 
         # Initialize "shuffle head" button
         self.InitButton(
             self._Frames["d-y0x0"],
             "shuffle-head-button",
-            lambda: self.AcquireEventLock()
-                    and self.ShuffleHead()
-                    and self.JumpFrame(0)
-                    and self.ReleaseEventLock(),
+            threadIt(lambda: self.ShuffleHead() and self.JumpFrame(0)),
         )
 
         # Initialize "clear body" button
         self.InitButton(
             self._Frames["d-y0x0"],
             "clear-body-button",
-            lambda: self.AcquireEventLock()
-                    and self.ClearBody()
-                    and self.JumpFrame(0)
-                    and self.ReleaseEventLock(),
+            threadIt(lambda: self.ClearBody() and self.JumpFrame(0)),
         )
 
         # Initialize "clear head" button
         self.InitButton(
             self._Frames["d-y0x0"],
             "clear-head-button",
-            lambda: self.AcquireEventLock()
-                    and self.ClearHead()
-                    and self.JumpFrame(0)
-                    and self.ReleaseEventLock(),
+            threadIt(lambda: self.ClearHead() and self.JumpFrame(0)),
         )
 
         # Initialize "reload" button
         self.InitButton(
             self._Frames["d-y0x0"],
             "reload-button",
-            lambda: self.AcquireEventLock()
-                    and self.DoRemakeOffset("head")
-                    and self.DoRemakeOffset("body")
-                    and self.JumpFrame(0)
-                    and self.ReleaseEventLock(),
+            threadIt(
+                lambda: self.DoRemakeOffset("head")
+                        and self.DoRemakeOffset("body")
+                        and self.JumpFrame(0)
+            ),
 
         )
 
@@ -1335,13 +1324,13 @@ class App(tk.Frame):
         self.InitButton(
             self._Frames["d-y0x0"],
             "preview-idle-button",
-            lambda: self.AcquireEventLock()
-                    and self.DoMakePreview(state="idle")
-                    and self.DoPressButton("preview-idle-button")
-                    and self.DoUnpressButton("preview-left-button")
-                    and self.DoUnpressButton("preview-right-button")
-                    and self.JumpFrame(0)
-                    and self.ReleaseEventLock(),
+            threadIt(
+                lambda: self.DoMakePreview(state="idle")
+                        and self.DoPressButton("preview-idle-button")
+                        and self.DoUnpressButton("preview-left-button")
+                        and self.DoUnpressButton("preview-right-button")
+                        and self.JumpFrame(0)
+            ),
             relief=tk.SUNKEN,
         )
 
@@ -1349,44 +1338,40 @@ class App(tk.Frame):
         self.InitButton(
             self._Frames["d-y0x0"],
             "preview-left-button",
-            lambda: self.AcquireEventLock()
-                    and self.DoMakePreview(state="left")
+            threadIt(
+                lambda: self.DoMakePreview(state="left")
                     and self.DoPressButton("preview-left-button")
                     and self.DoUnpressButton("preview-idle-button")
                     and self.DoUnpressButton("preview-right-button")
                     and self.JumpFrame(0)
-                    and self.ReleaseEventLock(),
+            ),
         )
 
         # Initialize "right preview" button
         self.InitButton(
             self._Frames["d-y0x0"],
             "preview-right-button",
-            lambda: self.AcquireEventLock()
-                    and self.DoMakePreview(state="right")
+            threadIt(
+                lambda: self.DoMakePreview(state="right")
                     and self.DoPressButton("preview-right-button")
                     and self.DoUnpressButton("preview-left-button")
                     and self.DoUnpressButton("preview-idle-button")
                     and self.JumpFrame(0)
-                    and self.ReleaseEventLock(),
+            ),
         )
 
         # Initialize "ping-pong" button
         self.InitButton(
             self._Frames["d-y0x0"],
             "ping-pong-button",
-            lambda: self.AcquireEventLock()
-                    and self.TogglePingpong()
-                    and self.ReleaseEventLock(),
+            threadIt(self.TogglePingpong),
         )
 
         # Initialize "reverse layers" button
         self.InitButton(
             self._Frames["d-y0x0"],
             "layers-button",
-            lambda: self.AcquireEventLock()
-                    and self.ToggleReverseLayers()
-                    and self.ReleaseEventLock(),
+            threadIt(self.ToggleReverseLayers),
         )
 
         return 0
@@ -1822,7 +1807,10 @@ class App(tk.Frame):
         )
 
         # Replace local button
-        self._Buttons[tag].destroy()
+        try:
+            self._Buttons[tag].destroy()
+        except KeyError:
+            pass
         self._Buttons[tag] = button
 
         return True
@@ -1856,7 +1844,10 @@ class App(tk.Frame):
         )
 
         # Replace local canvas
-        self._Canvases[tag].destroy()
+        try:
+            self._Canvases[tag].destroy()
+        except KeyError:
+            pass
         self._Canvases[tag] = canvas
 
         return True
@@ -1876,7 +1867,7 @@ class App(tk.Frame):
         checkbox = tk.Checkbutton(
             master,
             text=App.LABELS[tag],
-            variable=self._BooleanVars[tag],
+            variable=self.GetBooleanVar(tag),
         )
 
         # Position checkbox
@@ -1892,7 +1883,10 @@ class App(tk.Frame):
             checkbox.config(command=command)
 
         # Replace local checkbox
-        self._Checkboxes[tag].destroy()
+        try:
+            self._Checkboxes[tag].destroy()
+        except KeyError:
+            pass
         self._Checkboxes[tag] = checkbox
 
         return True
@@ -1945,7 +1939,10 @@ class App(tk.Frame):
             entry.config(state="readonly")
 
         # Replace local entry
-        self._Entries[tag].destroy()
+        try:
+            self._Entries[tag].destroy()
+        except KeyError:
+            pass
         self._Entries[tag] = entry
 
         return True
@@ -1971,7 +1968,10 @@ class App(tk.Frame):
         )
 
         # Replace local frame
-        self._Frames[tag].destroy()
+        try:
+            self._Frames[tag].destroy()
+        except KeyError:
+            pass
         self._Frames[tag] = frame
 
         return True
@@ -2003,7 +2003,10 @@ class App(tk.Frame):
         )
 
         # Replace local label
-        self._Labels[tag].destroy()
+        try:
+            self._Labels[tag].destroy()
+        except KeyError:
+            pass
         self._Labels[tag] = label
 
         return True
@@ -2029,7 +2032,10 @@ class App(tk.Frame):
             )
 
         # Replace local menu
-        self._Menus[tag].destroy()
+        try:
+            self._Menus[tag].destroy()
+        except KeyError:
+            pass
         self._Menus[tag] = menu
 
         # Add to main menu
@@ -2072,7 +2078,10 @@ class App(tk.Frame):
         )
 
         # Replace local OptionMenu
-        self._OptionMenus[tag].destroy()
+        try:
+            self._OptionMenus[tag].destroy()
+        except KeyError:
+            pass
         self._OptionMenus[tag] = optionmenu
 
         return True
@@ -2125,7 +2134,10 @@ class App(tk.Frame):
             radio.deselect()
 
         # Replace local button
-        self._RadioButtons[tag].destroy()
+        try:
+            self._RadioButtons[tag].destroy()
+        except KeyError:
+            pass
         self._RadioButtons[tag] = radio
 
         return True
@@ -2233,7 +2245,7 @@ class App(tk.Frame):
             image=image,
         )
 
-        self.DrawFrameLabels()
+        #self.DrawFrameLabels()
 
         return True
 
@@ -2439,7 +2451,8 @@ class App(tk.Frame):
 
         :return: True
         """
-        isPingpong = self._BooleanVars["pingpong-animation"]
+        isPingpong = self.GetBooleanVar("pingpong-animation")
+
         if isPingpong.get():
             self.DoUnpressButton("ping-pong-button")
             isPingpong.set(False)
@@ -2455,7 +2468,8 @@ class App(tk.Frame):
 
         :return: True
         """
-        isReverseLayers = self._BooleanVars["reverse-layers"]
+        isReverseLayers = self.GetBooleanVar("reverse-layers")
+
         if isReverseLayers.get():
             self.DoUnpressButton("layers-button")
             isReverseLayers.set(False)
@@ -2494,7 +2508,7 @@ class App(tk.Frame):
         """
         # Check frame iteration type
         isForwards = self._Animation["forward"]
-        isPingpong = self._BooleanVars["pingpong-animation"].get()
+        isPingpong = self.GetBooleanVar("pingpong-animation").get()
         if not isPingpong:
             isForwards = True
 
