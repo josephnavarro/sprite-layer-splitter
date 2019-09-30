@@ -131,12 +131,18 @@ class App(tk.Frame):
 
     # Default widget dimensions
     SIZES = {
-        # Preview canvases
+        # Preview canvases (pixels)
         "preview-anim":         [96, 96],
         "preview-resize":       [384, 96],
         "preview-static":       [384, 96],
 
-        # Icon-based buttons
+        # Entry widgets (characters)
+        "body-x":               [2, 1],
+        "body-y":               [2, 1],
+        "head-x":               [2, 1],
+        "head-y":               [2, 1],
+
+        # Icon-based buttons (pixels)
         "play-button":          [32, 32],
         "pause-button":         [32, 32],
         "skip-right-button":    [32, 32],
@@ -183,27 +189,26 @@ class App(tk.Frame):
         "preview-frames-label": [1, 1],
         "preview-anim-label":   [1, 2],
 
+        # Speed slider
+        "speed-slider":         [0, 0],
+
         # Left column
         "head":                 [0, 0],
         "body":                 [1, 0],
+        "body-x":               [2, 0],
+        "body-y":               [2, 1],
+        "head-x":               [3, 0],
+        "head-y":               [3, 1],
+        "offset-body":          [4, 0],
+        "offset-head":          [5, 0],
+        "speed-anim":           [6, 0],
+        "frame-label":          [7, 0],
+        "frame-0":              [7, 1],
+        "frame-1":              [7, 2],
+        "frame-2":              [7, 3],
+        "frame-3":              [7, 4],
 
         # Right column
-        "prioritize-label":     [16, 1],
-        "prioritize-1":         [17, 1],
-        "prioritize-2":         [18, 1],
-
-        # Frame data readout
-        "speed-slider":         [2, 0],
-        "offset-body":          [3, 0],
-        "offset-head":          [4, 0],
-        "speed-anim":           [5, 0],
-        "frame-label":          [7, 0],
-        "frame-0":              [6, 1],
-        "frame-1":              [6, 2],
-        "frame-2":              [6, 3],
-        "frame-3":              [6, 4],
-
-        # Icon-based buttons
         "reload-button":        [0, 1],
         "play-button":          [0, 2],
         "pause-button":         [0, 3],
@@ -219,6 +224,10 @@ class App(tk.Frame):
         "shuffle-head-button":  [2, 3],
         "clear-body-button":    [2, 4],
         "clear-head-button":    [2, 5],
+
+        "prioritize-label":     [16, 1],
+        "prioritize-1":         [17, 1],
+        "prioritize-2":         [18, 1],
     }
 
     # Padding for widgets
@@ -233,6 +242,10 @@ class App(tk.Frame):
         "speed-anim":           [0, 0],
         "offset-head":          [12, 0],
         "offset-body":          [12, 0],
+        "head-x":               [0, 0],
+        "head-y":               [0, 0],
+        "body-x":               [0, 0],
+        "body-y":               [0, 0],
         "frame-label":          [0, 0],
         "frame-0":              [0, 0],
         "frame-1":              [0, 0],
@@ -275,6 +288,11 @@ class App(tk.Frame):
 
     # Button and menu text labels
     LABELS = {
+        # Menus
+        "head-menu":            "Head",
+        "body-menu":            "Body",
+        "export-menu":          "Export",
+
         # Canvas captions
         "preview-frames-label": "Static frame preview",
         "preview-anim-label":   "Animated preview",
@@ -300,6 +318,10 @@ class App(tk.Frame):
         # Frame data readout
         "offset-body":          "Body  :=  x: {0:+d} / y: {1:+d}",
         "offset-head":          "Head  :=  x: {0:+d} / y: {1:+d}",
+        "body-x":               "X",
+        "body-y":               "Y",
+        "head-x":               "X",
+        "head-y":               "Y",
         "speed-anim":           "Speed:  {0:d}",
         "frame-label":          "Frame:",
         "frame-0":              "0",
@@ -527,83 +549,14 @@ class App(tk.Frame):
             },
         }
 
-        # Main menu instance
-        self._Menu = tk.Menu(self._Master)
+        self._Menus = {
+            "main-menu":   tk.Menu(self._Master),
+            "head-menu":   tk.Menu(),
+            "body-menu":   tk.Menu(),
+            "export-menu": tk.Menu(),
+        }
 
-        # "Head" menu
-        self._HeadMenu = tk.Menu(self._Menu, tearoff=0)
-        self._HeadMenu.add_command(
-            label=App.LABELS["rebuild-head-data"],
-            command=lambda: self.AcquireEventLock()
-                            and self.RebuildData("head")
-                            and self.ReleaseEventLock(),
-        )
-        self._HeadMenu.add_command(
-            label=App.LABELS["rebuild-head-images"],
-            command=lambda: self.AcquireEventLock()
-                            and self.RebuildImages("head")
-                            and self.ReleaseEventLock(),
-        )
-        self._HeadMenu.add_command(
-            label=App.LABELS["rebuild-head-offsets"],
-            command=lambda: self.AcquireEventLock()
-                            and self.RebuildOffsets("head")
-                            and self.ReleaseEventLock(),
-        )
-        self._HeadMenu.add_command(
-            label=App.LABELS["destroy-head-images"],
-            command=lambda: self.AcquireEventLock()
-                            and self.DestroyImages("head")
-                            and self.ReleaseEventLock(),
-        )
-
-        # "Body" menu
-        self._BodyMenu = tk.Menu(self._Menu, tearoff=0)
-        self._BodyMenu.add_command(
-            label=App.LABELS["rebuild-body-data"],
-            command=lambda: self.AcquireEventLock()
-                            and self.RebuildData("body")
-                            and self.ReleaseEventLock(),
-        )
-        self._BodyMenu.add_command(
-            label=App.LABELS["rebuild-body-images"],
-            command=lambda: self.AcquireEventLock()
-                            and self.RebuildImages("body")
-                            and self.ReleaseEventLock(),
-        )
-        self._BodyMenu.add_command(
-            label=App.LABELS["rebuild-body-offsets"],
-            command=lambda: self.AcquireEventLock()
-                            and self.RebuildOffsets("body")
-                            and self.ReleaseEventLock(),
-        )
-        self._BodyMenu.add_command(
-            label=App.LABELS["destroy-body-images"],
-            command=lambda: self.AcquireEventLock()
-                            and self.DestroyImages("body")
-                            and self.ReleaseEventLock(),
-        )
-
-        # "Export" menu
-        self._ExportMenu = tk.Menu(self._Menu, tearoff=0)
-        self._ExportMenu.add_command(
-            label=App.LABELS["export-idle"],
-            command=lambda: self.AcquireEventLock()
-                            and self.ExportFrames(idle_only=True)
-                            and self.ReleaseEventLock(),
-        )
-        self._ExportMenu.add_command(
-            label=App.LABELS["export-full"],
-            command=lambda: self.AcquireEventLock()
-                            and self.ExportFrames()
-                            and self.ReleaseEventLock(),
-        )
-
-        self._Menu.add_cascade(label="Export", menu=self._ExportMenu)
-        self._Menu.add_cascade(label="Head", menu=self._HeadMenu)
-        self._Menu.add_cascade(label="Body", menu=self._BodyMenu)
-
-        self._Master.config(menu=self._Menu)
+        self._Master.config(menu=self._Menus["main-menu"])
 
         # Widget-containing frames
         self._FrameA_Y1X0 = tk.Frame(self._Master)
@@ -665,6 +618,10 @@ class App(tk.Frame):
         self._StringVars = {
             "head":       tk.StringVar(self._Master),
             "body":       tk.StringVar(self._Master),
+            "head-x":     tk.StringVar(self._Master),
+            "head-y":     tk.StringVar(self._Master),
+            "body-x":     tk.StringVar(self._Master),
+            "body-y":     tk.StringVar(self._Master),
             "state":      tk.StringVar(self._Master),
             "frame":      tk.StringVar(self._Master),
             "prioritize": tk.StringVar(self._Master),
@@ -734,7 +691,7 @@ class App(tk.Frame):
         }
 
         # Menus
-        self._Menus = {
+        self._OptionMenus = {
             "head":  tk.OptionMenu(
                 self._FrameA_Y2X0,
                 self._StringVars["head"],
@@ -777,7 +734,11 @@ class App(tk.Frame):
         self.InitAllCheckboxes()
         self.InitAllLabels()
         self.InitAllMenus()
+        self.InitAllOptionMenus()
         self.InitAllRadioButtons()
+
+        self.DoRebuildData("head")
+        self.DoRebuildData("body")
 
         self.InitSliderFramerate()
 
@@ -1051,6 +1012,24 @@ class App(tk.Frame):
         :return: True.
         """
         self._EventLock = False
+        return True
+
+    def DoRebuildData(self, key):
+        """
+        Rebuilds head or body listings.
+
+        :param key: Either of "head" or "body".
+
+        :return: True.
+        """
+        CreateInputJSON(key)
+        self.InitData(key)
+        self.InitOptionMenu(
+            self._FrameB_Y1X0,
+            key,
+            self._Data[key]["list"],
+        )
+
         return True
 
     def DoRemakeOffset(self, key):
@@ -1455,17 +1434,101 @@ class App(tk.Frame):
         """
         Initializes all required menus.
 
-        :return: True on success; False on failure.
+        :return: True.
+        """
+        # Initialize "head" menu
+        self.InitMenu(
+            self._Menus["main-menu"],
+            "head-menu",
+            {
+                "label":   App.LABELS["rebuild-head-data"],
+                "command": lambda: self.AcquireEventLock()
+                                   and self.RebuildData("head")
+                                   and self.ReleaseEventLock(),
+            },
+            {
+                "label":   App.LABELS["rebuild-head-images"],
+                "command": lambda: self.AcquireEventLock()
+                                   and self.RebuildImages("head")
+                                   and self.ReleaseEventLock(),
+            },
+            {
+                "label":   App.LABELS["rebuild-head-offsets"],
+                "command": lambda: self.AcquireEventLock()
+                                   and self.RebuildOffsets("head")
+                                   and self.ReleaseEventLock(),
+            },
+            {
+                "label":   App.LABELS["destroy-head-images"],
+                "command": lambda: self.AcquireEventLock()
+                                   and self.DestroyImages("head")
+                                   and self.ReleaseEventLock(),
+            },
+        )
+
+        # Initialize "body" menu
+        self.InitMenu(
+            self._Menus["main-menu"],
+            "body-menu",
+            {
+                "label":   App.LABELS["rebuild-body-data"],
+                "command": lambda: self.AcquireEventLock()
+                                   and self.RebuildData("body")
+                                   and self.ReleaseEventLock(),
+            },
+            {
+                "label":   App.LABELS["rebuild-body-images"],
+                "command": lambda: self.AcquireEventLock()
+                                   and self.RebuildImages("body")
+                                   and self.ReleaseEventLock(),
+            },
+            {
+                "label":   App.LABELS["rebuild-body-offsets"],
+                "command": lambda: self.AcquireEventLock()
+                                   and self.RebuildOffsets("body")
+                                   and self.ReleaseEventLock(),
+            },
+            {
+                "label":   App.LABELS["destroy-body-images"],
+                "command": lambda: self.AcquireEventLock()
+                                   and self.DestroyImages("body")
+                                   and self.ReleaseEventLock(),
+            },
+        )
+
+        # Initialize "export" menu
+        self.InitMenu(
+            self._Menus["main-menu"],
+            "export-menu",
+            {
+                "label":   App.LABELS["export-idle"],
+                "command": lambda: self.AcquireEventLock()
+                                   and self.ExportFrames(idle_only=True)
+                                   and self.ReleaseEventLock(),
+            },
+            {
+                "label":   App.LABELS["export-full"],
+                "command": lambda: self.AcquireEventLock()
+                                   and self.ExportFrames()
+                                   and self.ReleaseEventLock(),
+            },
+        )
+
+    def InitAllOptionMenus(self):
+        """
+        Initializes all required option menus.
+
+        :return: True.
         """
         # Initialize "select head" dropdown menu
-        self.InitMenu(
+        self.InitOptionMenu(
             self._FrameB_Y1X0,
             "head",
             self._Data["head"]["list"],
         )
 
         # Initialize "select body" dropdown menu
-        self.InitMenu(
+        self.InitOptionMenu(
             self._FrameB_Y1X0,
             "body",
             self._Data["body"]["list"],
@@ -1732,12 +1795,43 @@ class App(tk.Frame):
             pady=App.PAD[tag][1],
         )
 
+        # Replace local label
         self._Labels[tag].destroy()
         self._Labels[tag] = label
 
         return True
 
-    def InitMenu(self, master, tag, options):
+    def InitMenu(self, master, tag, *commands):
+        """
+
+        :param master:
+        :param command:
+
+        :return: True.
+        """
+        assert tag != "main-menu"
+
+        menu = tk.Menu(master, tearoff=0)
+
+        for command in commands:
+            commandTag = command.get("label", "")
+            commandFnc = command.get("command", lambda: print())
+            menu.add_command(
+                label=commandTag,
+                command=commandFnc,
+            )
+
+        # Replace local menu
+        self._Menus[tag].destroy()
+        self._Menus[tag] = menu
+
+        # Add to main menu
+        self._Menus["main-menu"].add_cascade(
+            label=App.LABELS[tag],
+            menu=menu,
+        )
+
+    def InitOptionMenu(self, master, tag, options):
         """
         Initializes a menu.
 
@@ -1753,8 +1847,8 @@ class App(tk.Frame):
 
         self._StringVars[tag].set(App.LABELS[tag])
 
-        menu = tk.OptionMenu(master, self._StringVars[tag], *options)
-        menu.config(
+        optionmenu = tk.OptionMenu(master, self._StringVars[tag], *options)
+        optionmenu.config(
             width=width,
             foreground=foreground,
             background=background,
@@ -1762,15 +1856,17 @@ class App(tk.Frame):
             activeforeground=foreground,
         )
 
-        menu.grid(
+        # Position OptionMenu
+        optionmenu.grid(
             row=App.GRID[tag][0],
             column=App.GRID[tag][1],
             padx=App.PAD[tag][0],
             pady=App.PAD[tag][1],
         )
 
-        self._Menus[tag].destroy()
-        self._Menus[tag] = menu
+        # Replace local OptionMenu
+        self._OptionMenus[tag].destroy()
+        self._OptionMenus[tag] = optionmenu
 
         return True
 
@@ -2011,9 +2107,7 @@ class App(tk.Frame):
         alert = App.MESSAGES["message"]["rebuild"]["data"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            CreateInputJSON(key)
-            self.InitData(key)
-            self.InitMenu(self._FrameA_Y2X0, key, self._Data[key]["list"])
+            self.DoRebuildData(key)
             tk.messagebox.showinfo(title, alert)
 
         return True
