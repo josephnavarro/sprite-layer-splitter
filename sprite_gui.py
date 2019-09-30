@@ -195,10 +195,14 @@ class App(tk.Frame):
         # Left column
         "head":                 [0, 0],
         "body":                 [1, 0],
-        "body-x":               [2, 0],
-        "body-y":               [2, 1],
-        "head-x":               [3, 0],
-        "head-y":               [3, 1],
+        "body-x-label":         [0, 0],
+        "body-x":               [0, 1],
+        "body-y-label":         [0, 2],
+        "body-y":               [0, 3],
+        "head-x-label":         [1, 0],
+        "head-x":               [1, 1],
+        "head-y-label":         [1, 2],
+        "head-y":               [1, 3],
         "offset-body":          [4, 0],
         "offset-head":          [5, 0],
         "speed-anim":           [6, 0],
@@ -240,11 +244,15 @@ class App(tk.Frame):
 
         # Frame data readout
         "speed-anim":           [0, 0],
-        "offset-head":          [12, 0],
-        "offset-body":          [12, 0],
+        "offset-head":          [0, 0],
+        "offset-body":          [0, 0],
+        "head-x-label":         [0, 0],
         "head-x":               [0, 0],
+        "head-y-label":         [0, 0],
         "head-y":               [0, 0],
+        "body-x-label":         [0, 0],
         "body-x":               [0, 0],
+        "body-y-label":         [0, 0],
         "body-y":               [0, 0],
         "frame-label":          [0, 0],
         "frame-0":              [0, 0],
@@ -316,12 +324,12 @@ class App(tk.Frame):
         "destroy-head-images":  "Clean head sources",
 
         # Frame data readout
-        "offset-body":          "Body  :=  x: {0:+d} / y: {1:+d}",
-        "offset-head":          "Head  :=  x: {0:+d} / y: {1:+d}",
-        "body-x":               "X",
-        "body-y":               "Y",
-        "head-x":               "X",
-        "head-y":               "Y",
+        "offset-body":          "Body:",
+        "offset-head":          "Head:",
+        "body-x-label":         "X",
+        "body-y-label":         "Y",
+        "head-x-label":         "X",
+        "head-y-label":         "Y",
         "speed-anim":           "Speed:  {0:d}",
         "frame-label":          "Frame:",
         "frame-0":              "0",
@@ -549,15 +557,6 @@ class App(tk.Frame):
             },
         }
 
-        self._Menus = {
-            "main-menu":   tk.Menu(self._Master),
-            "head-menu":   tk.Menu(),
-            "body-menu":   tk.Menu(),
-            "export-menu": tk.Menu(),
-        }
-
-        self._Master.config(menu=self._Menus["main-menu"])
-
         # Widget-containing frames
         self._FrameA_Y1X0 = tk.Frame(self._Master)
         self._FrameA_Y1X0.grid(row=1, column=0)
@@ -573,6 +572,12 @@ class App(tk.Frame):
 
         self._FrameB_Y1X1 = tk.Frame(self._FrameA_Y2X0)
         self._FrameB_Y1X1.grid(row=1, column=1)
+
+        self._FrameC_Y0X0a = tk.Frame(self._FrameB_Y1X0)
+        self._FrameC_Y0X0a.grid(row=4, column=0)
+
+        self._FrameC_Y1X0a = tk.Frame(self._FrameB_Y1X0)
+        self._FrameC_Y1X0a.grid(row=5, column=0)
 
         self._FrameC_Y7X0 = tk.Frame(self._FrameB_Y1X0)
         self._FrameC_Y7X0.grid(row=7, column=0)
@@ -607,6 +612,15 @@ class App(tk.Frame):
 
         self._FramePadTop = tk.Frame(self._Master, height=10)
         self._FramePadTop.grid(row=0)
+
+        self._Menus = {
+            "main-menu":   tk.Menu(self._Master),
+            "head-menu":   tk.Menu(),
+            "body-menu":   tk.Menu(),
+            "export-menu": tk.Menu(),
+        }
+
+        self._Master.config(menu=self._Menus["main-menu"])
 
         # Boolean variables
         self._BooleanVars = {
@@ -680,6 +694,14 @@ class App(tk.Frame):
             "reverse-layers":     tk.Checkbutton(),
         }
 
+        # Entry widgets
+        self._Entries = {
+            "head-x": tk.Entry(),
+            "head-y": tk.Entry(),
+            "body-x": tk.Entry(),
+            "body-y": tk.Entry(),
+        }
+
         # Radio buttons
         self._RadioButtons = {
             "prioritize-1": tk.Radiobutton(),
@@ -722,6 +744,10 @@ class App(tk.Frame):
             "preview-options":      tk.Label(),
             "prioritize-label":     tk.Label(),
             "speed-anim":           tk.Label(),
+            "body-x-label":         tk.Label(),
+            "body-y-label":         tk.Label(),
+            "head-x-label":         tk.Label(),
+            "head-y-label":         tk.Label(),
         }
 
         # Sliders
@@ -732,6 +758,7 @@ class App(tk.Frame):
         self.InitAllButtons()
         self.InitAllCanvases()
         self.InitAllCheckboxes()
+        self.InitAllEntries()
         self.InitAllLabels()
         self.InitAllMenus()
         self.InitAllOptionMenus()
@@ -1366,6 +1393,47 @@ class App(tk.Frame):
         self.InitData("body")
         return True
 
+    def InitAllEntries(self):
+        """
+        Initializes all required entry widgets.
+
+        :return: True
+        """
+        # Initialize "body x-coordinate" entry
+        self.InitEntry(
+            self._FrameC_Y0X0a,
+            "body-x",
+            tk.W,
+            text="0",
+            justify=tk.CENTER,
+        )
+        # Initialize "body y-coordinate" entry
+        self.InitEntry(
+            self._FrameC_Y0X0a,
+            "body-y",
+            tk.W,
+            text="0",
+            justify=tk.CENTER,
+        )
+        # Initialize "head x-coordinate" entry
+        self.InitEntry(
+            self._FrameC_Y1X0a,
+            "head-x",
+            tk.W,
+            text="0",
+            justify=tk.CENTER,
+        )
+        # Initialize "head y-coordinate" entry
+        self.InitEntry(
+            self._FrameC_Y1X0a,
+            "head-y",
+            tk.W,
+            text="0",
+            justify=tk.CENTER,
+        )
+
+        return True
+
     def InitAllLabels(self):
         """
         Initializes all required labels.
@@ -1408,7 +1476,7 @@ class App(tk.Frame):
         self.InitLabel(
             self._FrameB_Y1X0,
             "offset-head",
-            ("Courier", App.FONTSIZE_MONOS),
+            ("calibri", App.FONTSIZE_SMALL),
             tk.W, 0, 0,
         )
 
@@ -1416,8 +1484,37 @@ class App(tk.Frame):
         self.InitLabel(
             self._FrameB_Y1X0,
             "offset-body",
-            ("Courier", App.FONTSIZE_MONOS),
+            ("calibri", App.FONTSIZE_SMALL),
             tk.W, 0, 0,
+        )
+
+        # Initialize "body x-coordinate" label
+        self.InitLabel(
+            self._FrameC_Y0X0a,
+            "body-x-label",
+            ("calibri", App.FONTSIZE_SMALL),
+            tk.W,
+        )
+        # Initialize "body y-coordinate" label
+        self.InitLabel(
+            self._FrameC_Y0X0a,
+            "body-y-label",
+            ("calibri", App.FONTSIZE_SMALL),
+            tk.W,
+        )
+        # Initialize "head x-coordinate" label
+        self.InitLabel(
+            self._FrameC_Y1X0a,
+            "head-x-label",
+            ("calibri", App.FONTSIZE_SMALL),
+            tk.W,
+        )
+        # Initialize "head y-coordinate" label
+        self.InitLabel(
+            self._FrameC_Y1X0a,
+            "head-y-label",
+            ("calibri", App.FONTSIZE_SMALL),
+            tk.W,
         )
 
         # Initialize "prioritize" label
@@ -1513,6 +1610,8 @@ class App(tk.Frame):
                                    and self.ReleaseEventLock(),
             },
         )
+
+        return True
 
     def InitAllOptionMenus(self):
         """
@@ -1766,6 +1865,41 @@ class App(tk.Frame):
 
         self._Data[key]["list"] = [App.DEFAULT_NAME] + sorted(list(data))
         self._Data[key]["offset"] = LoadOffsets(key)
+
+        return True
+
+    def InitEntry(self, master, tag, sticky, text="", disabled=True,
+                  justify=tk.LEFT):
+        """
+        Initializes an entry widget.
+
+        :param master:
+        :param tag:
+
+        :return: True
+        """
+        stringVar = self._StringVars[tag]
+        stringVar.set(str(text))
+        entry = tk.Entry(
+            master,
+            textvariable=stringVar,
+            width=App.SIZES[tag][0],
+            justify=justify
+        )
+        entry.grid(
+            row=App.GRID[tag][0],
+            column=App.GRID[tag][1],
+            sticky=sticky,
+            padx=App.PAD[tag][0],
+            pady=App.PAD[tag][1],
+        )
+
+        if disabled:
+            entry.config(state="readonly")
+
+        # Replace local entry
+        self._Entries[tag].destroy()
+        self._Entries[tag] = entry
 
         return True
 
@@ -2341,7 +2475,7 @@ class App(tk.Frame):
 
     def UpdateOffsetLabel(self, key, state, frame):
         """
-        Updates label for current (x,y) head offset.
+        Updates labels for current frame's (x, y) offsets.
 
         :param key:   Either of "head" or "body".
         :param state: Current sprite state.
@@ -2349,12 +2483,16 @@ class App(tk.Frame):
 
         :return: True.
         """
-        label = "offset-{}".format(key)
+        strvarx = "{}-x".format(key)
+        strvary = "{}-y".format(key)
         try:
             xy = self._Data[key]["current"]["offset"][state][frame]
-            self._Labels[label].config(text=App.LABELS[label].format(*xy))
+            self._StringVars[strvarx].set(str(xy[0]))
+            self._StringVars[strvary].set(str(xy[1]))
+
         except (KeyError, IndexError):
-            self._Labels[label].config(text=App.LABELS[label].format(0, 0))
+            self._StringVars[strvarx].set(str(0))
+            self._StringVars[strvary].set(str(0))
 
         return True
 
