@@ -519,16 +519,29 @@ class App(tk.Frame):
         )
 
     def ThreadIt(self, callback):
+        """
+        Wraps a widget callback function.
+
+        Surrounds function call with event-locking procedures and delegates
+        the call to its own thread. (TODO: This is currently not the case;
+        multithreading caused concurrency issues. Fix somehow!)
+
+        :param callback: Function to wrap.
+
+        :return: Wrapped function.
+        """
+
         def function():
             self.AcquireEventLock()
-            threading.Thread(target=callback).start()
+            callback()
+            #threading.Thread(target=callback).start()
             self.ReleaseEventLock()
 
         return function
 
     def KillITunes(self):
         """
-        Kills any iTunes instance. Checks periodically.
+        Kills any running iTunes instance. Checks periodically.
 
         :return: None.
         """
@@ -640,82 +653,22 @@ class App(tk.Frame):
         self._Master.config(menu=self._Menus["main-menu"])
 
         # Boolean variables
-        self._BooleanVars = {
-        }
+        self._BooleanVars = {}
 
         # String variables
-        self._StringVars = {
-            "head":       tk.StringVar(self._Master),
-            "body":       tk.StringVar(self._Master),
-            "head-x":     tk.StringVar(self._Master),
-            "head-y":     tk.StringVar(self._Master),
-            "body-x":     tk.StringVar(self._Master),
-            "body-y":     tk.StringVar(self._Master),
-            "state":      tk.StringVar(self._Master),
-            "frame":      tk.StringVar(self._Master),
-            "prioritize": tk.StringVar(self._Master),
-        }
+        self._StringVars = {}
 
         # Buttons
-        self._Buttons = {
-            # Export buttons
-            "export-idle":          tk.Button(),
-            "export-full":          tk.Button(),
-
-            # Previewing buttons
-            "preview-idle":         tk.Button(),
-            "preview-left":         tk.Button(),
-            "preview-right":        tk.Button(),
-
-            # Body-related buttons
-            "rebuild-body-data":    tk.Button(),
-            "rebuild-body-images":  tk.Button(),
-            "rebuild-body-offsets": tk.Button(),
-            "destroy-body-images":  tk.Button(),
-
-            # Head-related buttons
-            "rebuild-head-data":    tk.Button(),
-            "rebuild-head-images":  tk.Button(),
-            "rebuild-head-offsets": tk.Button(),
-            "destroy-head-images":  tk.Button(),
-
-            # Icon-based buttons
-            "play-button":          tk.Button(),
-            "pause-button":         tk.Button(),
-            "skip-right-button":    tk.Button(),
-            "skip-left-button":     tk.Button(),
-            "shuffle-button":       tk.Button(),
-            "shuffle-head-button":  tk.Button(),
-            "shuffle-body-button":  tk.Button(),
-            "clear-body-button":    tk.Button(),
-            "clear-head-button":    tk.Button(),
-            "reload-button":        tk.Button(),
-            "preview-idle-button":  tk.Button(),
-            "preview-left-button":  tk.Button(),
-            "preview-right-button": tk.Button(),
-            "ping-pong-button":     tk.Button(),
-            "layers-button":        tk.Button(),
-        }
+        self._Buttons = {}
 
         # Canvases
-        self._Canvases = {
-            "preview-static": tk.Canvas(self._Master),
-            "preview-anim":   tk.Canvas(self._Master),
-        }
+        self._Canvases = {}
 
         # Check buttons
-        self._Checkboxes = {
-            "pingpong-animation": tk.Checkbutton(),
-            "reverse-layers":     tk.Checkbutton(),
-        }
+        self._Checkboxes = {}
 
         # Entry widgets
-        self._Entries = {
-            "head-x": tk.Entry(),
-            "head-y": tk.Entry(),
-            "body-x": tk.Entry(),
-            "body-y": tk.Entry(),
-        }
+        self._Entries = {}
 
         # Frames
         self._Frames = {
@@ -754,17 +707,17 @@ class App(tk.Frame):
         self._OptionMenus = {
             "head":  tk.OptionMenu(
                 None,
-                self._StringVars["head"],
+                self.GetStringVar("head"),
                 *self._Data["head"]["list"]
             ),
             "body":  tk.OptionMenu(
                 None,
-                self._StringVars["body"],
+                self.GetStringVar("body"),
                 *self._Data["body"]["list"]
             ),
             "state": tk.OptionMenu(
                 None,
-                self._StringVars["state"],
+                self.GetStringVar("state"),
                 *STATES
             )
         }
@@ -851,7 +804,7 @@ class App(tk.Frame):
 
         :return: True.
         """
-        self._StringVars["body"].set(App.DEFAULT_NAME)
+        self.GetStringVar("body").set(App.DEFAULT_NAME)
         self.DoMakePreview()
 
         return True
@@ -862,7 +815,7 @@ class App(tk.Frame):
 
         :return: True.
         """
-        self._StringVars["head"].set(App.DEFAULT_NAME)
+        self.GetStringVar("head").set(App.DEFAULT_NAME)
         self.DoMakePreview()
 
         return True
@@ -899,6 +852,7 @@ class App(tk.Frame):
             else:
                 self.UpdateCurrentFrame(0)
 
+            self.CancelPending("animate")
             self.ScheduleAnimate()
 
         self.UpdateOffsetLabels()
@@ -1007,7 +961,7 @@ class App(tk.Frame):
         callback = sprite_splitter.Composite
         state = state or str(self._Animation["state"])
         color = App.COLORS["preview-static"]["bg"]
-        headfirst = self._StringVars["prioritize"].get() == "Head"
+        headfirst = self.GetStringVar("prioritize").get() == "Head"
         reverse = self.GetBooleanVar("reverse-layers").get()
 
         self.MakePreview(
@@ -1090,7 +1044,7 @@ class App(tk.Frame):
         CreateInputJSON(key)
         self.InitData(key)
         self.InitOptionMenu(
-            self._Frames["b-y1x0"],
+            self.GetFrame("b-y1x0"),
             key,
             self._Data[key]["list"],
         )
@@ -1179,7 +1133,7 @@ class App(tk.Frame):
 
         callback = sprite_splitter.Composite
         reverse = self.GetBooleanVar("reverse-layers").get()
-        headfirst = self._StringVars["prioritize"].get() == "Head"
+        headfirst = self.GetStringVars("prioritize").get() == "Head"
 
         self.DoExport(
             callback,
@@ -1211,9 +1165,13 @@ class App(tk.Frame):
 
     def GetBooleanVar(self, key):
         """
-        hhh
-        :param key:
-        :return:
+        Safely retrieves a Tkinter boolean variable at the given key.
+
+        Creates the variable if it doesn't exist yet.
+
+        :param key: Key of boolean variable to return.
+
+        :return: Boolean variable at key.
         """
         try:
             booleanVar = self._BooleanVars[key]
@@ -1221,6 +1179,23 @@ class App(tk.Frame):
             booleanVar = self._BooleanVars[key] = tk.BooleanVar()
 
         return booleanVar
+
+    def GetFrame(self, key):
+        """
+        Safely retrieves a Tkinter frame at the given key.
+
+        Creates the frame if it doesn't exist yet.
+
+        :param key: Key of frame to return.
+
+        :return: Frame at key.
+        """
+        try:
+            frame = self._Frames[key]
+        except KeyError:
+            frame = self._Frames[key] = tk.Frame()
+
+        return frame
 
     def GetKey(self, key):
         """
@@ -1230,11 +1205,28 @@ class App(tk.Frame):
 
         :return: Name's associated dictionary key.
         """
-        name = self._StringVars[key].get()
+        name = self.GetStringVar(key).get()
         if name != App.DEFAULT_NAME:
             return self._Data[key].get("data", {}).get(name, "")
         else:
             return ""
+
+    def GetStringVar(self, key):
+        """
+        Safely retrieves a Tkinter boolean variable at the given key.
+
+        Creates the variable if it doesn't exist yet.
+
+        :param key: Key of boolean variable to return.
+
+        :return: Boolean variable at key.
+        """
+        try:
+            stringVar = self._StringVars[key]
+        except KeyError:
+            stringVar = self._StringVars[key] = tk.StringVar(self._Master)
+
+        return stringVar
 
     def InitAllButtons(self):
         """
@@ -1246,14 +1238,14 @@ class App(tk.Frame):
 
         # Initialize "play animation" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "play-button",
             threadIt(self.TurnPlaybackOn),
         )
 
         # Initialize "pause animation" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "pause-button",
             threadIt(self.TurnPlaybackOff),
             relief=tk.SUNKEN,
@@ -1261,56 +1253,56 @@ class App(tk.Frame):
 
         # Initialize "skip frame right" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "skip-right-button",
             threadIt(lambda: self.FrameSkip(1)),
         )
 
         # Initialize "skip frame left" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "skip-left-button",
             threadIt(lambda: self.FrameSkip(-1)),
         )
 
         # Initialize "shuffle" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "shuffle-button",
             threadIt(lambda: self.ShuffleAll() and self.JumpFrame(0)),
         )
 
         # Initialize "shuffle body" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "shuffle-body-button",
             threadIt(lambda: self.ShuffleBody() and self.JumpFrame(0)),
         )
 
         # Initialize "shuffle head" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "shuffle-head-button",
             threadIt(lambda: self.ShuffleHead() and self.JumpFrame(0)),
         )
 
         # Initialize "clear body" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "clear-body-button",
             threadIt(lambda: self.ClearBody() and self.JumpFrame(0)),
         )
 
         # Initialize "clear head" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "clear-head-button",
             threadIt(lambda: self.ClearHead() and self.JumpFrame(0)),
         )
 
         # Initialize "reload" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "reload-button",
             threadIt(
                 lambda: self.DoRemakeOffset("head")
@@ -1322,7 +1314,7 @@ class App(tk.Frame):
 
         # Initialize "idle preview" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "preview-idle-button",
             threadIt(
                 lambda: self.DoMakePreview(state="idle")
@@ -1336,40 +1328,40 @@ class App(tk.Frame):
 
         # Initialize "left preview" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "preview-left-button",
             threadIt(
                 lambda: self.DoMakePreview(state="left")
-                    and self.DoPressButton("preview-left-button")
-                    and self.DoUnpressButton("preview-idle-button")
-                    and self.DoUnpressButton("preview-right-button")
-                    and self.JumpFrame(0)
+                        and self.DoPressButton("preview-left-button")
+                        and self.DoUnpressButton("preview-idle-button")
+                        and self.DoUnpressButton("preview-right-button")
+                        and self.JumpFrame(0)
             ),
         )
 
         # Initialize "right preview" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "preview-right-button",
             threadIt(
                 lambda: self.DoMakePreview(state="right")
-                    and self.DoPressButton("preview-right-button")
-                    and self.DoUnpressButton("preview-left-button")
-                    and self.DoUnpressButton("preview-idle-button")
-                    and self.JumpFrame(0)
+                        and self.DoPressButton("preview-right-button")
+                        and self.DoUnpressButton("preview-left-button")
+                        and self.DoUnpressButton("preview-idle-button")
+                        and self.JumpFrame(0)
             ),
         )
 
         # Initialize "ping-pong" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "ping-pong-button",
             threadIt(self.TogglePingpong),
         )
 
         # Initialize "reverse layers" button
         self.InitButton(
-            self._Frames["d-y0x0"],
+            self.GetFrame("d-y0x0"),
             "layers-button",
             threadIt(self.ToggleReverseLayers),
         )
@@ -1384,14 +1376,14 @@ class App(tk.Frame):
         """
         # Initialize "static preview" canvas
         self.InitCanvas(
-            self._Frames["a-y1x0"],
+            self.GetFrame("a-y1x0"),
             "preview-static",
             App.CANVAS_BORDERS,
         )
 
         # Initialize "animated preview" canvas
         self.InitCanvas(
-            self._Frames["a-y1x0"],
+            self.GetFrame("a-y1x0"),
             "preview-anim",
             App.CANVAS_BORDERS,
         )
@@ -1426,7 +1418,7 @@ class App(tk.Frame):
         """
         # Initialize "body x-coordinate" entry
         self.InitEntry(
-            self._Frames["c-y1x0a"],
+            self.GetFrame("c-y1x0a"),
             "body-x",
             tk.W,
             text="+0",
@@ -1434,7 +1426,7 @@ class App(tk.Frame):
         )
         # Initialize "body y-coordinate" entry
         self.InitEntry(
-            self._Frames["c-y1x0a"],
+            self.GetFrame("c-y1x0a"),
             "body-y",
             tk.W,
             text="+0",
@@ -1442,7 +1434,7 @@ class App(tk.Frame):
         )
         # Initialize "head x-coordinate" entry
         self.InitEntry(
-            self._Frames["c-y0x0a"],
+            self.GetFrame("c-y0x0a"),
             "head-x",
             tk.W,
             text="+0",
@@ -1450,7 +1442,7 @@ class App(tk.Frame):
         )
         # Initialize "head y-coordinate" entry
         self.InitEntry(
-            self._Frames["c-y0x0a"],
+            self.GetFrame("c-y0x0a"),
             "head-y",
             tk.W,
             text="+0",
@@ -1470,24 +1462,24 @@ class App(tk.Frame):
         self.InitFrame(self._Master, "a-y2x0")
 
         # Container frames
-        self.InitFrame(self._Frames["a-y1x0"], "b-y0x3")
-        self.InitFrame(self._Frames["a-y2x0"], "b-y1x0")
-        self.InitFrame(self._Frames["a-y2x0"], "b-y1x1")
-        self.InitFrame(self._Frames["b-y1x0"], "c-y0x0a")
-        self.InitFrame(self._Frames["b-y1x0"], "c-y1x0a")
-        self.InitFrame(self._Frames["b-y1x0"], "c-y7x0")
-        self.InitFrame(self._Frames["b-y1x1"], "c-y0x0b")
-        self.InitFrame(self._Frames["b-y1x1"], "c-y0x1")
-        self.InitFrame(self._Frames["c-y0x1"], "d-y0x0")
-        self.InitFrame(self._Frames["c-y0x1"], "d-y1x0")
+        self.InitFrame(self.GetFrame("a-y1x0"), "b-y0x3")
+        self.InitFrame(self.GetFrame("a-y2x0"), "b-y1x0")
+        self.InitFrame(self.GetFrame("a-y2x0"), "b-y1x1")
+        self.InitFrame(self.GetFrame("b-y1x0"), "c-y0x0a")
+        self.InitFrame(self.GetFrame("b-y1x0"), "c-y1x0a")
+        self.InitFrame(self.GetFrame("b-y1x0"), "c-y7x0")
+        self.InitFrame(self.GetFrame("b-y1x1"), "c-y0x0b")
+        self.InitFrame(self.GetFrame("b-y1x1"), "c-y0x1")
+        self.InitFrame(self.GetFrame("c-y0x1"), "d-y0x0")
+        self.InitFrame(self.GetFrame("c-y0x1"), "d-y1x0")
 
         # Padding frames
-        self.InitFrame(self._Frames["a-y1x0"], "pad-a-y1x0")
-        self.InitFrame(self._Frames["a-y2x0"], "pad-a-y2x0a")
-        self.InitFrame(self._Frames["a-y2x0"], "pad-a-y2x0b")
-        self.InitFrame(self._Frames["b-y0x3"], "pad-b-y0x3")
-        self.InitFrame(self._Frames["b-y1x0"], "pad-b-y1x0")
-        self.InitFrame(self._Frames["d-y1x0"], "pad-d-y1x0")
+        self.InitFrame(self.GetFrame("a-y1x0"), "pad-a-y1x0")
+        self.InitFrame(self.GetFrame("a-y2x0"), "pad-a-y2x0a")
+        self.InitFrame(self.GetFrame("a-y2x0"), "pad-a-y2x0b")
+        self.InitFrame(self.GetFrame("b-y0x3"), "pad-b-y0x3")
+        self.InitFrame(self.GetFrame("b-y1x0"), "pad-b-y1x0")
+        self.InitFrame(self.GetFrame("d-y1x0"), "pad-d-y1x0")
         self.InitFrame(self._Master, "pad-master-y0x0")
 
         return True
@@ -1500,7 +1492,7 @@ class App(tk.Frame):
         """
         # Initialize "animation speed" label
         self.InitLabel(
-            self._Frames["b-y1x0"],
+            self.GetFrame("b-y1x0"),
             "speed-anim",
             ("calibri", App.FONTSIZE_SMALL),
             tk.W, 0,
@@ -1508,7 +1500,7 @@ class App(tk.Frame):
 
         # Initialize "current frame" label
         self.InitLabel(
-            self._Frames["b-y1x0"],
+            self.GetFrame("b-y1x0"),
             "frame-label",
             ("calibri", App.FONTSIZE_SMALL),
             tk.SW,
@@ -1516,7 +1508,7 @@ class App(tk.Frame):
 
         # Initialize "static frames preview" label
         self.InitLabel(
-            self._Frames["a-y1x0"],
+            self.GetFrame("a-y1x0"),
             "preview-frames-label",
             ("calibri", App.FONTSIZE_SMALL),
             tk.W,
@@ -1685,7 +1677,7 @@ class App(tk.Frame):
         self.InitRadio(
             self._Frames["d-y1x0"],
             "prioritize-1",
-            self._StringVars["prioritize"],
+            self.GetStringVar("prioritize"),
             "Head",
             tk.W,
             select=True,
@@ -1695,7 +1687,7 @@ class App(tk.Frame):
         self.InitRadio(
             self._Frames["d-y1x0"],
             "prioritize-2",
-            self._StringVars["prioritize"],
+            self.GetStringVar("prioritize"),
             "Body",
             tk.W,
         )
@@ -1704,7 +1696,7 @@ class App(tk.Frame):
         self.InitRadio(
             self._Frames["c-y7x0"],
             "frame-0",
-            self._StringVars["frame"],
+            self.GetStringVar("frame"),
             "0",
             tk.W,
             select=True,
@@ -1715,7 +1707,7 @@ class App(tk.Frame):
         self.InitRadio(
             self._Frames["c-y7x0"],
             "frame-1",
-            self._StringVars["frame"],
+            self.GetStringVar("frame"),
             "1",
             tk.W,
             command=self.ThreadIt(lambda: self.JumpFrame(1)),
@@ -1725,7 +1717,7 @@ class App(tk.Frame):
         self.InitRadio(
             self._Frames["c-y7x0"],
             "frame-2",
-            self._StringVars["frame"],
+            self.GetStringVar("frame"),
             "2",
             tk.W,
             command=self.ThreadIt(lambda: self.JumpFrame(2)),
@@ -1735,7 +1727,7 @@ class App(tk.Frame):
         self.InitRadio(
             self._Frames["c-y7x0"],
             "frame-3",
-            self._StringVars["frame"],
+            self.GetStringVar("frame"),
             "3",
             tk.W,
             command=self.ThreadIt(lambda: self.JumpFrame(3)),
@@ -1919,7 +1911,7 @@ class App(tk.Frame):
 
         :return: True
         """
-        stringVar = self._StringVars[tag]
+        stringVar = self.GetStringVar(tag)
         stringVar.set(str(text))
         entry = tk.Entry(
             master,
@@ -2057,10 +2049,11 @@ class App(tk.Frame):
         width = App.SIZES["default-menu"][0]
         foreground = App.FromRGB(*App.COLORS[tag]["fg"])
         background = App.FromRGB(*App.COLORS[tag]["bg"])
+        stringVar = self.GetStringVar(tag)
 
-        self._StringVars[tag].set(App.LABELS[tag])
+        stringVar.set(App.LABELS[tag])
 
-        optionmenu = tk.OptionMenu(master, self._StringVars[tag], *options)
+        optionmenu = tk.OptionMenu(master, stringVar, *options)
         optionmenu.config(
             width=width,
             foreground=foreground,
@@ -2245,7 +2238,7 @@ class App(tk.Frame):
             image=image,
         )
 
-        #self.DrawFrameLabels()
+        # self.DrawFrameLabels()
 
         return True
 
@@ -2417,8 +2410,8 @@ class App(tk.Frame):
 
         :return: True.
         """
-        self._StringVars["body"].set(random.choice(self._Data["body"]["list"]))
-        self._StringVars["head"].set(random.choice(self._Data["head"]["list"]))
+        self.GetStringVar("body").set(random.choice(self._Data["body"]["list"]))
+        self.GetStringVar("head").set(random.choice(self._Data["head"]["list"]))
         self.DoMakePreview()
 
         return True
@@ -2429,7 +2422,7 @@ class App(tk.Frame):
 
         :return: True.
         """
-        self._StringVars["body"].set(random.choice(self._Data["body"]["list"]))
+        self.GetStringVar("body").set(random.choice(self._Data["body"]["list"]))
         self.DoMakePreview()
 
         return True
@@ -2440,7 +2433,7 @@ class App(tk.Frame):
 
         :return: True.
         """
-        self._StringVars["head"].set(random.choice(self._Data["head"]["list"]))
+        self.GetStringVar("head").set(random.choice(self._Data["head"]["list"]))
         self.DoMakePreview()
 
         return True
@@ -2574,12 +2567,12 @@ class App(tk.Frame):
         strvary = "{}-y".format(key)
         try:
             xy = self._Data[key]["current"]["offset"][state][frame]
-            self._StringVars[strvarx].set("{0:+d}".format(xy[0]))
-            self._StringVars[strvary].set("{0:+d}".format(xy[1]))
+            self.GetStringVar(strvarx).set("{0:+d}".format(xy[0]))
+            self.GetStringVar(strvary).set("{0:+d}".format(xy[1]))
 
         except (KeyError, IndexError):
-            self._StringVars[strvarx].set("{0:+d}".format(0))
-            self._StringVars[strvary].set("{0:+d}".format(0))
+            self.GetStringVar(strvarx).set("{0:+d}".format(0))
+            self.GetStringVar(strvary).set("{0:+d}".format(0))
 
         return True
 
