@@ -1839,13 +1839,16 @@ class App(tk.Frame):
 
         :return: True.
         """
-        data = self._Data[key]["data"] = {
+        newPaths = LoadPaths(key)
+        newOffsets = LoadOffsets(key)
+
+        names = self._Data[key]["data"] = {
             v.get("name", "---"): k
-            for k, v in LoadPaths(key).items()
+            for k, v in newPaths.items()
         }
 
-        self._Data[key]["list"] = [App.DEFAULT_NAME] + sorted(list(data))
-        self._Data[key]["offset"] = LoadOffsets(key)
+        self._Data[key]["list"] = [App.DEFAULT_NAME] + sorted(list(names))
+        self._Data[key]["offset"] = newOffsets
 
         return True
 
