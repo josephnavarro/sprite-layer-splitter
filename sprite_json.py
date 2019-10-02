@@ -69,7 +69,6 @@ def CreateInputJSON(key, profile):
     path = os.path.join(PATHS["images"], profile, key, "*.png")
     contents = ""
     for fn in sorted(glob.glob(path)):
-        print(path)
         n = os.path.splitext(os.path.basename(fn))[0]
         p = " ".join([(
             "({})".format(x.capitalize())

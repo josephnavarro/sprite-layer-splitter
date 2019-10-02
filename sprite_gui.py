@@ -617,13 +617,13 @@ class App(EasyGUI):
             "body":    {
                 "current": {},
                 "data":    {},
-                "list":    [""],
+                "list":    [self.DEFAULT_NAME],
                 "offset":  {},
             },
             "head":    {
                 "current": {},
                 "data":    {},
-                "list":    [""],
+                "list":    [self.DEFAULT_NAME],
                 "offset":  {},
             },
         }
@@ -1721,7 +1721,6 @@ class App(EasyGUI):
                     self.update_offset_labels()
 
                 except cv2.error:
-                    print("oops")
                     raise InvalidFilenameException
 
         except InvalidFilenameException:
