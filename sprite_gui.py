@@ -150,7 +150,7 @@ class App(tk.Frame):
         "pad-a-y2x0b":          [0, 10],
         "pad-b-y0x3":           [1, 10],
         "pad-b-y1x0":           [0, 16],
-        "pad-c-y1x0a":          [15, 16],
+        "pad-c-y1x0a":          [2, 16],
         "pad-d-y1x0":           [0, 16],
         "pad-master-y0x0":      [0, 10],
 
@@ -244,18 +244,18 @@ class App(tk.Frame):
         "body":                 [1, 0],
 
         "offset-body":          [0, 0],
-        "body-x-label":         [0, 1],
-        "body-x":               [0, 2],
-        "body-y-label":         [0, 3],
-        "body-y":               [0, 4],
-        "body-size":            [0, 5],
+        "body-x-label":         [0, 2],
+        "body-x":               [0, 3],
+        "body-y-label":         [0, 4],
+        "body-y":               [0, 5],
+        "body-size":            [0, 6],
 
         "offset-head":          [0, 0],
-        "head-x-label":         [0, 1],
-        "head-x":               [0, 2],
-        "head-y-label":         [0, 3],
-        "head-y":               [0, 4],
-        "head-size":            [0, 5],
+        "head-x-label":         [0, 2],
+        "head-x":               [0, 3],
+        "head-y-label":         [0, 4],
+        "head-y":               [0, 5],
+        "head-size":            [0, 6],
 
         "speed-anim":           [6, 0],
         "frame-label":          [7, 0],
@@ -1849,7 +1849,12 @@ class App(tk.Frame):
 
         return True
 
-    def InitEntry(self, master, tag, sticky, text="", disabled=True,
+    def InitEntry(self,
+                  master,
+                  tag,
+                  sticky,
+                  text="",
+                  disabled=True,
                   justify=tk.LEFT):
         """
         Initializes an entry widget.
@@ -2186,7 +2191,7 @@ class App(tk.Frame):
             image=image,
         )
 
-        # self.DrawFrameLabels()
+        #self.DrawFrameLabels()
 
         return True
 
@@ -2524,6 +2529,24 @@ class App(tk.Frame):
 
         return True
 
+    def UpdateSizeLabel(self, key):
+        """
+        Updates labels for current frame's size (e.g. "small" or "large").
+
+        :param key: Either of "head" or "body".
+
+        :return: True.
+        """
+        strvar = "{}-size".format(key)
+        try:
+            size = self._Data[key]["current"]["size"]
+            self.GetStringVar(strvar).set(size.capitalize())
+
+        except (KeyError, IndexError):
+            self.GetStringVar(strvar).set("Large")
+
+        return True
+
     def UpdateAnimationImage(self):
         """
         Updates currently-previewed animation frame.
@@ -2559,6 +2582,7 @@ class App(tk.Frame):
 
         self.UpdateOffsetLabel("head", state, frame)
         self.UpdateOffsetLabel("body", state, frame)
+        self.UpdateSizeLabel("head")
 
         return True
 
