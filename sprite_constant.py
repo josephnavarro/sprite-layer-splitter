@@ -9,7 +9,6 @@ Definitions of constant values.
 import os
 from namedenumiter import NamedEnumIter
 
-
 """ 
 Colors to avoid copying at all. 
 """
@@ -18,8 +17,11 @@ IGNORED_COLORS = [
     0xFF,  # White
 ]
 
+"""
+Various source directories.
+"""
 DIRECTORIES = {
-    "input": {
+    "input":  {
         "root": os.path.join("inputs", ""),
         "body": os.path.join("inputs", "images", "body"),
         "head": os.path.join("inputs", "images", "head"),
@@ -55,6 +57,14 @@ COLORS = NamedEnumIter(
     "red",
     "green",
     "purple",
+)
+
+"""
+Recognized sprite profiles.
+"""
+PROFILES = NamedEnumIter(
+    "echoes",
+    "fates",
 )
 
 """ 

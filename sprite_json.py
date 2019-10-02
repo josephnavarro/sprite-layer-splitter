@@ -13,13 +13,13 @@ from sprite_utils import *
 
 JSON_TEMPLATES = {
     "base": "{{{}}}",
-    "head": "\"{name}\": {{"
-            "\"path\": [\"images\", \"head\", \"{name}.png\"],"
-            "\"name\": \"{full}\""
+    "head": "\"{name}\":{{"
+            "\"path\":[\"images\",\"head\",\"{name}.png\"],"
+            "\"name\":\"{full}\""
             "}},",
-    "body": "\"{name}\": {{"
-            "\"path\": [\"images\", \"body\", \"{name}.png\"],"
-            "\"name\": \"{full}\""
+    "body": "\"{name}\":{{"
+            "\"path\":[\"images\",\"body\",\"{name}.png\"],"
+            "\"name\":\"{full}\""
             "}},",
 }
 
@@ -50,7 +50,8 @@ JSONS = {
     },
 }
 
-JSON_KEY_DEFAULT = "?.default"
+JSON_KEY_RESERVE = "?.{}"
+JSON_KEY_DEFAULT = JSON_KEY_RESERVE.format("default")
 
 
 def CreateInputJSON(key):
@@ -144,8 +145,3 @@ def LoadSourceCropping():
     with open(JSONS["sources"]["crop"], "r") as f:
         data = json.load(f)
     return data
-
-
-if __name__ == "__main__":
-    CreateInputJSON("head")
-    CreateInputJSON("body")

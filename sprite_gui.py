@@ -9,13 +9,14 @@ Graphical user interface layer.
 import cv2
 import psutil
 import random
-import threading
+# import threading
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import filedialog
 
 import sprite_imaging
 import sprite_splitter
+from gui import EasyGUI
 from sprite_prepare import *
 from sprite_utils import *
 
@@ -67,424 +68,445 @@ class UnspecifiedHeadException(Exception):
     pass
 
 
-class App(tk.Frame):
-    WINDOW_TITLE = "Fire Emblem 3DS Sprite Tool"
-
-    # Compositing tags
+class App(EasyGUI):
+    # Composition tag(s)
     DEFAULT_NAME = "None"
+    DEFAULT_PROFILE = PROFILES.echoes, str()
 
-    # Popup message text content
-    MESSAGES = {
-        "confirm": {
-            "rebuild": {
-                "data":   {
-                    "body": "Refresh list of available bodies?",
-                    "head": "Refresh list of available heads?",
-                },
-                "image":  {
-                    "body": "Remake source images for body sprites?",
-                    "head": "Remake source images for head sprites?",
-                },
-                "offset": {
-                    "body": "Refresh body sprite offsets?",
-                    "head": "Refresh head sprite offsets?",
-                },
-            },
-            "destroy": {
-                "head": "Delete source images for head sprites?",
-                "body": "Delete source images for body sprites?",
-            }
-        },
-        "message": {
-            "destroy": {
-                "head": "Completely deleted all head sources.",
-                "body": "Completely deleted all body sources.",
-            },
-            "failure": {
-                "body": "Error: Body not specified!",
-                "head": "Error: Head not specified!",
-                "type": "Error: Invalid image format specified!",
-            },
-            "invalid": {
-                "body": "Error: Body spritesheet {} does not exist!",
-                "head": "Error: Head spritesheet {} does not exist!",
-            },
-            "rebuild": {
-                "image":  {
-                    "body": "Succssfully reconstructed body source images.",
-                    "head": "Successfully reconstructed head source images.",
-                },
-                "data":   {
-                    "body": "Reassembled list of available bodies.",
-                    "head": "Reassembled list of available heads.",
-                },
-                "offset": {
-                    "body": "Successfully reloaded per-frame body offsets.",
-                    "head": "Successfully reloaded per-frame head offsets.",
-                },
-            },
-            "success": {
-                "full": "Sprite frames saved to {}!",
-                "idle": "Idle frames saved to {}!",
-            }
-        }
-    }
-
-    # Default widget dimensions
-    SIZES = {
-        # Frames
-        "a-y1x0":               [0, 0],
-        "a-y2x0":               [0, 0],
-        "b-y0x3":               [0, 0],
-        "b-y1x0":               [0, 0],
-        "b-y1x1":               [0, 0],
-        "c-y0x0a":              [0, 0],
-        "c-y1x0a":              [0, 0],
-        "c-y7x0":               [0, 0],
-        "c-y0x0b":              [0, 0],
-        "c-y0x1":               [0, 0],
-        "d-y0x0":               [0, 0],
-        "d-y1x0":               [0, 0],
-        "pad-a-y1x0":           [0, 10],
-        "pad-a-y2x0a":          [0, 10],
-        "pad-a-y2x0b":          [0, 10],
-        "pad-b-y0x3":           [1, 10],
-        "pad-b-y1x0":           [0, 16],
-        "pad-c-y1x0a":          [2, 16],
-        "pad-d-y1x0":           [0, 16],
-        "pad-master-y0x0":      [0, 10],
-
-        # Preview canvases (pixels)
-        "preview-anim":         [96, 96],
-        "preview-resize":       [384, 96],
-        "preview-static":       [384, 96],
-
-        # Entry widgets (characters)
-        "body-x":               [5, 1],
-        "body-y":               [5, 1],
-        "body-size":            [7, 1],
-        "head-x":               [5, 1],
-        "head-y":               [5, 1],
-        "head-size":            [7, 1],
-
-        # Icon-based buttons (pixels)
-        "play-button":          [32, 32],
-        "pause-button":         [32, 32],
-        "skip-right-button":    [32, 32],
-        "skip-left-button":     [32, 32],
-        "shuffle-button":       [32, 32],
-        "shuffle-body-button":  [32, 32],
-        "shuffle-head-button":  [32, 32],
-        "clear-body-button":    [32, 32],
-        "clear-head-button":    [32, 32],
-        "reload-button":        [32, 32],
-        "preview-idle-button":  [32, 32],
-        "preview-left-button":  [32, 32],
-        "preview-right-button": [32, 32],
-        "ping-pong-button":     [32, 32],
-        "layers-button":        [32, 32],
-    }
-
-    if IsWindows():
-        # Windows
-        SIZES["default-button"] = [36, 0]
-        SIZES["default-menu"] = [37, 0]
-        SIZES["default-slider"] = [200, 0]
-
-        FONTSIZE_VAR_W = 13
-        FONTSIZE_MONOS = 10
-        FONTSIZE_SMALL = 9
-        CANVAS_BORDERS = 13
-
-    else:
-        # OS X / Linux
-        SIZES["default-button"] = [28, 0]
-        SIZES["default-menu"] = [25, 0]
-        SIZES["default-slider"] = [200, 0]
-
-        FONTSIZE_VAR_W = 14
-        FONTSIZE_MONOS = 14
-        FONTSIZE_SMALL = 13
-        CANVAS_BORDERS = 13
-
-    GRID = {
-        # Frames
-        "a-y1x0":               [1, 0],
-        "a-y2x0":               [2, 0],
-        "b-y0x3":               [0, 3],
-        "b-y1x0":               [1, 0],
-        "b-y1x1":               [1, 1],
-        "c-y0x0a":              [4, 0],
-        "c-y1x0a":              [5, 0],
-        "c-y7x0":               [7, 0],
-        "c-y0x0b":              [0, 0],
-        "c-y0x1":               [0, 1],
-        "d-y0x0":               [0, 0],
-        "d-y1x0":               [1, 0],
-        "pad-a-y1x0":           [1, 0],
-        "pad-a-y2x0a":          [6, 0],
-        "pad-a-y2x0b":          [24, 0],
-        "pad-b-y0x3":           [0, 0],
-        "pad-b-y1x0":           [2, 0],
-        "pad-c-y1x0a":          [0, 1],
-        "pad-d-y1x0":           [0, 0],
-        "pad-master-y0x0":      [0, 0],
-
-        # Preview canvases
-        "preview-static":       [0, 1],
-        "preview-anim":         [0, 2],
-        "preview-frames-label": [1, 1],
-        "preview-anim-label":   [1, 2],
-
-        # Speed slider
-        "speed-slider":         [0, 0],
-
-        # Left column
-        "head":                 [0, 0],
-        "body":                 [1, 0],
-
-        "offset-body":          [0, 0],
-        "body-x-label":         [0, 2],
-        "body-x":               [0, 3],
-        "body-y-label":         [0, 4],
-        "body-y":               [0, 5],
-        "body-size":            [0, 6],
-
-        "offset-head":          [0, 0],
-        "head-x-label":         [0, 2],
-        "head-x":               [0, 3],
-        "head-y-label":         [0, 4],
-        "head-y":               [0, 5],
-        "head-size":            [0, 6],
-
-        "speed-anim":           [6, 0],
-        "frame-label":          [7, 0],
-        "frame-0":              [7, 1],
-        "frame-1":              [7, 2],
-        "frame-2":              [7, 3],
-        "frame-3":              [7, 4],
-
-        # Right column
-        "reload-button":        [0, 1],
-        "play-button":          [0, 2],
-        "pause-button":         [0, 3],
-        "skip-left-button":     [0, 4],
-        "skip-right-button":    [0, 5],
-        "preview-idle-button":  [1, 1],
-        "preview-left-button":  [1, 2],
-        "preview-right-button": [1, 3],
-        "ping-pong-button":     [1, 4],
-        "layers-button":        [1, 5],
-        "shuffle-button":       [2, 1],
-        "shuffle-body-button":  [2, 2],
-        "shuffle-head-button":  [2, 3],
-        "clear-body-button":    [2, 4],
-        "clear-head-button":    [2, 5],
-
-        "prioritize-label":     [16, 1],
-        "prioritize-1":         [17, 1],
-        "prioritize-2":         [18, 1],
-    }
-
-    # Padding for widgets
-    PAD = {
-        # Frames
-        "a-y1x0":               [0, 0],
-        "a-y2x0":               [0, 0],
-        "b-y0x3":               [0, 0],
-        "b-y1x0":               [0, 0],
-        "b-y1x1":               [0, 0],
-        "c-y0x0a":              [0, 0],
-        "c-y1x0a":              [0, 0],
-        "c-y7x0":               [0, 0],
-        "c-y0x0b":              [0, 0],
-        "c-y0x1":               [0, 0],
-        "d-y0x0":               [0, 0],
-        "d-y1x0":               [0, 0],
-        "pad-a-y1x0":           [0, 0],
-        "pad-a-y2x0a":          [0, 0],
-        "pad-a-y2x0b":          [0, 0],
-        "pad-b-y0x3":           [0, 0],
-        "pad-b-y1x0":           [0, 0],
-        "pad-d-y1x0":           [0, 0],
-        "pad-master-y0x0":      [0, 0],
-
-        # Preview canvases
-        "preview-frames-label": [0, 0],
-        "preview-anim-label":   [0, 0],
-        "preview-static":       [0, 0],
-        "preview-anim":         [0, 0],
-
-        # Frame data readout
-        "speed-anim":           [0, 0],
-        "offset-head":          [0, 0],
-        "offset-body":          [0, 0],
-        "head-x-label":         [0, 0],
-        "head-x":               [0, 0],
-        "head-y-label":         [0, 0],
-        "head-y":               [0, 0],
-        "head-size":            [0, 0],
-        "body-x-label":         [0, 0],
-        "body-x":               [0, 0],
-        "body-y-label":         [0, 0],
-        "body-y":               [0, 0],
-        "body-size":            [0, 0],
-        "frame-label":          [0, 0],
-        "frame-0":              [0, 0],
-        "frame-1":              [0, 0],
-        "frame-2":              [0, 0],
-        "frame-3":              [0, 0],
-
-        # Layer collision resolution
-        "prioritize-label":     [4, 4],
-        "prioritize-1":         [0, 0],
-        "prioritize-2":         [0, 0],
-
-        # Preview options
-        "head":                 [4, 4],
-        "body":                 [4, 4],
-
-        # Icon-based buttons
-        "play-button":          [0, 0],
-        "pause-button":         [0, 0],
-        "skip-left-button":     [0, 0],
-        "skip-right-button":    [0, 0],
-        "shuffle-button":       [0, 0],
-        "shuffle-body-button":  [0, 0],
-        "shuffle-head-button":  [0, 0],
-        "clear-body-button":    [0, 0],
-        "clear-head-button":    [0, 0],
-        "reload-button":        [0, 0],
-        "preview-idle-button":  [0, 0],
-        "preview-left-button":  [0, 0],
-        "preview-right-button": [0, 0],
-        "ping-pong-button":     [0, 0],
-        "layers-button":        [0, 0],
-    }
-
-    # Preview composition dimensions
+    # Dimensions for sprite previews
     RECTS = {
         "idle":  [0, 0, 128, 32],
         "left":  [0, 32, 128, 32],
         "right": [0, 64, 128, 32],
     }
 
-    # Button and menu text labels
-    LABELS = {
-        # Menus
-        "head-menu":            "Head",
-        "body-menu":            "Body",
-        "export-menu":          "Export",
-
-        # Canvas captions
-        "preview-frames-label": "Static frame preview",
-        "preview-anim-label":   "Animated preview",
-
-        # Export options
-        "export-full":          "Export all frames",
-        "export-idle":          "Export idle frames",
-
-        # Body options
-        "body":                 "Select body",
-        "rebuild-body-images":  "Remake body sources",
-        "rebuild-body-data":    "Refresh body listing",
-        "rebuild-body-offsets": "Refresh body offsets",
-        "destroy-body-images":  "Clean body sources",
-
-        # Head options
-        "head":                 "Select head",
-        "rebuild-head-images":  "Remake head sources",
-        "rebuild-head-data":    "Refresh head listing",
-        "rebuild-head-offsets": "Refresh head offsets",
-        "destroy-head-images":  "Clean head sources",
-
-        # Frame data readout
-        "offset-body":          "Body:",
-        "offset-head":          "Head:",
-        "body-x-label":         "X",
-        "body-y-label":         "Y",
-        "head-x-label":         "X",
-        "head-y-label":         "Y",
-        "speed-anim":           "Speed:  {0:d}",
-        "frame-label":          "Frame:",
-        "frame-0":              "0",
-        "frame-1":              "1",
-        "frame-2":              "2",
-        "frame-3":              "3",
-
-        # Layer collision resolution
-        "prioritize-label":     "On layer collision",
-        "prioritize-1":         "Paste head first",
-        "prioritize-2":         "Paste body first",
-
-        # Icon-based buttons
-        "play-button":          "",
-        "pause-button":         "",
-        "skip-right-button":    "",
-        "skip-left-button":     "",
-        "shuffle-button":       "",
-        "shuffle-body-button":  "",
-        "shuffle-head-button":  "",
-        "clear-body-button":    "",
-        "clear-head-button":    "",
-        "reload-button":        "",
-        "preview-idle-button":  "",
-        "preview-left-button":  "",
-        "preview-right-button": "",
-        "ping-pong-button":     "",
-        "layers-button":        "",
-    }
-
-    # Button icon images
-    IMAGES = {
-        "play-button":          os.path.join("misc", "play.png"),
-        "pause-button":         os.path.join("misc", "pause.png"),
-        "skip-right-button":    os.path.join("misc", "forward.png"),
-        "skip-left-button":     os.path.join("misc", "backward.png"),
-        "shuffle-button":       os.path.join("misc", "shuffle.png"),
-        "shuffle-body-button":  os.path.join("misc", "shuffle-body.png"),
-        "shuffle-head-button":  os.path.join("misc", "shuffle-head.png"),
-        "clear-body-button":    os.path.join("misc", "clear-body.png"),
-        "clear-head-button":    os.path.join("misc", "clear-head.png"),
-        "reload-button":        os.path.join("misc", "reload.png"),
-        "preview-idle-button":  os.path.join("misc", "idle.png"),
-        "preview-left-button":  os.path.join("misc", "left.png"),
-        "preview-right-button": os.path.join("misc", "right.png"),
-        "ping-pong-button":     os.path.join("misc", "ping-pong.png"),
-        "layers-button":        os.path.join("misc", "layers.png"),
-    }
-
-    # Widget colors (RGB, foreground + background)
-    COLORS = {
-        "head":                 {"fg": [0, 0, 0], "bg": [200, 224, 255]},
-        "body":                 {"fg": [0, 0, 0], "bg": [255, 200, 200]},
-        "preview-static":       {"fg": [0, 0, 0], "bg": [128, 128, 128]},
-        "preview-anim":         {"fg": [0, 0, 0], "bg": [128, 128, 128]},
-
-        # Icon-based buttons
-        "play-button":          {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "pause-button":         {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "skip-right-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "skip-left-button":     {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "shuffle-button":       {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "shuffle-head-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "shuffle-body-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "clear-body-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "clear-head-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "reload-button":        {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "preview-idle-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "preview-left-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "preview-right-button": {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "ping-pong-button":     {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-        "layers-button":        {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-    }
-
-    # Animation speed slider
+    # Constants for animation slider
     SPEED_SCALE_MIN = 0
     SPEED_SCALE_MAX = 12
 
+    @property
+    def colors(self) -> dict:
+        return {
+            "head":                 {"fg": [0, 0, 0], "bg": [200, 224, 255]},
+            "body":                 {"fg": [0, 0, 0], "bg": [255, 200, 200]},
+            "preview-static":       {"fg": [0, 0, 0], "bg": [128, 128, 128]},
+            "preview-anim":         {"fg": [0, 0, 0], "bg": [128, 128, 128]},
+
+            # Icon-based buttons
+            "play-button":          {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "pause-button":         {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "skip-right-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "skip-left-button":     {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "shuffle-button":       {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "shuffle-head-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "shuffle-body-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "clear-body-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "clear-head-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "reload-button":        {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "preview-idle-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "preview-left-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "preview-right-button": {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "ping-pong-button":     {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "layers-button":        {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+        }
+
+    @property
+    def event_lock_delay(self) -> int:
+        return 333
+
+    @property
+    def grid(self) -> dict:
+        return {
+            # Frames
+            "a-y1x0":               [1, 0],
+            "a-y2x0":               [2, 0],
+            "b-y0x3":               [0, 3],
+            "b-y1x0":               [1, 0],
+            "b-y1x1":               [1, 1],
+            "c-y0x0a":              [4, 0],
+            "c-y1x0a":              [5, 0],
+            "c-y7x0":               [7, 0],
+            "c-y0x0b":              [0, 0],
+            "c-y0x1":               [0, 1],
+            "d-y0x0":               [0, 0],
+            "d-y1x0":               [1, 0],
+            "pad-a-y1x0":           [1, 0],
+            "pad-a-y2x0a":          [6, 0],
+            "pad-a-y2x0b":          [24, 0],
+            "pad-b-y0x3":           [0, 0],
+            "pad-b-y1x0":           [2, 0],
+            "pad-c-y1x0a":          [0, 1],
+            "pad-d-y1x0":           [0, 0],
+            "pad-master-y0x0":      [0, 0],
+
+            # Preview canvases
+            "preview-static":       [0, 1],
+            "preview-anim":         [0, 2],
+            "preview-frames-label": [1, 1],
+            "preview-anim-label":   [1, 2],
+
+            # Speed slider
+            "speed-slider":         [0, 0],
+
+            # Left column
+            "head":                 [0, 0],
+            "body":                 [1, 0],
+
+            "offset-body":          [0, 0],
+            "body-x-label":         [0, 2],
+            "body-x":               [0, 3],
+            "body-y-label":         [0, 4],
+            "body-y":               [0, 5],
+            "body-size":            [0, 6],
+
+            "offset-head":          [0, 0],
+            "head-x-label":         [0, 2],
+            "head-x":               [0, 3],
+            "head-y-label":         [0, 4],
+            "head-y":               [0, 5],
+            "head-size":            [0, 6],
+
+            "speed-anim":           [6, 0],
+            "frame-label":          [7, 0],
+            "frame-0":              [7, 1],
+            "frame-1":              [7, 2],
+            "frame-2":              [7, 3],
+            "frame-3":              [7, 4],
+
+            # Right column
+            "reload-button":        [0, 1],
+            "play-button":          [0, 2],
+            "pause-button":         [0, 3],
+            "skip-left-button":     [0, 4],
+            "skip-right-button":    [0, 5],
+            "preview-idle-button":  [1, 1],
+            "preview-left-button":  [1, 2],
+            "preview-right-button": [1, 3],
+            "ping-pong-button":     [1, 4],
+            "layers-button":        [1, 5],
+            "shuffle-button":       [2, 1],
+            "shuffle-body-button":  [2, 2],
+            "shuffle-head-button":  [2, 3],
+            "clear-body-button":    [2, 4],
+            "clear-head-button":    [2, 5],
+
+            "prioritize-label":     [16, 1],
+            "prioritize-1":         [17, 1],
+            "prioritize-2":         [18, 1],
+        }
+
+    @property
+    def images(self) -> dict:
+        return {
+            "play-button":          os.path.join("misc", "play.png"),
+            "pause-button":         os.path.join("misc", "pause.png"),
+            "skip-right-button":    os.path.join("misc", "forward.png"),
+            "skip-left-button":     os.path.join("misc", "backward.png"),
+            "shuffle-button":       os.path.join("misc", "shuffle.png"),
+            "shuffle-body-button":  os.path.join("misc", "shuffle-body.png"),
+            "shuffle-head-button":  os.path.join("misc", "shuffle-head.png"),
+            "clear-body-button":    os.path.join("misc", "clear-body.png"),
+            "clear-head-button":    os.path.join("misc", "clear-head.png"),
+            "reload-button":        os.path.join("misc", "reload.png"),
+            "preview-idle-button":  os.path.join("misc", "idle.png"),
+            "preview-left-button":  os.path.join("misc", "left.png"),
+            "preview-right-button": os.path.join("misc", "right.png"),
+            "ping-pong-button":     os.path.join("misc", "ping-pong.png"),
+            "layers-button":        os.path.join("misc", "layers.png"),
+        }
+
+    @property
+    def labels(self) -> dict:
+        return {
+            # Menus
+            "head-menu":            "Head",
+            "body-menu":            "Body",
+            "export-menu":          "Export",
+
+            # Canvas captions
+            "preview-frames-label": "Static frame preview",
+            "preview-anim-label":   "Animated preview",
+
+            # Export options
+            "export-full":          "Export all frames",
+            "export-idle":          "Export idle frames",
+
+            # Body options
+            "body":                 "Select body",
+            "rebuild-body-images":  "Remake body sources",
+            "rebuild-body-data":    "Refresh body listing",
+            "rebuild-body-offsets": "Refresh body offsets",
+            "destroy-body-images":  "Clean body sources",
+
+            # Head options
+            "head":                 "Select head",
+            "rebuild-head-images":  "Remake head sources",
+            "rebuild-head-data":    "Refresh head listing",
+            "rebuild-head-offsets": "Refresh head offsets",
+            "destroy-head-images":  "Clean head sources",
+
+            # Frame data readout
+            "offset-body":          "Body:",
+            "offset-head":          "Head:",
+            "body-x-label":         "X",
+            "body-y-label":         "Y",
+            "head-x-label":         "X",
+            "head-y-label":         "Y",
+            "speed-anim":           "Speed:  {0:d}",
+            "frame-label":          "Frame:",
+            "frame-0":              "0",
+            "frame-1":              "1",
+            "frame-2":              "2",
+            "frame-3":              "3",
+
+            # Layer collision resolution
+            "prioritize-label":     "On layer collision",
+            "prioritize-1":         "Paste head first",
+            "prioritize-2":         "Paste body first",
+
+            # Icon-based buttons
+            "play-button":          "",
+            "pause-button":         "",
+            "skip-right-button":    "",
+            "skip-left-button":     "",
+            "shuffle-button":       "",
+            "shuffle-body-button":  "",
+            "shuffle-head-button":  "",
+            "clear-body-button":    "",
+            "clear-head-button":    "",
+            "reload-button":        "",
+            "preview-idle-button":  "",
+            "preview-left-button":  "",
+            "preview-right-button": "",
+            "ping-pong-button":     "",
+            "layers-button":        "",
+        }
+
+    @property
+    def messages(self) -> dict:
+        return {
+            "confirm": {
+                "rebuild": {
+                    "data":   {
+                        "body": "Refresh list of available bodies?",
+                        "head": "Refresh list of available heads?",
+                    },
+                    "image":  {
+                        "body": "Remake source images for body sprites?",
+                        "head": "Remake source images for head sprites?",
+                    },
+                    "offset": {
+                        "body": "Refresh body sprite offsets?",
+                        "head": "Refresh head sprite offsets?",
+                    },
+                },
+                "destroy": {
+                    "head": "Delete source images for head sprites?",
+                    "body": "Delete source images for body sprites?",
+                }
+            },
+            "message": {
+                "destroy": {
+                    "head": "Completely deleted all head sources.",
+                    "body": "Completely deleted all body sources.",
+                },
+                "failure": {
+                    "body": "Error: Body not specified!",
+                    "head": "Error: Head not specified!",
+                    "type": "Error: Invalid image format specified!",
+                },
+                "invalid": {
+                    "body": "Error: Body spritesheet {} does not exist!",
+                    "head": "Error: Head spritesheet {} does not exist!",
+                },
+                "rebuild": {
+                    "image":  {
+                        "body": "Succssfully reconstructed body source images.",
+                        "head": "Successfully reconstructed head source images.",
+                    },
+                    "data":   {
+                        "body": "Reassembled list of available bodies.",
+                        "head": "Reassembled list of available heads.",
+                    },
+                    "offset": {
+                        "body": "Successfully reloaded per-frame body offsets.",
+                        "head": "Successfully reloaded per-frame head offsets.",
+                    },
+                },
+                "success": {
+                    "full": "Sprite frames saved to {}!",
+                    "idle": "Idle frames saved to {}!",
+                }
+            }
+        }
+
+    @property
+    def pad(self) -> dict:
+        return {
+            # Frames
+            "a-y1x0":               [0, 0],
+            "a-y2x0":               [0, 0],
+            "b-y0x3":               [0, 0],
+            "b-y1x0":               [0, 0],
+            "b-y1x1":               [0, 0],
+            "c-y0x0a":              [0, 0],
+            "c-y1x0a":              [0, 0],
+            "c-y7x0":               [0, 0],
+            "c-y0x0b":              [0, 0],
+            "c-y0x1":               [0, 0],
+            "d-y0x0":               [0, 0],
+            "d-y1x0":               [0, 0],
+            "pad-a-y1x0":           [0, 0],
+            "pad-a-y2x0a":          [0, 0],
+            "pad-a-y2x0b":          [0, 0],
+            "pad-b-y0x3":           [0, 0],
+            "pad-b-y1x0":           [0, 0],
+            "pad-d-y1x0":           [0, 0],
+            "pad-master-y0x0":      [0, 0],
+
+            # Preview canvases
+            "preview-frames-label": [0, 0],
+            "preview-anim-label":   [0, 0],
+            "preview-static":       [0, 0],
+            "preview-anim":         [0, 0],
+
+            # Frame data readout
+            "speed-anim":           [0, 0],
+            "offset-head":          [0, 0],
+            "offset-body":          [0, 0],
+            "head-x-label":         [0, 0],
+            "head-x":               [0, 0],
+            "head-y-label":         [0, 0],
+            "head-y":               [0, 0],
+            "head-size":            [0, 0],
+            "body-x-label":         [0, 0],
+            "body-x":               [0, 0],
+            "body-y-label":         [0, 0],
+            "body-y":               [0, 0],
+            "body-size":            [0, 0],
+            "frame-label":          [0, 0],
+            "frame-0":              [0, 0],
+            "frame-1":              [0, 0],
+            "frame-2":              [0, 0],
+            "frame-3":              [0, 0],
+
+            # Layer collision resolution
+            "prioritize-label":     [4, 4],
+            "prioritize-1":         [0, 0],
+            "prioritize-2":         [0, 0],
+
+            # Preview options
+            "head":                 [4, 4],
+            "body":                 [4, 4],
+
+            # Icon-based buttons
+            "play-button":          [0, 0],
+            "pause-button":         [0, 0],
+            "skip-left-button":     [0, 0],
+            "skip-right-button":    [0, 0],
+            "shuffle-button":       [0, 0],
+            "shuffle-body-button":  [0, 0],
+            "shuffle-head-button":  [0, 0],
+            "clear-body-button":    [0, 0],
+            "clear-head-button":    [0, 0],
+            "reload-button":        [0, 0],
+            "preview-idle-button":  [0, 0],
+            "preview-left-button":  [0, 0],
+            "preview-right-button": [0, 0],
+            "ping-pong-button":     [0, 0],
+            "layers-button":        [0, 0],
+        }
+
+    @property
+    def sizes(self) -> dict:
+        sizes = {
+            # Frames
+            "a-y1x0":               [0, 0],
+            "a-y2x0":               [0, 0],
+            "b-y0x3":               [0, 0],
+            "b-y1x0":               [0, 0],
+            "b-y1x1":               [0, 0],
+            "c-y0x0a":              [0, 0],
+            "c-y1x0a":              [0, 0],
+            "c-y7x0":               [0, 0],
+            "c-y0x0b":              [0, 0],
+            "c-y0x1":               [0, 0],
+            "d-y0x0":               [0, 0],
+            "d-y1x0":               [0, 0],
+            "pad-a-y1x0":           [0, 10],
+            "pad-a-y2x0a":          [0, 10],
+            "pad-a-y2x0b":          [0, 10],
+            "pad-b-y0x3":           [1, 10],
+            "pad-b-y1x0":           [0, 16],
+            "pad-c-y1x0a":          [1 if IsOSX() else 2, 16],
+            "pad-d-y1x0":           [0, 16],
+            "pad-master-y0x0":      [0, 10],
+
+            # Preview canvases (pixels)
+            "preview-anim":         [96, 96],
+            "preview-resize":       [384, 96],
+            "preview-static":       [384, 96],
+
+            # Entry widgets (characters)
+            "body-x":               [5, 1],
+            "body-y":               [5, 1],
+            "body-size":            [7, 1],
+            "head-x":               [5, 1],
+            "head-y":               [5, 1],
+            "head-size":            [7, 1],
+
+            # Icon-based buttons (pixels)
+            "play-button":          [32, 32],
+            "pause-button":         [32, 32],
+            "skip-right-button":    [32, 32],
+            "skip-left-button":     [32, 32],
+            "shuffle-button":       [32, 32],
+            "shuffle-body-button":  [32, 32],
+            "shuffle-head-button":  [32, 32],
+            "clear-body-button":    [32, 32],
+            "clear-head-button":    [32, 32],
+            "reload-button":        [32, 32],
+            "preview-idle-button":  [32, 32],
+            "preview-left-button":  [32, 32],
+            "preview-right-button": [32, 32],
+            "ping-pong-button":     [32, 32],
+            "layers-button":        [32, 32],
+        }
+        if self.is_windows():
+            # Windows
+            sizes["default-button"] = [36, 0]
+            sizes["default-menu"] = [37, 0]
+            sizes["default-slider"] = [200, 0]
+            sizes["FONTSIZE_MONOS"] = 10
+            sizes["CANVAS_BORDERS"] = 13
+            sizes["FONTSIZE_SMALL"] = 9
+            sizes["FONTSIZE_VAR_W"] = 13
+        else:
+            # OS X / Linux
+            sizes["default-button"] = [28, 0]
+            sizes["default-menu"] = [25, 0]
+            sizes["default-slider"] = [200, 0]
+            sizes["FONTSIZE_MONOS"] = 14
+            sizes["CANVAS_BORDERS"] = 13
+            sizes["FONTSIZE_SMALL"] = 13
+            sizes["FONTSIZE_VAR_W"] = 14
+
+        return sizes
+
+    @property
+    def resize_x(self) -> bool:
+        return False
+
+    @property
+    def resize_y(self) -> bool:
+        return False
+
+    @property
+    def title(self) -> str:
+        return "Fire Emblem 3DS Sprite Tool"
+
     @staticmethod
-    def MinutesToMilliseconds(minutes):
+    def ms_from_min(minutes):
         """
         Converts minutes to milliseconds.
 
@@ -494,8 +516,7 @@ class App(tk.Frame):
         """
         return minutes * 60 * 1000
 
-    @staticmethod
-    def DrawText(canvas, x, y, text):
+    def draw_text(self, canvas, x, y, text) -> None:
         """
         Draws text to a given canvas.
 
@@ -506,7 +527,7 @@ class App(tk.Frame):
 
         :return: None.
         """
-        font = "Courier {} bold".format(App.FONTSIZE_MONOS)
+        font = "Courier {} bold".format(self.sizes["FONTSIZE_MONOS"])
         for m in range(-2, 3):
             for n in range(-2, 3):
                 canvas.create_text(
@@ -526,28 +547,7 @@ class App(tk.Frame):
             anchor=tk.NW,
         )
 
-    def ThreadIt(self, callback):
-        """
-        Wraps a widget callback function.
-
-        Surrounds function call with event-locking procedures and delegates
-        the call to its own thread. (TODO: This is currently not the case;
-        multithreading caused concurrency issues. Fix somehow!)
-
-        :param callback: Function to wrap.
-
-        :return: Wrapped function.
-        """
-
-        def function():
-            self.AcquireEventLock()
-            callback()
-            # threading.Thread(target=callback).start()
-            self.ReleaseEventLock()
-
-        return function
-
-    def KillITunes(self):
+    def kill_itunes(self) -> None:
         """
         Kills any running iTunes instance. Checks periodically.
 
@@ -568,30 +568,17 @@ class App(tk.Frame):
         if zombie:
             # Process was already killed; check again in 15 minutes
             print("iTunes has already been reaped.")
-            timeout = App.MinutesToMilliseconds(15)
+            timeout = App.ms_from_min(15)
         elif found:
             # iTunes was found; check again in 1 minute
             print("iTunes has been put in its place.")
-            timeout = App.MinutesToMilliseconds(1)
+            timeout = App.ms_from_min(1)
         else:
             # iTunes not found; check again in 10 minutes
             print("iTunes is inactive. Good!")
-            timeout = App.MinutesToMilliseconds(10)
+            timeout = App.ms_from_min(10)
 
-        self.SetPending("kill-itnes", self.KillITunes, timeout)
-
-    @staticmethod
-    def FromRGB(r, g, b):
-        """
-        Returns a Tkinter-friendly color code from an RGB color tuple.
-
-        :param r: Red channel (0-255)
-        :param g: Green channel (0-255)
-        :param b: Blue channel (0-255)
-
-        :return: Color string.
-        """
-        return "#{0:02x}{1:02x}{2:02x}".format(r, g, b)
+        self.set_pending("kill-itunes", self.kill_itunes, timeout)
 
     def __init__(self, root, *args, **kwargs):
         """
@@ -601,30 +588,10 @@ class App(tk.Frame):
         :param args:   Optional arguments to tk.Frame.
         :param kwargs: Keyword arguments to tk.Frame.
         """
-        super().__init__(root, *args, **kwargs)
-
-        # Maintain reference to root Frame
-        self._Master = root
-        self._Master.resizable(False, False)
-        self.winfo_toplevel().title(App.WINDOW_TITLE)
-
-        # Repeat callback jobs
-        self._PendingJobs = {
-            "event-lock":  None,
-            "animate":     None,
-            "kill-itunes": None,
-        }
-
-        self._EventLock = False
-
         # Set icon for Mac OS X (and kill iTunes)
-        if IsOSX():
-            image = tk.Image("photo", file="misc/icon.png")
-            # noinspection PyProtectedMember
-            root.tk.call("wm", "iconphoto", root._w, image)
-            self.KillITunes()
 
-        # Initialize local non-widget data
+
+        # Initialize animation data
         self._Animation = {
             "image":   None,
             "init":    False,
@@ -636,15 +603,16 @@ class App(tk.Frame):
             "state":   STATES.idle,
         }
 
-        # Initialize per-frame body and head data
+        # Initialize per-frame data
         self._Data = {
-            "body": {
+            "profile": "",
+            "body":    {
                 "current": {},
                 "data":    {},
                 "list":    [""],
                 "offset":  {},
             },
-            "head": {
+            "head":    {
                 "current": {},
                 "data":    {},
                 "list":    [""],
@@ -652,98 +620,49 @@ class App(tk.Frame):
             },
         }
 
-        # Menu bar
-        self._Menus = {"main-menu": tk.Menu(self._Master)}
-        self._BooleanVars = {}
-        self._Buttons = {}
-        self._Canvases = {}
-        self._Checkboxes = {}
-        self._Entries = {}
-        self._Frames = {}
-        self._Labels = {}
-        self._OptionMenus = {}
-        self._RadioButtons = {}
-        self._StringVars = {}
-
         # Sliders
-        self._ScaleAnimSpeed = tk.Scale()
+        self._ScaleAnimationRate = tk.Scale()
+
+        super().__init__(root, *args, **kwargs)
+
+        if self.is_osx():
+            image = tk.Image("photo", file="misc/icon.png")
+            # noinspection PyProtectedMember
+            root.tk.call("wm", "iconphoto", root._w, image)
+            self.kill_itunes()
+
+        # Repeat callback jobs
+        self._PendingJobs["animate"] = None
+        self._PendingJobs["kill-itunes"] = None
 
         # Complete widget initialization
-        self.InitAllFrames()
-        self.InitAllData()
-        self.InitAllButtons()
-        self.InitAllCanvases()
-        self.InitAllCheckboxes()
-        self.InitAllEntries()
-        self.InitAllLabels()
-        self.InitAllMenus()
-        self.InitAllOptionMenus()
-        self.InitAllRadioButtons()
+        self.init_all_data()
+        self.init_rate_slider()
 
-        self.InitSliderFramerate()
-
-    def AcquireEventLock(self):
-        """
-        Acquires the event lock.
-
-        :return: True on success; False on failure.
-        """
-        if not self._EventLock:
-            self._EventLock = True
-            return True
-        else:
-            print("locked")
-            return False
-
-    def ReleaseEventLock(self):
-        """
-        Releases the event lock.
-
-        :return: True on success; False on failure.
-        """
-        self.CancelPending("event-lock")
-        self.SetPending("event-lock", self.DoReleaseEventLock, 333)
-
-        return True
-
-    def CancelPending(self, key):
-        """
-        Cancels a pending scheduled event.
-
-        :param key: Key of event to cancel.
-
-        :return: True
-        """
-        job = self._PendingJobs.get(key, None)
-        if job is not None:
-            self.after_cancel(job)
-
-        return True
-
-    def ClearBody(self):
+    def clear_body(self) -> bool:
         """
         Clears body selection.
 
         :return: True.
         """
-        self.GetStringVar("body").set(App.DEFAULT_NAME)
-        self.DoMakePreview()
+        self.get_string_var("body").set(App.DEFAULT_NAME)
+        self.do_make_preview()
 
         return True
 
-    def ClearHead(self):
+    def clear_head(self) -> bool:
         """
         Clears head selection.
 
         :return: True.
         """
-        self.GetStringVar("head").set(App.DEFAULT_NAME)
-        self.DoMakePreview()
+        self.get_string_var("head").set(App.DEFAULT_NAME)
+        self.do_make_preview()
 
         return True
 
     # noinspection PyMethodMayBeStatic
-    def DestroyImages(self, key):
+    def destroy_images(self, key) -> bool:
         """
         Callback function. Destroys intermediate spritesheets.
 
@@ -751,9 +670,9 @@ class App(tk.Frame):
 
         :return: True on success; False on failure.
         """
-        title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["destroy"][key]
-        alert = App.MESSAGES["message"]["destroy"][key]
+        title = self.title
+        query = self.messages["confirm"]["destroy"][key]
+        alert = self.messages["message"]["destroy"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             FlushInputs(key)
@@ -762,7 +681,7 @@ class App(tk.Frame):
         else:
             return False
 
-    def DoAnimate(self, update=True):
+    def do_animate(self, update=True) -> bool:
         """
         Local animation callback function.
 
@@ -770,20 +689,20 @@ class App(tk.Frame):
         """
         if self._Animation["playing"]:
             if update:
-                self.UpdateCurrentFrame(1)
+                self.update_current_frame(1)
             else:
-                self.UpdateCurrentFrame(0)
+                self.update_current_frame(0)
 
-            self.CancelPending("animate")
-            self.ScheduleAnimate()
+            self.cancel_pending("animate")
+            self.schedule_animate()
 
-        self.UpdateOffsetLabels()
-        self.UpdateAnimationImage()
-        self.SelectAnimRadioButton()
+        self.update_offset_labels()
+        self.update_animation_image()
+        self.select_anim_radiobutton()
 
         return True
 
-    def DoComposite(self, func, **kwargs):
+    def do_composite(self, func, **kwargs):
         """
         Performs a general-purpose image composition routine.
 
@@ -793,33 +712,33 @@ class App(tk.Frame):
         """
         head = ""
         body = ""
-        im = None
+        image = None
 
         try:
             # Perform sprite composition
-            head = self.GetKey("head")
-            body = self.GetKey("body")
-            im = func(head, body, **kwargs)
+            head = self.get_key("head")
+            body = self.get_key("body")
+            image = func(head, body, **kwargs)
 
         except sprite_splitter.NonexistentHeadException as e:
             # Head spritesheet does not exist
-            title = App.WINDOW_TITLE
-            alert: str = App.MESSAGES["message"]["invalid"]["head"]
+            title = self.title
+            alert: str = self.messages["message"]["invalid"]["head"]
             tk.messagebox.showinfo(title, alert.format(e.filename))
 
         except sprite_splitter.NonexistentBodyException as e:
             # Body spritesheet does not exist
-            title = App.WINDOW_TITLE
-            alert: str = App.MESSAGES["message"]["invalid"]["body"]
+            title = self.title
+            alert: str = self.messages["message"]["invalid"]["body"]
             tk.messagebox.showinfo(title, alert.format(e.filename))
 
         except cv2.error:
             # CV2 image processing error
             raise InvalidFilenameException
 
-        return head, body, im
+        return head, body, image
 
-    def DoExport(self, callback, message, **kwargs):
+    def do_export(self, callback, message, **kwargs) -> bool:
         """
         Composites and exports animation frames to file.
 
@@ -830,9 +749,9 @@ class App(tk.Frame):
         """
         try:
             # Perform sprite composition
-            head, body, im = self.DoComposite(callback, **kwargs)
+            head, body, image = self.do_composite(callback, **kwargs)
 
-            if im is not None:
+            if image is not None:
                 if not head and not body:
                     head = "blank"
                     body = "sheet"
@@ -852,8 +771,8 @@ class App(tk.Frame):
 
                 # Save image if path is valid
                 if path:
-                    sprite_splitter.SaveImage(im, path)
-                    title = App.WINDOW_TITLE
+                    sprite_splitter.SaveImage(image, path)
+                    title = self.title
                     alert = message.format(os.path.basename(path))
                     tk.messagebox.showinfo(title, alert)
 
@@ -861,8 +780,8 @@ class App(tk.Frame):
 
         except InvalidFilenameException:
             # Image format not recognized
-            title = App.WINDOW_TITLE
-            alert = App.MESSAGES["message"]["failure"]["type"]
+            title = self.title
+            alert = self.messages["message"]["failure"]["type"]
             tk.messagebox.showinfo(title, alert)
             return False
 
@@ -870,7 +789,7 @@ class App(tk.Frame):
             # Filename not specified
             return False
 
-    def DoMakePreview(self, *, state=""):
+    def do_make_preview(self, *, state="") -> bool:
         """
         Creates an animated preview.
 
@@ -878,15 +797,15 @@ class App(tk.Frame):
 
         :return: True on success; False on failure.
         """
-        self.TurnPlaybackOff()
+        self.turn_playback_off()
 
         callback = sprite_splitter.Composite
         state = state or str(self._Animation["state"])
-        color = App.COLORS["preview-static"]["bg"]
-        headfirst = self.GetStringVar("prioritize").get() == "Head"
-        reverse = self.GetBooleanVar("reverse-layers").get()
+        color = self.colors["preview-static"]["bg"]
+        headfirst = self.get_string_var("prioritize").get() == "Head"
+        reverse = self.get_boolean_var("reverse-layers").get()
 
-        self.MakePreview(
+        self.make_preview(
             callback,
             state,
             color=color,
@@ -896,22 +815,22 @@ class App(tk.Frame):
 
         return True
 
-    def DoPause(self):
+    def do_pause(self) -> bool:
         """
         Presses "pause" button, effectively.
 
         :return: True.
         """
-        self.CancelPending("animate")
+        self.cancel_pending("animate")
 
         if self._Animation["objects"]:
             self._Animation["playing"] = False
-            self.DoPressButton("pause-button")
-            self.DoUnpressButton("play-button")
+            self.do_press_button("pause-button")
+            self.do_unpress_button("play-button")
 
         return True
 
-    def DoPlay(self):
+    def do_play(self) -> bool:
         """
         Presses "play" button, effectively.
 
@@ -919,43 +838,13 @@ class App(tk.Frame):
         """
         if self._Animation["objects"]:
             self._Animation["playing"] = True
-            self.DoPressButton("play-button")
-            self.DoUnpressButton("pause-button")
-            self.DoAnimate(False)
+            self.do_press_button("play-button")
+            self.do_unpress_button("pause-button")
+            self.do_animate(False)
 
         return True
 
-    def DoPressButton(self, key):
-        """
-        Visibly presses a button.
-
-        :param key: Key of button to press.
-
-        :return: True.
-        """
-        try:
-            button = self._Buttons[key]
-            if IsOSX():
-                button.config(
-                    highlightbackground=App.FromRGB(*App.COLORS[key]["fg"])
-                )
-            else:
-                button.config(relief=tk.SUNKEN)
-        except KeyError:
-            pass
-
-        return True
-
-    def DoReleaseEventLock(self):
-        """
-        Releases local event lock.
-
-        :return: True.
-        """
-        self._EventLock = False
-        return True
-
-    def DoRebuildData(self, key):
+    def do_rebuild_data(self, key) -> bool:
         """
         Rebuilds head or body listings.
 
@@ -964,16 +853,15 @@ class App(tk.Frame):
         :return: True.
         """
         CreateInputJSON(key)
-        self.InitData(key)
-        self.InitOptionMenu(
-            self.GetFrame("b-y1x0"),
-            key,
-            self._Data[key]["list"],
+        self.init_data(key)
+        self.init_option_menu(
+            self.get_frame("b-y1x0"),
+            key, self._Data[key]["list"],
         )
 
         return True
 
-    def DoRemakeOffset(self, key):
+    def do_remake_offset(self, key) -> bool:
         """
         Rebuilds per-frame offsets.
 
@@ -982,12 +870,12 @@ class App(tk.Frame):
         :return: True.
         """
         self._Data[key]["offset"] = LoadOffsets(key)
-        self.UpdateOffsetLabels()
-        self.DoMakePreview()
+        self.update_offset_labels()
+        self.do_make_preview()
 
         return True
 
-    def DoSkipFrame(self, skip):
+    def do_skip_frame(self, skip) -> bool:
         """
         Skips a specific number of animation frames.
 
@@ -1002,44 +890,24 @@ class App(tk.Frame):
             frame = 0
 
         self._Animation["frame"] = frame
-        self.SelectAnimRadioButton()
+        self.select_anim_radiobutton()
 
         return True
 
-    def DoUnpressButton(self, key):
-        """
-        Visibly unpresses a button.
-
-        :param key: Key of button to unpress.
-
-        :return: True.
-        """
-        try:
-            button = self._Buttons[key]
-            if IsOSX():
-                button.config(
-                    highlightbackground=App.FromRGB(*App.COLORS[key]["bg"])
-                )
-            else:
-                button.config(relief=tk.RAISED)
-        except KeyError:
-            pass
-
-        return True
-
-    def DrawFrameLabels(self):
+    def draw_frame_labels(self) -> bool:
         """
         Draw frame labels to animation preview canvas.
+        TODO: Currently unused!
 
         :return: True on success; False on failure.
         """
         canvas = self._Canvases["preview-static"]
         for n in range(4):
-            App.DrawText(canvas, 18 + 96 * n, 92, "({})".format(n))
+            self.draw_text(canvas, 18 + 96 * n, 92, "({})".format(n))
 
         return True
 
-    def ExportFrames(self, *, idle_only=False):
+    def export_frames(self, *, idle_only=False) -> bool:
         """
         Composites and exports all frames to file.
 
@@ -1047,17 +915,16 @@ class App(tk.Frame):
 
         :return: True on success; False on failure.
         """
-
         if idle_only:
-            message = App.MESSAGES["message"]["success"]["idle"]
+            message = self.messages["message"]["success"]["idle"]
         else:
-            message = App.MESSAGES["message"]["success"]["full"]
+            message = self.messages["message"]["success"]["full"]
 
         callback = sprite_splitter.Composite
-        reverse = self.GetBooleanVar("reverse-layers").get()
-        headfirst = self.GetStringVars("prioritize").get() == "Head"
+        reverse = self.get_boolean_var("reverse-layers").get()
+        headfirst = self.get_string_var("prioritize").get() == "Head"
 
-        self.DoExport(
+        self.do_export(
             callback,
             message,
             headfirst=headfirst,
@@ -1067,7 +934,7 @@ class App(tk.Frame):
 
         return True
 
-    def FrameSkip(self, skip):
+    def frame_skip(self, skip) -> bool:
         """
         Skips any number of frames forward or backward.
 
@@ -1078,48 +945,14 @@ class App(tk.Frame):
         :return: True.
         """
         if self._Animation["objects"]:
-            self.DoPause()
-            self.DoSkipFrame(skip)
-            self.UpdateOffsetLabels()
-            self.UpdateAnimationImage()
+            self.do_pause()
+            self.do_skip_frame(skip)
+            self.update_offset_labels()
+            self.update_animation_image()
 
         return True
 
-    def GetBooleanVar(self, key):
-        """
-        Safely retrieves a Tkinter boolean variable at the given key.
-
-        Creates the variable if it doesn't exist yet.
-
-        :param key: Key of boolean variable to return.
-
-        :return: Boolean variable at key.
-        """
-        try:
-            booleanVar = self._BooleanVars[key]
-        except KeyError:
-            booleanVar = self._BooleanVars[key] = tk.BooleanVar()
-
-        return booleanVar
-
-    def GetFrame(self, key):
-        """
-        Safely retrieves a Tkinter frame at the given key.
-
-        Creates the frame if it doesn't exist yet.
-
-        :param key: Key of frame to return.
-
-        :return: Frame at key.
-        """
-        try:
-            frame = self._Frames[key]
-        except KeyError:
-            frame = self._Frames[key] = tk.Frame()
-
-        return frame
-
-    def GetKey(self, key):
+    def get_key(self, key) -> str:
         """
         Gets a dict key associated with a named body or head.
 
@@ -1127,192 +960,175 @@ class App(tk.Frame):
 
         :return: Name's associated dictionary key.
         """
-        name = self.GetStringVar(key).get()
-        if name != App.DEFAULT_NAME:
+        name = self.get_string_var(key).get()
+        if name != self.DEFAULT_NAME:
             return self._Data[key].get("data", {}).get(name, "")
         else:
             return ""
 
-    def GetStringVar(self, key):
-        """
-        Safely retrieves a Tkinter boolean variable at the given key.
-
-        Creates the variable if it doesn't exist yet.
-
-        :param key: Key of boolean variable to return.
-
-        :return: Boolean variable at key.
-        """
-        try:
-            stringVar = self._StringVars[key]
-        except KeyError:
-            stringVar = self._StringVars[key] = tk.StringVar(self._Master)
-
-        return stringVar
-
-    def InitAllButtons(self):
+    def init_all_buttons(self) -> bool:
         """
         Initializes all required buttons.
 
         :return: True.
         """
-        threadIt = self.ThreadIt
+        thread_it = self.thread_it
 
         # Initialize "play animation" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "play-button",
-            threadIt(self.TurnPlaybackOn),
+            thread_it(self.turn_playback_on),
         )
 
         # Initialize "pause animation" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "pause-button",
-            threadIt(self.TurnPlaybackOff),
-            relief=tk.SUNKEN,
+            thread_it(self.turn_playback_off),
+            pressed=True,
         )
 
         # Initialize "skip frame right" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "skip-right-button",
-            threadIt(lambda: self.FrameSkip(1)),
+            thread_it(lambda: self.frame_skip(1)),
         )
 
         # Initialize "skip frame left" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "skip-left-button",
-            threadIt(lambda: self.FrameSkip(-1)),
+            thread_it(lambda: self.frame_skip(-1)),
         )
 
         # Initialize "shuffle" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "shuffle-button",
-            threadIt(lambda: self.ShuffleAll() and self.JumpFrame(0)),
+            thread_it(lambda: self.shuffle_all() and self.jump_frame(0)),
         )
 
         # Initialize "shuffle body" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "shuffle-body-button",
-            threadIt(lambda: self.ShuffleBody() and self.JumpFrame(0)),
+            thread_it(lambda: self.shuffle_body() and self.jump_frame(0)),
         )
 
         # Initialize "shuffle head" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "shuffle-head-button",
-            threadIt(lambda: self.ShuffleHead() and self.JumpFrame(0)),
+            thread_it(lambda: self.shuffle_head() and self.jump_frame(0)),
         )
 
         # Initialize "clear body" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "clear-body-button",
-            threadIt(lambda: self.ClearBody() and self.JumpFrame(0)),
+            thread_it(lambda: self.clear_body() and self.jump_frame(0)),
         )
 
         # Initialize "clear head" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "clear-head-button",
-            threadIt(lambda: self.ClearHead() and self.JumpFrame(0)),
+            thread_it(lambda: self.clear_head() and self.jump_frame(0)),
         )
 
         # Initialize "reload" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "reload-button",
-            threadIt(
-                lambda: self.DoRemakeOffset("head")
-                        and self.DoRemakeOffset("body")
-                        and self.JumpFrame(0)
+            thread_it(
+                lambda: self.do_remake_offset("head")
+                        and self.do_remake_offset("body")
+                        and self.jump_frame(0)
             ),
 
         )
 
         # Initialize "idle preview" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "preview-idle-button",
-            threadIt(
-                lambda: self.DoMakePreview(state="idle")
-                        and self.DoPressButton("preview-idle-button")
-                        and self.DoUnpressButton("preview-left-button")
-                        and self.DoUnpressButton("preview-right-button")
-                        and self.JumpFrame(0)
+            thread_it(
+                lambda: self.do_make_preview(state="idle")
+                        and self.do_press_button("preview-idle-button")
+                        and self.do_unpress_button("preview-left-button")
+                        and self.do_unpress_button("preview-right-button")
+                        and self.jump_frame(0)
             ),
-            relief=tk.SUNKEN,
+            pressed=True,
         )
 
         # Initialize "left preview" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "preview-left-button",
-            threadIt(
-                lambda: self.DoMakePreview(state="left")
-                        and self.DoPressButton("preview-left-button")
-                        and self.DoUnpressButton("preview-idle-button")
-                        and self.DoUnpressButton("preview-right-button")
-                        and self.JumpFrame(0)
+            thread_it(
+                lambda: self.do_make_preview(state="left")
+                        and self.do_press_button("preview-left-button")
+                        and self.do_unpress_button("preview-idle-button")
+                        and self.do_unpress_button("preview-right-button")
+                        and self.jump_frame(0)
             ),
         )
 
         # Initialize "right preview" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "preview-right-button",
-            threadIt(
-                lambda: self.DoMakePreview(state="right")
-                        and self.DoPressButton("preview-right-button")
-                        and self.DoUnpressButton("preview-left-button")
-                        and self.DoUnpressButton("preview-idle-button")
-                        and self.JumpFrame(0)
+            thread_it(
+                lambda: self.do_make_preview(state="right")
+                        and self.do_press_button("preview-right-button")
+                        and self.do_unpress_button("preview-left-button")
+                        and self.do_unpress_button("preview-idle-button")
+                        and self.jump_frame(0)
             ),
         )
 
         # Initialize "ping-pong" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "ping-pong-button",
-            threadIt(self.TogglePingpong),
+            thread_it(self.toggle_pingpong),
         )
 
         # Initialize "reverse layers" button
-        self.InitButton(
-            self.GetFrame("d-y0x0"),
+        self.init_button(
+            self.get_frame("d-y0x0"),
             "layers-button",
-            threadIt(self.ToggleReverseLayers),
+            thread_it(self.toggle_reverse_layers),
         )
 
-        return 0
+        return True
 
-    def InitAllCanvases(self):
+    def init_all_canvases(self) -> bool:
         """
         Initializes all required canvases.
 
         :return: True on success; False on failure.
         """
         # Initialize "static preview" canvas
-        self.InitCanvas(
-            self.GetFrame("a-y1x0"),
+        self.init_canvas(
+            self.get_frame("a-y1x0"),
             "preview-static",
-            App.CANVAS_BORDERS,
+            self.sizes["CANVAS_BORDERS"],
         )
 
         # Initialize "animated preview" canvas
-        self.InitCanvas(
-            self.GetFrame("a-y1x0"),
+        self.init_canvas(
+            self.get_frame("a-y1x0"),
             "preview-anim",
-            App.CANVAS_BORDERS,
+            self.sizes["CANVAS_BORDERS"],
         )
 
         return True
 
-    def InitAllCheckboxes(self):
+    def init_all_checkboxes(self) -> bool:
         """
         Initializes all required checkboxes.
 
@@ -1322,25 +1138,25 @@ class App(tk.Frame):
 
         return True
 
-    def InitAllData(self):
+    def init_all_data(self) -> bool:
         """
         Initializes all required data.
 
         :return: True on success; False on failure.
         """
-        self.InitData("head")
-        self.InitData("body")
+        self.init_data("head")
+        self.init_data("body")
         return True
 
-    def InitAllEntries(self):
+    def init_all_entries(self) -> bool:
         """
         Initializes all required entry widgets.
 
         :return: True
         """
         # Initialize "body x-coordinate" entry
-        self.InitEntry(
-            self.GetFrame("c-y1x0a"),
+        self.init_entry(
+            self.get_frame("c-y1x0a"),
             "body-x",
             tk.W,
             text="+0",
@@ -1348,8 +1164,8 @@ class App(tk.Frame):
         )
 
         # Initialize "body y-coordinate" entry
-        self.InitEntry(
-            self.GetFrame("c-y1x0a"),
+        self.init_entry(
+            self.get_frame("c-y1x0a"),
             "body-y",
             tk.W,
             text="+0",
@@ -1357,8 +1173,8 @@ class App(tk.Frame):
         )
 
         # Initialize "head x-coordinate" entry
-        self.InitEntry(
-            self.GetFrame("c-y0x0a"),
+        self.init_entry(
+            self.get_frame("c-y0x0a"),
             "head-x",
             tk.W,
             text="+0",
@@ -1366,8 +1182,8 @@ class App(tk.Frame):
         )
 
         # Initialize "head y-coordinate" entry
-        self.InitEntry(
-            self.GetFrame("c-y0x0a"),
+        self.init_entry(
+            self.get_frame("c-y0x0a"),
             "head-y",
             tk.W,
             text="+0",
@@ -1375,8 +1191,8 @@ class App(tk.Frame):
         )
 
         # Initialize "head size" entry
-        self.InitEntry(
-            self.GetFrame("c-y0x0a"),
+        self.init_entry(
+            self.get_frame("c-y0x0a"),
             "head-size",
             tk.W,
             text="Large",
@@ -1384,8 +1200,8 @@ class App(tk.Frame):
         )
 
         # Initialize "body size" entry (unused)
-        self.InitEntry(
-            self.GetFrame("c-y1x0a"),
+        self.init_entry(
+            self.get_frame("c-y1x0a"),
             "body-size",
             tk.W,
             text="",
@@ -1394,135 +1210,135 @@ class App(tk.Frame):
 
         return True
 
-    def InitAllFrames(self):
+    def init_all_frames(self) -> bool:
         """
         Initializes all required frames.
 
         :return: True.
         """
         # Main frames
-        self.InitFrame(self._Master, "a-y1x0")
-        self.InitFrame(self._Master, "a-y2x0")
+        self.init_frame(self._Master, "a-y1x0")
+        self.init_frame(self._Master, "a-y2x0")
 
         # Container frames
-        self.InitFrame(self.GetFrame("a-y1x0"), "b-y0x3")
-        self.InitFrame(self.GetFrame("a-y2x0"), "b-y1x0")
-        self.InitFrame(self.GetFrame("a-y2x0"), "b-y1x1")
-        self.InitFrame(self.GetFrame("b-y1x0"), "c-y0x0a")
-        self.InitFrame(self.GetFrame("b-y1x0"), "c-y1x0a")
-        self.InitFrame(self.GetFrame("b-y1x0"), "c-y7x0")
-        self.InitFrame(self.GetFrame("b-y1x1"), "c-y0x0b")
-        self.InitFrame(self.GetFrame("b-y1x1"), "c-y0x1")
-        self.InitFrame(self.GetFrame("c-y0x1"), "d-y0x0")
-        self.InitFrame(self.GetFrame("c-y0x1"), "d-y1x0")
+        self.init_frame(self.get_frame("a-y1x0"), "b-y0x3")
+        self.init_frame(self.get_frame("a-y2x0"), "b-y1x0")
+        self.init_frame(self.get_frame("a-y2x0"), "b-y1x1")
+        self.init_frame(self.get_frame("b-y1x0"), "c-y0x0a")
+        self.init_frame(self.get_frame("b-y1x0"), "c-y1x0a")
+        self.init_frame(self.get_frame("b-y1x0"), "c-y7x0")
+        self.init_frame(self.get_frame("b-y1x1"), "c-y0x0b")
+        self.init_frame(self.get_frame("b-y1x1"), "c-y0x1")
+        self.init_frame(self.get_frame("c-y0x1"), "d-y0x0")
+        self.init_frame(self.get_frame("c-y0x1"), "d-y1x0")
 
         # Padding frames
-        self.InitFrame(self.GetFrame("a-y1x0"), "pad-a-y1x0")
-        self.InitFrame(self.GetFrame("a-y2x0"), "pad-a-y2x0a")
-        self.InitFrame(self.GetFrame("a-y2x0"), "pad-a-y2x0b")
-        self.InitFrame(self.GetFrame("b-y0x3"), "pad-b-y0x3")
-        self.InitFrame(self.GetFrame("b-y1x0"), "pad-b-y1x0")
-        self.InitFrame(self.GetFrame("c-y1x0a"), "pad-c-y1x0a")
-        self.InitFrame(self.GetFrame("d-y1x0"), "pad-d-y1x0")
-        self.InitFrame(self._Master, "pad-master-y0x0")
+        self.init_frame(self.get_frame("a-y1x0"), "pad-a-y1x0")
+        self.init_frame(self.get_frame("a-y2x0"), "pad-a-y2x0a")
+        self.init_frame(self.get_frame("a-y2x0"), "pad-a-y2x0b")
+        self.init_frame(self.get_frame("b-y0x3"), "pad-b-y0x3")
+        self.init_frame(self.get_frame("b-y1x0"), "pad-b-y1x0")
+        self.init_frame(self.get_frame("c-y1x0a"), "pad-c-y1x0a")
+        self.init_frame(self.get_frame("d-y1x0"), "pad-d-y1x0")
+        self.init_frame(self._Master, "pad-master-y0x0")
 
         return True
 
-    def InitAllLabels(self):
+    def init_all_labels(self) -> bool:
         """
         Initializes all required labels.
 
         :return: True on success; False on failure.
         """
         # Initialize "animation speed" label
-        self.InitLabel(
-            self.GetFrame("b-y1x0"),
+        self.init_label(
+            self.get_frame("b-y1x0"),
             "speed-anim",
-            ("calibri", App.FONTSIZE_SMALL),
+            ("calibri", self.sizes["FONTSIZE_SMALL"]),
             tk.W, 0,
         )
 
         # Initialize "current frame" label
-        self.InitLabel(
-            self.GetFrame("b-y1x0"),
+        self.init_label(
+            self.get_frame("b-y1x0"),
             "frame-label",
-            ("calibri", App.FONTSIZE_SMALL),
+            ("calibri", self.sizes["FONTSIZE_SMALL"]),
             tk.SW,
         )
 
         # Initialize "static frames preview" label
-        self.InitLabel(
-            self.GetFrame("a-y1x0"),
+        self.init_label(
+            self.get_frame("a-y1x0"),
             "preview-frames-label",
-            ("calibri", App.FONTSIZE_SMALL),
+            ("calibri", self.sizes["FONTSIZE_SMALL"]),
             tk.W,
         )
 
         # Initialize "animated preview" label
-        self.InitLabel(
+        self.init_label(
             self._Frames["a-y1x0"],
             "preview-anim-label",
-            ("calibri", App.FONTSIZE_SMALL),
+            ("calibri", self.sizes["FONTSIZE_SMALL"]),
             tk.W,
         )
 
         # Initialize "head offset" label
-        self.InitLabel(
+        self.init_label(
             self._Frames["c-y0x0a"],
             "offset-head",
-            ("calibri", App.FONTSIZE_SMALL),
+            ("calibri", self.sizes["FONTSIZE_SMALL"]),
             tk.W, 0, 0,
         )
 
         # Initialize "body offset" label
-        self.InitLabel(
+        self.init_label(
             self._Frames["c-y1x0a"],
             "offset-body",
-            ("calibri", App.FONTSIZE_SMALL),
+            ("calibri", self.sizes["FONTSIZE_SMALL"]),
             tk.W,
             0, 0,
         )
 
         # Initialize "body x-coordinate" label
-        self.InitLabel(
+        self.init_label(
             self._Frames["c-y1x0a"],
             "body-x-label",
-            ("calibri", App.FONTSIZE_SMALL),
+            ("calibri", self.sizes["FONTSIZE_SMALL"]),
             tk.W,
         )
         # Initialize "body y-coordinate" label
-        self.InitLabel(
+        self.init_label(
             self._Frames["c-y1x0a"],
             "body-y-label",
-            ("calibri", App.FONTSIZE_SMALL),
+            ("calibri", self.sizes["FONTSIZE_SMALL"]),
             tk.W,
         )
         # Initialize "head x-coordinate" label
-        self.InitLabel(
+        self.init_label(
             self._Frames["c-y0x0a"],
             "head-x-label",
-            ("calibri", App.FONTSIZE_SMALL),
+            ("calibri", self.sizes["FONTSIZE_SMALL"]),
             tk.W,
         )
         # Initialize "head y-coordinate" label
-        self.InitLabel(
+        self.init_label(
             self._Frames["c-y0x0a"],
             "head-y-label",
-            ("calibri", App.FONTSIZE_SMALL),
+            ("calibri", self.sizes["FONTSIZE_SMALL"]),
             tk.W,
         )
 
         # Initialize "prioritize" label
-        self.InitLabel(
+        self.init_label(
             self._Frames["d-y1x0"],
             "prioritize-label",
-            ("calibri", App.FONTSIZE_SMALL),
+            ("calibri", self.sizes["FONTSIZE_SMALL"]),
             tk.NS,
         )
 
         return True
 
-    def InitAllMenus(self):
+    def init_all_menus(self) -> bool:
         """
         Initializes all required menus.
 
@@ -1531,83 +1347,87 @@ class App(tk.Frame):
         # Initialize main menu bar
         self._Master.config(menu=self._Menus["main-menu"])
 
-        threadIt = self.ThreadIt
+        thread_it = self.thread_it
+        init_menu = self.init_menu
+        labels = self.labels
 
         # Initialize "head" menu
-        self.InitMenu(
+        init_menu(
             self._Menus["main-menu"],
             "head-menu",
             {
-                "label":   App.LABELS["rebuild-head-data"],
-                "command": threadIt(lambda: self.RebuildData("head")),
+                "label":   labels["rebuild-head-data"],
+                "command": thread_it(lambda: self.rebuild_data("head")),
             },
             {
-                "label":   App.LABELS["rebuild-head-images"],
-                "command": threadIt(lambda: self.RebuildImages("head")),
+                "label":   labels["rebuild-head-images"],
+                "command": thread_it(lambda: self.rebuild_images("head")),
             },
             {
-                "label":   App.LABELS["rebuild-head-offsets"],
-                "command": threadIt(lambda: self.RebuildOffsets("head")),
+                "label":   labels["rebuild-head-offsets"],
+                "command": thread_it(lambda: self.rebuild_offsets("head")),
             },
             {
-                "label":   App.LABELS["destroy-head-images"],
-                "command": threadIt(lambda: self.DestroyImages("head")),
+                "label":   labels["destroy-head-images"],
+                "command": thread_it(lambda: self.destroy_images("head")),
             },
         )
 
         # Initialize "body" menu
-        self.InitMenu(
+        init_menu(
             self._Menus["main-menu"],
             "body-menu",
             {
-                "label":   App.LABELS["rebuild-body-data"],
-                "command": threadIt(lambda: self.RebuildData("body")),
+                "label":   labels["rebuild-body-data"],
+                "command": thread_it(lambda: self.rebuild_data("body")),
             },
             {
-                "label":   App.LABELS["rebuild-body-images"],
-                "command": threadIt(lambda: self.RebuildImages("body")),
+                "label":   labels["rebuild-body-images"],
+                "command": thread_it(lambda: self.rebuild_images("body")),
             },
             {
-                "label":   App.LABELS["rebuild-body-offsets"],
-                "command": threadIt(lambda: self.RebuildOffsets("body")),
+                "label":   labels["rebuild-body-offsets"],
+                "command": thread_it(lambda: self.rebuild_offsets("body")),
             },
             {
-                "label":   App.LABELS["destroy-body-images"],
-                "command": threadIt(lambda: self.DestroyImages("body")),
+                "label":   labels["destroy-body-images"],
+                "command": thread_it(lambda: self.destroy_images("body")),
             },
         )
 
         # Initialize "export" menu
-        self.InitMenu(
+        init_menu(
             self._Menus["main-menu"],
             "export-menu",
             {
-                "label":   App.LABELS["export-idle"],
-                "command": threadIt(lambda: self.ExportFrames(idle_only=True)),
+                "label":   labels["export-idle"],
+                "command": thread_it(lambda: self.export_frames(idle_only=True)),
             },
             {
-                "label":   App.LABELS["export-full"],
-                "command": threadIt(self.ExportFrames),
+                "label":   labels["export-full"],
+                "command": thread_it(self.export_frames),
             },
         )
 
         return True
 
-    def InitAllOptionMenus(self):
+    def init_all_optionmenus(self) -> bool:
         """
         Initializes all required option menus.
 
         :return: True.
         """
+        init_optionmenu = self.init_option_menu
+
         # Initialize "select head" dropdown menu
-        self.InitOptionMenu(
+        init_optionmenu(
             self._Frames["b-y1x0"],
             "head",
             self._Data["head"]["list"],
         )
 
         # Initialize "select body" dropdown menu
-        self.InitOptionMenu(
+        init_optionmenu(
             self._Frames["b-y1x0"],
             "body",
             self._Data["body"]["list"],
@@ -1615,223 +1435,79 @@ class App(tk.Frame):
 
         return True
 
-    def InitAllRadioButtons(self):
+    def init_all_radiobuttons(self) -> bool:
         """
         Initializes all required radio buttons.
 
         :return: True.
         """
+        init_radio = self.init_radio
+        get_string_var = self.get_string_var
+        thread_it = self.thread_it
+
         # Initialize "prioritize head" radio button
-        self.InitRadio(
+        init_radio(
             self._Frames["d-y1x0"],
             "prioritize-1",
-            self.GetStringVar("prioritize"),
+            get_string_var("prioritize"),
             "Head",
             tk.W,
             select=True,
         )
 
         # Initialize "prioritize body" radio button
-        self.InitRadio(
+        init_radio(
             self._Frames["d-y1x0"],
             "prioritize-2",
-            self.GetStringVar("prioritize"),
+            get_string_var("prioritize"),
             "Body",
             tk.W,
         )
 
         # Initialize "frame #1" radio button
-        self.InitRadio(
+        init_radio(
             self._Frames["c-y7x0"],
             "frame-0",
-            self.GetStringVar("frame"),
+            get_string_var("frame"),
             "0",
             tk.W,
             select=True,
-            command=self.ThreadIt(lambda: self.JumpFrame(0)),
+            command=thread_it(lambda: self.jump_frame(0)),
         )
 
         # Initialize "frame #2" radio button
-        self.InitRadio(
+        init_radio(
             self._Frames["c-y7x0"],
             "frame-1",
-            self.GetStringVar("frame"),
+            get_string_var("frame"),
             "1",
             tk.W,
-            command=self.ThreadIt(lambda: self.JumpFrame(1)),
+            command=thread_it(lambda: self.jump_frame(1)),
         )
 
         # Initialize "frame #3" radio button
-        self.InitRadio(
+        init_radio(
             self._Frames["c-y7x0"],
             "frame-2",
-            self.GetStringVar("frame"),
+            get_string_var("frame"),
             "2",
             tk.W,
-            command=self.ThreadIt(lambda: self.JumpFrame(2)),
+            command=thread_it(lambda: self.jump_frame(2)),
         )
 
         # Initialize "frame #4" radio button
-        self.InitRadio(
+        init_radio(
             self._Frames["c-y7x0"],
             "frame-3",
-            self.GetStringVar("frame"),
+            get_string_var("frame"),
             "3",
             tk.W,
-            command=self.ThreadIt(lambda: self.JumpFrame(3)),
+            command=thread_it(lambda: self.jump_frame(3)),
         )
 
         return True
 
-    def InitButton(self, master, tag, command, relief=tk.RAISED):
-        """
-        Initializes a local button.
-
-        :param master:  Tkinter root frame for button.
-        :param tag:     Tag of button to initialize.
-        :param command: Callback function for button.
-        :param relief:  Initial button relief. (Default tk.RAISED).
-
-        :return: None.
-        """
-        w, h = App.SIZES.get(tag, App.SIZES["default-button"])
-        fg = App.FromRGB(*App.COLORS[tag]["fg"])  # FG color
-        bg = App.FromRGB(*App.COLORS[tag]["bg"])  # BG color
-
-        # Image object
-        path = App.IMAGES.get(tag, "")
-        if path:
-            image = sprite_imaging.OpenTkinter(path, w, h)
-        else:
-            image = None
-
-        # Create button
-        button = tk.Button(
-            master,
-            text=App.LABELS[tag],
-            command=command,
-        )
-
-        # Configure button
-        button.image = image
-        button.config(
-            width=w,
-            height=h,
-            foreground=fg,
-            background=bg,
-            activebackground=bg,
-            activeforeground=fg,
-            image=image,
-            relief=relief,
-        )
-
-        # Simulate "raised" and "sunken" on OS X
-        if IsOSX():
-            if relief == tk.RAISED:
-                button.config(
-                    highlightbackground=bg,
-                    highlightcolor=fg,
-                )
-            else:
-                button.config(
-                    highlightbackground=fg,
-                    highlightcolor=fg,
-                )
-
-        # Position button
-        button.grid(
-            row=App.GRID[tag][0],
-            column=App.GRID[tag][1],
-            padx=App.PAD[tag][0],
-            pady=App.PAD[tag][1],
-        )
-
-        # Replace local button
-        try:
-            self._Buttons[tag].destroy()
-        except KeyError:
-            pass
-        self._Buttons[tag] = button
-
-        return True
-
-    def InitCanvas(self, master, tag, border):
-        """
-        Locally initializes a canvas.
-
-        :param master: Widget root.
-        :param tag:    Name of canvas to initialize.
-        :param border: Border size for canvas.
-
-        :return: True.
-        """
-        # Create canvas
-        canvas = tk.Canvas(
-            master,
-            width=App.SIZES[tag][0],
-            height=App.SIZES[tag][1],
-            background=App.FromRGB(*App.COLORS[tag]["bg"]),
-            relief=tk.SUNKEN,
-            borderwidth=border,
-        )
-
-        # Position canvas
-        canvas.grid(
-            row=App.GRID[tag][0],
-            column=App.GRID[tag][1],
-            padx=App.PAD[tag][0],
-            pady=App.PAD[tag][1],
-        )
-
-        # Replace local canvas
-        try:
-            self._Canvases[tag].destroy()
-        except KeyError:
-            pass
-        self._Canvases[tag] = canvas
-
-        return True
-
-    def InitCheckbox(self, master, tag, sticky, command=None):
-        """
-        Initializes a checkbox.
-
-        :param master:  Widget root.
-        :param tag:     Tag of checkbox to initialize.
-        :param sticky:  Anchoring string.
-        :param command: Callback function. (Default None).
-
-        :return: True.
-        """
-        # Create checkbox
-        checkbox = tk.Checkbutton(
-            master,
-            text=App.LABELS[tag],
-            variable=self.GetBooleanVar(tag),
-        )
-
-        # Position checkbox
-        checkbox.grid(
-            row=App.GRID[tag][0],
-            column=App.GRID[tag][1],
-            padx=App.PAD[tag][0],
-            pady=App.PAD[tag][1],
-            sticky=sticky,
-        )
-
-        if command is not None:
-            checkbox.config(command=command)
-
-        # Replace local checkbox
-        try:
-            self._Checkboxes[tag].destroy()
-        except KeyError:
-            pass
-        self._Checkboxes[tag] = checkbox
-
-        return True
-
-    def InitData(self, key):
+    def init_data(self, key) -> bool:
         """
         Completes initialization of data from file.
 
@@ -1852,246 +1528,7 @@ class App(tk.Frame):
 
         return True
 
-    def InitEntry(self,
-                  master,
-                  tag,
-                  sticky,
-                  text="",
-                  disabled=True,
-                  justify=tk.LEFT):
-        """
-        Initializes an entry widget.
-
-        :param master:
-        :param tag:
-
-        :return: True
-        """
-        stringVar = self.GetStringVar(tag)
-        stringVar.set(str(text))
-        entry = tk.Entry(
-            master,
-            textvariable=stringVar,
-            width=App.SIZES[tag][0],
-            justify=justify
-        )
-        entry.grid(
-            row=App.GRID[tag][0],
-            column=App.GRID[tag][1],
-            sticky=sticky,
-            padx=App.PAD[tag][0],
-            pady=App.PAD[tag][1],
-        )
-
-        if disabled:
-            entry.config(state="readonly")
-
-        # Replace local entry
-        try:
-            self._Entries[tag].destroy()
-        except KeyError:
-            pass
-        self._Entries[tag] = entry
-
-        return True
-
-    def InitFrame(self, master, tag):
-        """
-        Initializes a frame.
-
-        :param master: Widget root.
-        :param tag:    Tag of frame to initialize.
-
-        :return: True.
-        """
-        frame = tk.Frame(
-            master,
-            width=App.SIZES[tag][0],
-            height=App.SIZES[tag][1],
-        )
-
-        frame.grid(
-            row=App.GRID[tag][0],
-            column=App.GRID[tag][1],
-        )
-
-        # Replace local frame
-        try:
-            self._Frames[tag].destroy()
-        except KeyError:
-            pass
-        self._Frames[tag] = frame
-
-        return True
-
-    def InitLabel(self, master, tag, font, sticky, *args):
-        """
-        Initializes a label.
-
-        :param master: Widget root.
-        :param tag:    Tag of label to initialize.
-        :param font:   Font of label to initialize.
-        :param sticky: Anchoring string.
-        :param args:   Zero or more formatting arguments for string.
-
-        :return: True.
-        """
-        try:
-            text = App.LABELS[tag].format(*args)
-        except IndexError:
-            text = App.LABELS[tag]
-
-        label = tk.Label(master, font=font, text=text)
-        label.grid(
-            row=App.GRID[tag][0],
-            column=App.GRID[tag][1],
-            sticky=sticky,
-            padx=App.PAD[tag][0],
-            pady=App.PAD[tag][1],
-        )
-
-        # Replace local label
-        try:
-            self._Labels[tag].destroy()
-        except KeyError:
-            pass
-        self._Labels[tag] = label
-
-        return True
-
-    def InitMenu(self, master, tag, *commands):
-        """
-
-        :param master:
-        :param command:
-
-        :return: True.
-        """
-        assert tag != "main-menu"
-
-        menu = tk.Menu(master, tearoff=0)
-
-        for command in commands:
-            commandTag = command.get("label", "")
-            commandFnc = command.get("command", lambda: print())
-            menu.add_command(
-                label=commandTag,
-                command=commandFnc,
-            )
-
-        # Replace local menu
-        try:
-            self._Menus[tag].destroy()
-        except KeyError:
-            pass
-        self._Menus[tag] = menu
-
-        # Add to main menu
-        self._Menus["main-menu"].add_cascade(
-            label=App.LABELS[tag],
-            menu=menu,
-        )
-
-    def InitOptionMenu(self, master, tag, options):
-        """
-        Initializes a menu.
-
-        :param master:  Root of widget.
-        :param tag:     Tag of menu to initialize.
-        :param options: Options to populate menu with.
-
-        :return: True.
-        """
-        width = App.SIZES["default-menu"][0]
-        foreground = App.FromRGB(*App.COLORS[tag]["fg"])
-        background = App.FromRGB(*App.COLORS[tag]["bg"])
-        stringVar = self.GetStringVar(tag)
-
-        stringVar.set(App.LABELS[tag])
-
-        optionmenu = tk.OptionMenu(master, stringVar, *options)
-        optionmenu.config(
-            width=width,
-            foreground=foreground,
-            background=background,
-            activebackground=background,
-            activeforeground=foreground,
-        )
-
-        # Position OptionMenu
-        optionmenu.grid(
-            row=App.GRID[tag][0],
-            column=App.GRID[tag][1],
-            padx=App.PAD[tag][0],
-            pady=App.PAD[tag][1],
-        )
-
-        # Replace local OptionMenu
-        try:
-            self._OptionMenus[tag].destroy()
-        except KeyError:
-            pass
-        self._OptionMenus[tag] = optionmenu
-
-        return True
-
-    def InitRadio(self,
-                  master,
-                  tag,
-                  variable,
-                  value,
-                  sticky,
-                  *,
-                  select=False,
-                  command=None,
-                  ):
-        """
-        Initializes a radio button.
-
-        :param master:
-        :param tag:
-        :param variable:
-        :param value:
-        :param sticky:
-        :param select:
-        :param command:
-
-        :return: True.
-        """
-        # Create radio button
-        radio = tk.Radiobutton(
-            master,
-            text=App.LABELS[tag],
-            variable=variable,
-            value=value,
-            command=command,
-        )
-
-        # Position radio button
-        radio.grid(
-            row=App.GRID[tag][0],
-            column=App.GRID[tag][1],
-            sticky=sticky,
-            padx=App.PAD[tag][0],
-            pady=App.PAD[tag][1],
-        )
-
-        # (Optional) Select button
-        if select:
-            radio.select()
-        else:
-            radio.deselect()
-
-        # Replace local button
-        try:
-            self._RadioButtons[tag].destroy()
-        except KeyError:
-            pass
-        self._RadioButtons[tag] = radio
-
-        return True
-
-    def InitSliderFramerate(self):
+    def init_rate_slider(self) -> bool:
         """
         Completes initialization of framerate slider.
 
@@ -2099,30 +1536,30 @@ class App(tk.Frame):
         """
         scale = tk.Scale(
             self._Frames["c-y0x0b"],
-            from_=App.SPEED_SCALE_MAX,
-            to=App.SPEED_SCALE_MIN,
+            from_=self.SPEED_SCALE_MAX,
+            to=self.SPEED_SCALE_MIN,
             orient=tk.VERTICAL,
-            length=App.SIZES["default-slider"][0],
+            length=self.sizes["default-slider"][0],
             showvalue=0,
-            command=self.UpdateSpeed,
+            command=self.update_speed,
         )
 
         scale.set(self._Animation["speed"])
 
         scale.grid(
-            row=App.GRID["speed-slider"][0],
-            column=App.GRID["speed-slider"][1],
+            row=self.grid["speed-slider"][0],
+            column=self.grid["speed-slider"][1],
             sticky=tk.W,
             padx=16,
             pady=4,
         )
 
-        self._ScaleAnimSpeed.destroy()
-        self._ScaleAnimSpeed = scale
+        self._ScaleAnimationRate.destroy()
+        self._ScaleAnimationRate = scale
 
         return True
 
-    def JumpFrame(self, frame):
+    def jump_frame(self, frame) -> bool:
         """
         Jumps to a specific animation frame.
 
@@ -2133,16 +1570,16 @@ class App(tk.Frame):
         self._Animation["playing"] = False
         self._Animation["frame"] = frame
 
-        self.DoPressButton("pause-button")
-        self.DoUnpressButton("play-button")
+        self.do_press_button("pause-button")
+        self.do_unpress_button("play-button")
 
-        self.UpdateAnimationImage()
-        self.UpdateOffsetLabels()
-        self.SelectAnimRadioButton()
+        self.update_animation_image()
+        self.update_offset_labels()
+        self.select_anim_radiobutton()
 
         return True
 
-    def MakeAnimationFrames(self, image, reset):
+    def make_animation_frames(self, image, reset):
         """
         Populates local animation buffer.
 
@@ -2152,7 +1589,7 @@ class App(tk.Frame):
         :return: True
         """
         # Get animation frames
-        w, h = App.SIZES["preview-anim"]
+        w, h = self.sizes["preview-anim"]
         self._Animation["objects"] = [
             sprite_imaging.ToPILToTkinter(
                 sprite_imaging.Crop(image, [w * n, 0], [w, h])
@@ -2163,7 +1600,7 @@ class App(tk.Frame):
         if reset:
             self._Animation["frame"] = 0
             self._Animation["forward"] = True
-        self._Animation["speed"] = self._ScaleAnimSpeed.get()
+        self._Animation["speed"] = self._ScaleAnimationRate.get()
 
         # Create animated preview
         self._Canvases["preview-anim"].create_image(
@@ -2173,11 +1610,11 @@ class App(tk.Frame):
         )
 
         # Update labels
-        self.UpdateOffsetLabels()
+        self.update_offset_labels()
 
         return True
 
-    def MakeAnimationPreview(self, image):
+    def make_animation_preview(self, image):
         """
         Displays static preview frames.
 
@@ -2194,11 +1631,11 @@ class App(tk.Frame):
             image=image,
         )
 
-        #self.DrawFrameLabels()
+        # self.DrawFrameLabels()
 
         return True
 
-    def MakePreview(self, func, state, reset=False, **kwargs):
+    def make_preview(self, func, state, reset=False, **kwargs):
         """
         Generates a static preview image.
 
@@ -2213,7 +1650,7 @@ class App(tk.Frame):
             self._Animation["state"] = state
             self._Data["head"]["offset"] = LoadOffsets("head")
 
-            head, body, image = self.DoComposite(func, **kwargs)
+            head, body, image = self.do_composite(func, **kwargs)
             if image is not None:
                 try:
                     # Crop idle frames from source spritesheet
@@ -2226,13 +1663,13 @@ class App(tk.Frame):
                             ),
                             cv2.COLOR_BGR2RGB,
                         ),
-                        dsize=tuple(App.SIZES["preview-resize"]),
+                        dsize=tuple(self.sizes["preview-resize"]),
                         interpolation=cv2.INTER_NEAREST,
                     )
 
                     # Set static and animated previews
-                    self.MakeAnimationPreview(image)
-                    self.MakeAnimationFrames(image, reset)
+                    self.make_animation_preview(image)
+                    self.make_animation_frames(image, reset)
 
                     try:
                         # Populate per-frame head offset data
@@ -2248,7 +1685,7 @@ class App(tk.Frame):
                     except KeyError:
                         self._Data["body"]["current"] = {}
 
-                    self.UpdateOffsetLabels()
+                    self.update_offset_labels()
 
                 except cv2.error:
                     raise InvalidFilenameException
@@ -2256,13 +1693,13 @@ class App(tk.Frame):
         except InvalidFilenameException:
             # Image format not recognized
             tk.messagebox.showinfo(
-                App.WINDOW_TITLE,
-                App.MESSAGES["message"]["failure"]["type"],
+                self.title,
+                self.messages["message"]["failure"]["type"],
             )
 
         return True
 
-    def RebuildData(self, key):
+    def rebuild_data(self, key):
         """
         Callback function. Rebuilds a given JSON database.
 
@@ -2270,18 +1707,17 @@ class App(tk.Frame):
 
         :return: True.
         """
-        title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["data"][key]
-        alert = App.MESSAGES["message"]["rebuild"]["data"][key]
+        title = self.title
+        query = self.messages["confirm"]["rebuild"]["data"][key]
+        alert = self.messages["message"]["rebuild"]["data"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            self.DoRebuildData(key)
+            self.do_rebuild_data(key)
             tk.messagebox.showinfo(title, alert)
 
         return True
 
-    # noinspection PyMethodMayBeStatic
-    def RebuildImages(self, key):
+    def rebuild_images(self, key) -> bool:
         """
         Callback function. Rebuilds intermediate body spritesheets.
 
@@ -2289,9 +1725,9 @@ class App(tk.Frame):
 
         :return: True.
         """
-        title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["image"][key]
-        alert = App.MESSAGES["message"]["rebuild"]["image"][key]
+        title = self.title
+        query = self.messages["confirm"]["rebuild"]["image"][key]
+        alert = self.messages["message"]["rebuild"]["image"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
             Prepare(key)
@@ -2299,7 +1735,7 @@ class App(tk.Frame):
 
         return True
 
-    def RebuildOffsets(self, key):
+    def rebuild_offsets(self, key) -> bool:
         """
         Callback function. Rebuilds offset database.
 
@@ -2307,17 +1743,17 @@ class App(tk.Frame):
 
         :return: True.
         """
-        title = App.WINDOW_TITLE
-        query = App.MESSAGES["confirm"]["rebuild"]["offset"][key]
-        alert = App.MESSAGES["message"]["rebuild"]["offset"][key]
+        title = self.title
+        query = self.messages["confirm"]["rebuild"]["offset"][key]
+        alert = self.messages["message"]["rebuild"]["offset"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            self.DoRemakeOffset(key)
+            self.do_remake_offset(key)
             tk.messagebox.showinfo(title, alert)
 
         return True
 
-    def ScheduleAnimate(self):
+    def schedule_animate(self) -> bool:
         """
         Schedules an animation callback routine.
 
@@ -2325,11 +1761,11 @@ class App(tk.Frame):
         """
         speed = self._Animation["speed"]
         if speed > 0:
-            self.SetPending("animate", self.DoAnimate, 1000 // speed)
+            self.set_pending("animate", self.do_animate, 1000 // speed)
 
         return True
 
-    def SelectAnimRadioButton(self):
+    def select_anim_radiobutton(self) -> bool:
         """
         Selects the appropriate animation frame radio button.
 
@@ -2346,170 +1782,160 @@ class App(tk.Frame):
 
         return True
 
-    def SetPending(self, key, callback, delay):
+    def shuffle_all(self) -> bool:
         """
-        Schedules a callback function to run after a time delay.
+        Shuffles currently-selected bodies and heads.
 
-        :param key:      Key of callback to flag.
-        :param callback: Callback function to trigger.
-        :param delay:    Time delay (milliseconds).
+        :return: True.
+        """
+        self.shuffle_body()
+        self.shuffle_head()
+        self.do_make_preview()
+
+        return True
+
+    def shuffle_body(self) -> bool:
+        """
+        Shuffles body selection.
+
+        :return: True.
+        """
+        self.get_string_var("body").set(
+            random.choice(self._Data["body"]["list"])
+        )
+        self.do_make_preview()
+
+        return True
+
+    def shuffle_head(self) -> bool:
+        """
+        Shuffles head selection.
+
+        :return: True.
+        """
+        self.get_string_var("head").set(
+            random.choice(self._Data["head"]["list"])
+        )
+        self.do_make_preview()
+
+        return True
+
+    def toggle_pingpong(self) -> bool:
+        """
+        Turns animation ping-ponging on or off.
 
         :return: True
         """
-        self._PendingJobs[key] = self.after(delay, callback)
+        is_pingpong = self.get_boolean_var("pingpong-animation")
 
-        return True
-
-    def ShuffleAll(self):
-        """
-        Shuffles bodies and heads.
-
-        :return: True.
-        """
-        self.GetStringVar("body").set(random.choice(self._Data["body"]["list"]))
-        self.GetStringVar("head").set(random.choice(self._Data["head"]["list"]))
-        self.DoMakePreview()
-
-        return True
-
-    def ShuffleBody(self):
-        """
-        Shuffles bodies.
-
-        :return: True.
-        """
-        self.GetStringVar("body").set(random.choice(self._Data["body"]["list"]))
-        self.DoMakePreview()
-
-        return True
-
-    def ShuffleHead(self):
-        """
-        Shuffles heads.
-
-        :return: True.
-        """
-        self.GetStringVar("head").set(random.choice(self._Data["head"]["list"]))
-        self.DoMakePreview()
-
-        return True
-
-    def TogglePingpong(self):
-        """
-        hhh
-
-        :return: True
-        """
-        isPingpong = self.GetBooleanVar("pingpong-animation")
-
-        if isPingpong.get():
-            self.DoUnpressButton("ping-pong-button")
-            isPingpong.set(False)
+        if is_pingpong.get():
+            self.do_unpress_button("ping-pong-button")
+            is_pingpong.set(False)
         else:
-            self.DoPressButton("ping-pong-button")
-            isPingpong.set(True)
+            self.do_press_button("ping-pong-button")
+            is_pingpong.set(True)
 
         return True
 
-    def ToggleReverseLayers(self):
+    def toggle_reverse_layers(self):
         """
-        hhh
+        Turns layer reversal on or off.
 
         :return: True
         """
-        isReverseLayers = self.GetBooleanVar("reverse-layers")
+        is_reverse_layers = self.get_boolean_var("reverse-layers")
 
-        if isReverseLayers.get():
-            self.DoUnpressButton("layers-button")
-            isReverseLayers.set(False)
+        if is_reverse_layers.get():
+            self.do_unpress_button("layers-button")
+            is_reverse_layers.set(False)
         else:
-            self.DoPressButton("layers-button")
-            isReverseLayers.set(True)
+            self.do_press_button("layers-button")
+            is_reverse_layers.set(True)
 
         return True
 
-    def TurnPlaybackOn(self):
+    def turn_playback_on(self):
         """
         Turns animation playback on.
 
         :return: True.
         """
         if not self._Animation["playing"]:
-            self.DoMakePreview()
-            self.DoPlay()
+            self.do_make_preview()
+            self.do_play()
 
         return True
 
-    def TurnPlaybackOff(self):
+    def turn_playback_off(self):
         """
         Turns animation playing off.
 
         :return: True.
         """
-        self.DoPause()
+        self.do_pause()
         return True
 
-    def UpdateCurrentFrame(self, increment):
+    def update_current_frame(self, increment) -> bool:
         """
         Increments current animation frame.
 
         :return: True.
         """
         # Check frame iteration type
-        isForwards = self._Animation["forward"]
-        isPingpong = self.GetBooleanVar("pingpong-animation").get()
-        if not isPingpong:
-            isForwards = True
+        is_forwards = self._Animation["forward"]
+        is_pingpong = self.get_boolean_var("pingpong-animation").get()
+        if not is_pingpong:
+            is_forwards = True
 
         # Increment frame
         frame = self._Animation["frame"]
 
         if self._Animation["objects"]:
-            if isForwards:
+            if is_forwards:
                 # Forwards iteration
                 frame += increment
                 if frame < 0:
-                    if not isPingpong:
+                    if not is_pingpong:
                         frame = 3
-                        isForwards = True
+                        is_forwards = True
                     else:
                         frame = 1
-                        isForwards = True
+                        is_forwards = True
 
                 elif frame >= 4:
-                    if not isPingpong:
+                    if not is_pingpong:
                         frame = 0
-                        isForwards = True
+                        is_forwards = True
                     else:
                         frame = 2
-                        isForwards = False
+                        is_forwards = False
 
             else:
                 # Backwards iteration
                 frame -= increment
                 if frame < 0:
-                    if not isPingpong:
+                    if not is_pingpong:
                         frame = 3
-                        isForwards = True
+                        is_forwards = True
                     else:
                         frame = 1
-                        isForwards = True
+                        is_forwards = True
 
                 elif frame >= 4:
-                    if not isPingpong:
+                    if not is_pingpong:
                         frame = 0
-                        isForwards = True
+                        is_forwards = True
                     else:
                         frame = 2
-                        isForwards = False
+                        is_forwards = False
 
         # Update references to current frame
-        self._Animation["forward"] = isForwards
+        self._Animation["forward"] = is_forwards
         self._Animation["frame"] = frame
 
         return True
 
-    def UpdateOffsetLabel(self, key, state, frame):
+    def update_offset_label(self, key, state, frame):
         """
         Updates labels for current frame's (x, y) offsets.
 
@@ -2523,16 +1949,16 @@ class App(tk.Frame):
         strvary = "{}-y".format(key)
         try:
             xy = self._Data[key]["current"]["offset"][state][frame]
-            self.GetStringVar(strvarx).set("{0:+d}".format(xy[0]))
-            self.GetStringVar(strvary).set("{0:+d}".format(xy[1]))
+            self.get_string_var(strvarx).set("{0:+d}".format(xy[0]))
+            self.get_string_var(strvary).set("{0:+d}".format(xy[1]))
 
         except (KeyError, IndexError):
-            self.GetStringVar(strvarx).set("{0:+d}".format(0))
-            self.GetStringVar(strvary).set("{0:+d}".format(0))
+            self.get_string_var(strvarx).set("{0:+d}".format(0))
+            self.get_string_var(strvary).set("{0:+d}".format(0))
 
         return True
 
-    def UpdateSizeLabel(self, key):
+    def update_size_label(self, key) -> bool:
         """
         Updates labels for current frame's size (e.g. "small" or "large").
 
@@ -2543,14 +1969,14 @@ class App(tk.Frame):
         strvar = "{}-size".format(key)
         try:
             size = self._Data[key]["current"]["size"]
-            self.GetStringVar(strvar).set(size.capitalize())
+            self.get_string_var(strvar).set(size.capitalize())
 
         except (KeyError, IndexError):
-            self.GetStringVar(strvar).set("Large")
+            self.get_string_var(strvar).set("Large")
 
         return True
 
-    def UpdateAnimationImage(self):
+    def update_animation_image(self):
         """
         Updates currently-previewed animation frame.
 
@@ -2558,14 +1984,14 @@ class App(tk.Frame):
         """
         try:
             # Draw frame to canvas
-            animObjects = self._Animation["objects"]
-            animFrame = self._Animation["frame"]
-            animImage = animObjects[animFrame]
+            anim_objects = self._Animation["objects"]
+            anim_frame = self._Animation["frame"]
+            anim_image = anim_objects[anim_frame]
 
             self._Canvases["preview-anim"].create_image(
                 (16, 16),
                 anchor=tk.NW,
-                image=animImage,
+                image=anim_image,
             )
 
         except IndexError:
@@ -2574,7 +2000,7 @@ class App(tk.Frame):
 
         return True
 
-    def UpdateOffsetLabels(self):
+    def update_offset_labels(self) -> bool:
         """
         Updates per-frame (x,y) head and body offset labels.
 
@@ -2583,13 +2009,13 @@ class App(tk.Frame):
         state = self._Animation["state"]
         frame = self._Animation["frame"]
 
-        self.UpdateOffsetLabel("head", state, frame)
-        self.UpdateOffsetLabel("body", state, frame)
-        self.UpdateSizeLabel("head")
+        self.update_offset_label("head", state, frame)
+        self.update_offset_label("body", state, frame)
+        self.update_size_label("head")
 
         return True
 
-    def UpdateSpeed(self, speed):
+    def update_speed(self, speed) -> bool:
         """
         Updates current animation speed.
 
@@ -2598,14 +2024,14 @@ class App(tk.Frame):
         :return: True.
         """
         speed = int(speed)
-        text = App.LABELS["speed-anim"].format(speed)
+        text = self.labels["speed-anim"].format(speed)
 
         self._Labels["speed-anim"].config(text=text)
         self._Animation["speed"] = speed
 
         # Play animation
-        self.CancelPending("animate")
-        self.ScheduleAnimate()
+        self.cancel_pending("animate")
+        self.schedule_animate()
 
         return True
 

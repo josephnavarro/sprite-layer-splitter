@@ -176,6 +176,10 @@ class EnumItem:
     def float(self):
         return float(self)
 
+    @property
+    def string(self):
+        return str(self)
+
 
 class NamedEnumIter:
     """
