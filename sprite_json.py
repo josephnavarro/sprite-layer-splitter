@@ -14,16 +14,17 @@ from sprite_utils import *
 JSON_TEMPLATES = {
     "base": "{{{}}}",
     "head": "\"{name}\":{{"
-            "\"path\":[\"images\",\"head\",\"{name}.png\"],"
+            "\"path\":[\"images\",\"{profile}\",\"head\",\"{name}.png\"],"
             "\"name\":\"{full}\""
             "}},",
     "body": "\"{name}\":{{"
-            "\"path\":[\"images\",\"body\",\"{name}.png\"],"
+            "\"path\":[\"images\",\"{profile}\",\"body\",\"{name}.png\"],"
             "\"name\":\"{full}\""
             "}},",
 }
 
 PATHS = {
+    "images": os.path.join(DIRECTORIES["input"]["root"], "images"),
     "impath": os.path.join(DIRECTORIES["input"]["root"], "paths"),
     "offset": os.path.join(DIRECTORIES["input"]["root"], "offsets"),
     "source": {
@@ -54,18 +55,21 @@ JSON_KEY_RESERVE = "?.{}"
 JSON_KEY_DEFAULT = JSON_KEY_RESERVE.format("default")
 
 
-def CreateInputJSON(key):
+def CreateInputJSON(key, profile):
     """
     Automatically generates a character head JSON file.
 
     JSON contents will reflect contents of "inputs/head/".
 
+    :param key:
+    :param profile:
+
     :return: None.
     """
-    path = os.path.join(DIRECTORIES["input"][key], "*.png")
-
+    path = os.path.join(PATHS["images"], profile, key, "*.png")
     contents = ""
     for fn in sorted(glob.glob(path)):
+        print(path)
         n = os.path.splitext(os.path.basename(fn))[0]
         p = " ".join([(
             "({})".format(x.capitalize())
@@ -77,16 +81,18 @@ def CreateInputJSON(key):
             )
         ) for x in n.split("-")
         ])
-        contents += JSON_TEMPLATES[key].format(name=n, full=p)
+        contents += JSON_TEMPLATES[key].format(profile=profile, name=n, full=p)
 
     contents = contents.rstrip(",")
     contents = JSON_TEMPLATES["base"].format(contents)
+
+    #print(contents)
 
     with open(JSONS["paths"][key], "w") as f:
         f.write(contents)
 
 
-def LoadOffsets(key):
+def LoadOffsets(key, profile):
     """
     Loads and returns per-frame (x,y) offsets.
 
@@ -95,7 +101,7 @@ def LoadOffsets(key):
     :return: Dictionary containing all (x,y) offsets.
     """
     with open(JSONS["offset"][key], "r") as f:
-        data = json.load(f)
+        data = json.load(f).get(JSON_KEY_RESERVE.format(profile), {})
     return data
 
 

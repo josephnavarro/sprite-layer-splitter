@@ -222,6 +222,11 @@ class App(EasyGUI):
             "head-menu":            "Head",
             "body-menu":            "Body",
             "export-menu":          "Export",
+            "profile-menu":         "Profile",
+
+            # Profiles
+            "menu-radio-echoes":    "Echoes",
+            "menu-radio-fates":     "Fates",
 
             # Canvas captions
             "preview-frames-label": "Static frame preview",
@@ -321,16 +326,20 @@ class App(EasyGUI):
                 },
                 "rebuild": {
                     "image":  {
-                        "body": "Succssfully reconstructed body source images.",
-                        "head": "Successfully reconstructed head source images.",
+                        "body": "Succssfully reconstructed "
+                                "body source images.",
+                        "head": "Successfully reconstructed "
+                                "head source images.",
                     },
                     "data":   {
                         "body": "Reassembled list of available bodies.",
                         "head": "Reassembled list of available heads.",
                     },
                     "offset": {
-                        "body": "Successfully reloaded per-frame body offsets.",
-                        "head": "Successfully reloaded per-frame head offsets.",
+                        "body": "Successfully reloaded "
+                                "per-frame body offsets.",
+                        "head": "Successfully reloaded "
+                                "per-frame head offsets.",
                     },
                 },
                 "success": {
@@ -438,7 +447,7 @@ class App(EasyGUI):
             "pad-a-y2x0b":          [0, 10],
             "pad-b-y0x3":           [1, 10],
             "pad-b-y1x0":           [0, 16],
-            "pad-c-y1x0a":          [1 if IsOSX() else 2, 16],
+            "pad-c-y1x0a":          [1 if self.is_osx() else 2, 16],
             "pad-d-y1x0":           [0, 16],
             "pad-master-y0x0":      [0, 10],
 
@@ -588,8 +597,7 @@ class App(EasyGUI):
         :param args:   Optional arguments to tk.Frame.
         :param kwargs: Keyword arguments to tk.Frame.
         """
-        # Set icon for Mac OS X (and kill iTunes)
-
+        # Pre-initialization processing:
 
         # Initialize animation data
         self._Animation = {
@@ -625,6 +633,9 @@ class App(EasyGUI):
 
         super().__init__(root, *args, **kwargs)
 
+        # Post-initialization processing:
+
+        # Kill iTunes and set icon image if on Mac
         if self.is_osx():
             image = tk.Image("photo", file="misc/icon.png")
             # noinspection PyProtectedMember
@@ -702,23 +713,24 @@ class App(EasyGUI):
 
         return True
 
-    def do_composite(self, func, **kwargs):
+    def do_composite(self, callback, **kwargs):
         """
         Performs a general-purpose image composition routine.
 
-        :param func: Compositing function (CompositeIdle or CompositeFull)
+        :param callback: Compositing function (CompositeIdle or CompositeFull)
 
         :return: Tuple of head key, body key, and numpy image.
         """
         head = ""
         body = ""
         image = None
+        profile = self._Data["profile"]
 
         try:
             # Perform sprite composition
             head = self.get_key("head")
             body = self.get_key("body")
-            image = func(head, body, **kwargs)
+            image = callback(profile, head, body, **kwargs)
 
         except sprite_splitter.NonexistentHeadException as e:
             # Head spritesheet does not exist
@@ -852,11 +864,10 @@ class App(EasyGUI):
 
         :return: True.
         """
-        CreateInputJSON(key)
+        CreateInputJSON(key, self._Data["profile"])
         self.init_data(key)
         self.init_option_menu(
-            self.get_frame("b-y1x0"),
-            key, self._Data[key]["list"],
+            self.get_frame("b-y1x0"), key, self._Data[key]["list"],
         )
 
         return True
@@ -869,7 +880,7 @@ class App(EasyGUI):
 
         :return: True.
         """
-        self._Data[key]["offset"] = LoadOffsets(key)
+        self._Data[key]["offset"] = LoadOffsets(key, self._Data["profile"])
         self.update_offset_labels()
         self.do_make_preview()
 
@@ -901,9 +912,10 @@ class App(EasyGUI):
 
         :return: True on success; False on failure.
         """
+        draw_text = self.draw_text
         canvas = self._Canvases["preview-static"]
         for n in range(4):
-            self.draw_text(canvas, 18 + 96 * n, 92, "({})".format(n))
+            draw_text(canvas, 18 + 96 * n, 92, "({})".format(n))
 
         return True
 
@@ -972,75 +984,77 @@ class App(EasyGUI):
 
         :return: True.
         """
+        init_button = self.init_button
         thread_it = self.thread_it
+        get_frame = self.get_frame
 
         # Initialize "play animation" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "play-button",
             thread_it(self.turn_playback_on),
         )
 
         # Initialize "pause animation" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "pause-button",
             thread_it(self.turn_playback_off),
             pressed=True,
         )
 
         # Initialize "skip frame right" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "skip-right-button",
             thread_it(lambda: self.frame_skip(1)),
         )
 
         # Initialize "skip frame left" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "skip-left-button",
             thread_it(lambda: self.frame_skip(-1)),
         )
 
         # Initialize "shuffle" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "shuffle-button",
             thread_it(lambda: self.shuffle_all() and self.jump_frame(0)),
         )
 
         # Initialize "shuffle body" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "shuffle-body-button",
             thread_it(lambda: self.shuffle_body() and self.jump_frame(0)),
         )
 
         # Initialize "shuffle head" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "shuffle-head-button",
             thread_it(lambda: self.shuffle_head() and self.jump_frame(0)),
         )
 
         # Initialize "clear body" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "clear-body-button",
             thread_it(lambda: self.clear_body() and self.jump_frame(0)),
         )
 
         # Initialize "clear head" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "clear-head-button",
             thread_it(lambda: self.clear_head() and self.jump_frame(0)),
         )
 
         # Initialize "reload" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "reload-button",
             thread_it(
                 lambda: self.do_remake_offset("head")
@@ -1051,8 +1065,8 @@ class App(EasyGUI):
         )
 
         # Initialize "idle preview" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "preview-idle-button",
             thread_it(
                 lambda: self.do_make_preview(state="idle")
@@ -1065,8 +1079,8 @@ class App(EasyGUI):
         )
 
         # Initialize "left preview" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "preview-left-button",
             thread_it(
                 lambda: self.do_make_preview(state="left")
@@ -1078,8 +1092,8 @@ class App(EasyGUI):
         )
 
         # Initialize "right preview" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "preview-right-button",
             thread_it(
                 lambda: self.do_make_preview(state="right")
@@ -1091,14 +1105,14 @@ class App(EasyGUI):
         )
 
         # Initialize "ping-pong" button
-        self.init_button(
-            self.get_frame("d-y0x0"),
+        init_button(
+            get_frame("d-y0x0"),
             "ping-pong-button",
             thread_it(self.toggle_pingpong),
         )
 
         # Initialize "reverse layers" button
-        self.init_button(
+        init_button(
             self.get_frame("d-y0x0"),
             "layers-button",
             thread_it(self.toggle_reverse_layers),
@@ -1350,10 +1364,30 @@ class App(EasyGUI):
         thread_it = self.thread_it
         init_menu = self.init_menu
         labels = self.labels
+        root_menu = self._Menus["main-menu"]
+
+        # Initialize "profiles" menu
+        init_menu(
+            root_menu,
+            "profile-menu",
+            radio={
+                "menu-radio-echoes": {
+                    "value":    "echoes",
+                    "variable": "profile-variable",
+                    "command":  thread_it(lambda: self.set_profile("echoes")),
+                },
+                "menu-radio-fates":  {
+                    "value":    "fates",
+                    "variable": "profile-variable",
+                    "command":  thread_it(lambda: self.set_profile("fates")),
+                },
+
+            }
+        )
 
         # Initialize "head" menu
         init_menu(
-            self._Menus["main-menu"],
+            root_menu,
             "head-menu",
             {
                 "label":   labels["rebuild-head-data"],
@@ -1375,7 +1409,7 @@ class App(EasyGUI):
 
         # Initialize "body" menu
         init_menu(
-            self._Menus["main-menu"],
+            root_menu,
             "body-menu",
             {
                 "label":   labels["rebuild-body-data"],
@@ -1397,11 +1431,12 @@ class App(EasyGUI):
 
         # Initialize "export" menu
         init_menu(
-            self._Menus["main-menu"],
+            root_menu,
             "export-menu",
             {
                 "label":   labels["export-idle"],
-                "command": thread_it(lambda: self.export_frames(idle_only=True)),
+                "command": thread_it(
+                    lambda: self.export_frames(idle_only=True)),
             },
             {
                 "label":   labels["export-full"],
@@ -1418,20 +1453,14 @@ class App(EasyGUI):
         :return: True.
         """
         init_optionmenu = self.init_option_menu
+        frames = self._Frames
+        data = self._Data
 
         # Initialize "select head" dropdown menu
-        init_optionmenu(
-            self._Frames["b-y1x0"],
-            "head",
-            self._Data["head"]["list"],
-        )
+        init_optionmenu(frames["b-y1x0"], "head", data["head"]["list"])
 
         # Initialize "select body" dropdown menu
-        init_optionmenu(
-            self._Frames["b-y1x0"],
-            "body",
-            self._Data["body"]["list"],
-        )
+        init_optionmenu(frames["b-y1x0"], "body", data["body"]["list"])
 
         return True
 
@@ -1444,10 +1473,11 @@ class App(EasyGUI):
         init_radio = self.init_radio
         get_string_var = self.get_string_var
         thread_it = self.thread_it
+        frames = self._Frames
 
         # Initialize "prioritize head" radio button
         init_radio(
-            self._Frames["d-y1x0"],
+            frames["d-y1x0"],
             "prioritize-1",
             get_string_var("prioritize"),
             "Head",
@@ -1457,7 +1487,7 @@ class App(EasyGUI):
 
         # Initialize "prioritize body" radio button
         init_radio(
-            self._Frames["d-y1x0"],
+            frames["d-y1x0"],
             "prioritize-2",
             get_string_var("prioritize"),
             "Body",
@@ -1466,7 +1496,7 @@ class App(EasyGUI):
 
         # Initialize "frame #1" radio button
         init_radio(
-            self._Frames["c-y7x0"],
+            frames["c-y7x0"],
             "frame-0",
             get_string_var("frame"),
             "0",
@@ -1487,7 +1517,7 @@ class App(EasyGUI):
 
         # Initialize "frame #3" radio button
         init_radio(
-            self._Frames["c-y7x0"],
+            frames["c-y7x0"],
             "frame-2",
             get_string_var("frame"),
             "2",
@@ -1497,7 +1527,7 @@ class App(EasyGUI):
 
         # Initialize "frame #4" radio button
         init_radio(
-            self._Frames["c-y7x0"],
+            frames["c-y7x0"],
             "frame-3",
             get_string_var("frame"),
             "3",
@@ -1515,16 +1545,16 @@ class App(EasyGUI):
 
         :return: True.
         """
-        newPaths = LoadPaths(key)
-        newOffsets = LoadOffsets(key)
+        paths = LoadPaths(key)
+        data = self._Data
+        offsets = LoadOffsets(key, data["profile"])
 
-        names = self._Data[key]["data"] = {
-            v.get("name", "---"): k
-            for k, v in newPaths.items()
+        names = data[key]["data"] = {
+            v.get("name", "---"): k for k, v in paths.items()
         }
 
-        self._Data[key]["list"] = [App.DEFAULT_NAME] + sorted(list(names))
-        self._Data[key]["offset"] = newOffsets
+        data[key]["list"] = [self.DEFAULT_NAME] + sorted(list(names))
+        data[key]["offset"] = offsets
 
         return True
 
@@ -1588,9 +1618,11 @@ class App(EasyGUI):
 
         :return: True
         """
+        animation = self._Animation
+
         # Get animation frames
         w, h = self.sizes["preview-anim"]
-        self._Animation["objects"] = [
+        animation["objects"] = [
             sprite_imaging.ToPILToTkinter(
                 sprite_imaging.Crop(image, [w * n, 0], [w, h])
             ) for n in range(4)
@@ -1598,15 +1630,15 @@ class App(EasyGUI):
 
         # Reset animation counters
         if reset:
-            self._Animation["frame"] = 0
-            self._Animation["forward"] = True
-        self._Animation["speed"] = self._ScaleAnimationRate.get()
+            animation["frame"] = 0
+            animation["forward"] = True
+        animation["speed"] = self._ScaleAnimationRate.get()
 
         # Create animated preview
         self._Canvases["preview-anim"].create_image(
             (16, 16),
             anchor=tk.NW,
-            image=self._Animation["objects"][0],
+            image=animation["objects"][0],
         )
 
         # Update labels
@@ -1646,9 +1678,12 @@ class App(EasyGUI):
         :return: True.
         """
         try:
+            data = self._Data
+            profile = data["profile"]
+
             # Perform sprite composition
             self._Animation["state"] = state
-            self._Data["head"]["offset"] = LoadOffsets("head")
+            data["head"]["offset"] = LoadOffsets("head", profile)
 
             head, body, image = self.do_composite(func, **kwargs)
             if image is not None:
@@ -1673,29 +1708,27 @@ class App(EasyGUI):
 
                     try:
                         # Populate per-frame head offset data
-                        self._Data["head"]["current"] = \
-                            self._Data["head"]["offset"][body]
+                        data["head"]["current"] = data["head"]["offset"][body]
                     except KeyError:
-                        self._Data["head"]["current"] = {}
+                        data["head"]["current"] = {}
 
                     try:
                         # Populate per-frame body offset data
-                        self._Data["body"]["current"] = \
-                            self._Data["body"]["offset"][body]
+                        data["body"]["current"] = data["body"]["offset"][body]
                     except KeyError:
-                        self._Data["body"]["current"] = {}
+                        data["body"]["current"] = {}
 
                     self.update_offset_labels()
 
                 except cv2.error:
+                    print("oops")
                     raise InvalidFilenameException
 
         except InvalidFilenameException:
             # Image format not recognized
-            tk.messagebox.showinfo(
-                self.title,
-                self.messages["message"]["failure"]["type"],
-            )
+            title = self.title
+            message = self.messages["message"]["failure"]["type"]
+            tk.messagebox.showinfo(title, message)
 
         return True
 
@@ -1772,13 +1805,25 @@ class App(EasyGUI):
         :return: True.
         """
         frame = self._Animation["frame"]
-
         for n in range(4):
             key = "frame-{}".format(n)
-            if n == frame:
-                self._RadioButtons[key].select()
-            else:
-                self._RadioButtons[key].deselect()
+            self.toggle_radio(self._RadioButtons[key], n == frame)
+
+        return True
+
+    def set_profile(self, profile) -> bool:
+        """
+        hhh
+
+        :param profile:
+
+        :return: True
+        """
+        self._Data["profile"] = profile
+        self.do_rebuild_data("head")
+        self.do_rebuild_data("body")
+        self.do_remake_offset("head")
+        self.do_remake_offset("body")
 
         return True
 
@@ -1837,7 +1882,7 @@ class App(EasyGUI):
 
         return True
 
-    def toggle_reverse_layers(self):
+    def toggle_reverse_layers(self) -> bool:
         """
         Turns layer reversal on or off.
 
@@ -1854,7 +1899,7 @@ class App(EasyGUI):
 
         return True
 
-    def turn_playback_on(self):
+    def turn_playback_on(self) -> bool:
         """
         Turns animation playback on.
 
@@ -1866,7 +1911,7 @@ class App(EasyGUI):
 
         return True
 
-    def turn_playback_off(self):
+    def turn_playback_off(self) -> bool:
         """
         Turns animation playing off.
 
@@ -1881,16 +1926,18 @@ class App(EasyGUI):
 
         :return: True.
         """
+        animation = self._Animation
+
         # Check frame iteration type
-        is_forwards = self._Animation["forward"]
+        is_forwards = animation["forward"]
         is_pingpong = self.get_boolean_var("pingpong-animation").get()
         if not is_pingpong:
             is_forwards = True
 
         # Increment frame
-        frame = self._Animation["frame"]
+        frame = animation["frame"]
 
-        if self._Animation["objects"]:
+        if animation["objects"]:
             if is_forwards:
                 # Forwards iteration
                 frame += increment
@@ -1930,8 +1977,8 @@ class App(EasyGUI):
                         is_forwards = False
 
         # Update references to current frame
-        self._Animation["forward"] = is_forwards
-        self._Animation["frame"] = frame
+        animation["forward"] = is_forwards
+        animation["frame"] = frame
 
         return True
 
@@ -1976,7 +2023,7 @@ class App(EasyGUI):
 
         return True
 
-    def update_animation_image(self):
+    def update_animation_image(self) -> bool:
         """
         Updates currently-previewed animation frame.
 

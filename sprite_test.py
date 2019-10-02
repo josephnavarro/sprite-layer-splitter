@@ -34,18 +34,23 @@ def DoComposite(command, idle=False):
 
     :return: None.
     """
-    if len(command) == 3:
+    if len(command) == 4:
         sprite_utils.FixPath(ROOT_OUTPUT_DIR)
-        head = command[1]
-        body = command[2]
+        profile = command[1]
+        head = command[2]
+        body = command[3]
         path = os.path.join(ROOT_OUTPUT_DIR, "{}_{}.png".format(head, body))
 
         if idle:
-            image = sprite_splitter.Composite(head, body, idle_only=True)
+            image = sprite_splitter.Composite(
+                profile, head, body, idle_only=True
+            )
             sprite_splitter.SaveImage(image, path)
             print("Composited {} (idle only)!".format(path))
         else:
-            image = sprite_splitter.Composite(head, body)
+            image = sprite_splitter.Composite(
+                profile, head, body
+            )
             sprite_splitter.SaveImage(image, path)
             print("Composited {}!".format(path))
 

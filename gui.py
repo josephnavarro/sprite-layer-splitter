@@ -389,10 +389,12 @@ class EasyGUI(tk.Frame):
 
         return True
 
-    def init_menu(self, master, tag, *commands) -> bool:
+    def init_menu(self, master, tag, *commands, **kwargs) -> bool:
         assert tag != "main-menu"
 
+        get_string_var = self.get_string_var
         menu = tk.Menu(master, tearoff=0)
+        labels = self.labels
 
         for command in commands:
             ntag = command.get("label", "")
@@ -400,9 +402,22 @@ class EasyGUI(tk.Frame):
             menu.add_command(label=ntag, command=fnc)
 
         self.replace_widget(self._Menus, tag, menu)
-        self._Menus["main-menu"].add_cascade(
-            label=self.labels[tag], menu=menu
-        )
+        self._Menus["main-menu"].add_cascade(label=labels[tag], menu=menu)
+
+        # Initialize radiobuttons (if any)
+        radiobuttons = kwargs.get("radio", {})
+        if radiobuttons:
+            for k, v in radiobuttons.items():
+                label = labels[k]
+                variable = get_string_var(v["variable"])
+                command = v.get("command", None)
+                value = v.get("value", "")
+                menu.add_radiobutton(
+                    label=label,
+                    value=value,
+                    variable=variable,
+                    command=command,
+                )
 
         return True
 

@@ -13,7 +13,6 @@ from sprite_json import *
 from sprite_imaging import *
 from sprite_utils import *
 
-
 """
 Head source image error string.
 """
@@ -54,13 +53,17 @@ def SortedSet(*lists, reverse=False):
 
     :return: Sorted list of unique elements.
     """
-    outList = sorted(list(set(itertools.chain(*[list(x) for x in lists]))))
+    out_list = sorted(list(set(itertools.chain(*[list(x) for x in lists]))))
     if reverse:
-        outList.reverse()
-    return outList
+        out_list.reverse()
+    return out_list
 
 
-def PasteLayers(dest, head, body, layers, *,
+def PasteLayers(dest,
+                head,
+                body,
+                layers,
+                *,
                 headfirst=True,
                 reverse=False,
                 ):
@@ -132,9 +135,9 @@ def Split(image):
     return {
         p: ConvertAlpha(ApplyMask(base, MakeMask(mask, p)))
         for p in [
-        q for q in GetUniqueColors(ToGrayscale(mask))
-        if q not in IGNORED_COLORS
-    ]}
+            q for q in GetUniqueColors(ToGrayscale(mask))
+            if q not in IGNORED_COLORS
+        ]}
 
 
 def GetBodyOffsets(name, data):
@@ -250,9 +253,9 @@ def ProcessBody(name, image, where, body_data, source_data, is_alpha):
             frame = np.zeros(shape, np.uint8)
 
             for n in range(4):
-                atX = where[state][0] + (size[0] * order[state][n])
-                atY = where[state][1]
-                new = Crop(image, [atX, atY], size)
+                at_x = where[state][0] + (size[0] * order[state][n])
+                at_y = where[state][1]
+                new = Crop(image, [at_x, at_y], size)
                 x = dx + data[state][n][0] + (32 * n)
                 y = dy - data[state][n][1]
                 Paste(frame, new, (x, y))
@@ -311,9 +314,9 @@ def ProcessHead(name, image, where, head_data, source_data, is_alpha):
             frame = np.zeros(shape, np.uint8)
 
             for n in range(4):
-                atX = where[state][0] + (size[0] * order[state][n])
-                atY = where[state][1]
-                new = Crop(image, [atX, atY], size)
+                at_x = where[state][0] + (size[0] * order[state][n])
+                at_y = where[state][1]
+                new = Crop(image, [at_x, at_y], size)
                 x = dx + data[state][n][0] + (32 * n)
                 y = dy - data[state][n][1]
                 Paste(frame, new, (x, y))
@@ -347,39 +350,39 @@ def Process(head_path,
     """
     if not head_path:
         # Create blank for head
-        headImage = np.zeros([256, 384, 3], dtype=np.uint8)
-        headImage[:, :] = (0, 0, 0)
+        head_image = np.zeros([256, 384, 3], dtype=np.uint8)
+        head_image[:, :] = (0, 0, 0)
     else:
         # Load head spritesheet from file
-        headImage = cv2.imread(head_path)
-        if headImage.size == 0:
+        head_image = cv2.imread(head_path)
+        if head_image.size == 0:
             print(HEAD_SRC_NOT_FOUND.format(head_path))
             raise SystemExit
 
     if not body_path:
         # Create blank for body
-        bodyImage = np.zeros([256, 384, 3], dtype=np.uint8)
-        bodyImage[:, :] = (0, 0, 0)
+        body_image = np.zeros([256, 384, 3], dtype=np.uint8)
+        body_image[:, :] = (0, 0, 0)
     else:
         # Load body spritesheet from file
-        bodyImage = cv2.imread(body_path)
-        if bodyImage.size == 0:
+        body_image = cv2.imread(body_path)
+        if body_image.size == 0:
             print(BODY_SRC_NOT_FOUND.format(body_path))
             raise SystemExit
 
-    baseName = os.path.splitext(os.path.basename(body_path))[0]
+    base_name = os.path.splitext(os.path.basename(body_path))[0]
     return {
         "head": ProcessHead(
-            baseName,
-            headImage,
+            base_name,
+            head_image,
             head_offset,
             head_data,
             source_data,
             is_alpha,
         ),
         "body": ProcessBody(
-            baseName,
-            bodyImage,
+            base_name,
+            body_image,
             body_offset,
             body_data,
             source_data,
@@ -388,7 +391,8 @@ def Process(head_path,
     }
 
 
-def Composite(head,
+def Composite(profile,
+              head,
               body,
               offset=(0, 0),
               *,
@@ -401,6 +405,7 @@ def Composite(head,
     """
     Composites spritesheet.
 
+    :param profile:   Profile key.
     :param head:      Head spritesheet name.
     :param body:      Body spritesheet name.
     :param offset:    Manual X-Y offset onto master sheet. (Default (0,0)).
@@ -412,65 +417,66 @@ def Composite(head,
     :return: Composited image.
     """
     # Load head composition data from JSON
-    headOffsets = LoadOffsets("head")
-    headPaths = LoadPaths("head")
+    head_offsets = LoadOffsets("head", profile)
+    head_paths = LoadPaths("head")
     if not head:
-        headPath = ""
+        head_path = ""
     else:
-        headPath = os.path.join(
+        head_path = os.path.join(
             DIRECTORIES["input"]["root"],
-            *headPaths[head]["path"]
+            *head_paths[head]["path"]
         )
-        if not os.path.isfile(headPath):
-            raise NonexistentHeadException(headPath)
+        if not os.path.isfile(head_path):
+            raise NonexistentHeadException(head_path)
 
     # Load body composition data from JSON
-    bodyOffsets = LoadOffsets("body")
-    bodyPaths = LoadPaths("body")
+    body_offsets = LoadOffsets("body", profile)
+    body_paths = LoadPaths("body")
     if not body:
-        bodyPath = ""
+        body_path = ""
     else:
-        bodyPath = os.path.join(
+        body_path = os.path.join(
             DIRECTORIES["input"]["root"],
-            *bodyPaths[body]["path"]
+            *body_paths[body]["path"]
         )
-        if not os.path.isfile(bodyPath):
-            raise NonexistentBodyException(bodyPath)
+        if not os.path.isfile(body_path):
+            raise NonexistentBodyException(body_path)
 
     # Load miscellaneous composition rules from JSON
-    srcColorData = LoadSourceColoring()
-    srcCropData = LoadSourceCropping()
+    src_color_data = LoadSourceColoring()
+    src_crop_data = LoadSourceCropping()
 
     # Make master spritesheet
     if idle_only:
         w, h = COLOR_REGION[0], STATE_REGION[1] * (len(COLORS) + 1)
     else:
         w, h = COLOR_REGION[0], COLOR_REGION[1] * (len(COLORS) + 1)
-    outImage = MakeBlank(w, h, color=color)
+
+    out_image = MakeBlank(w, h, color=color)
 
     # Process each color
     for y, color in enumerate(COLORS):
-        newImage = MakeBlank(*COLOR_REGION)
-        newData = Process(
-            headPath,
-            bodyPath,
-            [offset[0], offset[1] + HEAD_BLOCK * srcColorData[color]],
-            [offset[0], offset[1] + BODY_BLOCK * srcColorData[color]],
-            headOffsets,
-            bodyOffsets,
-            srcCropData,
+        new_image = MakeBlank(*COLOR_REGION)
+        new_data = Process(
+            head_path,
+            body_path,
+            [offset[0], offset[1] + HEAD_BLOCK * src_color_data[color]],
+            [offset[0], offset[1] + BODY_BLOCK * src_color_data[color]],
+            head_offsets,
+            body_offsets,
+            src_crop_data,
             is_alpha,
         )
 
         # Compose idle frames
         PasteLayers(
-            newImage,
-            newData["head"]["idle"],
-            newData["body"]["idle"],
+            new_image,
+            new_data["head"]["idle"],
+            new_data["body"]["idle"],
             SortedSet(
-                newData["head"]["idle"],
-                newData["body"]["idle"],
-                reverse=headOffsets.get(body, {}).get("reverse", False),
+                new_data["head"]["idle"],
+                new_data["body"]["idle"],
+                reverse=head_offsets.get(body, {}).get("reverse", False),
             ),
             headfirst=headfirst,
             reverse=reverse,
@@ -479,19 +485,19 @@ def Composite(head,
         if idle_only:
             # Paste idle frames onto master spritesheet
             Paste(
-                outImage,
-                newImage,
+                out_image,
+                new_image,
                 (0, y * STATE_REGION[1]),
             )
         else:
             # Compose left movement frames
             PasteLayers(
-                newImage,
-                newData["head"]["left"],
-                newData["body"]["left"],
+                new_image,
+                new_data["head"]["left"],
+                new_data["body"]["left"],
                 SortedSet(
-                    newData["head"]["left"],
-                    newData["body"]["left"],
+                    new_data["head"]["left"],
+                    new_data["body"]["left"],
                 ),
                 headfirst=headfirst,
                 reverse=reverse,
@@ -499,12 +505,12 @@ def Composite(head,
 
             # Compose right movement frames
             PasteLayers(
-                newImage,
-                newData["head"]["right"],
-                newData["body"]["right"],
+                new_image,
+                new_data["head"]["right"],
+                new_data["body"]["right"],
                 SortedSet(
-                    newData["head"]["right"],
-                    newData["body"]["right"],
+                    new_data["head"]["right"],
+                    new_data["body"]["right"],
                 ),
                 headfirst=headfirst,
                 reverse=reverse,
@@ -512,32 +518,32 @@ def Composite(head,
 
             # Paste onto master spritesheet
             Paste(
-                outImage,
-                newImage,
+                out_image,
+                new_image,
                 (0, y * COLOR_REGION[1]),
             )
 
         # (Optional) Make grayscale based on purple sprite
         if color == "purple":
-            newGray = cv2.cvtColor(
-                cv2.cvtColor(newImage, cv2.COLOR_BGR2GRAY),
+            new_gray = cv2.cvtColor(
+                cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY),
                 cv2.COLOR_GRAY2BGR,
             )
 
             if is_alpha:
-                newGray = ReplaceColor(
-                    ConvertAlpha(newGray),
+                new_gray = ReplaceColor(
+                    ConvertAlpha(new_gray),
                     [0, 0, 0, 255],
                     [0, 0, 0, 0],
                 )
 
             if idle_only:
-                Paste(outImage, newGray, (0, (y + 1) * STATE_REGION[1]))
+                Paste(out_image, new_gray, (0, (y + 1) * STATE_REGION[1]))
             else:
-                Paste(outImage, newGray, (0, (y + 1) * COLOR_REGION[1]))
+                Paste(out_image, new_gray, (0, (y + 1) * COLOR_REGION[1]))
 
     # Return newly composed image
-    return outImage
+    return out_image
 
 
 def SaveImage(image, path):
