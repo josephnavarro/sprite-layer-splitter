@@ -9,6 +9,13 @@ from PIL import Image, ImageTk
 
 class EasyGUI(tk.Frame):
     def __init__(self, root, *args, **kwargs):
+        """
+        Wrapper around Tkinter GUI functions.
+
+        :param root:   Tkinter instance.
+        :param args:   Positional arguments.
+        :param kwargs: Keyword arguments.
+        """
         super().__init__(root, *args, **kwargs)
         self._Master = root
         self._Master.resizable(self.resize_x, self.resize_y)
@@ -44,50 +51,114 @@ class EasyGUI(tk.Frame):
 
     @property
     def colors(self) -> dict:
+        """
+        Standard colors for local widgets.
+
+        :return: Dictionary mapping widget keys to respective colors.
+        """
         raise NotImplementedError
 
     @property
     def event_lock_delay(self) -> int:
+        """
+        Time delay for event locking.
+
+        :return: Event lock delay in milliseconds.
+        """
         raise NotImplementedError
 
     @property
     def grid(self) -> dict:
+        """
+        Grid positions for local widgets.
+
+        :return: Dictionary mapping widget keys to gridded positions.
+        """
         raise NotImplementedError
 
     @property
     def images(self) -> dict:
+        """
+        Paths to standardized local images.
+
+        :return: Dictionary mapping widget keys to image paths (if any).
+        """
         raise NotImplementedError
 
     @property
     def labels(self) -> dict:
+        """
+        String labels for various local widgets.
+
+        :return: Dictionary mapping widget keys to labels (if any).
+        """
         raise NotImplementedError
 
     @property
     def messages(self) -> dict:
+        """
+        String messages. (Prompts, alerts, etc.)
+
+        :return: Dictionary mapping widget keys to messages (if any).
+        """
         raise NotImplementedError
 
     @property
     def pad(self) -> dict:
+        """
+        Standard padding for local widgets.
+
+        :return: Dictionary mapping widget keys to padding data.
+        """
         raise NotImplementedError
 
     @property
     def sizes(self) -> dict:
+        """
+        Standard sizes for local widgets.
+
+        :return:
+        """
         raise NotImplementedError
 
     @property
     def resize_x(self) -> bool:
+        """
+        Whether to allow horizontal resizing.
+
+        :return: Boolean representing horizontal resizing flag.
+        """
         raise NotImplementedError
 
     @property
     def resize_y(self) -> bool:
+        """
+        Whether to allow vertical resizing.
+
+        :return: Boolean representing vertical resizing flag.
+        """
         raise NotImplementedError
 
     @property
     def title(self) -> str:
+        """
+        String title for GUI application.
+
+        :return: String title.
+        """
         raise NotImplementedError
 
     @staticmethod
     def from_rgb(r, g, b) -> str:
+        """
+        Converts an RGB sequence into a Tkinter-recognized color string.
+
+        :param r: Red channel (0-255).
+        :param g: Green channel (0-255).
+        :param b: Blue channel (0-255).
+
+        :return: Color string usable by Tkinter.
+        """
         return "#{0:02x}{1:02x}{2:02x}".format(r, g, b)
 
     @staticmethod
@@ -110,12 +181,31 @@ class EasyGUI(tk.Frame):
 
     @staticmethod
     def open_image(path, w, h, antialias=True) -> ImageTk.PhotoImage:
+        """
+        Opens an image from file into a Tkinter-compatible format.
+
+        :param path:      Relative path to image.
+        :param w:         Width to resize to.
+        :param h:         Height to resize to.
+        :param antialias: Whether to antialias. (Default True).
+
+        :return: Tkinter PhotoImage object.
+        """
         image = Image.open(path)
         aliasing = Image.ANTIALIAS if antialias else Image.NEAREST
         return ImageTk.PhotoImage(image.resize((w, h), aliasing))
 
     @staticmethod
     def replace_widget(container, tag, widget) -> None:
+        """
+        Replaces a local widget by key.
+
+        :param container: Target container of widgets.
+        :param tag:       Tag of widget to replace.
+        :param widget:    Widget instance to replace with.
+
+        :return: None.
+        """
         try:
             container[tag].destroy()
         except KeyError:
@@ -124,17 +214,18 @@ class EasyGUI(tk.Frame):
 
     @staticmethod
     def toggle_radio(radiobutton, selected) -> None:
+        """
+        Toggles a radio button.
+
+        :param radiobutton: Radio button to toggle.
+        :param selected:    Whether radio button should be selected.
+
+        :return: None.
+        """
         if selected:
             radiobutton.select()
         else:
             radiobutton.deselect()
-
-    def add_pending_job(self, tag) -> bool:
-        if tag in self._PendingJobs:
-            return False
-        else:
-            self._PendingJobs[tag] = None
-            return True
 
     def acquire_event_lock(self) -> bool:
         if not self._EventLock:
@@ -183,6 +274,12 @@ class EasyGUI(tk.Frame):
         return True
 
     def get_boolean_var(self, key) -> tk.BooleanVar:
+        """
+
+        :param key:
+
+        :return:
+        """
         try:
             var = self._BooleanVars[key]
         except KeyError:
@@ -190,6 +287,12 @@ class EasyGUI(tk.Frame):
         return var
 
     def get_frame(self, key) -> tk.Frame:
+        """
+
+        :param key:
+
+        :return: Frame.
+        """
         try:
             frame = self._Frames[key]
         except KeyError:
@@ -197,6 +300,12 @@ class EasyGUI(tk.Frame):
         return frame
 
     def get_string_var(self, key) -> tk.StringVar:
+        """
+
+        :param key:
+
+        :return:
+        """
         try:
             var = self._StringVars[key]
         except KeyError:
@@ -204,33 +313,78 @@ class EasyGUI(tk.Frame):
         return var
 
     def init_all_buttons(self) -> bool:
+        """
+
+        :return:
+        """
         raise NotImplementedError
 
     def init_all_canvases(self) -> bool:
+        """
+
+        :return:
+        """
         raise NotImplementedError
 
     def init_all_checkboxes(self) -> bool:
+        """
+
+        :return:
+        """
         raise NotImplementedError
 
     def init_all_entries(self) -> bool:
+        """
+
+        :return:
+        """
         raise NotImplementedError
 
     def init_all_frames(self) -> bool:
+        """
+
+        :return:
+        """
         raise NotImplementedError
 
     def init_all_labels(self) -> bool:
+        """
+
+        :return:
+        """
         raise NotImplementedError
 
     def init_all_menus(self) -> bool:
+        """
+
+        :return:
+        """
         raise NotImplementedError
 
     def init_all_optionmenus(self) -> bool:
+        """
+
+        :return:
+        """
         raise NotImplementedError
 
     def init_all_radiobuttons(self) -> bool:
+        """
+
+        :return:
+        """
         raise NotImplementedError
 
     def init_button(self, master, tag, command, pressed=False) -> bool:
+        """
+
+        :param master:
+        :param tag:
+        :param command:
+        :param pressed:
+
+        :return:
+        """
         w, h = self.sizes.get(tag, self.sizes["default-button"])
         fg = self.from_rgb(*self.colors[tag]["fg"])
         bg = self.from_rgb(*self.colors[tag]["bg"])
@@ -282,6 +436,14 @@ class EasyGUI(tk.Frame):
         return True
 
     def init_canvas(self, master, tag, border) -> bool:
+        """
+
+        :param master:
+        :param tag:
+        :param border:
+
+        :return:
+        """
         canvas = tk.Canvas(
             master,
             width=self.sizes[tag][0],
@@ -303,6 +465,15 @@ class EasyGUI(tk.Frame):
         return True
 
     def init_checkbox(self, master, tag, sticky, command=None) -> bool:
+        """
+
+        :param master:
+        :param tag:
+        :param sticky:
+        :param command:
+
+        :return:
+        """
         checkbox = tk.Checkbutton(
             master,
             text=self.labels[tag],
@@ -329,6 +500,17 @@ class EasyGUI(tk.Frame):
                    text="",
                    disabled=True,
                    justify=tk.LEFT) -> bool:
+        """
+
+        :param master:
+        :param tag:
+        :param sticky:
+        :param text:
+        :param disabled:
+        :param justify:
+
+        :return:
+        """
         var = self.get_string_var(tag)
         var.set(text)
 
@@ -355,6 +537,13 @@ class EasyGUI(tk.Frame):
         return True
 
     def init_frame(self, master, tag) -> bool:
+        """
+
+        :param master:
+        :param tag:
+
+        :return:
+        """
         frame = tk.Frame(
             master,
             width=self.sizes[tag][0],
@@ -371,6 +560,16 @@ class EasyGUI(tk.Frame):
         return True
 
     def init_label(self, master, tag, font, sticky, *args) -> bool:
+        """
+
+        :param master:
+        :param tag:
+        :param font:
+        :param sticky:
+        :param args:
+
+        :return:
+        """
         try:
             text = self.labels[tag].format(*args)
         except IndexError:
@@ -390,6 +589,15 @@ class EasyGUI(tk.Frame):
         return True
 
     def init_menu(self, master, tag, *commands, **kwargs) -> bool:
+        """
+
+        :param master:
+        :param tag:
+        :param commands:
+        :param kwargs:
+
+        :return:
+        """
         assert tag != "main-menu"
 
         get_string_var = self.get_string_var
@@ -422,6 +630,14 @@ class EasyGUI(tk.Frame):
         return True
 
     def init_option_menu(self, master, tag, options) -> bool:
+        """
+
+        :param master:
+        :param tag:
+        :param options:
+
+        :return:
+        """
         width = self.sizes["default-menu"][0]
         fg = self.from_rgb(*self.colors[tag]["fg"])
         bg = self.from_rgb(*self.colors[tag]["bg"])
@@ -457,6 +673,18 @@ class EasyGUI(tk.Frame):
                    *,
                    select=False,
                    command=None) -> bool:
+        """
+
+        :param master:
+        :param tag:
+        :param variable:
+        :param value:
+        :param sticky:
+        :param select:
+        :param command:
+
+        :return:
+        """
         radio = tk.Radiobutton(
             master,
             text=self.labels[tag],
@@ -479,6 +707,10 @@ class EasyGUI(tk.Frame):
         return True
 
     def release_event_lock(self) -> bool:
+        """
+
+        :return: True
+        """
         self.cancel_pending("event-lock")
         self.set_pending(
             "event-lock",
@@ -488,10 +720,24 @@ class EasyGUI(tk.Frame):
         return True
 
     def set_pending(self, key, callback, delay) -> bool:
+        """
+
+        :param key:
+        :param callback:
+        :param delay:
+
+        :return: True
+        """
         self._PendingJobs[key] = self.after(delay, callback)
         return True
 
     def thread_it(self, callback):
+        """
+
+        :param callback:
+
+        :return:
+        """
         def function():
             self.acquire_event_lock()
             callback()

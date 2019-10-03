@@ -1158,8 +1158,8 @@ class App(EasyGUI):
 
         :return: True on success; False on failure.
         """
-        self.init_data("head")
-        self.init_data("body")
+        self.init_data("head", empty=True)
+        self.init_data("body", empty=True)
         return True
 
     def init_all_entries(self) -> bool:
@@ -1537,11 +1537,12 @@ class App(EasyGUI):
 
         return True
 
-    def init_data(self, key) -> bool:
+    def init_data(self, key, *, empty=False) -> bool:
         """
         Completes initialization of data from file.
 
-        :param key: Either of "head" or "body".
+        :param key:   Either of "head" or "body".
+        :param empty: Whether to keep field empty. (Default False).
 
         :return: True.
         """
@@ -1553,7 +1554,10 @@ class App(EasyGUI):
             v.get("name", "---"): k for k, v in paths.items()
         }
 
-        data[key]["list"] = [self.DEFAULT_NAME] + sorted(list(names))
+        data[key]["list"] = [self.DEFAULT_NAME]
+        if not empty:
+            data[key]["list"] += sorted(list(names))
+
         data[key]["offset"] = offsets
 
         return True
