@@ -93,7 +93,7 @@ def ProcessBody(filename, profile, data):
         key = os.path.splitext(os.path.basename(filename))[0]
         rectData = data[JSON_KEY_RESERVE.format(profile)][key]
     except KeyError:
-        rectData = data[JSON_KEY_RESERVE.format(profile)]
+        rectData = data[JSON_KEY_RESERVE.format(profile)][JSON_KEY_DEFAULT]
 
     rects = [
         CropImage(img, *rectData["0"]["idle"]),
@@ -136,7 +136,7 @@ def ProcessHead(filename, profile, data):
         key = os.path.splitext(os.path.basename(filename))[0]
         rectData = data[JSON_KEY_RESERVE.format(profile)][key]
     except KeyError:
-        rectData = data[JSON_KEY_RESERVE.format(profile)]
+        rectData = data[JSON_KEY_RESERVE.format(profile)][JSON_KEY_DEFAULT]
 
     rects = [
         CropImage(img, *rectData["0"]["idle"]),

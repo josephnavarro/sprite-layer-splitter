@@ -1,112 +1,94 @@
 {
-    "?.default":  {
-        "0": {
-            "idle":            [2, 2, 256, 64],
-            "large-direction": [2, 70, 256, 64],
-            "small-direction": [2, 262, 256, 48]
+    "?.echoes": {
+        "?.default":  {
+            "0": {
+                "idle":            [2, 2, 256, 64],
+                "large-direction": [2, 70, 256, 64],
+                "small-direction": [2, 262, 256, 48]
+            },
+            "1": {
+                "idle":            [2, 330, 256, 64],
+                "large-direction": [2, 398, 256, 64],
+                "small-direction": [2, 590, 256, 48]
+            },
+            "2": {
+                "idle":            [2, 658, 256, 64],
+                "large-direction": [2, 726, 256, 64],
+                "small-direction": [2, 918, 256, 48]
+            },
+            "3": {
+                "idle":            [2, 658, 256, 64],
+                "large-direction": [2, 726, 256, 64],
+                "small-direction": [2, 918, 256, 48]
+            }
         },
-        "1": {
-            "idle":            [2, 330, 256, 64],
-            "large-direction": [2, 398, 256, 64],
-            "small-direction": [2, 590, 256, 48]
+        "bonewalker": {
+            "0": {
+                "idle":            [2, 2, 256, 32],
+                "large-direction": [2, 38, 256, 32],
+                "small-direction": [2, 70, 256, 32]
+            },
+            "2": {
+                "idle":            [2, 298, 256, 32],
+                "large-direction": [2, 334, 256, 32],
+                "small-direction": [2, 368, 256, 32]
+            },
+            "3": {
+                "idle":            [2, 594, 256, 32],
+                "large-direction": [2, 630, 256, 32],
+                "small-direction": [2, 662, 256, 32]
+            },
+            "1": {
+                "idle":            [2, 890, 256, 32],
+                "large-direction": [2, 926, 256, 32],
+                "small-direction": [2, 958, 256, 32]
+            }
         },
-        "2": {
-            "idle":            [2, 658, 256, 64],
-            "large-direction": [2, 726, 256, 64],
-            "small-direction": [2, 918, 256, 48]
-        },
-        "3": {
-            "idle":            [2, 658, 256, 64],
-            "large-direction": [2, 726, 256, 64],
-            "small-direction": [2, 918, 256, 48]
+        "deathgoyle": {
+            "0": {
+                "idle":            [2, 2, 256, 32],
+                "large-direction": [2, 38, 256, 32],
+                "small-direction": [2, 70, 256, 32]
+            },
+            "2": {
+                "idle":            [2, 298, 256, 32],
+                "large-direction": [2, 334, 256, 32],
+                "small-direction": [2, 368, 256, 32]
+            },
+            "3": {
+                "idle":            [2, 594, 256, 32],
+                "large-direction": [2, 630, 256, 32],
+                "small-direction": [2, 662, 256, 32]
+            },
+            "1": {
+                "idle":            [2, 890, 256, 32],
+                "large-direction": [2, 926, 256, 32],
+                "small-direction": [2, 958, 256, 32]
+            }
         }
     },
-    "?.echoes":   {
-        "0": {
-            "idle":            [2, 2, 256, 64],
-            "large-direction": [2, 70, 256, 64],
-            "small-direction": [2, 262, 256, 48]
-        },
-        "1": {
-            "idle":            [2, 330, 256, 64],
-            "large-direction": [2, 398, 256, 64],
-            "small-direction": [2, 590, 256, 48]
-        },
-        "2": {
-            "idle":            [2, 658, 256, 64],
-            "large-direction": [2, 726, 256, 64],
-            "small-direction": [2, 918, 256, 48]
-        },
-        "3": {
-            "idle":            [2, 658, 256, 64],
-            "large-direction": [2, 726, 256, 64],
-            "small-direction": [2, 918, 256, 48]
-        }
-    },
-    "?.fates":    {
-        "0": {
-            "idle":            [2, 2, 256, 64],
-            "large-direction": [2, 70, 256, 64],
-            "small-direction": [2, 406, 256, 48]
-        },
-        "1": {
-            "idle":            [2, 586, 256, 64],
-            "large-direction": [2, 654, 256, 64],
-            "small-direction": [2, 990, 256, 48]
-        },
-        "2": {
-            "idle":            [2, 1170, 256, 64],
-            "large-direction": [2, 1238, 256, 64],
-            "small-direction": [2, 1574, 256, 48]
-        },
-        "3": {
-            "idle":            [2, 1754, 256, 64],
-            "large-direction": [2, 1822, 256, 64],
-            "small-direction": [2, 2158, 256, 48]
-        }
-    },
-    "bonewalker": {
-        "0": {
-            "idle":            [2, 2, 256, 32],
-            "large-direction": [2, 38, 256, 32],
-            "small-direction": [2, 70, 256, 32]
-        },
-        "2": {
-            "idle":            [2, 298, 256, 32],
-            "large-direction": [2, 334, 256, 32],
-            "small-direction": [2, 368, 256, 32]
-        },
-        "3": {
-            "idle":            [2, 594, 256, 32],
-            "large-direction": [2, 630, 256, 32],
-            "small-direction": [2, 662, 256, 32]
-        },
-        "1": {
-            "idle":            [2, 890, 256, 32],
-            "large-direction": [2, 926, 256, 32],
-            "small-direction": [2, 958, 256, 32]
-        }
-    },
-    "deathgoyle": {
-        "0": {
-            "idle":            [2, 2, 256, 32],
-            "large-direction": [2, 38, 256, 32],
-            "small-direction": [2, 70, 256, 32]
-        },
-        "2": {
-            "idle":            [2, 298, 256, 32],
-            "large-direction": [2, 334, 256, 32],
-            "small-direction": [2, 368, 256, 32]
-        },
-        "3": {
-            "idle":            [2, 594, 256, 32],
-            "large-direction": [2, 630, 256, 32],
-            "small-direction": [2, 662, 256, 32]
-        },
-        "1": {
-            "idle":            [2, 890, 256, 32],
-            "large-direction": [2, 926, 256, 32],
-            "small-direction": [2, 958, 256, 32]
+    "?.fates":  {
+        "?.default": {
+            "0": {
+                "idle":            [2, 2, 256, 64],
+                "large-direction": [2, 70, 256, 64],
+                "small-direction": [2, 406, 256, 48]
+            },
+            "1": {
+                "idle":            [2, 586, 256, 64],
+                "large-direction": [2, 654, 256, 64],
+                "small-direction": [2, 990, 256, 48]
+            },
+            "2": {
+                "idle":            [2, 1170, 256, 64],
+                "large-direction": [2, 1238, 256, 64],
+                "small-direction": [2, 1574, 256, 48]
+            },
+            "3": {
+                "idle":            [2, 1754, 256, 64],
+                "large-direction": [2, 1822, 256, 64],
+                "small-direction": [2, 2158, 256, 48]
+            }
         }
     }
 }
