@@ -72,22 +72,22 @@
             "0": {
                 "idle":            [2, 2, 256, 64],
                 "large-direction": [2, 70, 256, 64],
-                "small-direction": [2, 406, 256, 48]
+                "small-direction": [2, 388, 256, 48]
             },
             "1": {
                 "idle":            [2, 586, 256, 64],
                 "large-direction": [2, 654, 256, 64],
-                "small-direction": [2, 990, 256, 48]
+                "small-direction": [2, 972, 256, 48]
             },
             "2": {
                 "idle":            [2, 1170, 256, 64],
                 "large-direction": [2, 1238, 256, 64],
-                "small-direction": [2, 1574, 256, 48]
+                "small-direction": [2, 1556, 256, 48]
             },
             "3": {
                 "idle":            [2, 1754, 256, 64],
                 "large-direction": [2, 1822, 256, 64],
-                "small-direction": [2, 2158, 256, 48]
+                "small-direction": [2, 2140, 256, 48]
             }
         }
     }
