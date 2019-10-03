@@ -255,8 +255,9 @@ class EasyGUI(tk.Frame):
 
     def do_press_button(self, key) -> bool:
         """
+        Visually presses a button.
 
-        :param key:
+        :param key: Key of button to press.
 
         :return: True.
         """
@@ -275,17 +276,20 @@ class EasyGUI(tk.Frame):
 
     def do_release_event_lock(self) -> bool:
         """
+        Releases local event lock.
 
-        :return:
+        :return: True.
         """
         self._EventLock = False
         return True
 
     def do_unpress_button(self, key) -> bool:
         """
+        Visually unpresses a button.
 
-        :param key:
-        :return:
+        :param key: Key of button to unpress.
+
+        :return: True.
         """
         try:
             button = self._Buttons[key]
@@ -302,10 +306,12 @@ class EasyGUI(tk.Frame):
 
     def get_boolean_var(self, key) -> tk.BooleanVar:
         """
+        Safely retrieves a Tkinter boolean variable. Creates one at the given
+        key if it doesn't exist yet.
 
-        :param key:
+        :param key: Key of boolean variable to return.
 
-        :return:
+        :return: Tkinter boolean variable.
         """
         try:
             var = self._BooleanVars[key]
@@ -315,10 +321,12 @@ class EasyGUI(tk.Frame):
 
     def get_button(self, key) -> tk.Button:
         """
+        Safely retrieves a Tkinter button. Creates one at the given key if it
+        doesn't exist yet.
 
-        :param key:
+        :param key: Key of button to return.
 
-        :return:
+        :return: Tkinter button object.
         """
         try:
             button = self._Buttons[key]
@@ -328,10 +336,12 @@ class EasyGUI(tk.Frame):
 
     def get_canvas(self, key) -> tk.Canvas:
         """
+        Safely retrieves a Tkinter canvas. Creates one at the given key if it
+        doesn't exist yet.
 
-        :param key:
+        :param key: Key of canvas to return.
 
-        :return:
+        :return: Tkinter canvas object.
         """
         try:
             canvas = self._Canvases[key]
@@ -341,8 +351,10 @@ class EasyGUI(tk.Frame):
 
     def get_frame(self, key) -> tk.Frame:
         """
+        Safely retrieves a Tkinter frame. Creates one at the given key if it
+        doesn't exist yet.
 
-        :param key:
+        :param key: Key of frame to return.
 
         :return: Frame.
         """
@@ -354,10 +366,12 @@ class EasyGUI(tk.Frame):
 
     def get_string_var(self, key) -> tk.StringVar:
         """
+        Safely retrieves a Tkinter string variable. Creates one at the given
+        key if it doesn't exist yet.
 
-        :param key:
+        :param key: Key of string variable to return.
 
-        :return:
+        :return: Tkinter string variable.
         """
         try:
             var = self._StringVars[key]
@@ -367,43 +381,49 @@ class EasyGUI(tk.Frame):
 
     def init_all_buttons(self) -> bool:
         """
+        Initializes all required buttons.
 
-        :return:
+        :return: True.
         """
         raise NotImplementedError
 
     def init_all_canvases(self) -> bool:
         """
+        Initializes all required canvases.
 
-        :return:
+        :return: True.
         """
         raise NotImplementedError
 
     def init_all_checkboxes(self) -> bool:
         """
+        Initializes all required checkboxes.
 
-        :return:
+        :return: True.
         """
         raise NotImplementedError
 
     def init_all_entries(self) -> bool:
         """
+        Initializes all required entry fields.
 
-        :return:
+        :return: True.
         """
         raise NotImplementedError
 
     def init_all_frames(self) -> bool:
         """
+        Initializes all required frames.
 
-        :return:
+        :return: True.
         """
         raise NotImplementedError
 
     def init_all_labels(self) -> bool:
         """
+        Initializes all required labels.
 
-        :return:
+        :return: True.
         """
         raise NotImplementedError
 

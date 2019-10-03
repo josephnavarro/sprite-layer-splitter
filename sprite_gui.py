@@ -93,21 +93,21 @@ class App(EasyGUI):
             "preview-anim":         {"fg": [0, 0, 0], "bg": [128, 128, 128]},
 
             # Icon-based buttons
-            "play-button":          {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "pause-button":         {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "skip-right-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "skip-left-button":     {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "shuffle-button":       {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "shuffle-head-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "shuffle-body-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "clear-body-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "clear-head-button":    {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "reload-button":        {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "preview-idle-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "preview-left-button":  {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "preview-right-button": {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "ping-pong-button":     {"fg": [0, 0, 0], "bg": [222, 222, 222]},
-            "layers-button":        {"fg": [0, 0, 0], "bg": [222, 222, 222]},
+            "play-button":          {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "pause-button":         {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "skip-right-button":    {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "skip-left-button":     {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "shuffle-button":       {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "shuffle-head-button":  {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "shuffle-body-button":  {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "clear-body-button":    {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "clear-head-button":    {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "reload-button":        {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "preview-idle-button":  {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "preview-left-button":  {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "preview-right-button": {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "ping-pong-button":     {"fg": [255, 0, 0], "bg": [222, 222, 222]},
+            "layers-button":        {"fg": [255, 0, 0], "bg": [222, 222, 222]},
         }
 
     @property
@@ -1791,7 +1791,6 @@ class App(EasyGUI):
         speed = self._Animation["speed"]
         if speed > 0:
             self.set_pending("animate", self.do_animate, 1000 // speed)
-
         return True
 
     def select_anim_radiobutton(self) -> bool:
@@ -1800,11 +1799,11 @@ class App(EasyGUI):
 
         :return: True.
         """
-        frame = self._Animation["frame"]
+        frame: int = self._Animation["frame"]
+        buttons: dict = self._RadioButtons
+        toggle = self.toggle_radio
         for n in range(4):
-            key = "frame-{}".format(n)
-            self.toggle_radio(self._RadioButtons[key], n == frame)
-
+            toggle(buttons["frame-{}".format(n)], n == frame)
         return True
 
     def set_profile(self, profile) -> bool:
@@ -1815,15 +1814,18 @@ class App(EasyGUI):
 
         :return: True
         """
-        if profile != self._Data["profile"]:
-            self._Data["profile"] = profile
+        data: dict = self._Data
+        rebuild = self.do_rebuild_data
+        remake = self.do_remake_offset
+        get = self.get_button
 
-            self.do_rebuild_data("head")
-            self.do_rebuild_data("body")
-            self.do_remake_offset("head")
-            self.do_remake_offset("body")
-
-            self.get_button("preview-idle-button").invoke()
+        if profile != data["profile"]:
+            data["profile"] = profile
+            rebuild("head")
+            rebuild("body")
+            remake("head")
+            remake("body")
+            get("preview-idle-button").invoke()
 
         return True
 
@@ -1926,11 +1928,12 @@ class App(EasyGUI):
 
         :return: True.
         """
-        animation = self._Animation
+        animation: dict = self._Animation
+        get = self.get_boolean_var
 
         # Check frame iteration type
         is_forwards = animation["forward"]
-        is_pingpong = self.get_boolean_var("pingpong-animation").get()
+        is_pingpong = get("pingpong-animation").get()
         if not is_pingpong:
             is_forwards = True
 
@@ -1992,16 +1995,19 @@ class App(EasyGUI):
 
         :return: True.
         """
-        strvarx = "{}-x".format(key)
-        strvary = "{}-y".format(key)
+        var_x: str = "{}-x".format(key)
+        var_y: str = "{}-y".format(key)
+        data: dict = self._Data
+        get = self.get_string_var
+
         try:
-            xy = self._Data[key]["current"]["offset"][state][frame]
-            self.get_string_var(strvarx).set("{0:+d}".format(xy[0]))
-            self.get_string_var(strvary).set("{0:+d}".format(xy[1]))
+            xy = data[key]["current"]["offset"][state][frame]
+            get(var_x).set("{0:+d}".format(xy[0]))
+            get(var_y).set("{0:+d}".format(xy[1]))
 
         except (KeyError, IndexError):
-            self.get_string_var(strvarx).set("{0:+d}".format(0))
-            self.get_string_var(strvary).set("{0:+d}".format(0))
+            get(var_x).set("{0:+d}".format(0))
+            get(var_y).set("{0:+d}".format(0))
 
         return True
 
@@ -2013,13 +2019,16 @@ class App(EasyGUI):
 
         :return: True.
         """
-        strvar = "{}-size".format(key)
+        var: str = "{}-size".format(key)
+        data: dict = self._Data
+        get = self.get_string_var
+
         try:
-            size = self._Data[key]["current"]["size"]
-            self.get_string_var(strvar).set(size.capitalize())
+            size = data[key]["current"]["size"]
+            get(var).set(size.capitalize())
 
         except (KeyError, IndexError):
-            self.get_string_var(strvar).set("Large")
+            get(var).set("Large")
 
         return True
 
@@ -2029,13 +2038,15 @@ class App(EasyGUI):
 
         :return: True.
         """
+        animation = self._Animation
+        canvases = self._Canvases
         try:
             # Draw frame to canvas
-            anim_objects = self._Animation["objects"]
-            anim_frame = self._Animation["frame"]
+            anim_objects = animation["objects"]
+            anim_frame = animation["frame"]
             anim_image = anim_objects[anim_frame]
 
-            self._Canvases["preview-anim"].create_image(
+            canvases["preview-anim"].create_image(
                 (16, 16),
                 anchor=tk.NW,
                 image=anim_image,
@@ -2053,12 +2064,16 @@ class App(EasyGUI):
 
         :return: True.
         """
-        state = self._Animation["state"]
-        frame = self._Animation["frame"]
+        animation = self._Animation
+        update_offset_label = self.update_offset_label
+        update_size_label = self.update_size_label
 
-        self.update_offset_label("head", state, frame)
-        self.update_offset_label("body", state, frame)
-        self.update_size_label("head")
+        state = animation["state"]
+        frame = animation["frame"]
+
+        update_offset_label("head", state, frame)
+        update_offset_label("body", state, frame)
+        update_size_label("head")
 
         return True
 
