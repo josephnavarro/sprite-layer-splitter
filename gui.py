@@ -228,6 +228,11 @@ class EasyGUI(tk.Frame):
             radiobutton.deselect()
 
     def acquire_event_lock(self) -> bool:
+        """
+        Safely acquires the local event lock.
+
+        :return: True if event lock was set; False otherwise.
+        """
         if not self._EventLock:
             self._EventLock = True
             return True
@@ -235,6 +240,13 @@ class EasyGUI(tk.Frame):
             return False
 
     def cancel_pending(self, key) -> bool:
+        """
+        Cancels a pending callback function.
+
+        :param key: Key of task to cancel.
+
+        :return: True.
+        """
         job = self._PendingJobs.get(key, None)
         if job is not None:
             self.after_cancel(job)
@@ -242,6 +254,12 @@ class EasyGUI(tk.Frame):
         return True
 
     def do_press_button(self, key) -> bool:
+        """
+
+        :param key:
+
+        :return: True.
+        """
         try:
             button = self._Buttons[key]
             if self.is_osx():
@@ -256,10 +274,19 @@ class EasyGUI(tk.Frame):
         return True
 
     def do_release_event_lock(self) -> bool:
+        """
+
+        :return:
+        """
         self._EventLock = False
         return True
 
     def do_unpress_button(self, key) -> bool:
+        """
+
+        :param key:
+        :return:
+        """
         try:
             button = self._Buttons[key]
             if self.is_osx():
@@ -285,6 +312,32 @@ class EasyGUI(tk.Frame):
         except KeyError:
             var = self._BooleanVars[key] = tk.BooleanVar()
         return var
+
+    def get_button(self, key) -> tk.Button:
+        """
+
+        :param key:
+
+        :return:
+        """
+        try:
+            button = self._Buttons[key]
+        except KeyError:
+            button = self._Buttons[key] = tk.Button()
+        return button
+
+    def get_canvas(self, key) -> tk.Canvas:
+        """
+
+        :param key:
+
+        :return:
+        """
+        try:
+            canvas = self._Canvases[key]
+        except KeyError:
+            canvas = self._Canvases[key] = tk.Canvas()
+        return canvas
 
     def get_frame(self, key) -> tk.Frame:
         """

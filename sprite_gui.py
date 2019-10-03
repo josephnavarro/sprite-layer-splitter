@@ -525,7 +525,7 @@ class App(EasyGUI):
         """
         return minutes * 60 * 1000
 
-    def draw_text(self, canvas, x, y, text) -> None:
+    def draw_text(self, canvas: tk.Canvas, x: int, y: int, text: str) -> None:
         """
         Draws text to a given canvas.
 
@@ -536,18 +536,7 @@ class App(EasyGUI):
 
         :return: None.
         """
-        font = "Courier {} bold".format(self.sizes["FONTSIZE_MONOS"])
-        for m in range(-2, 3):
-            for n in range(-2, 3):
-                canvas.create_text(
-                    x + m,
-                    y + n,
-                    font=font,
-                    fill="black",
-                    text=text,
-                    anchor=tk.NW,
-                )
-
+        font = "calibri {}".format(self.sizes["FONTSIZE_VAR_W"])
         canvas.create_text(
             x, y,
             font=font,
@@ -1140,6 +1129,11 @@ class App(EasyGUI):
             self.sizes["CANVAS_BORDERS"],
         )
 
+        self.draw_text(
+            self.get_canvas("preview-static"), 24, 24,
+            "Please select a profile."
+        )
+
         return True
 
     def init_all_checkboxes(self) -> bool:
@@ -1613,7 +1607,7 @@ class App(EasyGUI):
 
         return True
 
-    def make_animation_frames(self, image, reset):
+    def make_animation_frames(self, image, reset) -> bool:
         """
         Populates local animation buffer.
 
@@ -1650,7 +1644,7 @@ class App(EasyGUI):
 
         return True
 
-    def make_animation_preview(self, image):
+    def make_animation_preview(self, image) -> bool:
         """
         Displays static preview frames.
 
@@ -1671,7 +1665,7 @@ class App(EasyGUI):
 
         return True
 
-    def make_preview(self, func, state, reset=False, **kwargs):
+    def make_preview(self, func, state, reset=False, **kwargs) -> bool:
         """
         Generates a static preview image.
 
@@ -1735,7 +1729,7 @@ class App(EasyGUI):
 
         return True
 
-    def rebuild_data(self, key):
+    def rebuild_data(self, key) -> bool:
         """
         Callback function. Rebuilds a given JSON database.
 
@@ -1822,11 +1816,15 @@ class App(EasyGUI):
 
         :return: True
         """
-        self._Data["profile"] = profile
-        self.do_rebuild_data("head")
-        self.do_rebuild_data("body")
-        self.do_remake_offset("head")
-        self.do_remake_offset("body")
+        if profile != self._Data["profile"]:
+            self._Data["profile"] = profile
+
+            self.do_rebuild_data("head")
+            self.do_rebuild_data("body")
+            self.do_remake_offset("head")
+            self.do_remake_offset("body")
+
+            self.get_button("preview-idle-button").invoke()
 
         return True
 
