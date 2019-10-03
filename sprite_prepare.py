@@ -43,7 +43,7 @@ def MakeImage(w, h):
     return Image.new(MODE, (w, h), (0, 0, 0, 255))
 
 
-def Prepare(key):
+def Prepare(key, profile):
     """
     Creates intermediate spritesheets.
 
@@ -54,26 +54,27 @@ def Prepare(key):
     print("Now generating intermediate {} spritesheets...".format(key))
 
     data = LoadCreate(key)
-    files = glob.glob(os.path.join(PATHS["source"][key], "*.png"))
+    dir = os.path.join(PATHS["source"]["root"], profile, key, "*.png")
+    files = glob.glob(dir)
     files.sort()
 
     for filename in files:
         print("Generating intermediate for {}...".format(filename))
 
-        root = FixPath(DIRECTORIES["input"][key])
+        root = FixPath(os.path.join(PATHS["images"], profile, key))
         path = os.path.join(root, os.path.split(filename)[-1])
 
         if key == "head":
-            image = ProcessHead(filename, data)
+            image = ProcessHead(filename, profile, data)
             image.save(path)
         elif key == "body":
-            image = ProcessBody(filename, data)
+            image = ProcessBody(filename, profile, data)
             image.save(path)
 
     print("Intermediate {} spritesheets complete!".format(key))
 
 
-def ProcessBody(filename, data):
+def ProcessBody(filename, profile, data):
     """
     Processes an input "body" image.
 
@@ -90,9 +91,9 @@ def ProcessBody(filename, data):
 
     try:
         key = os.path.splitext(os.path.basename(filename))[0]
-        rectData = data[key]
+        rectData = data[JSON_KEY_RESERVE.format(profile)][key]
     except KeyError:
-        rectData = data[JSON_KEY_DEFAULT]
+        rectData = data[JSON_KEY_RESERVE.format(profile)]
 
     rects = [
         CropImage(img, *rectData["0"]["idle"]),
@@ -116,7 +117,7 @@ def ProcessBody(filename, data):
     return output
 
 
-def ProcessHead(filename, data):
+def ProcessHead(filename, profile, data):
     """
     Processes an input "head" image.
 
@@ -133,9 +134,9 @@ def ProcessHead(filename, data):
 
     try:
         key = os.path.splitext(os.path.basename(filename))[0]
-        rectData = data[key]
+        rectData = data[JSON_KEY_RESERVE.format(profile)][key]
     except KeyError:
-        rectData = data[JSON_KEY_DEFAULT]
+        rectData = data[JSON_KEY_RESERVE.format(profile)]
 
     rects = [
         CropImage(img, *rectData["0"]["idle"]),
@@ -160,5 +161,5 @@ def ProcessHead(filename, data):
 
 
 if __name__ == "__main__":
-    Prepare("body")
-    Prepare("head")
+    Prepare("body", "echoes")
+    Prepare("head", "echoes")

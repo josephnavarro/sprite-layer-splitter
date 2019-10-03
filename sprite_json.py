@@ -57,9 +57,9 @@ JSON_KEY_DEFAULT = JSON_KEY_RESERVE.format("default")
 
 def CreateInputJSON(key, profile):
     """
-    Automatically generates a character head JSON file.
+    Automatically generates a character head or body JSON file.
 
-    JSON contents will reflect contents of "inputs/head/".
+    JSON contents will reflect contents of "inputs/{profile}/{head|body}/".
 
     :param key:
     :param profile:

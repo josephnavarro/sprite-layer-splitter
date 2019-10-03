@@ -661,7 +661,6 @@ class App(EasyGUI):
 
         return True
 
-    # noinspection PyMethodMayBeStatic
     def destroy_images(self, key) -> bool:
         """
         Callback function. Destroys intermediate spritesheets.
@@ -702,7 +701,7 @@ class App(EasyGUI):
 
         return True
 
-    def do_composite(self, callback, **kwargs):
+    def do_composite(self, callback, **kwargs) -> tuple:
         """
         Performs a general-purpose image composition routine.
 
@@ -1760,7 +1759,7 @@ class App(EasyGUI):
         alert = self.messages["message"]["rebuild"]["image"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            Prepare(key)
+            Prepare(key, self._Data["profile"])
             tk.messagebox.showinfo(title, alert)
 
         return True
