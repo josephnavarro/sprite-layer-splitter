@@ -85,7 +85,7 @@ def CreateInputJSON(key, profile):
     contents = contents.rstrip(",")
     contents = JSON_TEMPLATES["base"].format(contents)
 
-    #print(contents)
+    # print(contents)
 
     with open(JSONS["paths"][key], "w") as f:
         f.write(contents)

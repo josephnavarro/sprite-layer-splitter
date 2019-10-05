@@ -8,6 +8,8 @@ from PIL import Image, ImageTk
 
 
 class EasyGUI(tk.Frame):
+
+
     def __init__(self, root, *args, **kwargs):
         """
         Wrapper around Tkinter GUI functions.
@@ -24,6 +26,7 @@ class EasyGUI(tk.Frame):
         self._PendingJobs = {
             "event-lock": None,
         }
+
         self._EventLock = False
 
         # Menu bar
@@ -611,11 +614,12 @@ class EasyGUI(tk.Frame):
 
     def init_frame(self, master, tag) -> bool:
         """
+        Initializes an arbitrary Tkinter frame widget.
 
-        :param master:
-        :param tag:
+        :param master: Root widget for frame.
+        :param tag:    Tag to store frame under.
 
-        :return:
+        :return: True.
         """
         frame = tk.Frame(
             master,
@@ -634,14 +638,15 @@ class EasyGUI(tk.Frame):
 
     def init_label(self, master, tag, font, sticky, *args) -> bool:
         """
+        Initializes an arbitrary Tkinter label widget.
 
-        :param master:
-        :param tag:
-        :param font:
-        :param sticky:
-        :param args:
+        :param master:  Root widget.
+        :param tag:     Tag to store label under.
+        :param font:    Font for label.
+        :param sticky:  Tkinter anchoring string.
+        :param args:    Zero or more arguments for string formatting.
 
-        :return:
+        :return: True.
         """
         try:
             text = self.labels[tag].format(*args)
@@ -704,12 +709,13 @@ class EasyGUI(tk.Frame):
 
     def init_option_menu(self, master, tag, options) -> bool:
         """
+        Initializes an arbitrary Tkinter optionmenu widget.
 
-        :param master:
-        :param tag:
-        :param options:
+        :param master:  Root widget for new optionmenu.
+        :param tag:     Tag to store optionmenu under.
+        :param options: Iterable of options to supply.
 
-        :return:
+        :return: True.
         """
         width = self.sizes["default-menu"][0]
         fg = self.from_rgb(*self.colors[tag]["fg"])
@@ -747,14 +753,15 @@ class EasyGUI(tk.Frame):
                    select=False,
                    command=None) -> bool:
         """
+        Initializes an arbitrary Tkinter radiobutton widget.
 
-        :param master:
-        :param tag:
-        :param variable:
-        :param value:
-        :param sticky:
-        :param select:
-        :param command:
+        :param master:   Root widget for new radiobutton.
+        :param tag:      Tag to store radiobutton under.
+        :param variable: Tkinter string variable for radiobutton.
+        :param value:    Initial value for radio button.
+        :param sticky:   Tkinter anchoring string.
+        :param select:   Whether initially selected. (Default False).
+        :param command:  Callback function for radio button. (Default None).
 
         :return:
         """
@@ -781,6 +788,7 @@ class EasyGUI(tk.Frame):
 
     def release_event_lock(self) -> bool:
         """
+        Releases the GUI's local event lock.
 
         :return: True
         """
@@ -794,23 +802,29 @@ class EasyGUI(tk.Frame):
 
     def set_pending(self, key, callback, delay) -> bool:
         """
+        Schedules a callback function after a given time delay.
 
-        :param key:
-        :param callback:
-        :param delay:
+        :param key:      Key to store callback ID under.
+        :param callback: Callback function to invoke.
+        :param delay:    Time delay for invocation. (Milliseconds).
 
-        :return: True
+        :return: True.
         """
         self._PendingJobs[key] = self.after(delay, callback)
         return True
 
     def thread_it(self, callback):
         """
+        Wrapper for an arbitrary callback function.
 
-        :param callback:
+        Adds handling for acquiring and releasing the GUI's local event lock.
+        TODO: Maybe implement multithreading here
 
-        :return:
+        :param callback: Function to wrap.
+
+        :return: Wrapped function.
         """
+
         def function():
             self.acquire_event_lock()
             callback()

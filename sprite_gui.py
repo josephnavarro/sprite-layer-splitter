@@ -1795,12 +1795,12 @@ class App(EasyGUI):
 
     def select_anim_radiobutton(self) -> bool:
         """
-        Selects the appropriate animation frame radio button.
+        Selects radio button corresponding to current frame of animation.
 
         :return: True.
         """
-        frame: int = self._Animation["frame"]
-        buttons: dict = self._RadioButtons
+        frame = self._Animation["frame"]
+        buttons = self._RadioButtons
         toggle = self.toggle_radio
         for n in range(4):
             toggle(buttons["frame-{}".format(n)], n == frame)
@@ -1808,13 +1808,13 @@ class App(EasyGUI):
 
     def set_profile(self, profile) -> bool:
         """
-        hhh
+        Sets currently-selected source profile.
 
-        :param profile:
+        :param profile: Tag of profile to set.
 
-        :return: True
+        :return: True.
         """
-        data: dict = self._Data
+        data = self._Data
         rebuild = self.do_rebuild_data
         remake = self.do_remake_offset
         get = self.get_button
