@@ -3,8 +3,7 @@
 ## Overview
 **Fire Emblem 3DS Sprite Splitter** is a desktop GUI application used to assemble spritesheets using
 materials from the Fire Emblem 3DS games.
-<br><br>
-
+<br>
 Specifically, **Fire Emblem Fates** and **Fire Emblem Echoes**, in order to accomodate their class-changing
 systems, store their map sprites in separate layers for the head and body. Each of these layers is further
 divided into smaller components using a greyscale mask. As such, sprites ripped from these games appear
