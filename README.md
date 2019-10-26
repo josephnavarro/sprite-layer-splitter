@@ -30,7 +30,7 @@ from [The Spriters Resource](https://www.spriters-resource.com/3ds/fireemblemfat
 ### Image output
 <p align="center">
 <img src="examples/output1.png" alt="output-1">
-</p>
+</p><br>
 Assembled images will be output to `outputs/caeldori_dark-falcon-f.png`. Sprite sheet will contain blue, red, green, and purple colored versions of the unit, as well as an auto-generated grayscale image.
 
 
