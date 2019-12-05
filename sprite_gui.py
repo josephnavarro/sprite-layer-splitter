@@ -674,7 +674,7 @@ class App(EasyGUI):
         alert = self.messages["message"]["destroy"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            FlushInputs(key)
+            flush_inputs(key)
             tk.messagebox.showinfo(title, alert)
             return True
         else:
@@ -761,7 +761,7 @@ class App(EasyGUI):
                     body = "head"
 
                 # Prompt user for destination filename
-                FixPath(ROOT_OUTPUT_DIR)
+                fix_path(ROOT_OUTPUT_DIR)
                 path = filedialog.asksaveasfilename(
                     initialfile="{}_{}.png".format(head, body),
                     initialdir=ROOT_OUTPUT_DIR,
@@ -771,7 +771,7 @@ class App(EasyGUI):
 
                 # Save image if path is valid
                 if path:
-                    sprite_splitter.SaveImage(image, path)
+                    sprite_splitter.save_image(image, path)
                     title = self.title
                     alert = message.format(os.path.basename(path))
                     tk.messagebox.showinfo(title, alert)
@@ -799,7 +799,7 @@ class App(EasyGUI):
         """
         self.turn_playback_off()
 
-        callback = sprite_splitter.Composite
+        callback = sprite_splitter.composite
         state = state or str(self._Animation["state"])
         color = self.colors["preview-static"]["bg"]
         headfirst = self.get_string_var("prioritize").get() == "Head"
@@ -852,7 +852,7 @@ class App(EasyGUI):
 
         :return: True.
         """
-        CreateInputJSON(key, self._Data["profile"])
+        create_input_json(key, self._Data["profile"])
         self.init_data(key)
         self.init_option_menu(
             self.get_frame("b-y1x0"), key, self._Data[key]["list"],
@@ -868,7 +868,7 @@ class App(EasyGUI):
 
         :return: True.
         """
-        self._Data[key]["offset"] = LoadOffsets(key, self._Data["profile"])
+        self._Data[key]["offset"] = load_offsets(key, self._Data["profile"])
         self.update_offset_labels()
         self.do_make_preview()
 
@@ -920,7 +920,7 @@ class App(EasyGUI):
         else:
             message = self.messages["message"]["success"]["full"]
 
-        callback = sprite_splitter.Composite
+        callback = sprite_splitter.composite
         reverse = self.get_boolean_var("reverse-layers").get()
         headfirst = self.get_string_var("prioritize").get() == "Head"
 
@@ -1539,9 +1539,9 @@ class App(EasyGUI):
 
         :return: True.
         """
-        paths = LoadPaths(key)
+        paths = load_paths(key)
         data = self._Data
-        offsets = LoadOffsets(key, data["profile"])
+        offsets = load_offsets(key, data["profile"])
 
         names = data[key]["data"] = {
             v.get("name", "---"): k for k, v in paths.items()
@@ -1680,7 +1680,7 @@ class App(EasyGUI):
 
             # Perform sprite composition
             self._Animation["state"] = state
-            data["head"]["offset"] = LoadOffsets("head", profile)
+            data["head"]["offset"] = load_offsets("head", profile)
 
             head, body, image = self.do_composite(func, **kwargs)
             if image is not None:
@@ -1759,7 +1759,7 @@ class App(EasyGUI):
         alert = self.messages["message"]["rebuild"]["image"][key]
 
         if tk.messagebox.askquestion(title, query) == "yes":
-            Prepare(key, self._Data["profile"])
+            prepare(key, self._Data["profile"])
             tk.messagebox.showinfo(title, alert)
 
         return True
@@ -2098,7 +2098,7 @@ class App(EasyGUI):
         return True
 
 
-def GUIMain():
+def gui_main():
     """
     Entrypoint for GUI version of Sprite Compositing Tool.
 
@@ -2110,4 +2110,4 @@ def GUIMain():
 
 
 if __name__ == "__main__":
-    GUIMain()
+    gui_main()

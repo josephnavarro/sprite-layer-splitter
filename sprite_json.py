@@ -55,7 +55,7 @@ JSON_KEY_RESERVE = "?.{}"
 JSON_KEY_DEFAULT = JSON_KEY_RESERVE.format("default")
 
 
-def CreateInputJSON(key, profile):
+def create_input_json(key, profile):
     """
     Automatically generates a character head or body JSON file.
 
@@ -91,7 +91,7 @@ def CreateInputJSON(key, profile):
         f.write(contents)
 
 
-def LoadOffsets(key, profile):
+def load_offsets(key, profile):
     """
     Loads and returns per-frame (x,y) offsets.
 
@@ -104,7 +104,7 @@ def LoadOffsets(key, profile):
     return data
 
 
-def LoadPaths(key):
+def load_paths(key):
     """
     Loads and returns relative filepaths to spritesheets.
 
@@ -117,7 +117,7 @@ def LoadPaths(key):
     return data
 
 
-def LoadCreate(key):
+def load_create(key):
     """
     Loads and returns cropping regions on raw spritesheets.
 
@@ -130,7 +130,7 @@ def LoadCreate(key):
     return data
 
 
-def LoadSourceColoring():
+def load_source_coloring():
     """
     Loads and returns standardized color order on master spritesheets.
 
@@ -141,7 +141,7 @@ def LoadSourceColoring():
     return data
 
 
-def LoadSourceCropping():
+def load_source_cropping():
     """
     Loads and returns standardized cropping regions on master spritesheets.
 

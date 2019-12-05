@@ -44,7 +44,7 @@ class NonexistentBodyException(Exception):
         self.filename = name
 
 
-def SortedSet(*lists, reverse=False):
+def sorted_set(*lists, reverse=False):
     """
     Sorts unique elements among one or more input lists.
 
@@ -59,14 +59,14 @@ def SortedSet(*lists, reverse=False):
     return out_list
 
 
-def PasteLayers(dest,
-                head,
-                body,
-                layers,
-                *,
-                headfirst=True,
-                reverse=False,
-                ):
+def paste_layers(dest,
+                 head,
+                 body,
+                 layers,
+                 *,
+                 headfirst=True,
+                 reverse=False,
+                 ):
     """
     Pastes head and body subregions in proper layering order.
     (In-place).
@@ -108,7 +108,7 @@ def PasteLayers(dest,
                 pass
 
 
-def Split(image):
+def split(image):
     """
     Isolates irregular regions on an image, then sorts by luminosity.
 
@@ -140,7 +140,7 @@ def Split(image):
         ]}
 
 
-def GetBodyOffsets(name, data):
+def get_body_offsets(name, data):
     """
     Retrieves framewise offset data for body sprites.
 
@@ -157,7 +157,7 @@ def GetBodyOffsets(name, data):
     }
 
 
-def GetBodyOrder(name, data):
+def get_body_order(name, data):
     """
     Retrieves frame ordering data for body sprites.
 
@@ -174,7 +174,7 @@ def GetBodyOrder(name, data):
     }
 
 
-def GetHeadOffsets(name, data):
+def get_head_offsets(name, data):
     """
     Retrieves framewise offset data for head sprites.
 
@@ -192,7 +192,7 @@ def GetHeadOffsets(name, data):
     }
 
 
-def GetHeadOrder(name, data):
+def get_head_order(name, data):
     """
     Retrieves frame ordering data for head sprites.
 
@@ -209,7 +209,7 @@ def GetHeadOrder(name, data):
     }
 
 
-def ProcessBody(name, image, where, body_data, source_data, is_alpha):
+def process_body(name, image, where, body_data, source_data, is_alpha):
     """
     Processes a unit's body sprite.
 
@@ -222,15 +222,15 @@ def ProcessBody(name, image, where, body_data, source_data, is_alpha):
 
     :return: Dictionary mapping luminosities to image layers.
     """
-    layers = Split(Crop(image, where, REGION_FULL_BODY))
+    layers = split(Crop(image, where, REGION_FULL_BODY))
     if is_alpha:
         layers = {
             k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0])
             for k, v in layers.items()
         }
 
-    data = GetBodyOffsets(name, body_data)
-    order = GetBodyOrder(name, body_data)
+    data = get_body_offsets(name, body_data)
+    order = get_body_order(name, body_data)
     size = source_data["body"]["size"]
     where = source_data["body"]["where"]
 
@@ -265,7 +265,7 @@ def ProcessBody(name, image, where, body_data, source_data, is_alpha):
     return output
 
 
-def ProcessHead(name, image, where, head_data, source_data, is_alpha):
+def process_head(name, image, where, head_data, source_data, is_alpha):
     """
     Processes a unit's head sprite.
 
@@ -278,15 +278,15 @@ def ProcessHead(name, image, where, head_data, source_data, is_alpha):
 
     :return: Dictionary mapping luminosities to image layers.
     """
-    layers = Split(Crop(image, where, REGION_FULL_HEAD))
+    layers = split(Crop(image, where, REGION_FULL_HEAD))
     if is_alpha:
         layers = {
             k: ReplaceColor(v, [0, 0, 0, 255], [0, 0, 0, 0])
             for k, v in layers.items()
         }
 
-    data = GetHeadOffsets(name, head_data)
-    order = GetHeadOrder(name, head_data)
+    data = get_head_offsets(name, head_data)
+    order = get_head_order(name, head_data)
     type = data["size"]
     size = source_data["head"][type]["size"]
     where = source_data["head"][type]["where"]
@@ -326,7 +326,7 @@ def ProcessHead(name, image, where, head_data, source_data, is_alpha):
     return output
 
 
-def Process(head_path,
+def process(head_path,
             body_path,
             head_offset,
             body_offset,
@@ -372,7 +372,7 @@ def Process(head_path,
 
     base_name = os.path.splitext(os.path.basename(body_path))[0]
     return {
-        "head": ProcessHead(
+        "head": process_head(
             base_name,
             head_image,
             head_offset,
@@ -380,7 +380,7 @@ def Process(head_path,
             source_data,
             is_alpha,
         ),
-        "body": ProcessBody(
+        "body": process_body(
             base_name,
             body_image,
             body_offset,
@@ -391,7 +391,7 @@ def Process(head_path,
     }
 
 
-def Composite(profile,
+def composite(profile,
               head,
               body,
               offset=(0, 0),
@@ -417,8 +417,8 @@ def Composite(profile,
     :return: Composited image.
     """
     # Load head composition data from JSON
-    head_offsets = LoadOffsets("head", profile)
-    head_paths = LoadPaths("head")
+    head_offsets = load_offsets("head", profile)
+    head_paths = load_paths("head")
     if not head:
         head_path = ""
     else:
@@ -430,8 +430,8 @@ def Composite(profile,
             raise NonexistentHeadException(head_path)
 
     # Load body composition data from JSON
-    body_offsets = LoadOffsets("body", profile)
-    body_paths = LoadPaths("body")
+    body_offsets = load_offsets("body", profile)
+    body_paths = load_paths("body")
     if not body:
         body_path = ""
     else:
@@ -443,8 +443,8 @@ def Composite(profile,
             raise NonexistentBodyException(body_path)
 
     # Load miscellaneous composition rules from JSON
-    src_color_data = LoadSourceColoring()
-    src_crop_data = LoadSourceCropping()
+    src_color_data = load_source_coloring()
+    src_crop_data = load_source_cropping()
 
     # Make master spritesheet
     if idle_only:
@@ -457,7 +457,7 @@ def Composite(profile,
     # Process each color
     for y, color in enumerate(COLORS):
         new_image = MakeBlank(*COLOR_REGION)
-        new_data = Process(
+        new_data = process(
             head_path,
             body_path,
             [offset[0], offset[1] + HEAD_BLOCK * src_color_data[color]],
@@ -469,11 +469,11 @@ def Composite(profile,
         )
 
         # Compose idle frames
-        PasteLayers(
+        paste_layers(
             new_image,
             new_data["head"]["idle"],
             new_data["body"]["idle"],
-            SortedSet(
+            sorted_set(
                 new_data["head"]["idle"],
                 new_data["body"]["idle"],
                 reverse=head_offsets.get(body, {}).get("reverse", False),
@@ -491,11 +491,11 @@ def Composite(profile,
             )
         else:
             # Compose left movement frames
-            PasteLayers(
+            paste_layers(
                 new_image,
                 new_data["head"]["left"],
                 new_data["body"]["left"],
-                SortedSet(
+                sorted_set(
                     new_data["head"]["left"],
                     new_data["body"]["left"],
                 ),
@@ -504,11 +504,11 @@ def Composite(profile,
             )
 
             # Compose right movement frames
-            PasteLayers(
+            paste_layers(
                 new_image,
                 new_data["head"]["right"],
                 new_data["body"]["right"],
-                SortedSet(
+                sorted_set(
                     new_data["head"]["right"],
                     new_data["body"]["right"],
                 ),
@@ -546,7 +546,7 @@ def Composite(profile,
     return out_image
 
 
-def SaveImage(image, path):
+def save_image(image, path):
     """
     Saves a CV2-format image to file.
 

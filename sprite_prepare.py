@@ -16,7 +16,7 @@ Default PIL image mode.
 MODE = "RGBA"
 
 
-def CropImage(im, x, y, w, h):
+def crop_image(im, x, y, w, h):
     """
     Crops a PIL image.
 
@@ -31,7 +31,7 @@ def CropImage(im, x, y, w, h):
     return im.crop((x, y, w + x, h + y))
 
 
-def MakeImage(w, h):
+def make_image(w, h):
     """
     Creates a blank PIL image.
 
@@ -43,7 +43,7 @@ def MakeImage(w, h):
     return Image.new(MODE, (w, h), (0, 0, 0, 255))
 
 
-def Prepare(key, profile):
+def prepare(key, profile):
     """
     Creates intermediate spritesheets.
 
@@ -53,7 +53,7 @@ def Prepare(key, profile):
     """
     print("Now generating intermediate {} spritesheets...".format(key))
 
-    data = LoadCreate(key)
+    data = load_create(key)
     dir = os.path.join(PATHS["source"]["root"], profile, key, "*.png")
     files = glob.glob(dir)
     files.sort()
@@ -61,20 +61,20 @@ def Prepare(key, profile):
     for filename in files:
         print("Generating intermediate for {}...".format(filename))
 
-        root = FixPath(os.path.join(PATHS["images"], profile, key))
+        root = fix_path(os.path.join(PATHS["images"], profile, key))
         path = os.path.join(root, os.path.split(filename)[-1])
 
         if key == "head":
-            image = ProcessHead(filename, profile, data)
+            image = process_head(filename, profile, data)
             image.save(path)
         elif key == "body":
-            image = ProcessBody(filename, profile, data)
+            image = process_body(filename, profile, data)
             image.save(path)
 
     print("Intermediate {} spritesheets complete!".format(key))
 
 
-def ProcessBody(filename, profile, data):
+def process_body(filename, profile, data):
     """
     Processes an input "body" image.
 
@@ -96,28 +96,28 @@ def ProcessBody(filename, profile, data):
         rectData = data[JSON_KEY_RESERVE.format(profile)][JSON_KEY_DEFAULT]
 
     rects = [
-        CropImage(img, *rectData["0"]["idle"]),
-        CropImage(img, *rectData["0"]["left"]),
-        CropImage(img, *rectData["0"]["right"]),
-        CropImage(img, *rectData["1"]["idle"]),
-        CropImage(img, *rectData["1"]["left"]),
-        CropImage(img, *rectData["1"]["right"]),
-        CropImage(img, *rectData["2"]["idle"]),
-        CropImage(img, *rectData["2"]["left"]),
-        CropImage(img, *rectData["2"]["right"]),
-        CropImage(img, *rectData["3"]["idle"]),
-        CropImage(img, *rectData["3"]["left"]),
-        CropImage(img, *rectData["3"]["right"]),
+        crop_image(img, *rectData["0"]["idle"]),
+        crop_image(img, *rectData["0"]["left"]),
+        crop_image(img, *rectData["0"]["right"]),
+        crop_image(img, *rectData["1"]["idle"]),
+        crop_image(img, *rectData["1"]["left"]),
+        crop_image(img, *rectData["1"]["right"]),
+        crop_image(img, *rectData["2"]["idle"]),
+        crop_image(img, *rectData["2"]["left"]),
+        crop_image(img, *rectData["2"]["right"]),
+        crop_image(img, *rectData["3"]["idle"]),
+        crop_image(img, *rectData["3"]["left"]),
+        crop_image(img, *rectData["3"]["right"]),
     ]
 
-    output = MakeImage(256, len(rects) * 32)
+    output = make_image(256, len(rects) * 32)
     for n, r in enumerate(rects):
         output.paste(r, (0, n * 32))
 
     return output
 
 
-def ProcessHead(filename, profile, data):
+def process_head(filename, profile, data):
     """
     Processes an input "head" image.
 
@@ -139,21 +139,21 @@ def ProcessHead(filename, profile, data):
         rectData = data[JSON_KEY_RESERVE.format(profile)][JSON_KEY_DEFAULT]
 
     rects = [
-        CropImage(img, *rectData["0"]["idle"]),
-        CropImage(img, *rectData["0"]["large-direction"]),
-        CropImage(img, *rectData["0"]["small-direction"]),
-        CropImage(img, *rectData["1"]["idle"]),
-        CropImage(img, *rectData["1"]["large-direction"]),
-        CropImage(img, *rectData["1"]["small-direction"]),
-        CropImage(img, *rectData["2"]["idle"]),
-        CropImage(img, *rectData["2"]["large-direction"]),
-        CropImage(img, *rectData["2"]["small-direction"]),
-        CropImage(img, *rectData["3"]["idle"]),
-        CropImage(img, *rectData["3"]["large-direction"]),
-        CropImage(img, *rectData["3"]["small-direction"]),
+        crop_image(img, *rectData["0"]["idle"]),
+        crop_image(img, *rectData["0"]["large-direction"]),
+        crop_image(img, *rectData["0"]["small-direction"]),
+        crop_image(img, *rectData["1"]["idle"]),
+        crop_image(img, *rectData["1"]["large-direction"]),
+        crop_image(img, *rectData["1"]["small-direction"]),
+        crop_image(img, *rectData["2"]["idle"]),
+        crop_image(img, *rectData["2"]["large-direction"]),
+        crop_image(img, *rectData["2"]["small-direction"]),
+        crop_image(img, *rectData["3"]["idle"]),
+        crop_image(img, *rectData["3"]["large-direction"]),
+        crop_image(img, *rectData["3"]["small-direction"]),
     ]
 
-    output = MakeImage(256, len(rects) * 64)
+    output = make_image(256, len(rects) * 64)
     for n, r in enumerate(rects):
         output.paste(r, (0, n * 64))
 
@@ -161,5 +161,5 @@ def ProcessHead(filename, profile, data):
 
 
 if __name__ == "__main__":
-    Prepare("body", "echoes")
-    Prepare("head", "echoes")
+    prepare("body", "echoes")
+    prepare("head", "echoes")

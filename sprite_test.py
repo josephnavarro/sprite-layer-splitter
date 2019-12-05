@@ -25,7 +25,7 @@ What do?
 >>> """
 
 
-def DoComposite(command, idle=False):
+def do_composite(command, idle=False):
     """
     Composites and saves a spritesheet.
 
@@ -35,27 +35,27 @@ def DoComposite(command, idle=False):
     :return: None.
     """
     if len(command) == 4:
-        sprite_utils.FixPath(ROOT_OUTPUT_DIR)
+        sprite_utils.fix_path(ROOT_OUTPUT_DIR)
         profile = command[1]
         head = command[2]
         body = command[3]
         path = os.path.join(ROOT_OUTPUT_DIR, "{}_{}.png".format(head, body))
 
         if idle:
-            image = sprite_splitter.Composite(
+            image = sprite_splitter.composite(
                 profile, head, body, idle_only=True
             )
-            sprite_splitter.SaveImage(image, path)
+            sprite_splitter.save_image(image, path)
             print("Composited {} (idle only)!".format(path))
         else:
-            image = sprite_splitter.Composite(
+            image = sprite_splitter.composite(
                 profile, head, body
             )
-            sprite_splitter.SaveImage(image, path)
+            sprite_splitter.save_image(image, path)
             print("Composited {}!".format(path))
 
 
-def DoRefresh():
+def do_refresh():
     """
     Refreshes imported Python library `sprite_splitter`.
 
@@ -68,7 +68,7 @@ def DoRefresh():
     print("Refreshed sprite loader!")
 
 
-def TestMain():
+def test_main():
     """
     Main testing function.
 
@@ -80,14 +80,14 @@ def TestMain():
         command = input(PROMPT).lower().split()
         if command:
             if command[0] in ("c", "composite"):
-                DoComposite(command)
+                do_composite(command)
             elif command[0] in ("i", "idle"):
-                DoComposite(command, idle=True)
+                do_composite(command, idle=True)
             elif command[0] in ("r", "refresh"):
-                DoRefresh()
+                do_refresh()
             elif command[0] in ("q", "quit"):
                 isRunning = False
 
 
 if __name__ == "__main__":
-    TestMain()
+    test_main()

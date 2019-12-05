@@ -11,7 +11,7 @@ import sys
 from sprite_constant import *
 
 
-def IsWindows():
+def is_windows():
     """
     Checks whether current platform is Windows.
 
@@ -20,7 +20,7 @@ def IsWindows():
     return sys.platform == "win32"
 
 
-def IsOSX():
+def is_osx():
     """
     Checks whether current platform is OS X.
 
@@ -29,7 +29,7 @@ def IsOSX():
     return sys.platform == "darwin"
 
 
-def FlushInputs(key):
+def flush_inputs(key):
     """
     Flushes an input directory.
 
@@ -47,7 +47,7 @@ def FlushInputs(key):
         return False
 
 
-def FlushOutputs():
+def flush_outputs():
     """
     Flushes entire image output directory.
 
@@ -62,7 +62,7 @@ def FlushOutputs():
         return False
 
 
-def FixPath(path):
+def fix_path(path):
     """
     Ensures existence of an output directory before returning it.
 
@@ -76,4 +76,4 @@ def FixPath(path):
 
 
 if __name__ == "__main__":
-    FlushOutputs()
+    flush_outputs()
